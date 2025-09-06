@@ -1,0 +1,13 @@
+Team: Huachipato
+Players:
+- Name: Antonio Lara, Position: Forward, Attack: 74, Defense: 36
+- Name: Benjamin Jara, Position: Midfielder, Attack: 64, Defense: 56
+- Name: Cristian Muñoz, Position: Defender, Attack: 46, Defense: 76
+- Name: David Navarro, Position: Goalkeeper, Attack: 16, Defense: 86
+- Name: Esteban Flores, Position: Midfielder, Attack: 66, Defense: 44
+- Name: Francisco Tapia, Position: Forward, Attack: 69, Defense: 24
+- Name: Guillermo Vera, Position: Defender, Attack: 34, Defense: 64
+- Name: Hugo Salinas, Position: Midfielder, Attack: 54, Defense: 46
+- Name: Ivan Morales, Position: Defender, Attack: 36, Defense: 66
+- Name: Jorge Pacheco, Position: Forward, Attack: 64, Defense: 34
+- Name: Luis Cabrera, Position: Midfielder, Attack: 56, Defense: 54

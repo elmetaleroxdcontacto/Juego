@@ -20,6 +20,11 @@ struct Player {
     int skill;
     int age;
     int value;
+    bool injured;
+    int injuryWeeks;
+    int goals;
+    int assists;
+    int matchesPlayed;
 };
 
 // Team class
@@ -33,8 +38,12 @@ public:
     int points; // For league standings
     int goalsFor;
     int goalsAgainst;
+    int wins;
+    int draws;
+    int losses;
+    vector<string> achievements;
 
-    Team(string n) : name(n), tactics("Balanced"), formation("4-4-2"), budget(1000000), points(0), goalsFor(0), goalsAgainst(0) {}
+    Team(string n) : name(n), tactics("Balanced"), formation("4-4-2"), budget(1000000), points(0), goalsFor(0), goalsAgainst(0), wins(0), draws(0), losses(0) {}
 
     void addPlayer(Player p) {
         players.push_back(p);
@@ -69,6 +78,9 @@ public:
         points = 0;
         goalsFor = 0;
         goalsAgainst = 0;
+        wins = 0;
+        draws = 0;
+        losses = 0;
     }
 };
 
@@ -114,15 +126,16 @@ struct Career {
     int currentWeek;
     vector<Team> allTeams;
     string saveFile;
+    vector<string> achievements;
 
     Career() : myTeam(nullptr), currentSeason(1), currentWeek(1), saveFile("career_save.txt") {}
 
     void initializeLeague() {
         // Load all teams from files
         vector<string> teamFiles = {
-            "Colo-Colo.txt", "Deportes_Copiapo.txt", "Deportes_Temuco.txt",
-            "Deportes_Valdivia.txt", "Unión_Española.txt", "Universidad_Catolica.txt",
-            "Universidad_de_Chile.txt"
+            "Colo-Colo.txt", "Universidad_Catolica.txt", "Universidad_de_Chile.txt",
+            "Union_Espanola.txt", "Deportes_Copiapo.txt", "Everton.txt",
+            "Nublense.txt", "Cobresal.txt", "Huachipato.txt"
         };
 
         for (const auto& file : teamFiles) {
@@ -157,7 +170,9 @@ struct Career {
             for (const auto& player : myTeam->players) {
                 file << player.name << "," << player.position << "," << player.attack << ","
                      << player.defense << "," << player.stamina << "," << player.skill << ","
-                     << player.age << "," << player.value << endl;
+                     << player.age << "," << player.value << "," << player.injured << ","
+                     << player.injuryWeeks << "," << player.goals << "," << player.assists << ","
+                     << player.matchesPlayed << endl;
             }
             file.close();
             cout << "Carrera guardada exitosamente." << endl;
@@ -190,13 +205,34 @@ struct Career {
                     Player p;
                     getline(ss, p.name, ',');
                     getline(ss, p.position, ',');
-                    getline(ss, token, ','); p.attack = stoi(token);
-                    getline(ss, token, ','); p.defense = stoi(token);
-                    getline(ss, token, ','); p.stamina = stoi(token);
-                    getline(ss, token, ','); p.skill = stoi(token);
-                    getline(ss, token, ','); p.age = stoi(token);
-                    getline(ss, token, ','); p.value = stoi(token);
-                    myTeam->addPlayer(p);
+                    try {
+                        getline(ss, token, ','); p.attack = stoi(token);
+                        getline(ss, token, ','); p.defense = stoi(token);
+                        getline(ss, token, ','); p.stamina = stoi(token);
+                        getline(ss, token, ','); p.skill = stoi(token);
+                        getline(ss, token, ','); p.age = stoi(token);
+                        getline(ss, token, ','); p.value = stoi(token);
+                        string injuredStr;
+                        getline(ss, injuredStr, ',');
+                        // Convert injuredStr to lowercase
+                        transform(injuredStr.begin(), injuredStr.end(), injuredStr.begin(), ::tolower);
+                        if (injuredStr == "1" || injuredStr == "true") {
+                            p.injured = true;
+                        } else {
+                            p.injured = false;
+                        }
+                        getline(ss, token, ','); p.injuryWeeks = stoi(token);
+                        getline(ss, token, ','); p.goals = stoi(token);
+                        getline(ss, token, ','); p.assists = stoi(token);
+                        getline(ss, token, ','); p.matchesPlayed = stoi(token);
+                        myTeam->addPlayer(p);
+                    } catch (const std::invalid_argument& e) {
+                        cout << "Error loading player data from save file: invalid data in line: " << line << endl;
+                        // Skip this invalid player and continue
+                    } catch (const std::out_of_range& e) {
+                        cout << "Error loading player data from save file: value out of range in line: " << line << endl;
+                        // Skip this invalid player and continue
+                    }
                 }
             }
             file.close();
@@ -205,6 +241,90 @@ struct Career {
         return false;
     }
 };
+
+// Function to simulate injury
+void simulateInjury(Player& player) {
+    if (rand() % 20 == 0) { // 5% chance
+        player.injured = true;
+        player.injuryWeeks = rand() % 4 + 1; // 1-4 weeks
+        cout << player.name << " se lesionó y estará fuera por " << player.injuryWeeks << " semanas." << endl;
+    }
+}
+
+// Function to heal injuries
+void healInjuries(Team& team) {
+    for (auto& player : team.players) {
+        if (player.injured) {
+            player.injuryWeeks--;
+            if (player.injuryWeeks <= 0) {
+                player.injured = false;
+                cout << player.name << " se recuperó de su lesión." << endl;
+            }
+        }
+    }
+}
+
+// Function for transfer market
+void transferMarket(Team& team) {
+    cout << "\n=== Mercado de Transferencias ===" << endl;
+    cout << "Presupuesto: $" << team.budget << endl;
+    cout << "1. Comprar jugador" << endl;
+    cout << "2. Vender jugador" << endl;
+    cout << "3. Volver" << endl;
+    int choice;
+    cin >> choice;
+    if (choice == 1) {
+        // Simple buy - create random player
+        Player p;
+        cout << "Nombre del jugador: ";
+        cin >> p.name;
+        cout << "Posición: ";
+        cin >> p.position;
+        p.attack = rand() % 50 + 50;
+        p.defense = rand() % 50 + 50;
+        p.stamina = rand() % 50 + 50;
+        p.skill = rand() % 50 + 50;
+        p.age = rand() % 20 + 18;
+        p.value = p.skill * 10000;
+        p.injured = false;
+        p.injuryWeeks = 0;
+        p.goals = 0;
+        p.assists = 0;
+        p.matchesPlayed = 0;
+        if (team.budget >= p.value) {
+            team.budget -= p.value;
+            team.addPlayer(p);
+            cout << "Jugador comprado." << endl;
+        } else {
+            cout << "Presupuesto insuficiente." << endl;
+        }
+    } else if (choice == 2) {
+        if (team.players.empty()) {
+            cout << "No hay jugadores para vender." << endl;
+            return;
+        }
+        cout << "Selecciona jugador para vender:" << endl;
+        for (size_t i = 0; i < team.players.size(); ++i) {
+            cout << i+1 << ". " << team.players[i].name << " ($" << team.players[i].value << ")" << endl;
+        }
+        int idx;
+        cin >> idx;
+        if (idx >= 1 && idx <= team.players.size()) {
+            team.budget += team.players[idx-1].value;
+            cout << team.players[idx-1].name << " vendido por $" << team.players[idx-1].value << endl;
+            team.players.erase(team.players.begin() + idx - 1);
+        }
+    }
+}
+
+// Function to check achievements
+void checkAchievements(Career& career) {
+    if (career.myTeam->wins >= 10 && find(career.achievements.begin(), career.achievements.end(), "10 Victorias") == career.achievements.end()) {
+        career.achievements.push_back("10 Victorias");
+        cout << "¡Logro desbloqueado: 10 Victorias!" << endl;
+    }
+    // Add more achievements
+}
 
 // Function to simulate a match
 void simulateMatch(Team& myTeam, Team& opponent) {
@@ -343,7 +463,7 @@ void trainPlayer(Team& team) {
     }
     cout << "Select player to train:" << endl;
     for (size_t i = 0; i < team.players.size(); ++i) {
-        cout << i+1 << ". " << team.players[i].name << endl;
+        cout << i+1 << ". " << team.players[i].name << (team.players[i].injured ? " (Lesionado)" : "") << endl;
     }
     int playerIndex;
     cin >> playerIndex;
@@ -352,6 +472,10 @@ void trainPlayer(Team& team) {
         return;
     }
     Player& p = team.players[playerIndex - 1];
+    if (p.injured) {
+        cout << "No puedes entrenar a un jugador lesionado." << endl;
+        return;
+    }
     cout << "Choose what to train:" << endl;
     cout << "1. Attack" << endl;
     cout << "2. Defense" << endl;
@@ -359,6 +483,12 @@ void trainPlayer(Team& team) {
     cout << "4. Skill" << endl;
     int trainChoice;
     cin >> trainChoice;
+    int cost = 5000;
+    if (team.budget < cost) {
+        cout << "Presupuesto insuficiente para entrenar." << endl;
+        return;
+    }
+    team.budget -= cost;
     int improvement = rand() % 5 + 1; // 1-5 points
     switch (trainChoice) {
         case 1:
@@ -410,6 +540,7 @@ void changeTactics(Team& team) {
 
 // Function to load team from file
 bool loadTeamFromFile(const string& filename, Team& team) {
+    cout << "Loading " << filename << endl;
     ifstream file(filename);
     if (!file.is_open()) {
         cout << "Failed to open file: " << filename << endl;
@@ -436,6 +567,11 @@ bool loadTeamFromFile(const string& filename, Team& team) {
             p.skill = (p.attack + p.defense) / 2;
             p.age = 25;
             p.value = p.skill * 10000;
+            p.injured = false;
+            p.injuryWeeks = 0;
+            p.goals = 0;
+            p.assists = 0;
+            p.matchesPlayed = 0;
             team.addPlayer(p);
         }
     }
@@ -451,9 +587,26 @@ void displayCareerMenu() {
     cout << "3. Cambiar Tacticas" << endl;
     cout << "4. Simular Semana" << endl;
     cout << "5. Ver Tabla de Posiciones" << endl;
-    cout << "6. Guardar Carrera" << endl;
-    cout << "7. Volver al Menu Principal" << endl;
+    cout << "6. Mercado de Transferencias" << endl;
+    cout << "7. Ver Estadisticas" << endl;
+    cout << "8. Guardar Carrera" << endl;
+    cout << "9. Volver al Menu Principal" << endl;
     cout << "Elige una opcion: ";
+}
+
+// Function to display statistics
+void displayStatistics(Team& team) {
+    cout << "\n--- Estadisticas del Equipo ---" << endl;
+    cout << "Victorias: " << team.wins << endl;
+    cout << "Empates: " << team.draws << endl;
+    cout << "Derrotas: " << team.losses << endl;
+    cout << "Goles a Favor: " << team.goalsFor << endl;
+    cout << "Goles en Contra: " << team.goalsAgainst << endl;
+    cout << "Puntos: " << team.points << endl;
+    cout << "\n--- Estadisticas de Jugadores ---" << endl;
+    for (const auto& p : team.players) {
+        cout << p.name << ": Goles " << p.goals << ", Asistencias " << p.assists << ", Partidos " << p.matchesPlayed << endl;
+    }
 }
 
 // Function to simulate career match with league updates
@@ -518,14 +671,28 @@ void simulateCareerMatch(Team& myTeam, Team& opponent, LeagueTable& leagueTable)
 
     if (myScore > oppScore) {
         myTeam.points += 3;
+        myTeam.wins++;
+        opponent.losses++;
         cout << "¡Ganaste!" << endl;
     } else if (myScore < oppScore) {
         opponent.points += 3;
+        opponent.wins++;
+        myTeam.losses++;
         cout << "Perdiste." << endl;
     } else {
         myTeam.points += 1;
         opponent.points += 1;
+        myTeam.draws++;
+        opponent.draws++;
         cout << "Empate." << endl;
+    }
+
+    // Simulate injuries
+    for (auto& p : myTeam.players) {
+        if (!p.injured) simulateInjury(p);
+    }
+    for (auto& p : opponent.players) {
+        if (!p.injured) simulateInjury(p);
     }
 
     // Sort table after match
@@ -556,17 +723,45 @@ int main() {
                     // New career - Team Selection
                     cout << "\nSelecciona tu equipo para la carrera:" << endl;
                     cout << "1. Colo-Colo" << endl;
-                    cout << "2. Deportes Copiapo" << endl;
-                    cout << "3. Deportes Temuco" << endl;
-                    cout << "4. Deportes Valdivia" << endl;
-                    cout << "5. Unión Española" << endl;
-                    cout << "6. Universidad Catolica" << endl;
-                    cout << "7. Universidad de Chile" << endl;
+                    cout << "2. Universidad Catolica" << endl;
+                    cout << "3. Universidad de Chile" << endl;
+                    cout << "4. Unión Española" << endl;
+                    cout << "5. Deportes Copiapo" << endl;
+                    cout << "6. Everton" << endl;
+                    cout << "7. Ñublense" << endl;
+                    cout << "8. Cobresal" << endl;
+                    cout << "9. Huachipato" << endl;
                     cout << "Elige un numero de equipo: ";
                     int teamChoice;
                     cin >> teamChoice;
 
-                    if (teamChoice >= 1 && teamChoice <= 7) {
+                    if (teamChoice >= 1 && teamChoice <= 9) {
+                        career.myTeam = &career.allTeams[teamChoice - 1];
+                        cout << "Has elegido: " << career.myTeam->name << endl;
+                    } else {
+                        cout << "Opcion invalida." << endl;
+                        continue;
+                    }
+                }
+
+                // If career was loaded but myTeam is null (due to team not found), reset to new career
+                if (career.myTeam == nullptr) {
+                    cout << "Equipo de la carrera guardada no encontrado. Iniciando nueva carrera." << endl;
+                    cout << "\nSelecciona tu equipo para la carrera:" << endl;
+                    cout << "1. Colo-Colo" << endl;
+                    cout << "2. Universidad Catolica" << endl;
+                    cout << "3. Universidad de Chile" << endl;
+                    cout << "4. Unión Española" << endl;
+                    cout << "5. Deportes Copiapo" << endl;
+                    cout << "6. Everton" << endl;
+                    cout << "7. Ñublense" << endl;
+                    cout << "8. Cobresal" << endl;
+                    cout << "9. Huachipato" << endl;
+                    cout << "Elige un numero de equipo: ";
+                    int teamChoice;
+                    cin >> teamChoice;
+
+                    if (teamChoice >= 1 && teamChoice <= 9) {
                         career.myTeam = &career.allTeams[teamChoice - 1];
                         cout << "Has elegido: " << career.myTeam->name << endl;
                     } else {
@@ -622,6 +817,10 @@ int main() {
                             if (career.currentWeek > 34) { // End of season
                                 cout << "\n¡Fin de temporada!" << endl;
                                 career.leagueTable.displayTable();
+                                // Promotions and relegations
+                                if (career.myTeam->points > 50) { // Top position
+                                    cout << "¡Tu equipo se clasificó para competiciones internacionales!" << endl;
+                                }
                                 career.currentSeason++;
                                 career.currentWeek = 1;
                                 career.agePlayers();
@@ -629,16 +828,33 @@ int main() {
                                 for (auto& team : career.allTeams) {
                                     team.resetSeasonStats();
                                 }
+                                // Heal all injuries at end of season
+                                for (auto& team : career.allTeams) {
+                                    for (auto& p : team.players) {
+                                        p.injured = false;
+                                        p.injuryWeeks = 0;
+                                    }
+                                }
                             }
+                            // Heal injuries weekly
+                            healInjuries(*career.myTeam);
+                            // Check achievements
+                            checkAchievements(career);
                             break;
                         }
                         case 5:
                             career.leagueTable.displayTable();
                             break;
                         case 6:
-                            career.saveCareer();
+                            transferMarket(*career.myTeam);
                             break;
                         case 7:
+                            displayStatistics(*career.myTeam);
+                            break;
+                        case 8:
+                            career.saveCareer();
+                            break;
+                        case 9:
                             cout << "Volviendo al menu principal." << endl;
                             break;
                         default:
@@ -651,24 +867,28 @@ int main() {
                 // Start Quick Game - Team Selection
                 cout << "\nSelecciona tu equipo:" << endl;
                 cout << "1. Colo-Colo.txt" << endl;
-                cout << "2. Deportes_Copiapo.txt" << endl;
-                cout << "3. Deportes_Temuco.txt" << endl;
-                cout << "4. Deportes_Valdivia.txt" << endl;
-                cout << "5. Unión_Española.txt" << endl;
-                cout << "6. Universidad_Catolica.txt" << endl;
-                cout << "7. Universidad_de_Chile.txt" << endl;
+                cout << "2. Universidad_Catolica.txt" << endl;
+                cout << "3. Universidad_de_Chile.txt" << endl;
+                cout << "4. Unión_Española.txt" << endl;
+                cout << "5. Deportes_Copiapo.txt" << endl;
+                cout << "6. Everton.txt" << endl;
+                cout << "7. Ñublense.txt" << endl;
+                cout << "8. Cobresal.txt" << endl;
+                cout << "9. Huachipato.txt" << endl;
                 cout << "Elige un numero de equipo: ";
                 int teamChoice;
                 cin >> teamChoice;
                 string filename;
                 switch (teamChoice) {
                     case 1: filename = "Colo-Colo.txt"; break;
-                    case 2: filename = "Deportes_Copiapo.txt"; break;
-                    case 3: filename = "Deportes_Temuco.txt"; break;
-                    case 4: filename = "Deportes_Valdivia.txt"; break;
-                    case 5: filename = "Unión_Española.txt"; break;
-                    case 6: filename = "Universidad_Catolica.txt"; break;
-                    case 7: filename = "Universidad_de_Chile.txt"; break;
+                    case 2: filename = "Universidad_Catolica.txt"; break;
+                    case 3: filename = "Universidad_de_Chile.txt"; break;
+                    case 4: filename = "Unión_Española.txt"; break;
+                    case 5: filename = "Deportes_Copiapo.txt"; break;
+                    case 6: filename = "Everton.txt"; break;
+                    case 7: filename = "Ñublense.txt"; break;
+                    case 8: filename = "Cobresal.txt"; break;
+                    case 9: filename = "Huachipato.txt"; break;
                     default: cout << "Opcion invalida." << endl; continue;
                 }
                 string filepath = "LigaChilena/" + filename;

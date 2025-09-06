@@ -1,0 +1,13 @@
+Team: Cobresal
+Players:
+- Name: Luis Mendoza, Position: Forward, Attack: 76, Defense: 34
+- Name: Mario Chavez, Position: Midfielder, Attack: 66, Defense: 54
+- Name: Nelson Fuentes, Position: Defender, Attack: 44, Defense: 74
+- Name: Oscar Reyes, Position: Goalkeeper, Attack: 14, Defense: 84
+- Name: Pablo Aguirre, Position: Midfielder, Attack: 64, Defense: 46
+- Name: Ramon Salinas, Position: Forward, Attack: 71, Defense: 26
+- Name: Sergio Cortes, Position: Defender, Attack: 36, Defense: 66
+- Name: Tomas Valenzuela, Position: Midfielder, Attack: 56, Defense: 44
+- Name: Ulises Ponce, Position: Defender, Attack: 34, Defense: 64
+- Name: Victor Hidalgo, Position: Forward, Attack: 66, Defense: 36
+- Name: Walter Espinoza, Position: Midfielder, Attack: 54, Defense: 56

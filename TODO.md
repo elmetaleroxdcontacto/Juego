@@ -18,6 +18,14 @@
 - [x] Agregar guardado automático de progreso
 
 ## Funcionalidades Adicionales
-- [ ] Modificar simulateMatch() para actualizar tabla de posiciones
-- [ ] Agregar función para avanzar semana/mes
-- [ ] Implementar fin de temporada y promociones/descensos
+- [x] Modificar simulateMatch() para actualizar tabla de posiciones
+- [x] Agregar función para avanzar semana/mes
+- [x] Implementar fin de temporada y promociones/descensos
+- [x] Implementar mercado de transferencias
+- [x] Agregar sistema de lesiones y recuperación de jugadores
+- [x] Implementar tácticas y formaciones variables
+- [x] Agregar gestión financiera (presupuesto, salarios)
+- [x] Implementar entrenamiento y desarrollo de jugadores
+- [x] Agregar estadísticas detalladas de partidos y temporada
+- [ ] Implementar modo multijugador local
+- [x] Agregar sistema de logros y recompensas

@@ -1,0 +1,13 @@
+Team: Ñublense
+Players:
+- Name: Alejandro Morales, Position: Forward, Attack: 78, Defense: 32
+- Name: Bruno Castillo, Position: Midfielder, Attack: 68, Defense: 52
+- Name: Claudio Vargas, Position: Defender, Attack: 42, Defense: 72
+- Name: Daniel Rojas, Position: Goalkeeper, Attack: 12, Defense: 82
+- Name: Eduardo Paredes, Position: Midfielder, Attack: 62, Defense: 48
+- Name: Fabian Soto, Position: Forward, Attack: 73, Defense: 28
+- Name: Gabriel Ramirez, Position: Defender, Attack: 38, Defense: 68
+- Name: Hector Gonzalez, Position: Midfielder, Attack: 58, Defense: 42
+- Name: Ignacio Herrera, Position: Defender, Attack: 32, Defense: 62
+- Name: Javier Luna, Position: Forward, Attack: 68, Defense: 38
+- Name: Kevin Ortega, Position: Midfielder, Attack: 52, Defense: 58

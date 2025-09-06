@@ -1,0 +1,13 @@
+Team: Everton
+Players:
+- Name: Pedro Sanchez, Position: Forward, Attack: 80, Defense: 35
+- Name: Juan Lopez, Position: Midfielder, Attack: 70, Defense: 55
+- Name: Carlos Ruiz, Position: Defender, Attack: 45, Defense: 75
+- Name: Miguel Torres, Position: Goalkeeper, Attack: 15, Defense: 85
+- Name: Andres Gomez, Position: Midfielder, Attack: 65, Defense: 50
+- Name: Felipe Diaz, Position: Forward, Attack: 75, Defense: 30
+- Name: Rodrigo Silva, Position: Defender, Attack: 40, Defense: 70
+- Name: Diego Martinez, Position: Midfielder, Attack: 60, Defense: 45
+- Name: Sebastian Vega, Position: Defender, Attack: 35, Defense: 65
+- Name: Matias Fernandez, Position: Forward, Attack: 70, Defense: 40
+- Name: Nicolas Alvarez, Position: Midfielder, Attack: 55, Defense: 60
