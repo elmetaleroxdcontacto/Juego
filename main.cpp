@@ -146,6 +146,39 @@ struct Career {
                 leagueTable.addTeam(&allTeams.back());
             }
         }
+
+        // Load second division teams
+        ifstream file("LigaChilena/SegundaDivision_teams.txt");
+        if (file.is_open()) {
+            string line;
+            while (getline(file, line)) {
+                if (!line.empty()) {
+                    Team team(line);
+                    // Generate 11 random players
+                    vector<string> positions = {"GK", "DF", "MF", "FW"};
+                    for (int i = 0; i < 11; ++i) {
+                        Player p;
+                        p.name = "Player" + to_string(i+1);
+                        p.position = positions[rand() % 4];
+                        p.attack = rand() % 50 + 30; // 30-79
+                        p.defense = rand() % 50 + 30;
+                        p.stamina = rand() % 50 + 30;
+                        p.skill = rand() % 50 + 30;
+                        p.age = rand() % 20 + 18;
+                        p.value = p.skill * 8000; // lower value for second division
+                        p.injured = false;
+                        p.injuryWeeks = 0;
+                        p.goals = 0;
+                        p.assists = 0;
+                        p.matchesPlayed = 0;
+                        team.addPlayer(p);
+                    }
+                    allTeams.push_back(team);
+                    leagueTable.addTeam(&allTeams.back());
+                }
+            }
+            file.close();
+        }
     }
 
     void agePlayers() {
@@ -731,11 +764,21 @@ int main() {
                     cout << "7. Ñublense" << endl;
                     cout << "8. Cobresal" << endl;
                     cout << "9. Huachipato" << endl;
+                    cout << "10. Deportes Valdivia" << endl;
+                    cout << "11. Deportes Linares" << endl;
+                    cout << "12. Deportes Rengo" << endl;
+                    cout << "13. Deportes Colina" << endl;
+                    cout << "14. Deportes Recoleta" << endl;
+                    cout << "15. Deportes Melipilla" << endl;
+                    cout << "16. Deportes Vallenar" << endl;
+                    cout << "17. Deportes Santa Cruz" << endl;
+                    cout << "18. Deportes Iberia" << endl;
+                    cout << "19. Deportes Concepción" << endl;
                     cout << "Elige un numero de equipo: ";
                     int teamChoice;
                     cin >> teamChoice;
 
-                    if (teamChoice >= 1 && teamChoice <= 9) {
+                    if (teamChoice >= 1 && teamChoice <= 19) {
                         career.myTeam = &career.allTeams[teamChoice - 1];
                         cout << "Has elegido: " << career.myTeam->name << endl;
                     } else {
@@ -757,11 +800,21 @@ int main() {
                     cout << "7. Ñublense" << endl;
                     cout << "8. Cobresal" << endl;
                     cout << "9. Huachipato" << endl;
+                    cout << "10. Deportes Valdivia" << endl;
+                    cout << "11. Deportes Linares" << endl;
+                    cout << "12. Deportes Rengo" << endl;
+                    cout << "13. Deportes Colina" << endl;
+                    cout << "14. Deportes Recoleta" << endl;
+                    cout << "15. Deportes Melipilla" << endl;
+                    cout << "16. Deportes Vallenar" << endl;
+                    cout << "17. Deportes Santa Cruz" << endl;
+                    cout << "18. Deportes Iberia" << endl;
+                    cout << "19. Deportes Concepción" << endl;
                     cout << "Elige un numero de equipo: ";
                     int teamChoice;
                     cin >> teamChoice;
 
-                    if (teamChoice >= 1 && teamChoice <= 9) {
+                    if (teamChoice >= 1 && teamChoice <= 19) {
                         career.myTeam = &career.allTeams[teamChoice - 1];
                         cout << "Has elegido: " << career.myTeam->name << endl;
                     } else {
@@ -860,7 +913,7 @@ int main() {
                         default:
                             cout << "Opcion invalida." << endl;
                     }
-                } while (careerChoice != 7);
+                } while (careerChoice != 9);
                 break;
             }
             case 2: { // Juego Rapido
@@ -889,17 +942,14 @@ int main() {
                     case 7: filename = "Ñublense.txt"; break;
                     case 8: filename = "Cobresal.txt"; break;
                     case 9: filename = "Huachipato.txt"; break;
-                    default: cout << "Opcion invalida." << endl; continue;
+                    default: cout << "Opción inválida." << endl; continue;
                 }
-                string filepath = "LigaChilena/" + filename;
-                if (loadTeamFromFile(filepath, myTeam)) {
-                    cout << "Equipo cargado exitosamente: " << myTeam.name << endl;
-                } else {
+                filename = "LigaChilena/" + filename;
+                if (!loadTeamFromFile(filename, myTeam)) {
                     cout << "Error al cargar el equipo." << endl;
                     continue;
                 }
-
-                // Game Loop
+                // Quick Game Loop
                 int gameChoice;
                 do {
                     displayGameMenu();
@@ -921,24 +971,17 @@ int main() {
                             simulateMatch(myTeam, opponent);
                             break;
                         case 6: {
-                            cout << "Equipos disponibles:" << endl;
-                            cout << "1. UniversidadCatolica.txt" << endl;
-                            cout << "2. UniversidaddeChile.txt" << endl;
-                            cout << "3. ColoColo.txt" << endl;
-                            cout << "Enter team filename to load (e.g., UniversidadCatolica.txt): ";
-                            string filename;
-                            cin >> filename;
-                            string filepath = "LigaChilena/" + filename;
-                            if (loadTeamFromFile(filepath, myTeam)) {
-                                cout << "Equipo cargado exitosamente." << endl;
-                            }
+                            cout << "Ingresa el nombre del archivo: ";
+                            string fname;
+                            cin >> fname;
+                            loadTeamFromFile(fname, myTeam);
                             break;
                         }
                         case 7:
-                            cout << "Volviendo al menu principal." << endl;
+                            cout << "Volviendo al menú principal." << endl;
                             break;
                         default:
-                            cout << "Opcion invalida." << endl;
+                            cout << "Opción inválida." << endl;
                     }
                 } while (gameChoice != 7);
                 break;
@@ -947,9 +990,8 @@ int main() {
                 cout << "Saliendo del juego." << endl;
                 break;
             default:
-                cout << "Opcion invalida." << endl;
+                cout << "Opción inválida." << endl;
         }
     } while (mainChoice != 3);
-
     return 0;
 }
