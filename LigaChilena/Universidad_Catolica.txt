@@ -1,0 +1,5 @@
+Team: Universidad Católica
+Players:
+- Name: Player1, Position: Forward, Attack: 83, Defense: 41
+- Name: Player2, Position: Midfielder, Attack: 77, Defense: 59
+- Name: Player3, Position: Defender, Attack: 49, Defense: 81

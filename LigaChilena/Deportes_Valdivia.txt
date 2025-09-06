@@ -1,0 +1,5 @@
+Team: Deportes Valdivia
+Players:
+- Name: Player1, Position: Forward, Attack: 70, Defense: 48
+- Name: Player2, Position: Midfielder, Attack: 65, Defense: 50
+- Name: Player3, Position: Defender, Attack: 55, Defense: 65

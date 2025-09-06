@@ -1,0 +1,5 @@
+Team: Deportes Temuco
+Players:
+- Name: Player1, Position: Forward, Attack: 75, Defense: 45
+- Name: Player2, Position: Midfielder, Attack: 70, Defense: 55
+- Name: Player3, Position: Defender, Attack: 50, Defense: 70

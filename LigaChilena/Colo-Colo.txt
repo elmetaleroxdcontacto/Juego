@@ -1,0 +1,5 @@
+Team: Colo-Colo
+Players:
+- Name: Player1, Position: Forward, Attack: 85, Defense: 40
+- Name: Player2, Position: Midfielder, Attack: 75, Defense: 60
+- Name: Player3, Position: Defender, Attack: 50, Defense: 80

@@ -1,0 +1,5 @@
+Team: Deportes Copiapó
+Players:
+- Name: Player1, Position: Forward, Attack: 73, Defense: 47
+- Name: Player2, Position: Midfielder, Attack: 68, Defense: 53
+- Name: Player3, Position: Defender, Attack: 52, Defense: 68

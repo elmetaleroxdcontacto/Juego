@@ -1,0 +1,5 @@
+Team: Universidad de Chile
+Players:
+- Name: Player1, Position: Forward, Attack: 82, Defense: 42
+- Name: Player2, Position: Midfielder, Attack: 78, Defense: 58
+- Name: Player3, Position: Defender, Attack: 48, Defense: 82
