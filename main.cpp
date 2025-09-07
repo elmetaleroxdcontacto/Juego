@@ -738,6 +738,7 @@ int main() {
     Team opponent("Opponent Team");
 
     int mainChoice;
+    bool careerStarted = false;
     do {
         displayMainMenu();
         cin >> mainChoice;
@@ -745,177 +746,164 @@ int main() {
             case 1: { // Modo Carrera
                 cout << "\n=== Modo Carrera ===" << endl;
 
-                // Initialize career
-                career.initializeLeague();
-
-                // Check for saved career
-                if (career.loadCareer()) {
-                    cout << "Carrera cargada exitosamente." << endl;
-                    cout << "Temporada " << career.currentSeason << ", Semana " << career.currentWeek << endl;
-                } else {
-                    // New career - Team Selection
-                    cout << "\nSelecciona tu equipo para la carrera:" << endl;
-                    cout << "1. Colo-Colo" << endl;
-                    cout << "2. Universidad Catolica" << endl;
-                    cout << "3. Universidad de Chile" << endl;
-                    cout << "4. Unión Española" << endl;
-                    cout << "5. Deportes Copiapo" << endl;
-                    cout << "6. Everton" << endl;
-                    cout << "7. Ñublense" << endl;
-                    cout << "8. Cobresal" << endl;
-                    cout << "9. Huachipato" << endl;
-                    cout << "10. Deportes Valdivia" << endl;
-                    cout << "11. Deportes Linares" << endl;
-                    cout << "12. Deportes Rengo" << endl;
-                    cout << "13. Deportes Colina" << endl;
-                    cout << "14. Deportes Recoleta" << endl;
-                    cout << "15. Deportes Melipilla" << endl;
-                    cout << "16. Deportes Vallenar" << endl;
-                    cout << "17. Deportes Santa Cruz" << endl;
-                    cout << "18. Deportes Iberia" << endl;
-                    cout << "19. Deportes Concepción" << endl;
-                    cout << "Elige un numero de equipo: ";
-                    int teamChoice;
-                    cin >> teamChoice;
-
-                    if (teamChoice >= 1 && teamChoice <= 19) {
-                        career.myTeam = &career.allTeams[teamChoice - 1];
-                        cout << "Has elegido: " << career.myTeam->name << endl;
-                    } else {
-                        cout << "Opcion invalida." << endl;
-                        continue;
-                    }
-                }
-
-                // If career was loaded but myTeam is null (due to team not found), reset to new career
-                if (career.myTeam == nullptr) {
-                    cout << "Equipo de la carrera guardada no encontrado. Iniciando nueva carrera." << endl;
-                    cout << "\nSelecciona tu equipo para la carrera:" << endl;
-                    cout << "1. Colo-Colo" << endl;
-                    cout << "2. Universidad Catolica" << endl;
-                    cout << "3. Universidad de Chile" << endl;
-                    cout << "4. Unión Española" << endl;
-                    cout << "5. Deportes Copiapo" << endl;
-                    cout << "6. Everton" << endl;
-                    cout << "7. Ñublense" << endl;
-                    cout << "8. Cobresal" << endl;
-                    cout << "9. Huachipato" << endl;
-                    cout << "10. Deportes Valdivia" << endl;
-                    cout << "11. Deportes Linares" << endl;
-                    cout << "12. Deportes Rengo" << endl;
-                    cout << "13. Deportes Colina" << endl;
-                    cout << "14. Deportes Recoleta" << endl;
-                    cout << "15. Deportes Melipilla" << endl;
-                    cout << "16. Deportes Vallenar" << endl;
-                    cout << "17. Deportes Santa Cruz" << endl;
-                    cout << "18. Deportes Iberia" << endl;
-                    cout << "19. Deportes Concepción" << endl;
-                    cout << "Elige un numero de equipo: ";
-                    int teamChoice;
-                    cin >> teamChoice;
-
-                    if (teamChoice >= 1 && teamChoice <= 19) {
-                        career.myTeam = &career.allTeams[teamChoice - 1];
-                        cout << "Has elegido: " << career.myTeam->name << endl;
-                    } else {
-                        cout << "Opcion invalida." << endl;
-                        continue;
-                    }
-                }
-
-                // Career Game Loop
-                int careerChoice;
+                int careerStartChoice;
                 do {
-                    cout << "\nTemporada " << career.currentSeason << ", Semana " << career.currentWeek << endl;
-                    displayCareerMenu();
-                    cin >> careerChoice;
-                    switch (careerChoice) {
-                        case 1:
-                            viewTeam(*career.myTeam);
-                            break;
-                        case 2:
-                            trainPlayer(*career.myTeam);
-                            break;
-                        case 3:
-                            changeTactics(*career.myTeam);
-                            break;
-                        case 4: {
-                            // Simulate week - play matches
-                            cout << "\nSimulando semana " << career.currentWeek << "..." << endl;
-
-                            // Find opponents for this week (simplified - each team plays one match per week)
-                            vector<Team*> opponents;
-                            for (auto& team : career.allTeams) {
-                                if (&team != career.myTeam) {
-                                    opponents.push_back(&team);
-                                }
+                    cout << "\nOpciones de Carrera:" << endl;
+                    cout << "1. Continuar Carrera" << endl;
+                    cout << "2. Nueva Carrera" << endl;
+                    cout << "3. Volver al Menu Principal" << endl;
+                    cout << "Elige una opcion: ";
+                    cin >> careerStartChoice;
+                    switch (careerStartChoice) {
+                        case 1: {
+                            career.initializeLeague();
+                            if (career.loadCareer()) {
+                                cout << "Carrera cargada exitosamente." << endl;
+                                cout << "Temporada " << career.currentSeason << ", Semana " << career.currentWeek << endl;
+                                careerStarted = true;
+                            } else {
+                                cout << "No se encontró una carrera guardada." << endl;
                             }
-
-                            // Play match against random opponent
-                            if (!opponents.empty()) {
-                                int oppIndex = rand() % opponents.size();
-                                simulateCareerMatch(*career.myTeam, *opponents[oppIndex], career.leagueTable);
-                            }
-
-                            // Simulate other matches
-                            for (size_t i = 0; i < career.allTeams.size(); ++i) {
-                                for (size_t j = i + 1; j < career.allTeams.size(); ++j) {
-                                    if (rand() % 3 == 0) { // 33% chance of additional matches
-                                        simulateCareerMatch(career.allTeams[i], career.allTeams[j], career.leagueTable);
-                                    }
-                                }
-                            }
-
-                            career.currentWeek++;
-                            if (career.currentWeek > 34) { // End of season
-                                cout << "\n¡Fin de temporada!" << endl;
-                                career.leagueTable.displayTable();
-                                // Promotions and relegations
-                                if (career.myTeam->points > 50) { // Top position
-                                    cout << "¡Tu equipo se clasificó para competiciones internacionales!" << endl;
-                                }
-                                career.currentSeason++;
-                                career.currentWeek = 1;
-                                career.agePlayers();
-                                // Reset season stats
-                                for (auto& team : career.allTeams) {
-                                    team.resetSeasonStats();
-                                }
-                                // Heal all injuries at end of season
-                                for (auto& team : career.allTeams) {
-                                    for (auto& p : team.players) {
-                                        p.injured = false;
-                                        p.injuryWeeks = 0;
-                                    }
-                                }
-                            }
-                            // Heal injuries weekly
-                            healInjuries(*career.myTeam);
-                            // Check achievements
-                            checkAchievements(career);
                             break;
                         }
-                        case 5:
-                            career.leagueTable.displayTable();
+                        case 2: {
+                            career.initializeLeague();
+                            // Team Selection
+                            cout << "\nSelecciona tu equipo para la carrera:" << endl;
+                            cout << "1. Colo-Colo" << endl;
+                            cout << "2. Universidad Catolica" << endl;
+                            cout << "3. Universidad de Chile" << endl;
+                            cout << "4. Unión Española" << endl;
+                            cout << "5. Deportes Copiapo" << endl;
+                            cout << "6. Everton" << endl;
+                            cout << "7. Ñublense" << endl;
+                            cout << "8. Cobresal" << endl;
+                            cout << "9. Huachipato" << endl;
+                            cout << "10. Deportes Valdivia" << endl;
+                            cout << "11. Deportes Linares" << endl;
+                            cout << "12. Deportes Rengo" << endl;
+                            cout << "13. Deportes Colina" << endl;
+                            cout << "14. Deportes Recoleta" << endl;
+                            cout << "15. Deportes Melipilla" << endl;
+                            cout << "16. Deportes Vallenar" << endl;
+                            cout << "17. Deportes Santa Cruz" << endl;
+                            cout << "18. Deportes Iberia" << endl;
+                            cout << "19. Deportes Concepción" << endl;
+                            cout << "Elige un numero de equipo: ";
+                            int teamChoice;
+                            cin >> teamChoice;
+                            if (teamChoice >= 1 && teamChoice <= 19) {
+                                career.myTeam = &career.allTeams[teamChoice - 1];
+                                cout << "Has elegido: " << career.myTeam->name << endl;
+                                careerStarted = true;
+                            } else {
+                                cout << "Opcion invalida." << endl;
+                            }
                             break;
-                        case 6:
-                            transferMarket(*career.myTeam);
+                        }
+                        case 3: {
                             break;
-                        case 7:
-                            displayStatistics(*career.myTeam);
-                            break;
-                        case 8:
-                            career.saveCareer();
-                            break;
-                        case 9:
-                            cout << "Volviendo al menu principal." << endl;
-                            break;
+                        }
                         default:
                             cout << "Opcion invalida." << endl;
+                            break;
                     }
-                } while (careerChoice != 9);
+                } while (!careerStarted && careerStartChoice != 3);
+
+                if (careerStarted) {
+                    // Career Game Loop
+                    int careerChoice;
+                    do {
+                        cout << "\nTemporada " << career.currentSeason << ", Semana " << career.currentWeek << endl;
+                        displayCareerMenu();
+                        cin >> careerChoice;
+                        switch (careerChoice) {
+                            case 1:
+                                viewTeam(*career.myTeam);
+                                break;
+                            case 2:
+                                trainPlayer(*career.myTeam);
+                                break;
+                            case 3:
+                                changeTactics(*career.myTeam);
+                                break;
+                            case 4: {
+                                // Simulate week - play matches
+                                cout << "\nSimulando semana " << career.currentWeek << "..." << endl;
+                                // Find opponents for this week (simplified - each team plays one match per week)
+                                vector<Team*> opponents;
+                                for (auto& team : career.allTeams) {
+                                    if (&team != career.myTeam) {
+                                        opponents.push_back(&team);
+                                    }
+                                }
+                                // Play match against random opponent
+                                if (!opponents.empty()) {
+                                    int oppIndex = rand() % opponents.size();
+                                    simulateCareerMatch(*career.myTeam, *opponents[oppIndex], career.leagueTable);
+                                }
+                                // Simulate other matches
+                                for (size_t i = 0; i < career.allTeams.size(); ++i) {
+                                    for (size_t j = i + 1; j < career.allTeams.size(); ++j) {
+                                        if (rand() % 3 == 0) { // 33% chance of additional matches
+                                            simulateCareerMatch(career.allTeams[i], career.allTeams[j], career.leagueTable);
+                                        }
+                                    }
+                                }
+                                career.currentWeek++;
+                                if (career.currentWeek > 34) { // End of season
+                                    cout << "\n¡Fin de temporada!" << endl;
+                                    career.leagueTable.displayTable();
+                                    // Promotions and relegations
+                                    if (career.myTeam->points > 50) { // Top position
+                                        cout << "¡Tu equipo se clasificó para competiciones internacionales!" << endl;
+                                    }
+                                    career.currentSeason++;
+                                    career.currentWeek = 1;
+                                    career.agePlayers();
+                                    // Reset season stats
+                                    for (auto& team : career.allTeams) {
+                                        team.resetSeasonStats();
+                                    }
+                                    // Heal all injuries at end of season
+                                    for (auto& team : career.allTeams) {
+                                        for (auto& p : team.players) {
+                                            p.injured = false;
+                                            p.injuryWeeks = 0;
+                                        }
+                                    }
+                                }
+                                // Heal injuries weekly
+                                healInjuries(*career.myTeam);
+                                // Check achievements
+                                checkAchievements(career);
+                                break;
+                            }
+                            case 5:
+                                career.leagueTable.displayTable();
+                                break;
+                            case 6:
+                                transferMarket(*career.myTeam);
+                                break;
+                            case 7:
+                                displayStatistics(*career.myTeam);
+                                break;
+                            case 8:
+                                career.saveCareer();
+                                break;
+                            case 9:
+                                cout << "Volviendo al menu principal." << endl;
+                                careerStarted = false;
+                                break;
+                            default:
+                                cout << "Opcion invalida." << endl;
+                                break;
+                        }
+                    } while (careerChoice != 9);
+                }
                 break;
             }
+
             case 2: { // Juego Rapido
                 // Start Quick Game - Team Selection
                 cout << "\nSelecciona tu equipo:" << endl;
@@ -942,12 +930,12 @@ int main() {
                     case 7: filename = "Ñublense.txt"; break;
                     case 8: filename = "Cobresal.txt"; break;
                     case 9: filename = "Huachipato.txt"; break;
-                    default: cout << "Opción inválida." << endl; continue;
+                    default: cout << "Opción inválida." << endl; break;
                 }
                 filename = "LigaChilena/" + filename;
                 if (!loadTeamFromFile(filename, myTeam)) {
                     cout << "Error al cargar el equipo." << endl;
-                    continue;
+                    break;
                 }
                 // Quick Game Loop
                 int gameChoice;
@@ -982,6 +970,7 @@ int main() {
                             break;
                         default:
                             cout << "Opción inválida." << endl;
+                            break;
                     }
                 } while (gameChoice != 7);
                 break;
@@ -992,6 +981,7 @@ int main() {
             default:
                 cout << "Opción inválida." << endl;
         }
-    } while (mainChoice != 3);
+    } while (mainChoice != 3 && !careerStarted);
+
     return 0;
 }
