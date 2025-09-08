@@ -179,6 +179,39 @@ struct Career {
             }
             file.close();
         }
+
+        // Load third division teams
+        ifstream file3("LigaChilena/PrimeraB_teams.txt");
+        if (file3.is_open()) {
+            string line;
+            while (getline(file3, line)) {
+                if (!line.empty()) {
+                    Team team(line);
+                    // Generate 11 random players
+                    vector<string> positions = {"GK", "DF", "MF", "FW"};
+                    for (int i = 0; i < 11; ++i) {
+                        Player p;
+                        p.name = "Player" + to_string(i+1);
+                        p.position = positions[rand() % 4];
+                        p.attack = rand() % 40 + 20; // 20-59
+                        p.defense = rand() % 40 + 20;
+                        p.stamina = rand() % 40 + 20;
+                        p.skill = rand() % 40 + 20;
+                        p.age = rand() % 20 + 18;
+                        p.value = p.skill * 5000; // lower value for third division
+                        p.injured = false;
+                        p.injuryWeeks = 0;
+                        p.goals = 0;
+                        p.assists = 0;
+                        p.matchesPlayed = 0;
+                        team.addPlayer(p);
+                    }
+                    allTeams.push_back(team);
+                    leagueTable.addTeam(&allTeams.back());
+                }
+            }
+            file3.close();
+        }
     }
 
     void agePlayers() {
@@ -789,10 +822,22 @@ int main() {
                             cout << "17. Deportes Santa Cruz" << endl;
                             cout << "18. Deportes Iberia" << endl;
                             cout << "19. Deportes Concepción" << endl;
+                            cout << "20. Deportes Temuco" << endl;
+                            cout << "21. Deportes Copiapó" << endl;
+                            cout << "22. Deportes Puerto Montt" << endl;
+                            cout << "23. Magallanes" << endl;
+                            cout << "24. Rangers" << endl;
+                            cout << "25. San Luis" << endl;
+                            cout << "26. Santiago Morning" << endl;
+                            cout << "27. Unión San Felipe" << endl;
+                            cout << "28. Barnechea" << endl;
+                            cout << "29. Cobreloa" << endl;
+                            cout << "30. Deportes Melipilla" << endl;
+                            cout << "31. Iberia" << endl;
                             cout << "Elige un numero de equipo: ";
                             int teamChoice;
                             cin >> teamChoice;
-                            if (teamChoice >= 1 && teamChoice <= 19) {
+                            if (teamChoice >= 1 && teamChoice <= 31) {
                                 career.myTeam = &career.allTeams[teamChoice - 1];
                                 cout << "Has elegido: " << career.myTeam->name << endl;
                                 careerStarted = true;
