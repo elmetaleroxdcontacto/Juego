@@ -1,5 +1,17 @@
 Team: Deportes Valdivia
 Players:
-- Name: Player1, Position: Forward, Attack: 70, Defense: 48
-- Name: Player2, Position: Midfielder, Attack: 65, Defense: 50
-- Name: Player3, Position: Defender, Attack: 55, Defense: 65
+- Name: Ruben Romero, Position: DF, Attack: 50, Defense: 27, Stamina: 58, Skill: 43, Age: 27, Value: 215000
+- Name: Mario Perez, Position: MF, Attack: 28, Defense: 53, Stamina: 100, Skill: 37, Age: 19, Value: 185000
+- Name: Emilio Torres, Position: GK, Attack: 55, Defense: 25, Stamina: 52, Skill: 47, Age: 35, Value: 235000
+- Name: Mario Delgado, Position: FW, Attack: 27, Defense: 54, Stamina: 60, Skill: 42, Age: 33, Value: 210000
+- Name: Adrian Santiago, Position: GK, Attack: 35, Defense: 35, Stamina: 68, Skill: 43, Age: 30, Value: 215000
+- Name: Samuel Vazquez, Position: MF, Attack: 31, Defense: 33, Stamina: 86, Skill: 39, Age: 21, Value: 195000
+- Name: Mateo Gonzalez, Position: DF, Attack: 58, Defense: 45, Stamina: 58, Skill: 56, Age: 18, Value: 280000
+- Name: Fernando Lopez, Position: MF, Attack: 28, Defense: 39, Stamina: 61, Skill: 29, Age: 24, Value: 145000
+- Name: Victor Moreno, Position: DF, Attack: 33, Defense: 53, Stamina: 77, Skill: 41, Age: 20, Value: 205000
+- Name: Fernando Vargas, Position: DF, Attack: 48, Defense: 24, Stamina: 99, Skill: 30, Age: 35, Value: 150000
+- Name: Leonardo Suarez, Position: GK, Attack: 37, Defense: 30, Stamina: 84, Skill: 27, Age: 32, Value: 135000
+- Name: Daniel Sanchez, Position: DF, Attack: 31, Defense: 46, Stamina: 92, Skill: 29, Age: 36, Value: 145000
+- Name: Sergio Arias, Position: GK, Attack: 27, Defense: 31, Stamina: 70, Skill: 21, Age: 32, Value: 105000
+- Name: Juan Lopez, Position: MF, Attack: 40, Defense: 26, Stamina: 95, Skill: 24, Age: 34, Value: 120000
+- Name: Gabriel Gil, Position: MF, Attack: 49, Defense: 27, Stamina: 90, Skill: 44, Age: 36, Value: 220000

@@ -1,0 +1,17 @@
+Team: Deportes Recoleta
+Players:
+- Name: Ricardo Munoz, Position: FW, Attack: 31, Defense: 42, Stamina: 83, Skill: 30, Age: 21, Value: 150000
+- Name: Cristian Ortega, Position: FW, Attack: 58, Defense: 26, Stamina: 61, Skill: 39, Age: 32, Value: 195000
+- Name: Noah Vazquez, Position: FW, Attack: 55, Defense: 55, Stamina: 89, Skill: 58, Age: 37, Value: 290000
+- Name: Hugo Luna, Position: FW, Attack: 23, Defense: 33, Stamina: 96, Skill: 22, Age: 34, Value: 110000
+- Name: Enrique Romero, Position: DF, Attack: 28, Defense: 39, Stamina: 62, Skill: 27, Age: 23, Value: 135000
+- Name: Salvador Santos, Position: FW, Attack: 54, Defense: 56, Stamina: 73, Skill: 50, Age: 19, Value: 250000
+- Name: Pablo Diaz, Position: MF, Attack: 41, Defense: 43, Stamina: 70, Skill: 49, Age: 36, Value: 245000
+- Name: Manuel Rojas, Position: FW, Attack: 29, Defense: 32, Stamina: 64, Skill: 25, Age: 26, Value: 125000
+- Name: Enrique Rodriguez, Position: GK, Attack: 37, Defense: 37, Stamina: 99, Skill: 39, Age: 24, Value: 195000
+- Name: Sebastian Fernandez, Position: FW, Attack: 33, Defense: 34, Stamina: 60, Skill: 31, Age: 19, Value: 155000
+- Name: Rafael Moreno, Position: GK, Attack: 44, Defense: 36, Stamina: 82, Skill: 41, Age: 20, Value: 205000
+- Name: Roberto Silva, Position: MF, Attack: 39, Defense: 54, Stamina: 54, Skill: 44, Age: 18, Value: 220000
+- Name: Javier Pena, Position: MF, Attack: 20, Defense: 35, Stamina: 84, Skill: 29, Age: 22, Value: 145000
+- Name: Francisco Moreno, Position: GK, Attack: 27, Defense: 22, Stamina: 66, Skill: 20, Age: 26, Value: 100000
+- Name: Nicolas Martinez, Position: GK, Attack: 33, Defense: 34, Stamina: 96, Skill: 40, Age: 35, Value: 200000

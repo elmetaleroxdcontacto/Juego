@@ -1,0 +1,17 @@
+Team: Palestino
+Players:
+- Name: Mario Luna, Position: FW, Attack: 59, Defense: 71, Stamina: 59, Skill: 63, Age: 30, Value: 630000
+- Name: Aiden Medina, Position: MF, Attack: 75, Defense: 98, Stamina: 86, Skill: 81, Age: 31, Value: 810000
+- Name: Antonio Castro, Position: GK, Attack: 51, Defense: 57, Stamina: 76, Skill: 50, Age: 36, Value: 500000
+- Name: Nicolas Silva, Position: MF, Attack: 80, Defense: 71, Stamina: 64, Skill: 77, Age: 23, Value: 770000
+- Name: Manuel Mora, Position: GK, Attack: 85, Defense: 88, Stamina: 62, Skill: 79, Age: 19, Value: 790000
+- Name: Samuel Santiago, Position: MF, Attack: 65, Defense: 91, Stamina: 60, Skill: 85, Age: 20, Value: 850000
+- Name: Victor Mendoza, Position: FW, Attack: 59, Defense: 84, Stamina: 64, Skill: 69, Age: 29, Value: 690000
+- Name: Daniel Guerrero, Position: DF, Attack: 77, Defense: 60, Stamina: 69, Skill: 69, Age: 34, Value: 690000
+- Name: Salvador Leon, Position: FW, Attack: 97, Defense: 93, Stamina: 86, Skill: 99, Age: 18, Value: 990000
+- Name: Antonio Acosta, Position: MF, Attack: 59, Defense: 99, Stamina: 69, Skill: 79, Age: 30, Value: 790000
+- Name: Ruben Arias, Position: DF, Attack: 87, Defense: 76, Stamina: 95, Skill: 76, Age: 32, Value: 760000
+- Name: Matias Acosta, Position: DF, Attack: 87, Defense: 93, Stamina: 51, Skill: 92, Age: 29, Value: 920000
+- Name: Enrique Medina, Position: DF, Attack: 80, Defense: 76, Stamina: 97, Skill: 70, Age: 19, Value: 700000
+- Name: Ruben Luna, Position: FW, Attack: 99, Defense: 56, Stamina: 50, Skill: 71, Age: 36, Value: 710000
+- Name: Mario Jimenez, Position: DF, Attack: 67, Defense: 91, Stamina: 88, Skill: 77, Age: 29, Value: 770000

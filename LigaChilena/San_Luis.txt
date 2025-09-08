@@ -1,0 +1,17 @@
+Team: San Luis
+Players:
+- Name: Ruben Reyes, Position: FW, Attack: 57, Defense: 31, Stamina: 55, Skill: 44, Age: 18, Value: 352000
+- Name: Miguel Medina, Position: DF, Attack: 33, Defense: 77, Stamina: 68, Skill: 45, Age: 26, Value: 360000
+- Name: Oliver Garcia, Position: MF, Attack: 52, Defense: 61, Stamina: 71, Skill: 48, Age: 24, Value: 384000
+- Name: Sebastian Jimenez, Position: FW, Attack: 41, Defense: 76, Stamina: 100, Skill: 49, Age: 29, Value: 392000
+- Name: William Ramos, Position: DF, Attack: 69, Defense: 48, Stamina: 76, Skill: 48, Age: 24, Value: 384000
+- Name: Diego Leon, Position: FW, Attack: 56, Defense: 74, Stamina: 78, Skill: 60, Age: 32, Value: 480000
+- Name: Elijah Diaz, Position: DF, Attack: 31, Defense: 68, Stamina: 99, Skill: 41, Age: 37, Value: 328000
+- Name: Rodrigo Vargas, Position: GK, Attack: 59, Defense: 49, Stamina: 69, Skill: 45, Age: 31, Value: 360000
+- Name: Thiago Leon, Position: GK, Attack: 40, Defense: 37, Stamina: 79, Skill: 44, Age: 29, Value: 352000
+- Name: Samuel Blanco, Position: GK, Attack: 48, Defense: 49, Stamina: 52, Skill: 51, Age: 32, Value: 408000
+- Name: Antonio Castro, Position: DF, Attack: 78, Defense: 44, Stamina: 74, Skill: 66, Age: 26, Value: 528000
+- Name: Santiago Herrera, Position: FW, Attack: 73, Defense: 37, Stamina: 100, Skill: 61, Age: 23, Value: 488000
+- Name: Pedro Peralta, Position: MF, Attack: 48, Defense: 53, Stamina: 58, Skill: 41, Age: 23, Value: 328000
+- Name: Samuel Rojas, Position: FW, Attack: 43, Defense: 76, Stamina: 50, Skill: 58, Age: 30, Value: 464000
+- Name: Oscar Ramos, Position: DF, Attack: 73, Defense: 61, Stamina: 79, Skill: 71, Age: 27, Value: 568000

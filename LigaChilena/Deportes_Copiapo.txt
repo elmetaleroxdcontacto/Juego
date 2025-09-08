@@ -1,5 +1,17 @@
 Team: Deportes Copiapó
 Players:
-- Name: Player1, Position: Forward, Attack: 73, Defense: 47
-- Name: Player2, Position: Midfielder, Attack: 68, Defense: 53
-- Name: Player3, Position: Defender, Attack: 52, Defense: 68
+- Name: Benjamin Rios, Position: GK, Attack: 37, Defense: 36, Stamina: 73, Skill: 43, Age: 28, Value: 344000
+- Name: Leonardo Reyes, Position: GK, Attack: 38, Defense: 35, Stamina: 57, Skill: 39, Age: 21, Value: 312000
+- Name: Rodrigo Aguilar, Position: MF, Attack: 66, Defense: 58, Stamina: 55, Skill: 60, Age: 29, Value: 480000
+- Name: Carlos Ortiz, Position: FW, Attack: 74, Defense: 47, Stamina: 64, Skill: 68, Age: 24, Value: 544000
+- Name: Salvador Garcia, Position: DF, Attack: 59, Defense: 48, Stamina: 55, Skill: 43, Age: 25, Value: 344000
+- Name: Nicolas Santiago, Position: GK, Attack: 65, Defense: 30, Stamina: 55, Skill: 45, Age: 24, Value: 360000
+- Name: Mario Jimenez, Position: GK, Attack: 33, Defense: 35, Stamina: 94, Skill: 37, Age: 21, Value: 296000
+- Name: Rodrigo Flores, Position: DF, Attack: 77, Defense: 62, Stamina: 94, Skill: 59, Age: 31, Value: 472000
+- Name: Henry Santiago, Position: FW, Attack: 58, Defense: 32, Stamina: 91, Skill: 47, Age: 22, Value: 376000
+- Name: Juan Torres, Position: MF, Attack: 39, Defense: 79, Stamina: 88, Skill: 68, Age: 33, Value: 544000
+- Name: Salvador Martin, Position: FW, Attack: 44, Defense: 58, Stamina: 83, Skill: 51, Age: 25, Value: 408000
+- Name: Oliver Munoz, Position: DF, Attack: 59, Defense: 78, Stamina: 71, Skill: 63, Age: 36, Value: 504000
+- Name: Luis Rios, Position: DF, Attack: 64, Defense: 78, Stamina: 86, Skill: 66, Age: 23, Value: 528000
+- Name: James Silva, Position: FW, Attack: 60, Defense: 76, Stamina: 79, Skill: 74, Age: 32, Value: 592000
+- Name: Fernando Rodriguez, Position: MF, Attack: 31, Defense: 53, Stamina: 68, Skill: 37, Age: 25, Value: 296000

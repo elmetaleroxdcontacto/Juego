@@ -1,0 +1,17 @@
+Team: Deportes Concepción
+Players:
+- Name: Eduardo Santiago, Position: FW, Attack: 58, Defense: 37, Stamina: 95, Skill: 43, Age: 33, Value: 215000
+- Name: Eduardo Garcia, Position: GK, Attack: 47, Defense: 25, Stamina: 60, Skill: 33, Age: 21, Value: 165000
+- Name: Francisco Arias, Position: FW, Attack: 47, Defense: 27, Stamina: 63, Skill: 32, Age: 33, Value: 160000
+- Name: Enrique Mendez, Position: GK, Attack: 20, Defense: 47, Stamina: 58, Skill: 26, Age: 22, Value: 130000
+- Name: Emilio Romero, Position: GK, Attack: 56, Defense: 46, Stamina: 89, Skill: 52, Age: 30, Value: 260000
+- Name: Salvador Jimenez, Position: DF, Attack: 36, Defense: 54, Stamina: 97, Skill: 49, Age: 34, Value: 245000
+- Name: Fernando Vega, Position: DF, Attack: 41, Defense: 55, Stamina: 92, Skill: 54, Age: 21, Value: 270000
+- Name: Daniel Torres, Position: GK, Attack: 51, Defense: 38, Stamina: 69, Skill: 47, Age: 24, Value: 235000
+- Name: Roberto Blanco, Position: DF, Attack: 48, Defense: 22, Stamina: 54, Skill: 38, Age: 35, Value: 190000
+- Name: Oliver Cortez, Position: DF, Attack: 22, Defense: 27, Stamina: 83, Skill: 31, Age: 22, Value: 155000
+- Name: Miguel Cabrera, Position: GK, Attack: 26, Defense: 53, Stamina: 74, Skill: 45, Age: 22, Value: 225000
+- Name: Sergio Castro, Position: DF, Attack: 34, Defense: 43, Stamina: 91, Skill: 35, Age: 31, Value: 175000
+- Name: Fernando Morales, Position: MF, Attack: 52, Defense: 37, Stamina: 94, Skill: 47, Age: 21, Value: 235000
+- Name: Francisco Luna, Position: FW, Attack: 45, Defense: 49, Stamina: 61, Skill: 56, Age: 32, Value: 280000
+- Name: Fernando Mendoza, Position: MF, Attack: 59, Defense: 23, Stamina: 75, Skill: 36, Age: 22, Value: 180000

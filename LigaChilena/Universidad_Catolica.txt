@@ -1,5 +1,17 @@
 Team: Universidad Católica
 Players:
-- Name: Player1, Position: Forward, Attack: 83, Defense: 41
-- Name: Player2, Position: Midfielder, Attack: 77, Defense: 59
-- Name: Player3, Position: Defender, Attack: 49, Defense: 81
+- Name: Henry Castillo, Position: DF, Attack: 64, Defense: 73, Stamina: 54, Skill: 72, Age: 24, Value: 720000
+- Name: Julian Aguilar, Position: FW, Attack: 61, Defense: 80, Stamina: 95, Skill: 67, Age: 31, Value: 670000
+- Name: James Gil, Position: DF, Attack: 77, Defense: 56, Stamina: 88, Skill: 66, Age: 21, Value: 660000
+- Name: Guillermo Gutierrez, Position: GK, Attack: 78, Defense: 52, Stamina: 82, Skill: 60, Age: 34, Value: 600000
+- Name: Ivan Lopez, Position: FW, Attack: 82, Defense: 60, Stamina: 64, Skill: 68, Age: 34, Value: 680000
+- Name: Antonio Vargas, Position: FW, Attack: 59, Defense: 61, Stamina: 96, Skill: 50, Age: 37, Value: 500000
+- Name: Liam Aguilar, Position: GK, Attack: 99, Defense: 86, Stamina: 76, Skill: 98, Age: 24, Value: 980000
+- Name: Antonio Pena, Position: DF, Attack: 93, Defense: 67, Stamina: 83, Skill: 86, Age: 23, Value: 860000
+- Name: Daniel Sanchez, Position: GK, Attack: 57, Defense: 57, Stamina: 87, Skill: 50, Age: 37, Value: 500000
+- Name: Sergio Mendez, Position: FW, Attack: 59, Defense: 91, Stamina: 83, Skill: 67, Age: 26, Value: 670000
+- Name: Javier Mora, Position: GK, Attack: 57, Defense: 53, Stamina: 78, Skill: 62, Age: 34, Value: 620000
+- Name: Lucas Garcia, Position: FW, Attack: 73, Defense: 51, Stamina: 56, Skill: 60, Age: 35, Value: 600000
+- Name: Henry Lopez, Position: FW, Attack: 79, Defense: 83, Stamina: 79, Skill: 74, Age: 19, Value: 740000
+- Name: Pedro Arias, Position: GK, Attack: 82, Defense: 54, Stamina: 94, Skill: 76, Age: 27, Value: 760000
+- Name: Alexander Gomez, Position: FW, Attack: 91, Defense: 76, Stamina: 98, Skill: 86, Age: 21, Value: 860000

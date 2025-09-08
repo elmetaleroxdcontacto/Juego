@@ -118,6 +118,21 @@ struct LeagueTable {
 // Forward declaration
 bool loadTeamFromFile(const string& filename, Team& team);
 
+string normalizeName(string name) {
+    // Replace spaces
+    replace(name.begin(), name.end(), ' ', '_');
+    // Replace accented characters
+    size_t pos;
+    while ((pos = name.find("ñ")) != string::npos) name.replace(pos, 2, "n");
+    while ((pos = name.find("Ñ")) != string::npos) name.replace(pos, 2, "n");
+    while ((pos = name.find("á")) != string::npos) name.replace(pos, 2, "a");
+    while ((pos = name.find("é")) != string::npos) name.replace(pos, 2, "e");
+    while ((pos = name.find("í")) != string::npos) name.replace(pos, 2, "i");
+    while ((pos = name.find("ó")) != string::npos) name.replace(pos, 2, "o");
+    while ((pos = name.find("ú")) != string::npos) name.replace(pos, 2, "u");
+    return name;
+}
+
 // Career structure
 struct Career {
     Team* myTeam;
@@ -131,27 +146,50 @@ struct Career {
     Career() : myTeam(nullptr), currentSeason(1), currentWeek(1), saveFile("career_save.txt") {}
 
     void initializeLeague() {
-        // Load all teams from files
-        vector<string> teamFiles = {
-            "Colo-Colo.txt", "Universidad_Catolica.txt", "Universidad_de_Chile.txt",
-            "Union_Espanola.txt", "Deportes_Copiapo.txt", "Everton.txt",
-            "Nublense.txt", "Cobresal.txt", "Huachipato.txt"
-        };
-
-        for (const auto& file : teamFiles) {
-            Team team("");
-            string filepath = "LigaChilena/" + file;
-            if (loadTeamFromFile(filepath, team)) {
-                allTeams.push_back(team);
-                leagueTable.addTeam(&allTeams.back());
-            }
-        }
-
-        // Load second division teams
-        ifstream file("LigaChilena/SegundaDivision_teams.txt");
+        // Load Primera División teams from teams.txt
+        ifstream file("LigaChilena/teams.txt");
         if (file.is_open()) {
             string line;
             while (getline(file, line)) {
+                if (!line.empty()) {
+                    Team team("");
+                    team.name = line;
+                    string filepath = "LigaChilena/" + normalizeName(line) + ".txt";
+                    if (loadTeamFromFile(filepath, team)) {
+                        // Loaded from file
+                    } else {
+                        // Generate random players
+                        vector<string> positions = {"GK", "DF", "MF", "FW"};
+                        for (int i = 0; i < 11; ++i) {
+                            Player p;
+                            p.name = "Player" + to_string(i+1);
+                            p.position = positions[rand() % 4];
+                            p.attack = rand() % 50 + 50; // higher for primera
+                            p.defense = rand() % 50 + 50;
+                            p.stamina = rand() % 50 + 50;
+                            p.skill = rand() % 50 + 50;
+                            p.age = rand() % 20 + 18;
+                            p.value = p.skill * 10000;
+                            p.injured = false;
+                            p.injuryWeeks = 0;
+                            p.goals = 0;
+                            p.assists = 0;
+                            p.matchesPlayed = 0;
+                            team.addPlayer(p);
+                        }
+                    }
+                    allTeams.push_back(team);
+                    leagueTable.addTeam(&allTeams.back());
+                }
+            }
+            file.close();
+        }
+
+        // Load second division teams
+        ifstream file2("LigaChilena/SegundaDivision_teams.txt");
+        if (file2.is_open()) {
+            string line;
+            while (getline(file2, line)) {
                 if (!line.empty()) {
                     Team team(line);
                     // Generate 11 random players
@@ -177,7 +215,7 @@ struct Career {
                     leagueTable.addTeam(&allTeams.back());
                 }
             }
-            file.close();
+            file2.close();
         }
 
         // Load third division teams
@@ -628,11 +666,24 @@ bool loadTeamFromFile(const string& filename, Team& team) {
             p.position = line.substr(posPos + 11, posAttack - (posPos + 11));
             p.attack = stoi(line.substr(posAttack + 8, posDefense - (posAttack + 8)));
             p.defense = stoi(line.substr(posDefense + 10));
-            // Set defaults for new attributes
-            p.stamina = 80;
-            p.skill = (p.attack + p.defense) / 2;
-            p.age = 25;
-            p.value = p.skill * 10000;
+
+            // Parse additional attributes if present
+            size_t posStamina = line.find(", Stamina: ");
+            if (posStamina != string::npos) {
+                size_t posSkill = line.find(", Skill: ");
+                p.stamina = stoi(line.substr(posStamina + 10, posSkill - (posStamina + 10)));
+                size_t posAge = line.find(", Age: ");
+                p.skill = stoi(line.substr(posSkill + 8, posAge - (posSkill + 8)));
+                size_t posValue = line.find(", Value: ");
+                p.age = stoi(line.substr(posAge + 6, posValue - (posAge + 6)));
+                p.value = stoi(line.substr(posValue + 8));
+            } else {
+                // Set defaults
+                p.stamina = 80;
+                p.skill = (p.attack + p.defense) / 2;
+                p.age = 25;
+                p.value = p.skill * 10000;
+            }
             p.injured = false;
             p.injuryWeeks = 0;
             p.goals = 0;
@@ -801,46 +852,60 @@ int main() {
                         }
                         case 2: {
                             career.initializeLeague();
-                            // Team Selection
-                            cout << "\nSelecciona tu equipo para la carrera:" << endl;
-                            cout << "1. Colo-Colo" << endl;
-                            cout << "2. Universidad Catolica" << endl;
-                            cout << "3. Universidad de Chile" << endl;
-                            cout << "4. Unión Española" << endl;
-                            cout << "5. Deportes Copiapo" << endl;
-                            cout << "6. Everton" << endl;
-                            cout << "7. Ñublense" << endl;
-                            cout << "8. Cobresal" << endl;
-                            cout << "9. Huachipato" << endl;
-                            cout << "10. Deportes Valdivia" << endl;
-                            cout << "11. Deportes Linares" << endl;
-                            cout << "12. Deportes Rengo" << endl;
-                            cout << "13. Deportes Colina" << endl;
-                            cout << "14. Deportes Recoleta" << endl;
-                            cout << "15. Deportes Melipilla" << endl;
-                            cout << "16. Deportes Vallenar" << endl;
-                            cout << "17. Deportes Santa Cruz" << endl;
-                            cout << "18. Deportes Iberia" << endl;
-                            cout << "19. Deportes Concepción" << endl;
-                            cout << "20. Deportes Temuco" << endl;
-                            cout << "21. Deportes Copiapó" << endl;
-                            cout << "22. Deportes Puerto Montt" << endl;
-                            cout << "23. Magallanes" << endl;
-                            cout << "24. Rangers" << endl;
-                            cout << "25. San Luis" << endl;
-                            cout << "26. Santiago Morning" << endl;
-                            cout << "27. Unión San Felipe" << endl;
-                            cout << "28. Barnechea" << endl;
-                            cout << "29. Cobreloa" << endl;
-                            cout << "30. Deportes Melipilla" << endl;
-                            cout << "31. Iberia" << endl;
-                            cout << "Elige un numero de equipo: ";
+                            // Division Selection
+                            cout << "\nSelecciona la división:" << endl;
+                            cout << "1. Primera División" << endl;
+                            cout << "2. Primera B" << endl;
+                            cout << "3. Segunda División" << endl;
+                            cout << "Elige una división: ";
+                            int divisionChoice;
+                            cin >> divisionChoice;
                             int teamChoice;
-                            cin >> teamChoice;
-                            if (teamChoice >= 1 && teamChoice <= 31) {
-                                career.myTeam = &career.allTeams[teamChoice - 1];
-                                cout << "Has elegido: " << career.myTeam->name << endl;
-                                careerStarted = true;
+                            if (divisionChoice == 1) {
+                                // Primera División
+                                cout << "\nEquipos de Primera División:" << endl;
+                                for (int i = 0; i < 16; ++i) {
+                                    cout << i + 1 << ". " << career.allTeams[i].name << endl;
+                                }
+                                cout << "Elige un numero de equipo: ";
+                                cin >> teamChoice;
+                                if (teamChoice >= 1 && teamChoice <= 16) {
+                                    career.myTeam = &career.allTeams[teamChoice - 1];
+                                    cout << "Has elegido: " << career.myTeam->name << endl;
+                                    careerStarted = true;
+                                } else {
+                                    cout << "Opcion invalida." << endl;
+                                }
+                            } else if (divisionChoice == 2) {
+                                // Primera B
+                                cout << "\nEquipos de Primera B:" << endl;
+                                for (int i = 0; i < 12; ++i) {
+                                    cout << i + 1 << ". " << career.allTeams[26 + i].name << endl;
+                                }
+                                cout << "Elige un numero de equipo: ";
+                                cin >> teamChoice;
+                                if (teamChoice >= 1 && teamChoice <= 12) {
+                                    career.myTeam = &career.allTeams[26 + teamChoice - 1];
+                                    cout << "Has elegido: " << career.myTeam->name << endl;
+                                    careerStarted = true;
+                                } else {
+                                    cout << "Opcion invalida." << endl;
+                                }
+                            } else if (divisionChoice == 3) {
+                                // Segunda División
+                                cout << "\nEquipos de Segunda División:" << endl;
+                                for (int i = 0; i < 10; ++i) {
+                                    cout << i + 1 << ". " << career.allTeams[16 + i].name << endl;
+                                }
+                                cout << "Elige un numero de equipo: ";
+                                cin >> teamChoice;
+                                if (teamChoice >= 1 && teamChoice <= 10) {
+                                    career.myTeam = &career.allTeams[16 + teamChoice - 1];
+                                    cout << "Has elegido: " << career.myTeam->name << endl;
+                                    careerStarted = true;
+                                } else {
+                                    cout << "Opcion invalida." << endl;
+                                }
                             } else {
                                 cout << "Opcion invalida." << endl;
                             }
@@ -951,35 +1016,55 @@ int main() {
 
             case 2: { // Juego Rapido
                 // Start Quick Game - Team Selection
-                cout << "\nSelecciona tu equipo:" << endl;
-                cout << "1. Colo-Colo.txt" << endl;
-                cout << "2. Universidad_Catolica.txt" << endl;
-                cout << "3. Universidad_de_Chile.txt" << endl;
-                cout << "4. Unión_Española.txt" << endl;
-                cout << "5. Deportes_Copiapo.txt" << endl;
-                cout << "6. Everton.txt" << endl;
-                cout << "7. Ñublense.txt" << endl;
-                cout << "8. Cobresal.txt" << endl;
-                cout << "9. Huachipato.txt" << endl;
+                cout << "\nSelecciona tu equipo de Primera División:" << endl;
+                ifstream teamsFile("LigaChilena/teams.txt");
+                vector<string> teamNames;
+                if (teamsFile.is_open()) {
+                    string line;
+                    int count = 1;
+                    while (getline(teamsFile, line)) {
+                        if (!line.empty()) {
+                            cout << count << ". " << line << endl;
+                            teamNames.push_back(line);
+                            count++;
+                        }
+                    }
+                    teamsFile.close();
+                } else {
+                    cout << "Error al cargar la lista de equipos." << endl;
+                    break;
+                }
                 cout << "Elige un numero de equipo: ";
                 int teamChoice;
                 cin >> teamChoice;
-                string filename;
-                switch (teamChoice) {
-                    case 1: filename = "Colo-Colo.txt"; break;
-                    case 2: filename = "Universidad_Catolica.txt"; break;
-                    case 3: filename = "Universidad_de_Chile.txt"; break;
-                    case 4: filename = "Unión_Española.txt"; break;
-                    case 5: filename = "Deportes_Copiapo.txt"; break;
-                    case 6: filename = "Everton.txt"; break;
-                    case 7: filename = "Ñublense.txt"; break;
-                    case 8: filename = "Cobresal.txt"; break;
-                    case 9: filename = "Huachipato.txt"; break;
-                    default: cout << "Opción inválida." << endl; break;
-                }
-                filename = "LigaChilena/" + filename;
-                if (!loadTeamFromFile(filename, myTeam)) {
-                    cout << "Error al cargar el equipo." << endl;
+                if (teamChoice >= 1 && teamChoice <= teamNames.size()) {
+                    string teamName = teamNames[teamChoice - 1];
+                    myTeam.name = teamName;
+                    string filename = "LigaChilena/" + normalizeName(teamName) + ".txt";
+                    if (!loadTeamFromFile(filename, myTeam)) {
+                        cout << "Error al cargar el equipo. Generando jugadores aleatorios." << endl;
+                        // Generate random players
+                        vector<string> positions = {"GK", "DF", "MF", "FW"};
+                        for (int i = 0; i < 11; ++i) {
+                            Player p;
+                            p.name = "Player" + to_string(i+1);
+                            p.position = positions[rand() % 4];
+                            p.attack = rand() % 50 + 50;
+                            p.defense = rand() % 50 + 50;
+                            p.stamina = rand() % 50 + 50;
+                            p.skill = rand() % 50 + 50;
+                            p.age = rand() % 20 + 18;
+                            p.value = p.skill * 10000;
+                            p.injured = false;
+                            p.injuryWeeks = 0;
+                            p.goals = 0;
+                            p.assists = 0;
+                            p.matchesPlayed = 0;
+                            myTeam.addPlayer(p);
+                        }
+                    }
+                } else {
+                    cout << "Opción inválida." << endl;
                     break;
                 }
                 // Quick Game Loop

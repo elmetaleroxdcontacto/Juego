@@ -1,5 +1,17 @@
 Team: Colo-Colo
 Players:
-- Name: Player1, Position: Forward, Attack: 85, Defense: 40
-- Name: Player2, Position: Midfielder, Attack: 75, Defense: 60
-- Name: Player3, Position: Defender, Attack: 50, Defense: 80
+- Name: Liam Alvarez, Position: MF, Attack: 97, Defense: 73, Stamina: 73, Skill: 87, Age: 23, Value: 870000
+- Name: Elijah Gil, Position: MF, Attack: 80, Defense: 76, Stamina: 80, Skill: 79, Age: 23, Value: 790000
+- Name: Mateo Castro, Position: FW, Attack: 83, Defense: 55, Stamina: 62, Skill: 66, Age: 20, Value: 660000
+- Name: Guillermo Jimenez, Position: GK, Attack: 73, Defense: 51, Stamina: 75, Skill: 60, Age: 24, Value: 600000
+- Name: Andres Ramos, Position: MF, Attack: 60, Defense: 50, Stamina: 52, Skill: 56, Age: 34, Value: 560000
+- Name: Samuel Mendez, Position: DF, Attack: 86, Defense: 87, Stamina: 86, Skill: 91, Age: 26, Value: 910000
+- Name: Roberto Gutierrez, Position: DF, Attack: 52, Defense: 93, Stamina: 77, Skill: 67, Age: 27, Value: 670000
+- Name: Julian Mendoza, Position: MF, Attack: 68, Defense: 86, Stamina: 100, Skill: 71, Age: 33, Value: 710000
+- Name: Emilio Romero, Position: GK, Attack: 64, Defense: 98, Stamina: 63, Skill: 81, Age: 31, Value: 810000
+- Name: William Morales, Position: GK, Attack: 66, Defense: 79, Stamina: 50, Skill: 62, Age: 30, Value: 620000
+- Name: Daniel Peralta, Position: DF, Attack: 61, Defense: 51, Stamina: 89, Skill: 60, Age: 24, Value: 600000
+- Name: Elijah Aguilar, Position: GK, Attack: 80, Defense: 50, Stamina: 70, Skill: 68, Age: 22, Value: 680000
+- Name: Oscar Jimenez, Position: DF, Attack: 59, Defense: 77, Stamina: 55, Skill: 74, Age: 18, Value: 740000
+- Name: Guillermo Rojas, Position: FW, Attack: 99, Defense: 75, Stamina: 71, Skill: 96, Age: 30, Value: 960000
+- Name: Santiago Morales, Position: GK, Attack: 60, Defense: 71, Stamina: 72, Skill: 66, Age: 23, Value: 660000

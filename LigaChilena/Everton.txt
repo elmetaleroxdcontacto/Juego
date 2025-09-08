@@ -1,13 +1,17 @@
 Team: Everton
 Players:
-- Name: Pedro Sanchez, Position: Forward, Attack: 80, Defense: 35
-- Name: Juan Lopez, Position: Midfielder, Attack: 70, Defense: 55
-- Name: Carlos Ruiz, Position: Defender, Attack: 45, Defense: 75
-- Name: Miguel Torres, Position: Goalkeeper, Attack: 15, Defense: 85
-- Name: Andres Gomez, Position: Midfielder, Attack: 65, Defense: 50
-- Name: Felipe Diaz, Position: Forward, Attack: 75, Defense: 30
-- Name: Rodrigo Silva, Position: Defender, Attack: 40, Defense: 70
-- Name: Diego Martinez, Position: Midfielder, Attack: 60, Defense: 45
-- Name: Sebastian Vega, Position: Defender, Attack: 35, Defense: 65
-- Name: Matias Fernandez, Position: Forward, Attack: 70, Defense: 40
-- Name: Nicolas Alvarez, Position: Midfielder, Attack: 55, Defense: 60
+- Name: Julian Jimenez, Position: GK, Attack: 87, Defense: 55, Stamina: 92, Skill: 62, Age: 23, Value: 620000
+- Name: Roberto Reyes, Position: GK, Attack: 94, Defense: 61, Stamina: 72, Skill: 76, Age: 36, Value: 760000
+- Name: Gabriel Flores, Position: FW, Attack: 76, Defense: 83, Stamina: 61, Skill: 76, Age: 18, Value: 760000
+- Name: Luis Morales, Position: MF, Attack: 96, Defense: 72, Stamina: 62, Skill: 82, Age: 21, Value: 820000
+- Name: Daniel Mora, Position: DF, Attack: 93, Defense: 76, Stamina: 60, Skill: 93, Age: 31, Value: 930000
+- Name: Rodrigo Rojas, Position: GK, Attack: 53, Defense: 86, Stamina: 84, Skill: 77, Age: 22, Value: 770000
+- Name: Emilio Ramos, Position: GK, Attack: 65, Defense: 63, Stamina: 66, Skill: 60, Age: 36, Value: 600000
+- Name: Emilio Castro, Position: GK, Attack: 97, Defense: 92, Stamina: 86, Skill: 99, Age: 26, Value: 990000
+- Name: Samuel Morales, Position: GK, Attack: 78, Defense: 99, Stamina: 90, Skill: 95, Age: 18, Value: 950000
+- Name: Antonio Moreno, Position: DF, Attack: 70, Defense: 52, Stamina: 82, Skill: 67, Age: 33, Value: 670000
+- Name: Alexander Castro, Position: FW, Attack: 72, Defense: 62, Stamina: 57, Skill: 62, Age: 21, Value: 620000
+- Name: Rafael Reyes, Position: MF, Attack: 95, Defense: 64, Stamina: 100, Skill: 88, Age: 35, Value: 880000
+- Name: Elijah Mendoza, Position: MF, Attack: 85, Defense: 59, Stamina: 64, Skill: 81, Age: 22, Value: 810000
+- Name: Gabriel Hernandez, Position: FW, Attack: 99, Defense: 55, Stamina: 62, Skill: 70, Age: 35, Value: 700000
+- Name: Salvador Gonzalez, Position: DF, Attack: 53, Defense: 98, Stamina: 100, Skill: 76, Age: 35, Value: 760000

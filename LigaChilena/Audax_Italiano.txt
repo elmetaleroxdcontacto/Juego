@@ -1,0 +1,17 @@
+Team: Audax Italiano
+Players:
+- Name: Alexander Castro, Position: MF, Attack: 68, Defense: 68, Stamina: 96, Skill: 77, Age: 29, Value: 770000
+- Name: Ricardo Rodriguez, Position: FW, Attack: 98, Defense: 66, Stamina: 95, Skill: 80, Age: 22, Value: 800000
+- Name: Angel Delgado, Position: FW, Attack: 66, Defense: 99, Stamina: 50, Skill: 78, Age: 22, Value: 780000
+- Name: Samuel Mora, Position: GK, Attack: 97, Defense: 58, Stamina: 69, Skill: 83, Age: 35, Value: 830000
+- Name: Carlos Munoz, Position: DF, Attack: 73, Defense: 88, Stamina: 85, Skill: 74, Age: 19, Value: 740000
+- Name: Miguel Santiago, Position: MF, Attack: 96, Defense: 81, Stamina: 75, Skill: 94, Age: 18, Value: 940000
+- Name: Gabriel Moreno, Position: GK, Attack: 64, Defense: 54, Stamina: 80, Skill: 63, Age: 20, Value: 630000
+- Name: Manuel Jimenez, Position: MF, Attack: 76, Defense: 74, Stamina: 98, Skill: 73, Age: 25, Value: 730000
+- Name: Alejandro Aguilar, Position: MF, Attack: 59, Defense: 70, Stamina: 60, Skill: 66, Age: 23, Value: 660000
+- Name: Diego Delgado, Position: MF, Attack: 92, Defense: 66, Stamina: 61, Skill: 74, Age: 35, Value: 740000
+- Name: Alejandro Mendez, Position: FW, Attack: 52, Defense: 74, Stamina: 90, Skill: 54, Age: 20, Value: 540000
+- Name: Matthew Cortez, Position: DF, Attack: 88, Defense: 82, Stamina: 60, Skill: 92, Age: 18, Value: 920000
+- Name: Cristian Mendoza, Position: DF, Attack: 60, Defense: 87, Stamina: 55, Skill: 75, Age: 25, Value: 750000
+- Name: Ricardo Diaz, Position: MF, Attack: 63, Defense: 77, Stamina: 86, Skill: 68, Age: 24, Value: 680000
+- Name: Alejandro Blanco, Position: GK, Attack: 78, Defense: 87, Stamina: 65, Skill: 75, Age: 34, Value: 750000

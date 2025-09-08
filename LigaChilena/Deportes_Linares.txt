@@ -1,0 +1,17 @@
+Team: Deportes Linares
+Players:
+- Name: Francisco Suarez, Position: GK, Attack: 38, Defense: 20, Stamina: 99, Skill: 32, Age: 19, Value: 160000
+- Name: Oscar Silva, Position: MF, Attack: 27, Defense: 34, Stamina: 86, Skill: 39, Age: 37, Value: 195000
+- Name: Carlos Moreno, Position: MF, Attack: 23, Defense: 46, Stamina: 61, Skill: 27, Age: 28, Value: 135000
+- Name: Cristian Fernandez, Position: DF, Attack: 46, Defense: 54, Stamina: 93, Skill: 44, Age: 26, Value: 220000
+- Name: Cristian Gonzalez, Position: GK, Attack: 24, Defense: 57, Stamina: 84, Skill: 45, Age: 35, Value: 225000
+- Name: Carlos Vargas, Position: DF, Attack: 40, Defense: 46, Stamina: 92, Skill: 36, Age: 37, Value: 180000
+- Name: Michael Gil, Position: FW, Attack: 22, Defense: 22, Stamina: 63, Skill: 30, Age: 35, Value: 150000
+- Name: Felipe Rojas, Position: FW, Attack: 53, Defense: 53, Stamina: 87, Skill: 45, Age: 25, Value: 225000
+- Name: Victor Cortez, Position: GK, Attack: 45, Defense: 21, Stamina: 76, Skill: 33, Age: 30, Value: 165000
+- Name: Sergio Ruiz, Position: GK, Attack: 50, Defense: 27, Stamina: 84, Skill: 31, Age: 27, Value: 155000
+- Name: Roberto Mendez, Position: GK, Attack: 35, Defense: 32, Stamina: 71, Skill: 38, Age: 30, Value: 190000
+- Name: Ivan Romero, Position: GK, Attack: 36, Defense: 41, Stamina: 70, Skill: 29, Age: 31, Value: 145000
+- Name: Michael Torres, Position: GK, Attack: 53, Defense: 40, Stamina: 85, Skill: 46, Age: 34, Value: 230000
+- Name: William Moreno, Position: GK, Attack: 57, Defense: 25, Stamina: 89, Skill: 44, Age: 31, Value: 220000
+- Name: Sergio Lopez, Position: DF, Attack: 40, Defense: 45, Stamina: 58, Skill: 49, Age: 20, Value: 245000

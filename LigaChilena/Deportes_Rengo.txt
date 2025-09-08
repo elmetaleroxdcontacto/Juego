@@ -1,0 +1,17 @@
+Team: Deportes Rengo
+Players:
+- Name: Roberto Acosta, Position: MF, Attack: 21, Defense: 26, Stamina: 71, Skill: 23, Age: 35, Value: 115000
+- Name: Daniel Santiago, Position: GK, Attack: 40, Defense: 49, Stamina: 98, Skill: 42, Age: 18, Value: 210000
+- Name: Rodrigo Castro, Position: FW, Attack: 45, Defense: 47, Stamina: 60, Skill: 44, Age: 37, Value: 220000
+- Name: Juan Romero, Position: FW, Attack: 27, Defense: 29, Stamina: 75, Skill: 30, Age: 27, Value: 150000
+- Name: Michael Vargas, Position: FW, Attack: 22, Defense: 32, Stamina: 95, Skill: 20, Age: 21, Value: 100000
+- Name: Hugo Morales, Position: DF, Attack: 46, Defense: 25, Stamina: 56, Skill: 40, Age: 25, Value: 200000
+- Name: Lucas Flores, Position: GK, Attack: 38, Defense: 54, Stamina: 56, Skill: 41, Age: 21, Value: 205000
+- Name: Ricardo Luna, Position: DF, Attack: 38, Defense: 55, Stamina: 54, Skill: 53, Age: 22, Value: 265000
+- Name: Elijah Perez, Position: FW, Attack: 25, Defense: 58, Stamina: 77, Skill: 42, Age: 37, Value: 210000
+- Name: Felipe Fernandez, Position: MF, Attack: 55, Defense: 56, Stamina: 56, Skill: 56, Age: 21, Value: 280000
+- Name: Nicolas Mora, Position: GK, Attack: 36, Defense: 38, Stamina: 64, Skill: 33, Age: 35, Value: 165000
+- Name: Matthew Alvarez, Position: FW, Attack: 47, Defense: 21, Stamina: 55, Skill: 26, Age: 25, Value: 130000
+- Name: Sergio Suarez, Position: GK, Attack: 37, Defense: 58, Stamina: 82, Skill: 56, Age: 32, Value: 280000
+- Name: Noah Ramos, Position: GK, Attack: 27, Defense: 46, Stamina: 72, Skill: 42, Age: 29, Value: 210000
+- Name: Carlos Suarez, Position: DF, Attack: 23, Defense: 55, Stamina: 75, Skill: 43, Age: 27, Value: 215000

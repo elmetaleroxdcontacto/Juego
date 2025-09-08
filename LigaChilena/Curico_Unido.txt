@@ -1,0 +1,17 @@
+Team: Curicó Unido
+Players:
+- Name: Nicolas Castillo, Position: GK, Attack: 60, Defense: 88, Stamina: 78, Skill: 69, Age: 37, Value: 690000
+- Name: Eduardo Santos, Position: FW, Attack: 93, Defense: 69, Stamina: 65, Skill: 86, Age: 31, Value: 860000
+- Name: Sergio Vazquez, Position: DF, Attack: 98, Defense: 69, Stamina: 95, Skill: 82, Age: 19, Value: 820000
+- Name: Mateo Luna, Position: MF, Attack: 58, Defense: 60, Stamina: 95, Skill: 56, Age: 25, Value: 560000
+- Name: Antonio Mora, Position: FW, Attack: 76, Defense: 87, Stamina: 79, Skill: 72, Age: 37, Value: 720000
+- Name: Pedro Alvarez, Position: GK, Attack: 55, Defense: 70, Stamina: 90, Skill: 55, Age: 22, Value: 550000
+- Name: Luis Rios, Position: DF, Attack: 59, Defense: 61, Stamina: 76, Skill: 64, Age: 36, Value: 640000
+- Name: William Hernandez, Position: DF, Attack: 87, Defense: 86, Stamina: 93, Skill: 93, Age: 32, Value: 930000
+- Name: Salvador Hernandez, Position: DF, Attack: 93, Defense: 84, Stamina: 88, Skill: 87, Age: 30, Value: 870000
+- Name: Pablo Herrera, Position: MF, Attack: 63, Defense: 90, Stamina: 52, Skill: 75, Age: 26, Value: 750000
+- Name: Sergio Mendez, Position: FW, Attack: 68, Defense: 58, Stamina: 71, Skill: 72, Age: 32, Value: 720000
+- Name: Ricardo Dominguez, Position: GK, Attack: 77, Defense: 80, Stamina: 51, Skill: 84, Age: 30, Value: 840000
+- Name: Sebastian Arias, Position: DF, Attack: 51, Defense: 95, Stamina: 100, Skill: 63, Age: 30, Value: 630000
+- Name: Nicolas Moreno, Position: GK, Attack: 55, Defense: 73, Stamina: 61, Skill: 54, Age: 25, Value: 540000
+- Name: Lucas Sanchez, Position: FW, Attack: 65, Defense: 58, Stamina: 54, Skill: 69, Age: 21, Value: 690000

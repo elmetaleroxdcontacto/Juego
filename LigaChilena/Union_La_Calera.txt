@@ -1,0 +1,17 @@
+Team: Unión La Calera
+Players:
+- Name: Elijah Ortega, Position: GK, Attack: 64, Defense: 91, Stamina: 89, Skill: 70, Age: 20, Value: 700000
+- Name: Victor Ortiz, Position: GK, Attack: 63, Defense: 65, Stamina: 88, Skill: 61, Age: 21, Value: 610000
+- Name: William Santiago, Position: FW, Attack: 99, Defense: 94, Stamina: 79, Skill: 91, Age: 24, Value: 910000
+- Name: Angel Santos, Position: DF, Attack: 80, Defense: 85, Stamina: 94, Skill: 76, Age: 28, Value: 760000
+- Name: William Garcia, Position: MF, Attack: 78, Defense: 60, Stamina: 75, Skill: 72, Age: 26, Value: 720000
+- Name: Thiago Garcia, Position: MF, Attack: 71, Defense: 55, Stamina: 83, Skill: 69, Age: 21, Value: 690000
+- Name: Oscar Gomez, Position: DF, Attack: 70, Defense: 90, Stamina: 55, Skill: 81, Age: 24, Value: 810000
+- Name: Hugo Ramos, Position: GK, Attack: 63, Defense: 62, Stamina: 51, Skill: 58, Age: 27, Value: 580000
+- Name: Thiago Rodriguez, Position: FW, Attack: 97, Defense: 60, Stamina: 72, Skill: 82, Age: 35, Value: 820000
+- Name: Salvador Rodriguez, Position: GK, Attack: 78, Defense: 63, Stamina: 73, Skill: 69, Age: 25, Value: 690000
+- Name: Sebastian Castillo, Position: MF, Attack: 68, Defense: 82, Stamina: 79, Skill: 82, Age: 31, Value: 820000
+- Name: Hugo Cabrera, Position: GK, Attack: 53, Defense: 65, Stamina: 71, Skill: 50, Age: 18, Value: 500000
+- Name: Thiago Silva, Position: DF, Attack: 95, Defense: 67, Stamina: 84, Skill: 90, Age: 21, Value: 900000
+- Name: Eduardo Delgado, Position: FW, Attack: 91, Defense: 60, Stamina: 50, Skill: 65, Age: 21, Value: 650000
+- Name: Rodrigo Jimenez, Position: DF, Attack: 52, Defense: 60, Stamina: 54, Skill: 61, Age: 27, Value: 610000

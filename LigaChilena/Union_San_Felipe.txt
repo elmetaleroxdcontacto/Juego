@@ -1,0 +1,17 @@
+Team: Unión San Felipe
+Players:
+- Name: Hugo Vazquez, Position: GK, Attack: 34, Defense: 49, Stamina: 69, Skill: 44, Age: 26, Value: 352000
+- Name: Pedro Aguilar, Position: DF, Attack: 75, Defense: 32, Stamina: 77, Skill: 54, Age: 23, Value: 432000
+- Name: Aiden Munoz, Position: DF, Attack: 54, Defense: 77, Stamina: 64, Skill: 64, Age: 33, Value: 512000
+- Name: Oscar Martinez, Position: DF, Attack: 41, Defense: 42, Stamina: 99, Skill: 47, Age: 27, Value: 376000
+- Name: Guillermo Gomez, Position: DF, Attack: 46, Defense: 34, Stamina: 72, Skill: 32, Age: 28, Value: 256000
+- Name: Liam Torres, Position: MF, Attack: 75, Defense: 66, Stamina: 88, Skill: 62, Age: 27, Value: 496000
+- Name: Matias Perez, Position: MF, Attack: 77, Defense: 56, Stamina: 63, Skill: 62, Age: 31, Value: 496000
+- Name: Benjamin Moreno, Position: MF, Attack: 60, Defense: 78, Stamina: 51, Skill: 62, Age: 26, Value: 496000
+- Name: Daniel Perez, Position: FW, Attack: 39, Defense: 73, Stamina: 97, Skill: 55, Age: 21, Value: 440000
+- Name: Samuel Mendez, Position: DF, Attack: 60, Defense: 72, Stamina: 60, Skill: 64, Age: 29, Value: 512000
+- Name: Pedro Castillo, Position: FW, Attack: 30, Defense: 42, Stamina: 64, Skill: 42, Age: 29, Value: 336000
+- Name: Miguel Moreno, Position: MF, Attack: 35, Defense: 33, Stamina: 70, Skill: 42, Age: 34, Value: 336000
+- Name: Sebastian Gil, Position: DF, Attack: 51, Defense: 32, Stamina: 77, Skill: 39, Age: 34, Value: 312000
+- Name: Leonardo Rios, Position: MF, Attack: 54, Defense: 78, Stamina: 58, Skill: 61, Age: 26, Value: 488000
+- Name: Emilio Flores, Position: GK, Attack: 35, Defense: 30, Stamina: 89, Skill: 37, Age: 24, Value: 296000

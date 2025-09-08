@@ -1,13 +1,17 @@
 Team: Huachipato
 Players:
-- Name: Antonio Lara, Position: Forward, Attack: 74, Defense: 36
-- Name: Benjamin Jara, Position: Midfielder, Attack: 64, Defense: 56
-- Name: Cristian Muñoz, Position: Defender, Attack: 46, Defense: 76
-- Name: David Navarro, Position: Goalkeeper, Attack: 16, Defense: 86
-- Name: Esteban Flores, Position: Midfielder, Attack: 66, Defense: 44
-- Name: Francisco Tapia, Position: Forward, Attack: 69, Defense: 24
-- Name: Guillermo Vera, Position: Defender, Attack: 34, Defense: 64
-- Name: Hugo Salinas, Position: Midfielder, Attack: 54, Defense: 46
-- Name: Ivan Morales, Position: Defender, Attack: 36, Defense: 66
-- Name: Jorge Pacheco, Position: Forward, Attack: 64, Defense: 34
-- Name: Luis Cabrera, Position: Midfielder, Attack: 56, Defense: 54
+- Name: Victor Romero, Position: FW, Attack: 80, Defense: 52, Stamina: 63, Skill: 70, Age: 36, Value: 700000
+- Name: Thiago Munoz, Position: FW, Attack: 99, Defense: 99, Stamina: 75, Skill: 99, Age: 18, Value: 990000
+- Name: Nicolas Ramos, Position: DF, Attack: 79, Defense: 73, Stamina: 79, Skill: 71, Age: 26, Value: 710000
+- Name: Elijah Blanco, Position: MF, Attack: 86, Defense: 54, Stamina: 62, Skill: 79, Age: 26, Value: 790000
+- Name: Elijah Luna, Position: FW, Attack: 93, Defense: 50, Stamina: 93, Skill: 75, Age: 32, Value: 750000
+- Name: Santiago Navarro, Position: FW, Attack: 84, Defense: 78, Stamina: 99, Skill: 75, Age: 20, Value: 750000
+- Name: Diego Sanchez, Position: FW, Attack: 94, Defense: 73, Stamina: 51, Skill: 73, Age: 26, Value: 730000
+- Name: Ivan Garcia, Position: MF, Attack: 51, Defense: 92, Stamina: 75, Skill: 71, Age: 26, Value: 710000
+- Name: Luis Vazquez, Position: DF, Attack: 77, Defense: 66, Stamina: 55, Skill: 67, Age: 29, Value: 670000
+- Name: Javier Gonzalez, Position: GK, Attack: 73, Defense: 66, Stamina: 87, Skill: 76, Age: 27, Value: 760000
+- Name: Pedro Leon, Position: FW, Attack: 89, Defense: 59, Stamina: 85, Skill: 70, Age: 32, Value: 700000
+- Name: Carlos Morales, Position: MF, Attack: 59, Defense: 76, Stamina: 87, Skill: 59, Age: 33, Value: 590000
+- Name: Salvador Acosta, Position: MF, Attack: 88, Defense: 88, Stamina: 77, Skill: 87, Age: 21, Value: 870000
+- Name: Adrian Blanco, Position: MF, Attack: 99, Defense: 81, Stamina: 88, Skill: 83, Age: 26, Value: 830000
+- Name: Mateo Aguilar, Position: MF, Attack: 70, Defense: 52, Stamina: 81, Skill: 70, Age: 36, Value: 700000

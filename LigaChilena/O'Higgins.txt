@@ -1,0 +1,17 @@
+Team: O'Higgins
+Players:
+- Name: James Mendoza, Position: DF, Attack: 78, Defense: 67, Stamina: 65, Skill: 66, Age: 33, Value: 660000
+- Name: Victor Vazquez, Position: MF, Attack: 54, Defense: 90, Stamina: 78, Skill: 77, Age: 29, Value: 770000
+- Name: Michael Navarro, Position: GK, Attack: 77, Defense: 94, Stamina: 53, Skill: 75, Age: 33, Value: 750000
+- Name: Adrian Guerrero, Position: DF, Attack: 50, Defense: 56, Stamina: 87, Skill: 50, Age: 28, Value: 500000
+- Name: Cristian Vargas, Position: FW, Attack: 98, Defense: 51, Stamina: 75, Skill: 70, Age: 30, Value: 700000
+- Name: Diego Vargas, Position: GK, Attack: 92, Defense: 80, Stamina: 99, Skill: 83, Age: 33, Value: 830000
+- Name: Lucas Reyes, Position: MF, Attack: 87, Defense: 53, Stamina: 59, Skill: 66, Age: 32, Value: 660000
+- Name: Luis Navarro, Position: FW, Attack: 70, Defense: 78, Stamina: 66, Skill: 69, Age: 19, Value: 690000
+- Name: Sebastian Vazquez, Position: MF, Attack: 89, Defense: 88, Stamina: 73, Skill: 92, Age: 36, Value: 920000
+- Name: Rafael Ortega, Position: GK, Attack: 87, Defense: 71, Stamina: 53, Skill: 79, Age: 24, Value: 790000
+- Name: Henry Diaz, Position: DF, Attack: 83, Defense: 88, Stamina: 66, Skill: 77, Age: 26, Value: 770000
+- Name: Oscar Leon, Position: GK, Attack: 99, Defense: 56, Stamina: 63, Skill: 84, Age: 23, Value: 840000
+- Name: Liam Diaz, Position: MF, Attack: 72, Defense: 68, Stamina: 59, Skill: 67, Age: 21, Value: 670000
+- Name: Alexander Cortez, Position: FW, Attack: 77, Defense: 59, Stamina: 94, Skill: 59, Age: 37, Value: 590000
+- Name: Carlos Martin, Position: FW, Attack: 98, Defense: 90, Stamina: 62, Skill: 86, Age: 29, Value: 860000

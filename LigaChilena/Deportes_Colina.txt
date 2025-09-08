@@ -1,0 +1,17 @@
+Team: Deportes Colina
+Players:
+- Name: Jose Vargas, Position: DF, Attack: 48, Defense: 29, Stamina: 67, Skill: 34, Age: 32, Value: 170000
+- Name: Alejandro Perez, Position: GK, Attack: 57, Defense: 54, Stamina: 52, Skill: 58, Age: 32, Value: 290000
+- Name: William Martinez, Position: DF, Attack: 35, Defense: 59, Stamina: 83, Skill: 44, Age: 29, Value: 220000
+- Name: Lucas Jimenez, Position: DF, Attack: 32, Defense: 56, Stamina: 59, Skill: 51, Age: 26, Value: 255000
+- Name: Antonio Mendez, Position: GK, Attack: 40, Defense: 56, Stamina: 82, Skill: 40, Age: 31, Value: 200000
+- Name: James Martin, Position: MF, Attack: 47, Defense: 31, Stamina: 60, Skill: 44, Age: 22, Value: 220000
+- Name: Matthew Morales, Position: FW, Attack: 29, Defense: 54, Stamina: 95, Skill: 34, Age: 29, Value: 170000
+- Name: Hugo Santos, Position: GK, Attack: 45, Defense: 51, Stamina: 65, Skill: 50, Age: 30, Value: 250000
+- Name: James Dominguez, Position: GK, Attack: 47, Defense: 46, Stamina: 73, Skill: 48, Age: 34, Value: 240000
+- Name: Lucas Santiago, Position: FW, Attack: 30, Defense: 29, Stamina: 82, Skill: 28, Age: 22, Value: 140000
+- Name: Guillermo Sanchez, Position: MF, Attack: 35, Defense: 48, Stamina: 95, Skill: 40, Age: 29, Value: 200000
+- Name: Angel Rios, Position: GK, Attack: 24, Defense: 54, Stamina: 71, Skill: 43, Age: 20, Value: 215000
+- Name: Roberto Gonzalez, Position: FW, Attack: 45, Defense: 39, Stamina: 64, Skill: 39, Age: 25, Value: 195000
+- Name: Hugo Sanchez, Position: MF, Attack: 46, Defense: 23, Stamina: 72, Skill: 33, Age: 29, Value: 165000
+- Name: Daniel Rojas, Position: GK, Attack: 27, Defense: 34, Stamina: 97, Skill: 24, Age: 33, Value: 120000

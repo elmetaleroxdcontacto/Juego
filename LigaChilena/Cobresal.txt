@@ -1,13 +1,17 @@
 Team: Cobresal
 Players:
-- Name: Luis Mendoza, Position: Forward, Attack: 76, Defense: 34
-- Name: Mario Chavez, Position: Midfielder, Attack: 66, Defense: 54
-- Name: Nelson Fuentes, Position: Defender, Attack: 44, Defense: 74
-- Name: Oscar Reyes, Position: Goalkeeper, Attack: 14, Defense: 84
-- Name: Pablo Aguirre, Position: Midfielder, Attack: 64, Defense: 46
-- Name: Ramon Salinas, Position: Forward, Attack: 71, Defense: 26
-- Name: Sergio Cortes, Position: Defender, Attack: 36, Defense: 66
-- Name: Tomas Valenzuela, Position: Midfielder, Attack: 56, Defense: 44
-- Name: Ulises Ponce, Position: Defender, Attack: 34, Defense: 64
-- Name: Victor Hidalgo, Position: Forward, Attack: 66, Defense: 36
-- Name: Walter Espinoza, Position: Midfielder, Attack: 54, Defense: 56
+- Name: Salvador Castillo, Position: GK, Attack: 93, Defense: 91, Stamina: 78, Skill: 93, Age: 28, Value: 930000
+- Name: Santiago Mendez, Position: MF, Attack: 56, Defense: 87, Stamina: 57, Skill: 68, Age: 21, Value: 680000
+- Name: Oscar Arias, Position: MF, Attack: 86, Defense: 89, Stamina: 83, Skill: 81, Age: 25, Value: 810000
+- Name: Oscar Martinez, Position: GK, Attack: 58, Defense: 88, Stamina: 96, Skill: 75, Age: 34, Value: 750000
+- Name: Victor Jimenez, Position: GK, Attack: 69, Defense: 77, Stamina: 75, Skill: 74, Age: 30, Value: 740000
+- Name: Santiago Rojas, Position: MF, Attack: 64, Defense: 50, Stamina: 82, Skill: 52, Age: 27, Value: 520000
+- Name: Salvador Mora, Position: MF, Attack: 73, Defense: 95, Stamina: 67, Skill: 83, Age: 26, Value: 830000
+- Name: Oscar Mendez, Position: MF, Attack: 73, Defense: 60, Stamina: 74, Skill: 57, Age: 36, Value: 570000
+- Name: Francisco Diaz, Position: FW, Attack: 59, Defense: 69, Stamina: 55, Skill: 66, Age: 32, Value: 660000
+- Name: Ivan Gonzalez, Position: GK, Attack: 94, Defense: 78, Stamina: 99, Skill: 86, Age: 19, Value: 860000
+- Name: Manuel Martin, Position: FW, Attack: 65, Defense: 80, Stamina: 55, Skill: 81, Age: 19, Value: 810000
+- Name: Enrique Ortiz, Position: MF, Attack: 51, Defense: 75, Stamina: 73, Skill: 58, Age: 37, Value: 580000
+- Name: Juan Santiago, Position: FW, Attack: 53, Defense: 53, Stamina: 50, Skill: 61, Age: 26, Value: 610000
+- Name: Enrique Alvarez, Position: GK, Attack: 77, Defense: 58, Stamina: 58, Skill: 72, Age: 29, Value: 720000
+- Name: Juan Gil, Position: DF, Attack: 54, Defense: 60, Stamina: 96, Skill: 62, Age: 24, Value: 620000

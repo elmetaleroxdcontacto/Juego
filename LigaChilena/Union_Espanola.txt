@@ -1,5 +1,17 @@
 Team: Unión Española
 Players:
-- Name: Player1, Position: Forward, Attack: 79, Defense: 44
-- Name: Player2, Position: Midfielder, Attack: 74, Defense: 61
-- Name: Player3, Position: Defender, Attack: 52, Defense: 78
+- Name: Antonio Lopez, Position: DF, Attack: 90, Defense: 56, Stamina: 83, Skill: 73, Age: 35, Value: 730000
+- Name: Francisco Ruiz, Position: GK, Attack: 74, Defense: 78, Stamina: 71, Skill: 72, Age: 35, Value: 720000
+- Name: Thiago Silva, Position: DF, Attack: 95, Defense: 65, Stamina: 72, Skill: 73, Age: 21, Value: 730000
+- Name: Benjamin Cabrera, Position: DF, Attack: 92, Defense: 62, Stamina: 96, Skill: 72, Age: 23, Value: 720000
+- Name: Mario Mendez, Position: FW, Attack: 95, Defense: 66, Stamina: 68, Skill: 74, Age: 32, Value: 740000
+- Name: Antonio Dominguez, Position: FW, Attack: 96, Defense: 81, Stamina: 78, Skill: 86, Age: 28, Value: 860000
+- Name: Juan Jimenez, Position: MF, Attack: 50, Defense: 99, Stamina: 66, Skill: 66, Age: 34, Value: 660000
+- Name: Daniel Morales, Position: GK, Attack: 79, Defense: 90, Stamina: 62, Skill: 82, Age: 19, Value: 820000
+- Name: Ivan Herrera, Position: DF, Attack: 86, Defense: 72, Stamina: 50, Skill: 73, Age: 32, Value: 730000
+- Name: Carlos Perez, Position: DF, Attack: 50, Defense: 74, Stamina: 88, Skill: 61, Age: 32, Value: 610000
+- Name: Mateo Pena, Position: GK, Attack: 64, Defense: 62, Stamina: 51, Skill: 58, Age: 20, Value: 580000
+- Name: Lucas Munoz, Position: MF, Attack: 60, Defense: 85, Stamina: 88, Skill: 76, Age: 33, Value: 760000
+- Name: Lucas Torres, Position: GK, Attack: 82, Defense: 68, Stamina: 69, Skill: 75, Age: 25, Value: 750000
+- Name: Henry Mendoza, Position: DF, Attack: 56, Defense: 67, Stamina: 96, Skill: 57, Age: 26, Value: 570000
+- Name: William Lopez, Position: MF, Attack: 69, Defense: 50, Stamina: 57, Skill: 59, Age: 33, Value: 590000

@@ -1,13 +1,17 @@
 Team: Ñublense
 Players:
-- Name: Alejandro Morales, Position: Forward, Attack: 78, Defense: 32
-- Name: Bruno Castillo, Position: Midfielder, Attack: 68, Defense: 52
-- Name: Claudio Vargas, Position: Defender, Attack: 42, Defense: 72
-- Name: Daniel Rojas, Position: Goalkeeper, Attack: 12, Defense: 82
-- Name: Eduardo Paredes, Position: Midfielder, Attack: 62, Defense: 48
-- Name: Fabian Soto, Position: Forward, Attack: 73, Defense: 28
-- Name: Gabriel Ramirez, Position: Defender, Attack: 38, Defense: 68
-- Name: Hector Gonzalez, Position: Midfielder, Attack: 58, Defense: 42
-- Name: Ignacio Herrera, Position: Defender, Attack: 32, Defense: 62
-- Name: Javier Luna, Position: Forward, Attack: 68, Defense: 38
-- Name: Kevin Ortega, Position: Midfielder, Attack: 52, Defense: 58
+- Name: Luis Pena, Position: FW, Attack: 88, Defense: 58, Stamina: 63, Skill: 63, Age: 25, Value: 630000
+- Name: Roberto Hernandez, Position: DF, Attack: 56, Defense: 86, Stamina: 61, Skill: 72, Age: 27, Value: 720000
+- Name: Nicolas Reyes, Position: FW, Attack: 91, Defense: 91, Stamina: 53, Skill: 99, Age: 28, Value: 990000
+- Name: Salvador Blanco, Position: FW, Attack: 99, Defense: 93, Stamina: 73, Skill: 94, Age: 26, Value: 940000
+- Name: Andres Gomez, Position: GK, Attack: 52, Defense: 90, Stamina: 93, Skill: 76, Age: 29, Value: 760000
+- Name: Roberto Reyes, Position: MF, Attack: 83, Defense: 88, Stamina: 67, Skill: 91, Age: 31, Value: 910000
+- Name: Carlos Lopez, Position: DF, Attack: 62, Defense: 68, Stamina: 64, Skill: 58, Age: 31, Value: 580000
+- Name: Diego Ramos, Position: MF, Attack: 96, Defense: 94, Stamina: 69, Skill: 89, Age: 26, Value: 890000
+- Name: Liam Peralta, Position: DF, Attack: 79, Defense: 81, Stamina: 74, Skill: 77, Age: 33, Value: 770000
+- Name: Rafael Rios, Position: DF, Attack: 67, Defense: 72, Stamina: 82, Skill: 60, Age: 18, Value: 600000
+- Name: Jose Gil, Position: GK, Attack: 71, Defense: 87, Stamina: 81, Skill: 86, Age: 22, Value: 860000
+- Name: William Moreno, Position: GK, Attack: 74, Defense: 81, Stamina: 60, Skill: 71, Age: 24, Value: 710000
+- Name: Carlos Rojas, Position: MF, Attack: 79, Defense: 75, Stamina: 54, Skill: 84, Age: 29, Value: 840000
+- Name: Thiago Vazquez, Position: FW, Attack: 56, Defense: 50, Stamina: 96, Skill: 56, Age: 34, Value: 560000
+- Name: Julian Arias, Position: MF, Attack: 80, Defense: 76, Stamina: 68, Skill: 84, Age: 21, Value: 840000

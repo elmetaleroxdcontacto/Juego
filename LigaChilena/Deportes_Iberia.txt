@@ -1,0 +1,17 @@
+Team: Deportes Iberia
+Players:
+- Name: Ruben Reyes, Position: MF, Attack: 39, Defense: 40, Stamina: 91, Skill: 42, Age: 31, Value: 210000
+- Name: Fernando Hernandez, Position: MF, Attack: 52, Defense: 40, Stamina: 83, Skill: 52, Age: 28, Value: 260000
+- Name: Alexander Medina, Position: MF, Attack: 38, Defense: 48, Stamina: 70, Skill: 48, Age: 28, Value: 240000
+- Name: Diego Navarro, Position: MF, Attack: 51, Defense: 33, Stamina: 70, Skill: 51, Age: 33, Value: 255000
+- Name: Matias Romero, Position: MF, Attack: 31, Defense: 33, Stamina: 78, Skill: 30, Age: 32, Value: 150000
+- Name: Antonio Vargas, Position: FW, Attack: 58, Defense: 41, Stamina: 100, Skill: 52, Age: 20, Value: 260000
+- Name: Miguel Lopez, Position: GK, Attack: 32, Defense: 29, Stamina: 80, Skill: 20, Age: 21, Value: 100000
+- Name: Oscar Flores, Position: MF, Attack: 56, Defense: 30, Stamina: 90, Skill: 45, Age: 18, Value: 225000
+- Name: Lucas Fernandez, Position: GK, Attack: 21, Defense: 51, Stamina: 58, Skill: 43, Age: 24, Value: 215000
+- Name: Michael Morales, Position: GK, Attack: 55, Defense: 52, Stamina: 98, Skill: 43, Age: 28, Value: 215000
+- Name: Javier Silva, Position: GK, Attack: 27, Defense: 30, Stamina: 61, Skill: 23, Age: 29, Value: 115000
+- Name: Miguel Luna, Position: MF, Attack: 23, Defense: 34, Stamina: 76, Skill: 32, Age: 35, Value: 160000
+- Name: Rodrigo Hernandez, Position: DF, Attack: 31, Defense: 30, Stamina: 59, Skill: 26, Age: 29, Value: 130000
+- Name: Leonardo Guerrero, Position: DF, Attack: 20, Defense: 42, Stamina: 50, Skill: 21, Age: 28, Value: 105000
+- Name: Diego Gil, Position: FW, Attack: 39, Defense: 52, Stamina: 68, Skill: 39, Age: 30, Value: 195000

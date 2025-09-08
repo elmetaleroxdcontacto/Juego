@@ -1,0 +1,17 @@
+Team: Rangers
+Players:
+- Name: Daniel Torres, Position: MF, Attack: 76, Defense: 41, Stamina: 98, Skill: 66, Age: 23, Value: 528000
+- Name: Javier Cabrera, Position: GK, Attack: 53, Defense: 65, Stamina: 76, Skill: 68, Age: 18, Value: 544000
+- Name: Samuel Mendez, Position: GK, Attack: 75, Defense: 60, Stamina: 91, Skill: 57, Age: 26, Value: 456000
+- Name: Cristian Perez, Position: MF, Attack: 63, Defense: 68, Stamina: 90, Skill: 70, Age: 21, Value: 560000
+- Name: Ricardo Mendez, Position: FW, Attack: 39, Defense: 55, Stamina: 53, Skill: 39, Age: 25, Value: 312000
+- Name: William Mendez, Position: MF, Attack: 63, Defense: 35, Stamina: 97, Skill: 45, Age: 27, Value: 360000
+- Name: Felipe Rojas, Position: FW, Attack: 61, Defense: 68, Stamina: 99, Skill: 61, Age: 28, Value: 488000
+- Name: Felipe Mendoza, Position: GK, Attack: 36, Defense: 63, Stamina: 69, Skill: 40, Age: 27, Value: 320000
+- Name: Manuel Gutierrez, Position: MF, Attack: 77, Defense: 60, Stamina: 79, Skill: 62, Age: 21, Value: 496000
+- Name: Ricardo Gomez, Position: GK, Attack: 50, Defense: 68, Stamina: 78, Skill: 51, Age: 31, Value: 408000
+- Name: Miguel Aguilar, Position: DF, Attack: 35, Defense: 46, Stamina: 89, Skill: 38, Age: 20, Value: 304000
+- Name: Lucas Gomez, Position: DF, Attack: 40, Defense: 52, Stamina: 82, Skill: 49, Age: 36, Value: 392000
+- Name: Ivan Lopez, Position: GK, Attack: 63, Defense: 34, Stamina: 94, Skill: 49, Age: 34, Value: 392000
+- Name: Michael Herrera, Position: FW, Attack: 47, Defense: 55, Stamina: 89, Skill: 56, Age: 24, Value: 448000
+- Name: Lucas Romero, Position: DF, Attack: 49, Defense: 76, Stamina: 82, Skill: 57, Age: 30, Value: 456000

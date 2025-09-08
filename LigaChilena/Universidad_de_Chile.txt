@@ -1,5 +1,17 @@
 Team: Universidad de Chile
 Players:
-- Name: Player1, Position: Forward, Attack: 82, Defense: 42
-- Name: Player2, Position: Midfielder, Attack: 78, Defense: 58
-- Name: Player3, Position: Defender, Attack: 48, Defense: 82
+- Name: Nicolas Lopez, Position: MF, Attack: 53, Defense: 71, Stamina: 97, Skill: 68, Age: 27, Value: 680000
+- Name: Matias Flores, Position: FW, Attack: 59, Defense: 87, Stamina: 56, Skill: 68, Age: 23, Value: 680000
+- Name: Samuel Blanco, Position: FW, Attack: 74, Defense: 54, Stamina: 75, Skill: 70, Age: 18, Value: 700000
+- Name: Alejandro Martin, Position: DF, Attack: 96, Defense: 57, Stamina: 59, Skill: 68, Age: 36, Value: 680000
+- Name: Manuel Gutierrez, Position: DF, Attack: 95, Defense: 95, Stamina: 96, Skill: 89, Age: 28, Value: 890000
+- Name: Pablo Aguilar, Position: GK, Attack: 61, Defense: 95, Stamina: 100, Skill: 81, Age: 35, Value: 810000
+- Name: Antonio Rodriguez, Position: FW, Attack: 55, Defense: 66, Stamina: 66, Skill: 67, Age: 26, Value: 670000
+- Name: Matias Torres, Position: GK, Attack: 81, Defense: 91, Stamina: 85, Skill: 94, Age: 36, Value: 940000
+- Name: Andres Delgado, Position: GK, Attack: 51, Defense: 71, Stamina: 88, Skill: 68, Age: 21, Value: 680000
+- Name: Julian Arias, Position: GK, Attack: 77, Defense: 57, Stamina: 96, Skill: 58, Age: 20, Value: 580000
+- Name: Matthew Diaz, Position: FW, Attack: 81, Defense: 93, Stamina: 55, Skill: 89, Age: 22, Value: 890000
+- Name: Sergio Ortiz, Position: DF, Attack: 95, Defense: 65, Stamina: 86, Skill: 74, Age: 25, Value: 740000
+- Name: Eduardo Peralta, Position: GK, Attack: 59, Defense: 86, Stamina: 69, Skill: 81, Age: 18, Value: 810000
+- Name: Francisco Santiago, Position: DF, Attack: 51, Defense: 79, Stamina: 60, Skill: 63, Age: 31, Value: 630000
+- Name: William Delgado, Position: FW, Attack: 92, Defense: 75, Stamina: 80, Skill: 81, Age: 34, Value: 810000

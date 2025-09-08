@@ -1,0 +1,17 @@
+Team: Deportes Vallenar
+Players:
+- Name: Aiden Mendoza, Position: GK, Attack: 20, Defense: 34, Stamina: 54, Skill: 35, Age: 18, Value: 175000
+- Name: Daniel Cortez, Position: DF, Attack: 37, Defense: 40, Stamina: 65, Skill: 37, Age: 33, Value: 185000
+- Name: Fernando Gutierrez, Position: FW, Attack: 49, Defense: 56, Stamina: 79, Skill: 59, Age: 26, Value: 295000
+- Name: Adrian Guerrero, Position: DF, Attack: 32, Defense: 59, Stamina: 75, Skill: 45, Age: 36, Value: 225000
+- Name: Ivan Diaz, Position: FW, Attack: 30, Defense: 24, Stamina: 92, Skill: 22, Age: 19, Value: 110000
+- Name: Daniel Santiago, Position: FW, Attack: 41, Defense: 54, Stamina: 66, Skill: 41, Age: 22, Value: 205000
+- Name: Alejandro Garcia, Position: FW, Attack: 38, Defense: 59, Stamina: 69, Skill: 47, Age: 33, Value: 235000
+- Name: Manuel Pena, Position: FW, Attack: 29, Defense: 32, Stamina: 71, Skill: 26, Age: 36, Value: 130000
+- Name: Luis Alvarez, Position: DF, Attack: 56, Defense: 43, Stamina: 58, Skill: 46, Age: 26, Value: 230000
+- Name: Noah Castillo, Position: GK, Attack: 32, Defense: 43, Stamina: 61, Skill: 27, Age: 27, Value: 135000
+- Name: Roberto Mendoza, Position: DF, Attack: 40, Defense: 55, Stamina: 73, Skill: 40, Age: 34, Value: 200000
+- Name: Javier Castro, Position: MF, Attack: 40, Defense: 48, Stamina: 84, Skill: 50, Age: 23, Value: 250000
+- Name: William Dominguez, Position: MF, Attack: 36, Defense: 26, Stamina: 53, Skill: 25, Age: 31, Value: 125000
+- Name: Daniel Herrera, Position: MF, Attack: 42, Defense: 23, Stamina: 58, Skill: 23, Age: 19, Value: 115000
+- Name: Daniel Delgado, Position: DF, Attack: 48, Defense: 52, Stamina: 65, Skill: 49, Age: 34, Value: 245000

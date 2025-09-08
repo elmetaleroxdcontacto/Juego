@@ -1,0 +1,17 @@
+Team: Santiago Morning
+Players:
+- Name: Pablo Morales, Position: GK, Attack: 31, Defense: 49, Stamina: 98, Skill: 36, Age: 30, Value: 288000
+- Name: Pedro Alvarez, Position: MF, Attack: 71, Defense: 69, Stamina: 58, Skill: 75, Age: 37, Value: 600000
+- Name: Pedro Ramos, Position: GK, Attack: 76, Defense: 50, Stamina: 84, Skill: 69, Age: 18, Value: 552000
+- Name: Rodrigo Mendez, Position: DF, Attack: 42, Defense: 62, Stamina: 72, Skill: 48, Age: 27, Value: 384000
+- Name: Lucas Suarez, Position: GK, Attack: 49, Defense: 51, Stamina: 55, Skill: 59, Age: 30, Value: 472000
+- Name: Daniel Martinez, Position: DF, Attack: 55, Defense: 44, Stamina: 79, Skill: 53, Age: 19, Value: 424000
+- Name: Santiago Diaz, Position: GK, Attack: 39, Defense: 55, Stamina: 68, Skill: 51, Age: 37, Value: 408000
+- Name: Benjamin Navarro, Position: MF, Attack: 65, Defense: 42, Stamina: 94, Skill: 54, Age: 20, Value: 432000
+- Name: Javier Morales, Position: MF, Attack: 40, Defense: 73, Stamina: 64, Skill: 54, Age: 32, Value: 432000
+- Name: Alejandro Reyes, Position: DF, Attack: 75, Defense: 75, Stamina: 72, Skill: 79, Age: 33, Value: 632000
+- Name: Salvador Garcia, Position: MF, Attack: 49, Defense: 56, Stamina: 74, Skill: 57, Age: 21, Value: 456000
+- Name: Salvador Ortega, Position: FW, Attack: 65, Defense: 31, Stamina: 85, Skill: 51, Age: 21, Value: 408000
+- Name: Oscar Vega, Position: MF, Attack: 50, Defense: 70, Stamina: 71, Skill: 50, Age: 28, Value: 400000
+- Name: Guillermo Dominguez, Position: DF, Attack: 39, Defense: 30, Stamina: 72, Skill: 30, Age: 31, Value: 240000
+- Name: Jose Herrera, Position: FW, Attack: 69, Defense: 61, Stamina: 100, Skill: 59, Age: 31, Value: 472000

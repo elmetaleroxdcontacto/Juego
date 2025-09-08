@@ -1,0 +1,17 @@
+Team: Deportes Melipilla
+Players:
+- Name: Henry Cortez, Position: MF, Attack: 43, Defense: 26, Stamina: 97, Skill: 28, Age: 19, Value: 140000
+- Name: Thiago Garcia, Position: FW, Attack: 48, Defense: 58, Stamina: 67, Skill: 53, Age: 27, Value: 265000
+- Name: Thiago Hernandez, Position: DF, Attack: 29, Defense: 20, Stamina: 84, Skill: 28, Age: 25, Value: 140000
+- Name: Nicolas Moreno, Position: FW, Attack: 30, Defense: 29, Stamina: 85, Skill: 38, Age: 20, Value: 190000
+- Name: Matthew Navarro, Position: MF, Attack: 43, Defense: 29, Stamina: 77, Skill: 39, Age: 27, Value: 195000
+- Name: Rodrigo Rodriguez, Position: DF, Attack: 32, Defense: 50, Stamina: 99, Skill: 47, Age: 26, Value: 235000
+- Name: Thiago Gomez, Position: FW, Attack: 29, Defense: 22, Stamina: 64, Skill: 32, Age: 21, Value: 160000
+- Name: Miguel Vargas, Position: FW, Attack: 28, Defense: 36, Stamina: 76, Skill: 37, Age: 30, Value: 185000
+- Name: Rodrigo Pena, Position: FW, Attack: 46, Defense: 23, Stamina: 81, Skill: 32, Age: 24, Value: 160000
+- Name: Emilio Peralta, Position: MF, Attack: 30, Defense: 51, Stamina: 58, Skill: 39, Age: 23, Value: 195000
+- Name: Hugo Lopez, Position: GK, Attack: 28, Defense: 42, Stamina: 58, Skill: 31, Age: 37, Value: 155000
+- Name: Oscar Rodriguez, Position: MF, Attack: 44, Defense: 41, Stamina: 80, Skill: 39, Age: 19, Value: 195000
+- Name: Mateo Perez, Position: GK, Attack: 28, Defense: 40, Stamina: 53, Skill: 32, Age: 24, Value: 160000
+- Name: Enrique Cabrera, Position: DF, Attack: 33, Defense: 45, Stamina: 81, Skill: 47, Age: 21, Value: 235000
+- Name: Mateo Gonzalez, Position: MF, Attack: 59, Defense: 33, Stamina: 75, Skill: 39, Age: 28, Value: 195000

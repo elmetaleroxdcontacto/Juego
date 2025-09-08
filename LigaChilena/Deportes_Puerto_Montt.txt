@@ -1,0 +1,17 @@
+Team: Deportes Puerto Montt
+Players:
+- Name: Enrique Ruiz, Position: GK, Attack: 53, Defense: 74, Stamina: 76, Skill: 54, Age: 23, Value: 432000
+- Name: Michael Rodriguez, Position: GK, Attack: 53, Defense: 46, Stamina: 54, Skill: 47, Age: 24, Value: 376000
+- Name: Ivan Herrera, Position: MF, Attack: 43, Defense: 35, Stamina: 59, Skill: 42, Age: 37, Value: 336000
+- Name: Javier Jimenez, Position: MF, Attack: 69, Defense: 46, Stamina: 78, Skill: 64, Age: 21, Value: 512000
+- Name: Fernando Martin, Position: DF, Attack: 41, Defense: 49, Stamina: 62, Skill: 36, Age: 24, Value: 288000
+- Name: Leonardo Ortiz, Position: MF, Attack: 52, Defense: 66, Stamina: 61, Skill: 64, Age: 33, Value: 512000
+- Name: Matthew Cortez, Position: FW, Attack: 32, Defense: 76, Stamina: 58, Skill: 58, Age: 36, Value: 464000
+- Name: Roberto Romero, Position: MF, Attack: 65, Defense: 38, Stamina: 66, Skill: 60, Age: 33, Value: 480000
+- Name: Ruben Castillo, Position: GK, Attack: 34, Defense: 41, Stamina: 64, Skill: 39, Age: 27, Value: 312000
+- Name: Miguel Navarro, Position: DF, Attack: 67, Defense: 73, Stamina: 51, Skill: 61, Age: 30, Value: 488000
+- Name: Santiago Lopez, Position: MF, Attack: 42, Defense: 69, Stamina: 65, Skill: 59, Age: 30, Value: 472000
+- Name: Daniel Ramos, Position: MF, Attack: 47, Defense: 79, Stamina: 94, Skill: 59, Age: 37, Value: 472000
+- Name: Roberto Delgado, Position: MF, Attack: 44, Defense: 56, Stamina: 97, Skill: 51, Age: 21, Value: 408000
+- Name: Henry Fernandez, Position: DF, Attack: 75, Defense: 52, Stamina: 99, Skill: 72, Age: 35, Value: 576000
+- Name: Aiden Castro, Position: GK, Attack: 66, Defense: 56, Stamina: 69, Skill: 60, Age: 37, Value: 480000

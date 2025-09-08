@@ -1,5 +1,17 @@
 Team: Deportes Temuco
 Players:
-- Name: Player1, Position: Forward, Attack: 75, Defense: 45
-- Name: Player2, Position: Midfielder, Attack: 70, Defense: 55
-- Name: Player3, Position: Defender, Attack: 50, Defense: 70
+- Name: James Peralta, Position: GK, Attack: 74, Defense: 64, Stamina: 82, Skill: 68, Age: 33, Value: 544000
+- Name: Fernando Gutierrez, Position: MF, Attack: 38, Defense: 47, Stamina: 87, Skill: 37, Age: 23, Value: 296000
+- Name: Salvador Martinez, Position: MF, Attack: 35, Defense: 38, Stamina: 76, Skill: 30, Age: 24, Value: 240000
+- Name: Sebastian Castro, Position: DF, Attack: 41, Defense: 44, Stamina: 68, Skill: 49, Age: 23, Value: 392000
+- Name: Eduardo Luna, Position: FW, Attack: 53, Defense: 40, Stamina: 59, Skill: 43, Age: 24, Value: 344000
+- Name: Antonio Suarez, Position: FW, Attack: 35, Defense: 46, Stamina: 73, Skill: 46, Age: 34, Value: 368000
+- Name: William Herrera, Position: FW, Attack: 35, Defense: 44, Stamina: 69, Skill: 45, Age: 31, Value: 360000
+- Name: Juan Sanchez, Position: MF, Attack: 76, Defense: 34, Stamina: 78, Skill: 61, Age: 27, Value: 488000
+- Name: Thiago Delgado, Position: GK, Attack: 75, Defense: 35, Stamina: 87, Skill: 61, Age: 37, Value: 488000
+- Name: Andres Santiago, Position: DF, Attack: 56, Defense: 57, Stamina: 83, Skill: 54, Age: 34, Value: 432000
+- Name: Gabriel Cortez, Position: MF, Attack: 46, Defense: 76, Stamina: 95, Skill: 63, Age: 28, Value: 504000
+- Name: William Mora, Position: FW, Attack: 30, Defense: 42, Stamina: 89, Skill: 42, Age: 32, Value: 336000
+- Name: Ricardo Reyes, Position: FW, Attack: 58, Defense: 33, Stamina: 99, Skill: 48, Age: 28, Value: 384000
+- Name: Henry Alvarez, Position: FW, Attack: 50, Defense: 72, Stamina: 99, Skill: 61, Age: 26, Value: 488000
+- Name: Juan Castro, Position: FW, Attack: 53, Defense: 53, Stamina: 63, Skill: 43, Age: 23, Value: 344000

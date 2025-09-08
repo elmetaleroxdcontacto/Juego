@@ -1,0 +1,17 @@
+Team: Iberia
+Players:
+- Name: Benjamin Arias, Position: FW, Attack: 41, Defense: 63, Stamina: 99, Skill: 58, Age: 34, Value: 464000
+- Name: Cristian Guerrero, Position: GK, Attack: 74, Defense: 76, Stamina: 95, Skill: 65, Age: 21, Value: 520000
+- Name: Mateo Fernandez, Position: GK, Attack: 31, Defense: 72, Stamina: 70, Skill: 55, Age: 24, Value: 440000
+- Name: Thiago Reyes, Position: FW, Attack: 47, Defense: 62, Stamina: 58, Skill: 58, Age: 32, Value: 464000
+- Name: Liam Rojas, Position: MF, Attack: 70, Defense: 72, Stamina: 79, Skill: 69, Age: 36, Value: 552000
+- Name: Aiden Mora, Position: GK, Attack: 69, Defense: 49, Stamina: 89, Skill: 61, Age: 28, Value: 488000
+- Name: Alexander Mendoza, Position: DF, Attack: 77, Defense: 36, Stamina: 71, Skill: 49, Age: 27, Value: 392000
+- Name: Noah Sanchez, Position: FW, Attack: 74, Defense: 52, Stamina: 65, Skill: 64, Age: 22, Value: 512000
+- Name: Carlos Santiago, Position: GK, Attack: 61, Defense: 43, Stamina: 94, Skill: 49, Age: 18, Value: 392000
+- Name: Andres Dominguez, Position: MF, Attack: 36, Defense: 71, Stamina: 95, Skill: 47, Age: 22, Value: 376000
+- Name: Felipe Arias, Position: FW, Attack: 73, Defense: 52, Stamina: 78, Skill: 61, Age: 26, Value: 488000
+- Name: Matias Acosta, Position: DF, Attack: 55, Defense: 47, Stamina: 92, Skill: 48, Age: 37, Value: 384000
+- Name: Matias Vargas, Position: FW, Attack: 67, Defense: 50, Stamina: 86, Skill: 54, Age: 36, Value: 432000
+- Name: Ruben Arias, Position: MF, Attack: 54, Defense: 69, Stamina: 57, Skill: 58, Age: 29, Value: 464000
+- Name: Miguel Peralta, Position: DF, Attack: 43, Defense: 47, Stamina: 70, Skill: 51, Age: 18, Value: 408000

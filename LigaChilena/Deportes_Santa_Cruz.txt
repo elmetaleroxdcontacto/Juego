@@ -1,0 +1,17 @@
+Team: Deportes Santa Cruz
+Players:
+- Name: Noah Leon, Position: MF, Attack: 51, Defense: 50, Stamina: 59, Skill: 47, Age: 27, Value: 235000
+- Name: Roberto Rodriguez, Position: GK, Attack: 56, Defense: 30, Stamina: 53, Skill: 45, Age: 34, Value: 225000
+- Name: Juan Dominguez, Position: DF, Attack: 40, Defense: 50, Stamina: 68, Skill: 54, Age: 36, Value: 270000
+- Name: Diego Cabrera, Position: GK, Attack: 52, Defense: 34, Stamina: 73, Skill: 47, Age: 19, Value: 235000
+- Name: Gabriel Acosta, Position: DF, Attack: 53, Defense: 47, Stamina: 74, Skill: 47, Age: 35, Value: 235000
+- Name: Felipe Delgado, Position: DF, Attack: 38, Defense: 24, Stamina: 89, Skill: 21, Age: 24, Value: 105000
+- Name: Lucas Blanco, Position: GK, Attack: 24, Defense: 52, Stamina: 57, Skill: 47, Age: 25, Value: 235000
+- Name: Guillermo Perez, Position: DF, Attack: 29, Defense: 25, Stamina: 55, Skill: 28, Age: 26, Value: 140000
+- Name: Andres Alvarez, Position: DF, Attack: 46, Defense: 40, Stamina: 60, Skill: 50, Age: 31, Value: 250000
+- Name: Samuel Mora, Position: GK, Attack: 29, Defense: 54, Stamina: 69, Skill: 38, Age: 23, Value: 190000
+- Name: Manuel Peralta, Position: FW, Attack: 27, Defense: 28, Stamina: 96, Skill: 33, Age: 34, Value: 165000
+- Name: Roberto Castillo, Position: GK, Attack: 35, Defense: 32, Stamina: 98, Skill: 33, Age: 27, Value: 165000
+- Name: Juan Gonzalez, Position: DF, Attack: 45, Defense: 26, Stamina: 50, Skill: 40, Age: 31, Value: 200000
+- Name: Liam Ortiz, Position: MF, Attack: 45, Defense: 48, Stamina: 57, Skill: 53, Age: 20, Value: 265000
+- Name: Henry Gomez, Position: MF, Attack: 26, Defense: 35, Stamina: 83, Skill: 39, Age: 27, Value: 195000

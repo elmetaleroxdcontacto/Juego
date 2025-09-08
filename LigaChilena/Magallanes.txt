@@ -1,0 +1,17 @@
+Team: Magallanes
+Players:
+- Name: Andres Vazquez, Position: FW, Attack: 36, Defense: 73, Stamina: 98, Skill: 58, Age: 21, Value: 464000
+- Name: Elijah Arias, Position: DF, Attack: 65, Defense: 54, Stamina: 50, Skill: 57, Age: 24, Value: 456000
+- Name: Sergio Vega, Position: GK, Attack: 49, Defense: 40, Stamina: 80, Skill: 37, Age: 20, Value: 296000
+- Name: Michael Mora, Position: GK, Attack: 30, Defense: 65, Stamina: 90, Skill: 44, Age: 22, Value: 352000
+- Name: Daniel Mora, Position: FW, Attack: 54, Defense: 45, Stamina: 95, Skill: 46, Age: 37, Value: 368000
+- Name: Sebastian Garcia, Position: GK, Attack: 41, Defense: 62, Stamina: 72, Skill: 50, Age: 25, Value: 400000
+- Name: Guillermo Hernandez, Position: GK, Attack: 41, Defense: 49, Stamina: 78, Skill: 51, Age: 29, Value: 408000
+- Name: Ruben Navarro, Position: MF, Attack: 46, Defense: 59, Stamina: 74, Skill: 47, Age: 30, Value: 376000
+- Name: Henry Mora, Position: DF, Attack: 59, Defense: 54, Stamina: 81, Skill: 60, Age: 25, Value: 480000
+- Name: Francisco Hernandez, Position: GK, Attack: 62, Defense: 31, Stamina: 62, Skill: 46, Age: 21, Value: 368000
+- Name: Victor Sanchez, Position: DF, Attack: 43, Defense: 41, Stamina: 51, Skill: 50, Age: 26, Value: 400000
+- Name: Juan Romero, Position: FW, Attack: 36, Defense: 71, Stamina: 100, Skill: 49, Age: 24, Value: 392000
+- Name: Javier Acosta, Position: MF, Attack: 51, Defense: 66, Stamina: 57, Skill: 54, Age: 22, Value: 432000
+- Name: Henry Diaz, Position: FW, Attack: 72, Defense: 61, Stamina: 74, Skill: 65, Age: 23, Value: 520000
+- Name: Aiden Gil, Position: DF, Attack: 72, Defense: 63, Stamina: 66, Skill: 63, Age: 32, Value: 504000

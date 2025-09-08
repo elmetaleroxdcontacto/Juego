@@ -1,0 +1,17 @@
+Team: Cobreloa
+Players:
+- Name: Benjamin Vargas, Position: GK, Attack: 76, Defense: 55, Stamina: 75, Skill: 73, Age: 33, Value: 584000
+- Name: Elijah Rodriguez, Position: DF, Attack: 70, Defense: 77, Stamina: 61, Skill: 72, Age: 24, Value: 576000
+- Name: Liam Martinez, Position: DF, Attack: 71, Defense: 39, Stamina: 91, Skill: 60, Age: 37, Value: 480000
+- Name: Adrian Cabrera, Position: GK, Attack: 32, Defense: 51, Stamina: 62, Skill: 45, Age: 31, Value: 360000
+- Name: Ricardo Aguilar, Position: FW, Attack: 62, Defense: 52, Stamina: 77, Skill: 59, Age: 28, Value: 472000
+- Name: Salvador Martin, Position: MF, Attack: 51, Defense: 47, Stamina: 89, Skill: 50, Age: 33, Value: 400000
+- Name: Benjamin Blanco, Position: DF, Attack: 44, Defense: 51, Stamina: 79, Skill: 55, Age: 31, Value: 440000
+- Name: Fernando Lopez, Position: GK, Attack: 46, Defense: 39, Stamina: 68, Skill: 39, Age: 32, Value: 312000
+- Name: Alexander Perez, Position: MF, Attack: 53, Defense: 42, Stamina: 71, Skill: 44, Age: 35, Value: 352000
+- Name: Benjamin Silva, Position: MF, Attack: 73, Defense: 53, Stamina: 64, Skill: 62, Age: 20, Value: 496000
+- Name: Alexander Mora, Position: DF, Attack: 41, Defense: 75, Stamina: 66, Skill: 63, Age: 21, Value: 504000
+- Name: Ricardo Silva, Position: DF, Attack: 36, Defense: 40, Stamina: 72, Skill: 35, Age: 31, Value: 280000
+- Name: Michael Jimenez, Position: MF, Attack: 61, Defense: 40, Stamina: 60, Skill: 44, Age: 37, Value: 352000
+- Name: Angel Gil, Position: FW, Attack: 36, Defense: 71, Stamina: 54, Skill: 49, Age: 29, Value: 392000
+- Name: Matias Rojas, Position: MF, Attack: 76, Defense: 63, Stamina: 93, Skill: 73, Age: 30, Value: 584000
