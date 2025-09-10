@@ -147,16 +147,16 @@ struct Career {
 
     void initializeLeague() {
         // Load Primera División teams from teams.txt
-        ifstream file("LigaChilena/teams.txt");
+        ifstream file("LigaChilena/primera_division/teams.txt");
         if (file.is_open()) {
             string line;
             while (getline(file, line)) {
                 if (!line.empty()) {
                     Team team("");
                     team.name = line;
-                    string filepath = "LigaChilena/" + normalizeName(line) + ".txt";
+                    string filepath = "LigaChilena/primera_division/" + normalizeName(line) + ".txt";
                     if (loadTeamFromFile(filepath, team)) {
-                        // Loaded from file
+                        // Loaded from file with all players and their stats
                     } else {
                         // Generate random players
                         vector<string> positions = {"GK", "DF", "MF", "FW"};
@@ -186,30 +186,35 @@ struct Career {
         }
 
         // Load second division teams
-        ifstream file2("LigaChilena/SegundaDivision_teams.txt");
+        ifstream file2("LigaChilena/segunda_division/SegundaDivision_teams.txt");
         if (file2.is_open()) {
             string line;
             while (getline(file2, line)) {
                 if (!line.empty()) {
                     Team team(line);
-                    // Generate 11 random players
-                    vector<string> positions = {"GK", "DF", "MF", "FW"};
-                    for (int i = 0; i < 11; ++i) {
-                        Player p;
-                        p.name = "Player" + to_string(i+1);
-                        p.position = positions[rand() % 4];
-                        p.attack = rand() % 50 + 30; // 30-79
-                        p.defense = rand() % 50 + 30;
-                        p.stamina = rand() % 50 + 30;
-                        p.skill = rand() % 50 + 30;
-                        p.age = rand() % 20 + 18;
-                        p.value = p.skill * 8000; // lower value for second division
-                        p.injured = false;
-                        p.injuryWeeks = 0;
-                        p.goals = 0;
-                        p.assists = 0;
-                        p.matchesPlayed = 0;
-                        team.addPlayer(p);
+                    string filepath = "LigaChilena/segunda_division/" + normalizeName(line) + ".txt";
+                    if (loadTeamFromFile(filepath, team)) {
+                        // Loaded from file
+                    } else {
+                        // Generate 11 random players if file not found
+                        vector<string> positions = {"GK", "DF", "MF", "FW"};
+                        for (int i = 0; i < 11; ++i) {
+                            Player p;
+                            p.name = "Player" + to_string(i+1);
+                            p.position = positions[rand() % 4];
+                            p.attack = rand() % 50 + 30; // 30-79
+                            p.defense = rand() % 50 + 30;
+                            p.stamina = rand() % 50 + 30;
+                            p.skill = rand() % 50 + 30;
+                            p.age = rand() % 20 + 18;
+                            p.value = p.skill * 8000; // lower value for second division
+                            p.injured = false;
+                            p.injuryWeeks = 0;
+                            p.goals = 0;
+                            p.assists = 0;
+                            p.matchesPlayed = 0;
+                            team.addPlayer(p);
+                        }
                     }
                     allTeams.push_back(team);
                     leagueTable.addTeam(&allTeams.back());
@@ -218,31 +223,37 @@ struct Career {
             file2.close();
         }
 
-        // Load third division teams
-        ifstream file3("LigaChilena/PrimeraB_teams.txt");
+        // Load Primera B teams
+        ifstream file3("LigaChilena/primera_b/PrimeraB_teams.txt");
         if (file3.is_open()) {
             string line;
             while (getline(file3, line)) {
                 if (!line.empty()) {
-                    Team team(line);
-                    // Generate 11 random players
-                    vector<string> positions = {"GK", "DF", "MF", "FW"};
-                    for (int i = 0; i < 11; ++i) {
-                        Player p;
-                        p.name = "Player" + to_string(i+1);
-                        p.position = positions[rand() % 4];
-                        p.attack = rand() % 40 + 20; // 20-59
-                        p.defense = rand() % 40 + 20;
-                        p.stamina = rand() % 40 + 20;
-                        p.skill = rand() % 40 + 20;
-                        p.age = rand() % 20 + 18;
-                        p.value = p.skill * 5000; // lower value for third division
-                        p.injured = false;
-                        p.injuryWeeks = 0;
-                        p.goals = 0;
-                        p.assists = 0;
-                        p.matchesPlayed = 0;
-                        team.addPlayer(p);
+                    Team team("");
+                    team.name = line;
+                    string filepath = "LigaChilena/primera_b/" + normalizeName(line) + ".txt";
+                    if (loadTeamFromFile(filepath, team)) {
+                        // Loaded from file
+                    } else {
+                        // Generate random players
+                        vector<string> positions = {"GK", "DF", "MF", "FW"};
+                        for (int i = 0; i < 11; ++i) {
+                            Player p;
+                            p.name = "Player" + to_string(i+1);
+                            p.position = positions[rand() % 4];
+                            p.attack = rand() % 40 + 20; // 20-59
+                            p.defense = rand() % 40 + 20;
+                            p.stamina = rand() % 40 + 20;
+                            p.skill = rand() % 40 + 20;
+                            p.age = rand() % 20 + 18;
+                            p.value = p.skill * 5000; // lower value for Primera B
+                            p.injured = false;
+                            p.injuryWeeks = 0;
+                            p.goals = 0;
+                            p.assists = 0;
+                            p.matchesPlayed = 0;
+                            team.addPlayer(p);
+                        }
                     }
                     allTeams.push_back(team);
                     leagueTable.addTeam(&allTeams.back());
@@ -879,12 +890,12 @@ int main() {
                             } else if (divisionChoice == 2) {
                                 // Primera B
                                 cout << "\nEquipos de Primera B:" << endl;
-                                for (int i = 0; i < 12; ++i) {
+                                for (int i = 0; i < 16; ++i) {
                                     cout << i + 1 << ". " << career.allTeams[26 + i].name << endl;
                                 }
                                 cout << "Elige un numero de equipo: ";
                                 cin >> teamChoice;
-                                if (teamChoice >= 1 && teamChoice <= 12) {
+                                if (teamChoice >= 1 && teamChoice <= 16) {
                                     career.myTeam = &career.allTeams[26 + teamChoice - 1];
                                     cout << "Has elegido: " << career.myTeam->name << endl;
                                     careerStarted = true;
@@ -894,12 +905,12 @@ int main() {
                             } else if (divisionChoice == 3) {
                                 // Segunda División
                                 cout << "\nEquipos de Segunda División:" << endl;
-                                for (int i = 0; i < 10; ++i) {
+                                for (int i = 0; i < 14; ++i) {
                                     cout << i + 1 << ". " << career.allTeams[16 + i].name << endl;
                                 }
                                 cout << "Elige un numero de equipo: ";
                                 cin >> teamChoice;
-                                if (teamChoice >= 1 && teamChoice <= 10) {
+                                if (teamChoice >= 1 && teamChoice <= 14) {
                                     career.myTeam = &career.allTeams[16 + teamChoice - 1];
                                     cout << "Has elegido: " << career.myTeam->name << endl;
                                     careerStarted = true;
@@ -918,6 +929,7 @@ int main() {
                             cout << "Opcion invalida." << endl;
                             break;
                     }
+
                 } while (!careerStarted && careerStartChoice != 3);
 
                 if (careerStarted) {
@@ -1009,6 +1021,7 @@ int main() {
                                 cout << "Opcion invalida." << endl;
                                 break;
                         }
+
                     } while (careerChoice != 9);
                 }
                 break;
@@ -1017,7 +1030,7 @@ int main() {
             case 2: { // Juego Rapido
                 // Start Quick Game - Team Selection
                 cout << "\nSelecciona tu equipo de Primera División:" << endl;
-                ifstream teamsFile("LigaChilena/teams.txt");
+                ifstream teamsFile("LigaChilena/primera_division/teams.txt");
                 vector<string> teamNames;
                 if (teamsFile.is_open()) {
                     string line;
@@ -1040,7 +1053,7 @@ int main() {
                 if (teamChoice >= 1 && teamChoice <= teamNames.size()) {
                     string teamName = teamNames[teamChoice - 1];
                     myTeam.name = teamName;
-                    string filename = "LigaChilena/" + normalizeName(teamName) + ".txt";
+                    string filename = "LigaChilena/primera_division/" + normalizeName(teamName) + ".txt";
                     if (!loadTeamFromFile(filename, myTeam)) {
                         cout << "Error al cargar el equipo. Generando jugadores aleatorios." << endl;
                         // Generate random players
@@ -1101,8 +1114,9 @@ int main() {
                         default:
                             cout << "Opción inválida." << endl;
                             break;
-                    }
-                } while (gameChoice != 7);
+                        }
+
+                    } while (gameChoice != 7);
                 break;
             }
             case 3:
@@ -1111,6 +1125,7 @@ int main() {
             default:
                 cout << "Opción inválida." << endl;
         }
+
     } while (mainChoice != 3 && !careerStarted);
 
     return 0;
