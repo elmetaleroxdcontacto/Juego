@@ -42,8 +42,11 @@
 - [x] Validar la curación de lesiones al final de temporada.
 - [x] Comprobar la selección de división en modo carrera.
 - [x] Asegurar que la tabla de liga se actualiza después de cada partido simulado.
+- [x] Agregar opción de retiro de jugador al cumplir entre 35 y 45 años.
 
 ## Notas
 - teams.txt tiene 16 equipos para Primera División.
 - Original: Primera 9 (0-8), Segunda 10 (9-18), Primera B 12 (19-30), Total 31.
 - Nuevo: Primera 16 (0-15), Segunda 10 (16-25), Primera B 12 (26-37), Total 38.
+
+- [x] Documentar todo el trabajo realizado en español en TODO.md

@@ -432,6 +432,80 @@ void transferMarket(Team& team) {
     }
 }
 
+// Function to scout players
+void scoutPlayers(Team& team) {
+    cout << "\n=== Ojeo de Jugadores ===" << endl;
+    cout << "Presupuesto: $" << team.budget << endl;
+    cout << "Costo de ojeo: $5000" << endl;
+    cout << "1. Otear jugadores" << endl;
+    cout << "2. Volver" << endl;
+    int choice;
+    cin >> choice;
+    if (choice == 1) {
+        if (team.budget >= 5000) {
+            team.budget -= 5000;
+            // Generate 3 random players
+            for (int i = 0; i < 3; ++i) {
+                Player p;
+                p.name = "Jugador Ojeado" + to_string(i+1);
+                vector<string> positions = {"GK", "DF", "MF", "FW"};
+                p.position = positions[rand() % 4];
+                p.attack = rand() % 50 + 50;
+                p.defense = rand() % 50 + 50;
+                p.stamina = rand() % 50 + 50;
+                p.skill = rand() % 50 + 50;
+                p.age = rand() % 20 + 18;
+                p.value = p.skill * 10000;
+                p.injured = false;
+                p.injuryWeeks = 0;
+                p.goals = 0;
+                p.assists = 0;
+                p.matchesPlayed = 0;
+                cout << "Jugador encontrado: " << p.name << " (" << p.position << ") - Ataque: " << p.attack << ", Defensa: " << p.defense << ", Valor: $" << p.value << endl;
+                cout << "¿Comprar? (1. Sí, 2. No): ";
+                int buy;
+                cin >> buy;
+                if (buy == 1 && team.budget >= p.value) {
+                    team.budget -= p.value;
+                    team.addPlayer(p);
+                    cout << "Jugador comprado." << endl;
+                } else if (buy == 1) {
+                    cout << "Presupuesto insuficiente." << endl;
+                }
+            }
+        } else {
+            cout << "Presupuesto insuficiente para ojeo." << endl;
+        }
+    }
+}
+
+// Function to retire players
+void retirePlayer(Team& team) {
+    cout << "\n=== Retiro de Jugadores ===" << endl;
+    vector<int> eligibleIndices;
+    cout << "Jugadores elegibles para retiro (35-45 años):" << endl;
+    for (size_t i = 0; i < team.players.size(); ++i) {
+        if (team.players[i].age >= 35 && team.players[i].age <= 45) {
+            eligibleIndices.push_back(i);
+            cout << eligibleIndices.size() << ". " << team.players[i].name << " (Edad: " << team.players[i].age << ")" << endl;
+        }
+    }
+    if (eligibleIndices.empty()) {
+        cout << "No hay jugadores elegibles para retiro." << endl;
+        return;
+    }
+    cout << "Selecciona un jugador para retirar (0 para cancelar): ";
+    int choice;
+    cin >> choice;
+    if (choice >= 1 && choice <= eligibleIndices.size()) {
+        int index = eligibleIndices[choice - 1];
+        cout << team.players[index].name << " se ha retirado." << endl;
+        team.players.erase(team.players.begin() + index);
+    } else if (choice != 0) {
+        cout << "Opción inválida." << endl;
+    }
+}
+
 // Function to check achievements
 void checkAchievements(Career& career) {
     if (career.myTeam->wins >= 10 && find(career.achievements.begin(), career.achievements.end(), "10 Victorias") == career.achievements.end()) {
@@ -716,9 +790,11 @@ void displayCareerMenu() {
     cout << "4. Simular Semana" << endl;
     cout << "5. Ver Tabla de Posiciones" << endl;
     cout << "6. Mercado de Transferencias" << endl;
-    cout << "7. Ver Estadisticas" << endl;
-    cout << "8. Guardar Carrera" << endl;
-    cout << "9. Volver al Menu Principal" << endl;
+    cout << "7. Ojeo de Jugadores" << endl;
+    cout << "8. Ver Estadisticas" << endl;
+    cout << "9. Guardar Carrera" << endl;
+    cout << "10. Retirar Jugador" << endl;
+    cout << "11. Volver al Menu Principal" << endl;
     cout << "Elige una opcion: ";
 }
 
@@ -1008,12 +1084,18 @@ int main() {
                                 transferMarket(*career.myTeam);
                                 break;
                             case 7:
-                                displayStatistics(*career.myTeam);
+                                scoutPlayers(*career.myTeam);
                                 break;
                             case 8:
-                                career.saveCareer();
+                                displayStatistics(*career.myTeam);
                                 break;
                             case 9:
+                                career.saveCareer();
+                                break;
+                            case 10:
+                                retirePlayer(*career.myTeam);
+                                break;
+                            case 11:
                                 cout << "Volviendo al menu principal." << endl;
                                 careerStarted = false;
                                 break;
@@ -1022,7 +1104,7 @@ int main() {
                                 break;
                         }
 
-                    } while (careerChoice != 9);
+                    } while (careerChoice != 11);
                 }
                 break;
             }
