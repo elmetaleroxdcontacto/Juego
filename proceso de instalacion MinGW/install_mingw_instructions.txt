@@ -1,0 +1,40 @@
+Step-by-step guide to install MinGW-w64 on Windows and compile your C++ program:
+
+1. Download MinGW-w64:
+   - Go to https://mingw-w64.org/doku.php/download
+   - Under "Pre-built toolchains and packages", click the "Cygwin" link for Windows.
+   - Alternatively, you can download from a trusted source like:
+     https://winlibs.com/ or https://sourceforge.net/projects/mingw-w64/
+
+2. Install MinGW-w64:
+   - Run the downloaded installer.
+   - Choose architecture (x86_64 for 64-bit Windows).
+   - Choose threads: posix.
+   - Choose exception: seh.
+   - Choose installation directory (e.g., C:\mingw-w64).
+   - Complete the installation.
+
+3. Add MinGW-w64 to your system PATH:
+   - Open System Properties > Advanced > Environment Variables.
+   - Under "System variables", find "Path" and click Edit.
+   - Add the path to the MinGW-w64 bin folder, e.g., C:\mingw-w64\mingw64\bin
+   - Click OK to save.
+
+4. Verify installation:
+   - Open a new Command Prompt.
+   - Run: g++ --version
+   - You should see the version info of g++.
+
+5. Compile your program:
+   - Navigate to your project folder in Command Prompt:
+     cd C:\Users\moises\Desktop\FootballManagerGame
+   - Compile with:
+     g++ main.cpp -o FootballManagerGame.exe
+
+6. Run your program:
+   - In the same Command Prompt, run:
+     FootballManagerGame.exe
+
+This will launch your Football Manager Game console application.
+
+If you want, I can help you with the commands to compile and run once MinGW-w64 is installed.
