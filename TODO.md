@@ -43,10 +43,18 @@
 - [x] Comprobar la selección de división en modo carrera.
 - [x] Asegurar que la tabla de liga se actualiza después de cada partido simulado.
 - [x] Agregar opción de retiro de jugador al cumplir entre 35 y 45 años.
+- [x] Crear archivo Colo-Colo.txt en primera_division con la plantilla actual de Colo-Colo de la Primera División Chilena.
+
+- Actualizar las plantillas de todos los equipos de la Primera División con los jugadores reales actuales de la temporada 2024/2025, obtenidos de transfermarkt.com.
+
 
 ## Notas
 - teams.txt tiene 16 equipos para Primera División.
 - Original: Primera 9 (0-8), Segunda 10 (9-18), Primera B 12 (19-30), Total 31.
 - Nuevo: Primera 16 (0-15), Segunda 10 (16-25), Primera B 12 (26-37), Total 38.
+
+- [x] Agregar Tercera División A con equipos y jugadores
+- [x] Agregar Tercera División B con equipos y jugadores
+- [x] Verificar que la API incluya las nuevas divisiones
 
 - [x] Documentar todo el trabajo realizado en español en TODO.md

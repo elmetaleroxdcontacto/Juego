@@ -1,0 +1,17 @@
+Team: Deportes La Serena
+Players:
+- Name: Daniel Romero, Position: FW, Attack: 82, Defense: 56, Stamina: 93, Skill: 64, Age: 36, Value: 640000
+- Name: Matias Sanchez, Position: GK, Attack: 62, Defense: 82, Stamina: 90, Skill: 64, Age: 19, Value: 640000
+- Name: Rafael Gutierrez, Position: MF, Attack: 69, Defense: 63, Stamina: 75, Skill: 56, Age: 28, Value: 560000
+- Name: Francisco Ortega, Position: MF, Attack: 94, Defense: 77, Stamina: 78, Skill: 92, Age: 37, Value: 920000
+- Name: Angel Martin, Position: MF, Attack: 56, Defense: 92, Stamina: 64, Skill: 75, Age: 30, Value: 750000
+- Name: Oscar Arias, Position: DF, Attack: 66, Defense: 64, Stamina: 64, Skill: 59, Age: 19, Value: 590000
+- Name: Daniel Alvarez, Position: DF, Attack: 90, Defense: 93, Stamina: 85, Skill: 87, Age: 32, Value: 870000
+- Name: Angel Perez, Position: MF, Attack: 77, Defense: 52, Stamina: 71, Skill: 70, Age: 30, Value: 700000
+- Name: Benjamin Rojas, Position: MF, Attack: 86, Defense: 55, Stamina: 71, Skill: 70, Age: 33, Value: 700000
+- Name: Javier Moreno, Position: GK, Attack: 54, Defense: 81, Stamina: 53, Skill: 58, Age: 36, Value: 580000
+- Name: Victor Moreno, Position: GK, Attack: 71, Defense: 81, Stamina: 84, Skill: 79, Age: 19, Value: 790000
+- Name: Felipe Lopez, Position: MF, Attack: 54, Defense: 91, Stamina: 70, Skill: 75, Age: 34, Value: 750000
+- Name: Guillermo Navarro, Position: MF, Attack: 56, Defense: 50, Stamina: 96, Skill: 54, Age: 23, Value: 540000
+- Name: Ivan Garcia, Position: DF, Attack: 78, Defense: 59, Stamina: 95, Skill: 71, Age: 20, Value: 710000
+- Name: Salvador Martin, Position: FW, Attack: 64, Defense: 99, Stamina: 93, Skill: 84, Age: 18, Value: 840000

@@ -1,0 +1,6 @@
+Team: Deportivo Tercera B1
+Players:
+- Name: Andres Diaz, Position: FW, Attack: 70, Defense: 35, Stamina: 65, Skill: 60, Age: 23, Value: 250000
+- Name: Felipe Morales, Position: MF, Attack: 60, Defense: 50, Stamina: 70, Skill: 55, Age: 25, Value: 230000
+- Name: Gabriel Silva, Position: DF, Attack: 45, Defense: 75, Stamina: 60, Skill: 50, Age: 28, Value: 220000
+- Name: Hector Lopez, Position: GK, Attack: 35, Defense: 85, Stamina: 55, Skill: 45, Age: 32, Value: 180000
