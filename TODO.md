@@ -71,3 +71,16 @@ Resumen: Se corrigio el XI, se amplio la normalizacion de posiciones, se mejoro 
 - [x] Documentar todo el trabajo realizado en español en TODO.md
 Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - [x] Modularizacion del codigo en archivos (models/io/simulation/ui) y uso de std::filesystem.
+
+## Tareas Recientes (2026)
+
+- [x] Corregir error de compilación en utils.cpp: "argument of type 'const char *' is incompatible with parameter of type 'LPCWSTR'"
+  - El problema era que las funciones Windows FindFirstFile/FindNextFile usaban versiones Unicode por defecto
+  - Solución: Cambiar a versiones ANSI explícitas (FindFirstFileA, FindNextFileA) y estructura WIN32_FIND_DATAA
+- [x] Crear script de compilación build.bat para facilitar la compilación del juego
+  - Compila todos los archivos fuente: main.cpp, io.cpp, models.cpp, simulation.cpp, ui.cpp, utils.cpp
+  - Genera el ejecutable FootballManager.exe
+  - Uso: ejecutar build.bat en la carpeta del proyecto
+- [x] Agregar pausa después de cada opción en los menús del juego
+  - Modo Carrera: después de cada opción (excepto volver), muestra "Presiona Enter para continuar..."
+  - Juego Rápido: después de cada opción (excepto volver), muestra "Presiona Enter para continuar..."

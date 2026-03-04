@@ -3,26 +3,21 @@
 #include <algorithm>
 #include <cctype>
 #include <cmath>
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <limits>
 #include <random>
 #include <sstream>
+#include <sys/stat.h>
+#include <direct.h>
+#include <windows.h>
 
 using namespace std;
 
-static std::mt19937 rng{std::random_device{}()};
-namespace fs = std::filesystem;
+#define stat _stat
+#define mkdir _mkdir
 
-static string pathToString(const fs::path& p) {
-#if defined(__cpp_char8_t)
-    auto u8 = p.u8string();
-    return string(u8.begin(), u8.end());
-#else
-    return p.u8string();
-#endif
-}
+static std::mt19937 rng{std::random_device{}()};
 
 int randInt(int minVal, int maxVal) {
     if (maxVal < minVal) swap(maxVal, minVal);
@@ -50,40 +45,58 @@ string toLower(const string& s) {
 }
 
 bool pathExists(const string& path) {
-    std::error_code ec;
-    return fs::exists(fs::u8path(path), ec);
+    struct stat buffer;
+    return (stat(path.c_str(), &buffer) == 0);
 }
 
 bool isDirectory(const string& path) {
-    std::error_code ec;
-    return fs::is_directory(fs::u8path(path), ec);
+    struct stat buffer;
+    if (stat(path.c_str(), &buffer) == 0) {
+        return (buffer.st_mode & S_IFDIR) != 0;
+    }
+    return false;
 }
 
 string joinPath(const string& a, const string& b) {
     if (a.empty()) return b;
-    fs::path p = fs::u8path(a);
-    p /= fs::u8path(b);
-    return pathToString(p);
+    string result = a;
+    if (!result.empty() && result.back() != '/' && result.back() != '\\') {
+        result += "\\";
+    }
+    result += b;
+    return result;
 }
 
 string pathFilename(const string& path) {
-    fs::path p = fs::u8path(path);
-    return pathToString(p.filename());
+    size_t pos = path.find_last_of("/\\");
+    if (pos == string::npos) return path;
+    return path.substr(pos + 1);
 }
 
 string pathExtension(const string& path) {
-    fs::path p = fs::u8path(path);
-    return pathToString(p.extension());
+    size_t pos = path.find_last_of('.');
+    if (pos == string::npos || pos == 0) return "";
+    return path.substr(pos);
 }
 
 vector<string> listDirectories(const string& root) {
     vector<string> out;
-    std::error_code ec;
-    fs::path p = fs::u8path(root);
-    if (!fs::exists(p, ec) || !fs::is_directory(p, ec)) return out;
-    for (fs::directory_iterator it(p, ec); !ec && it != fs::directory_iterator(); it.increment(ec)) {
-        if (it->is_directory(ec)) out.push_back(pathToString(it->path()));
-    }
+    if (!isDirectory(root)) return out;
+    
+    WIN32_FIND_DATAA findData;
+    HANDLE hFind = FindFirstFileA((root + "\\*").c_str(), &findData);
+    if (hFind == INVALID_HANDLE_VALUE) return out;
+    
+    do {
+        if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            string name(findData.cFileName);
+            if (name != "." && name != "..") {
+                out.push_back(joinPath(root, name));
+            }
+        }
+    } while (FindNextFileA(hFind, &findData));
+    
+    FindClose(hFind);
     return out;
 }
 

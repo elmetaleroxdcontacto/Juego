@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 
 #include "io.h"
 #include "models.h"
@@ -97,6 +98,10 @@ int main() {
                         case 12: cout << "Volviendo al menu principal." << endl; break;
                         default: break;
                     }
+                    if (careerChoice != 12) {
+                        cout << "\nPresiona Enter para continuar...";
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    }
                 } while (careerChoice != 12);
             }
         } else if (mainChoice == 2) {
@@ -162,6 +167,10 @@ int main() {
                     }
                     case 7: cout << "Volviendo al menu principal." << endl; break;
                     default: break;
+                }
+                if (gameChoice != 7) {
+                    cout << "\nPresiona Enter para continuar...";
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 }
             } while (gameChoice != 7);
         }
