@@ -1,0 +1,182 @@
+[
+  {
+    "name": "Hugo Araya",
+    "position_raw": "Hugo Araya Goalkeeper",
+    "position": "ARQ",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Diego Tapia",
+    "position_raw": "Diego Tapia Goalkeeper",
+    "position": "ARQ",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Cristián Alarcón",
+    "position_raw": "Cristián Alarcón Goalkeeper",
+    "position": "ARQ",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Bastián San Juan",
+    "position_raw": "Bastián San Juan Centre-Back",
+    "position": "DEF",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Diego García",
+    "position_raw": "Diego García Centre-Back",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Rodolfo González",
+    "position_raw": "Rodolfo González Centre-Back",
+    "position": "DEF",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Lucas Cornejo",
+    "position_raw": "Lucas Cornejo Centre-Back",
+    "position": "DEF",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Felipe Fritz",
+    "position_raw": "Felipe Fritz Left-Back",
+    "position": "N/A",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "David Tapia",
+    "position_raw": "David Tapia Right-Back",
+    "position": "N/A",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€325k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Cristian Muga",
+    "position_raw": "Cristian Muga Defensive Midfield",
+    "position": "DEF",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Jorge Gatica",
+    "position_raw": "Jorge Gatica Central Midfield",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Tomás Aránguiz",
+    "position_raw": "Tomás Aránguiz Central Midfield",
+    "position": "DEF",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Zúñiga",
+    "position_raw": "Sebastián Zúñiga Attacking Midfield",
+    "position": "MED",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Francisco Matamoros",
+    "position_raw": "Francisco Matamoros Attacking Midfield",
+    "position": "MED",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Cristian Insaurralde",
+    "position_raw": "Cristian Insaurralde Left Winger",
+    "position": "DEL",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Yastin Navarro",
+    "position_raw": "Yastin Navarro Left Winger",
+    "position": "DEL",
+    "age": "18",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Álvaro Delgado",
+    "position_raw": "Álvaro Delgado Right Winger",
+    "position": "DEL",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Matías Sandoval",
+    "position_raw": "Matías Sandoval Right Winger",
+    "position": "DEL",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Gustavo Gotti",
+    "position_raw": "Gustavo Gotti Centre-Forward",
+    "position": "DEL",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  },
+  {
+    "name": "Vicente Conelli",
+    "position_raw": "Vicente Conelli Centre-Forward",
+    "position": "DEL",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/deportes-cobreloa/kader/verein/9103/saison_id/2025"
+  }
+]

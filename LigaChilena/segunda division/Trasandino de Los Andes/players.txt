@@ -1,0 +1,19 @@
+- Matías Reyes | ARQ (Matías Reyes Goalkeeper) | Edad: 21 | Nº: N/A | Valor: -
+- Jean Cerda | ARQ (Jean Cerda Goalkeeper) | Edad: 22 | Nº: N/A | Valor: -
+- Matías Silva | DEF (Matías Silva Centre-Back) | Edad: 25 | Nº: N/A | Valor: -
+- Matías Torres | DEF (Matías Torres Centre-Back) | Edad: 25 | Nº: N/A | Valor: -
+- Joshoa Sotomayor | DEF (Joshoa Sotomayor Centre-Back) | Edad: 25 | Nº: N/A | Valor: -
+- Alejandro Henríquez | N/A (Alejandro Henríquez Left-Back) | Edad: 24 | Nº: N/A | Valor: -
+- Allan Jorquera | DEF (Allan Jorquera Defensive Midfield) | Edad: 22 | Nº: N/A | Valor: -
+- Walter Martínez | DEF (Walter Martínez Central Midfield) | Edad: 26 | Nº: N/A | Valor: -
+- Dylan Fernández | DEF (Dylan Fernández Central Midfield) | Edad: 22 | Nº: N/A | Valor: -
+- Jhoyner Gómez | DEF (Jhoyner Gómez Central Midfield) | Edad: 22 | Nº: N/A | Valor: -
+- José Mauricio Delgado | MED (José Mauricio Delgado Attacking Midfield) | Edad: 24 | Nº: N/A | Valor: -
+- Benjamín Rodríguez | MED (Benjamín Rodríguez Attacking Midfield) | Edad: 22 | Nº: N/A | Valor: -
+- Bastián Martínez | DEL (Bastián Martínez Left Winger) | Edad: 24 | Nº: N/A | Valor: -
+- Santiago Salaberry | DEL (Santiago Salaberry Left Winger) | Edad: 26 | Nº: N/A | Valor: -
+- Benjamín Venegas | MED (Benjamín Venegas Left Winger) | Edad: 22 | Nº: N/A | Valor: -
+- Brandon Martínez | DEL (Brandon Martínez Left Winger) | Edad: 22 | Nº: N/A | Valor: -
+- Sebastián Muñoz | DEL (Sebastián Muñoz Right Winger) | Edad: 18 | Nº: N/A | Valor: -
+- Javier Quiñones | DEL (Javier Quiñones Centre-Forward) | Edad: 23 | Nº: N/A | Valor: -
+- Tomás San Martín | DEL (Tomás San Martín Centre-Forward) | Edad: - | Nº: N/A | Valor: -

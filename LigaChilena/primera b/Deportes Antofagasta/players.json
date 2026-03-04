@@ -1,0 +1,227 @@
+[
+  {
+    "name": "Juan Pablo Cisternas",
+    "position_raw": "Juan Pablo Cisternas Goalkeeper",
+    "position": "ARQ",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Cristóbal Marín",
+    "position_raw": "Cristóbal Marín Goalkeeper",
+    "position": "ARQ",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Fernando Hurtado",
+    "position_raw": "Fernando Hurtado Goalkeeper",
+    "position": "ARQ",
+    "age": "42",
+    "number": "N/A",
+    "market_value": "€10k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Bastián Tapia",
+    "position_raw": "Bastián Tapia Centre-Back",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Cristián Díaz",
+    "position_raw": "Cristián Díaz Centre-Back",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Rodrigo Astorga",
+    "position_raw": "Rodrigo Astorga Centre-Back",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Diego Salvia",
+    "position_raw": "Diego Salvia Centre-Back",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Zacarías Abuhadba",
+    "position_raw": "Zacarías Abuhadba Left-Back",
+    "position": "N/A",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Mathías Suárez",
+    "position_raw": "Mathías Suárez Right-Back",
+    "position": "N/A",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Manuel Maluenda",
+    "position_raw": "Manuel Maluenda Right-Back",
+    "position": "N/A",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Franko Siegler",
+    "position_raw": "Franko Siegler Right-Back",
+    "position": "N/A",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Leyton",
+    "position_raw": "Sebastián Leyton Defensive Midfield",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Fabián Manzano",
+    "position_raw": "Fabián Manzano Defensive Midfield",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Iván Rozas",
+    "position_raw": "Iván Rozas Central Midfield",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Adrián Cuadra",
+    "position_raw": "Adrián Cuadra Central Midfield",
+    "position": "DEF",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€225k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Sergio Hinojosa",
+    "position_raw": "Sergio Hinojosa Central Midfield",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Patricio Castro",
+    "position_raw": "Patricio Castro Central Midfield",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Diego Rojas",
+    "position_raw": "Diego Rojas Attacking Midfield",
+    "position": "MED",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "José Bandez",
+    "position_raw": "José Bandez Left Winger",
+    "position": "DEL",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Brayan Hurtado",
+    "position_raw": "Brayan Hurtado Left Winger",
+    "position": "DEL",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Kevin Campillay",
+    "position_raw": "Kevin Campillay Right Winger",
+    "position": "MED",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€375k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Christian Bravo",
+    "position_raw": "Christian Bravo Right Winger",
+    "position": "DEL",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Matías Gallegos",
+    "position_raw": "Matías Gallegos Centre-Forward",
+    "position": "DEL",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€375k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Josepablo Monreal",
+    "position_raw": "Josepablo Monreal Centre-Forward",
+    "position": "DEL",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  },
+  {
+    "name": "Felipe Álvarez",
+    "position_raw": "Felipe Álvarez Centre-Forward",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-antofagasta/kader/verein/17222/saison_id/2025"
+  }
+]

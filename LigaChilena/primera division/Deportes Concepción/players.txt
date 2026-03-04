@@ -1,0 +1,31 @@
+- Nicolás Araya | ARQ (Nicolás Araya Goalkeeper) | Edad: 26 | Nº: N/A | Valor: €200k
+- Nery Veloso | ARQ (Nery Veloso Goalkeeper) | Edad: 38 | Nº: N/A | Valor: -
+- César | ARQ (César Goalkeeper) | Edad: 34 | Nº: N/A | Valor: -
+- Norman Rodríguez | DEF (Norman Rodríguez Centre-Back) | Edad: 27 | Nº: N/A | Valor: €450k
+- Diego Carrasco | DEF (Diego Carrasco Centre-Back) | Edad: 30 | Nº: N/A | Valor: €250k
+- Fausto Grillo | DEF (Fausto Grillo Centre-Back) | Edad: 33 | Nº: N/A | Valor: €200k
+- Sebastián Silva | DEF (Sebastián Silva Centre-Back) | Edad: 34 | Nº: N/A | Valor: €125k
+- Cristian Suárez | DEF (Cristian Suárez Centre-Back) | Edad: 39 | Nº: N/A | Valor: €25k
+- Brayan Véjar | N/A (Brayan Véjar Left-Back) | Edad: 30 | Nº: N/A | Valor: €300k
+- Jonathan Espínola | N/A (Jonathan Espínola Left-Back) | Edad: 23 | Nº: N/A | Valor: €150k
+- Javier Rojas | N/A (Javier Rojas Left-Back) | Edad: 20 | Nº: N/A | Valor: -
+- Ariel Cáceres | N/A (Ariel Cáceres Right-Back) | Edad: 26 | Nº: N/A | Valor: €225k
+- Mateo González | N/A (Mateo González Right-Back) | Edad: 20 | Nº: N/A | Valor: -
+- Yonatan Rodríguez | DEF (Yonatan Rodríguez Defensive Midfield) | Edad: 32 | Nº: N/A | Valor: €200k
+- Sebastián Martínez | DEF (Sebastián Martínez Defensive Midfield) | Edad: 32 | Nº: N/A | Valor: €125k
+- Misael Dávila | DEF (Misael Dávila Central Midfield) | Edad: 34 | Nº: N/A | Valor: €250k
+- Fabrizio Manzo | DEF (Fabrizio Manzo Central Midfield) | Edad: 27 | Nº: N/A | Valor: €200k
+- Nelson Sepúlveda | DEF (Nelson Sepúlveda Central Midfield) | Edad: 34 | Nº: N/A | Valor: €175k
+- Mario Sandoval | DEF (Mario Sandoval Central Midfield) | Edad: 34 | Nº: N/A | Valor: €100k
+- Nicolás Fuentes | DEF (Nicolás Fuentes Central Midfield) | Edad: 20 | Nº: N/A | Valor: €25k
+- Leonardo Valencia | MED (Leonardo Valencia Attacking Midfield) | Edad: 34 | Nº: N/A | Valor: €300k
+- Jorge Henríquez | MED (Jorge Henríquez Attacking Midfield) | Edad: 31 | Nº: N/A | Valor: €300k
+- Leenhan Romero | MED (Leenhan Romero Attacking Midfield) | Edad: 19 | Nº: N/A | Valor: -
+- Ethan Espinoza | DEL (Ethan Espinoza Left Winger) | Edad: 25 | Nº: N/A | Valor: €450k
+- Ángel Gillard | DEL (Ángel Gillard Left Winger) | Edad: 24 | Nº: N/A | Valor: €300k
+- Franco Cáceres | DEL (Franco Cáceres Left Winger) | Edad: 18 | Nº: N/A | Valor: -
+- Aldrix Jara | DEL (Aldrix Jara Right Winger) | Edad: 25 | Nº: N/A | Valor: €350k
+- Matías Cavalleri | DEL (Matías Cavalleri Right Winger) | Edad: 27 | Nº: N/A | Valor: -
+- Ignacio Mesías | DEL (Ignacio Mesías Centre-Forward) | Edad: 25 | Nº: N/A | Valor: €500k
+- Carlos Escobar | DEL (Carlos Escobar Centre-Forward) | Edad: 36 | Nº: N/A | Valor: €50k
+- Joaquín Larrivey | DEL (Joaquín Larrivey Centre-Forward) | Edad: 41 | Nº: N/A | Valor: €10k

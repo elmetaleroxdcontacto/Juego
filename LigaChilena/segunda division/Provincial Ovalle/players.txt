@@ -1,0 +1,28 @@
+- Kevin Catalán | ARQ (Kevin Catalán Goalkeeper) | Edad: 26 | Nº: N/A | Valor: -
+- Claudio Abarca | ARQ (Claudio Abarca Goalkeeper) | Edad: 32 | Nº: N/A | Valor: -
+- Guillermo Orellana | ARQ (Guillermo Orellana Goalkeeper) | Edad: 39 | Nº: N/A | Valor: -
+- Diego Cerón | DEF (Diego Cerón Centre-Back) | Edad: 34 | Nº: N/A | Valor: -
+- Sebastián Contreras | DEF (Sebastián Contreras Centre-Back) | Edad: 30 | Nº: N/A | Valor: -
+- Erick Millalen | DEF (Erick Millalen Centre-Back) | Edad: 26 | Nº: N/A | Valor: -
+- Bastián Solano | DEF (Bastián Solano Centre-Back) | Edad: 26 | Nº: N/A | Valor: -
+- César González Silva | DEF (César González Silva Centre-Back) | Edad: 23 | Nº: N/A | Valor: -
+- Odswart Canessa | DEL (Odswart Canessa Left-Back) | Edad: 26 | Nº: N/A | Valor: -
+- Jaime Soto | N/A (Jaime Soto Right-Back) | Edad: 33 | Nº: N/A | Valor: -
+- Camilo Matamala | MED (Camilo Matamala Right-Back) | Edad: 20 | Nº: N/A | Valor: -
+- Luis Cabrera | DEF (Luis Cabrera Defensive Midfield) | Edad: 32 | Nº: N/A | Valor: -
+- Martín Lara | DEF (Martín Lara Central Midfield) | Edad: 25 | Nº: N/A | Valor: -
+- Hernán Becica | DEF (Hernán Becica Central Midfield) | Edad: 39 | Nº: N/A | Valor: -
+- Mauro Maureira | DEF (Mauro Maureira Central Midfield) | Edad: 24 | Nº: N/A | Valor: -
+- Bastián Araya | DEF (Bastián Araya Central Midfield) | Edad: 26 | Nº: N/A | Valor: -
+- Matías Ávila | DEF (Matías Ávila Central Midfield) | Edad: 28 | Nº: N/A | Valor: -
+- Sergio Bobadilla | DEF (Sergio Bobadilla Central Midfield) | Edad: 25 | Nº: N/A | Valor: -
+- Luis Oyarzo | MED (Luis Oyarzo Attacking Midfield) | Edad: 29 | Nº: N/A | Valor: -
+- Renato Tarifeño | DEL (Renato Tarifeño Left Winger) | Edad: 29 | Nº: N/A | Valor: -
+- Benjamín Castro | MED (Benjamín Castro Left Winger) | Edad: 19 | Nº: N/A | Valor: -
+- Benjamín Cortés | MED (Benjamín Cortés Left Winger) | Edad: 23 | Nº: N/A | Valor: -
+- Luis Felipe Maluenda | DEL (Luis Felipe Maluenda Right Winger) | Edad: 22 | Nº: N/A | Valor: -
+- Gabriel Suazo L. | DEL (Gabriel Suazo L. Right Winger) | Edad: 19 | Nº: N/A | Valor: -
+- Lens Leger | DEL (Lens Leger Right Winger) | Edad: 23 | Nº: N/A | Valor: -
+- Diego Cuéllar | DEL (Diego Cuéllar Centre-Forward) | Edad: 39 | Nº: N/A | Valor: -
+- David Salazar | DEL (David Salazar Centre-Forward) | Edad: 26 | Nº: N/A | Valor: -
+- Cristian Duma | DEL (Cristian Duma Centre-Forward) | Edad: 29 | Nº: N/A | Valor: -

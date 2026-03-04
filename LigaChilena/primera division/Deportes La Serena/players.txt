@@ -1,0 +1,27 @@
+- Federico Lanzillotta | ARQ (Federico Lanzillotta Goalkeeper) | Edad: 33 | Nº: N/A | Valor: €225k
+- Eryin Sanhueza | ARQ (Eryin Sanhueza Goalkeeper) | Edad: 30 | Nº: N/A | Valor: €200k
+- José Tapia | ARQ (José Tapia Goalkeeper) | Edad: 23 | Nº: N/A | Valor: €50k
+- Lucas Alarcón | DEF (Lucas Alarcón Centre-Back) | Edad: 25 | Nº: N/A | Valor: €400k
+- Andrés Zanini | DEF (Andrés Zanini Centre-Back) | Edad: 29 | Nº: N/A | Valor: €350k
+- Fernando Dinamarca | MED (Fernando Dinamarca Left-Back) | Edad: 21 | Nº: N/A | Valor: €600k
+- Yahir Salazar | N/A (Yahir Salazar Left-Back) | Edad: 21 | Nº: N/A | Valor: €150k
+- Rafael Delgado | DEL (Rafael Delgado Left-Back) | Edad: 36 | Nº: N/A | Valor: €100k
+- Joaquín Gutiérrez | N/A (Joaquín Gutiérrez Right-Back) | Edad: 23 | Nº: N/A | Valor: €600k
+- Bruno Gutiérrez | N/A (Bruno Gutiérrez Right-Back) | Edad: 23 | Nº: N/A | Valor: €250k
+- Matías Pinto | N/A (Matías Pinto Right-Back) | Edad: 21 | Nº: N/A | Valor: €250k
+- Sebastián Díaz | DEF (Sebastián Díaz Defensive Midfield) | Edad: 29 | Nº: N/A | Valor: €400k
+- Francis Mac Allister | DEF (Francis Mac Allister Defensive Midfield) | Edad: 30 | Nº: N/A | Valor: €350k
+- Gonzalo Escalante | DEF (Gonzalo Escalante Central Midfield) | Edad: 32 | Nº: N/A | Valor: €500k
+- Matías Marín | DEF (Matías Marín Central Midfield) | Edad: 26 | Nº: N/A | Valor: €375k
+- Milovan Velásquez | DEF (Milovan Velásquez Central Midfield) | Edad: 18 | Nº: N/A | Valor: -
+- Felipe Chamorro | MED (Felipe Chamorro Attacking Midfield) | Edad: 24 | Nº: N/A | Valor: €700k
+- Joan Orellana | MED (Joan Orellana Attacking Midfield) | Edad: 20 | Nº: N/A | Valor: -
+- Jeisson Vargas | DEL (Jeisson Vargas Left Winger) | Edad: 28 | Nº: N/A | Valor: €750k
+- Alexander Oroz | DEL (Alexander Oroz Left Winger) | Edad: 23 | Nº: N/A | Valor: €300k
+- Rodrigo Dubó | DEL (Rodrigo Dubó Left Winger) | Edad: 22 | Nº: N/A | Valor: -
+- Bastián Contreras | DEL (Bastián Contreras Right Winger) | Edad: 20 | Nº: N/A | Valor: -
+- Diego Rubio | DEL (Diego Rubio Centre-Forward) | Edad: 32 | Nº: N/A | Valor: €800k
+- Ángelo Henríquez | DEL (Ángelo Henríquez Centre-Forward) | Edad: 31 | Nº: N/A | Valor: €400k
+- Nicolás Stefanelli | DEL (Nicolás Stefanelli Centre-Forward) | Edad: 31 | Nº: N/A | Valor: €250k
+- Fabricio Díaz | DEL (Fabricio Díaz Centre-Forward) | Edad: 19 | Nº: N/A | Valor: €75k
+- Carlos Vásquez | DEL (Carlos Vásquez Centre-Forward) | Edad: 23 | Nº: N/A | Valor: -

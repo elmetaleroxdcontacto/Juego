@@ -1,0 +1,209 @@
+[
+  {
+    "name": "Matías Bórquez",
+    "position_raw": "Matías Bórquez Goalkeeper",
+    "position": "ARQ",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Claudio González",
+    "position_raw": "Claudio González Goalkeeper",
+    "position": "ARQ",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Augusto Aguirre",
+    "position_raw": "Augusto Aguirre Centre-Back",
+    "position": "DEF",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Axel Alfonzo",
+    "position_raw": "Axel Alfonzo Centre-Back",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Benjamín Molina",
+    "position_raw": "Benjamín Molina Centre-Back",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Alfonso Parot",
+    "position_raw": "Alfonso Parot Left-Back",
+    "position": "N/A",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Marcelo Flores",
+    "position_raw": "Marcelo Flores Left-Back",
+    "position": "N/A",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Yerko González",
+    "position_raw": "Yerko González Right-Back",
+    "position": "N/A",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Carlos Morales",
+    "position_raw": "Carlos Morales Right-Back",
+    "position": "N/A",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Misael Llantén",
+    "position_raw": "Misael Llantén Defensive Midfield",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "César Fuentes",
+    "position_raw": "César Fuentes Defensive Midfield",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Ramón Martínez",
+    "position_raw": "Ramón Martínez Defensive Midfield",
+    "position": "DEF",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Flavio Moya",
+    "position_raw": "Flavio Moya Central Midfield",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Danilo Catalán",
+    "position_raw": "Danilo Catalán Central Midfield",
+    "position": "DEF",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "César Pinares",
+    "position_raw": "César Pinares Attacking Midfield",
+    "position": "MED",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Jean Meneses",
+    "position_raw": "Jean Meneses Left Winger",
+    "position": "DEL",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€1.60m",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Daniel Castro",
+    "position_raw": "Daniel Castro Left Winger",
+    "position": "DEL",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€750k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Joaquín Montecinos",
+    "position_raw": "Joaquín Montecinos Right Winger",
+    "position": "DEL",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Vicente Álvarez",
+    "position_raw": "Vicente Álvarez Right Winger",
+    "position": "DEL",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Facundo Marín",
+    "position_raw": "Facundo Marín Right Winger",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Marcos Arturia",
+    "position_raw": "Marcos Arturia Centre-Forward",
+    "position": "DEL",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Gonzalo Sosa",
+    "position_raw": "Gonzalo Sosa Centre-Forward",
+    "position": "DEL",
+    "age": "37",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  },
+  {
+    "name": "Joaquín Plaza",
+    "position_raw": "Joaquín Plaza Centre-Forward",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/club-de-deportes-limache/kader/verein/26697/saison_id/2025"
+  }
+]

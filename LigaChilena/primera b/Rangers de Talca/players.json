@@ -1,0 +1,209 @@
+[
+  {
+    "name": "José Luis Gamonal",
+    "position_raw": "José Luis Gamonal Goalkeeper",
+    "position": "ARQ",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Cristian Campestrini",
+    "position_raw": "Cristian Campestrini Goalkeeper",
+    "position": "ARQ",
+    "age": "45",
+    "number": "N/A",
+    "market_value": "€10k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Martín Torres",
+    "position_raw": "Martín Torres Goalkeeper",
+    "position": "ARQ",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Acuña",
+    "position_raw": "Sebastián Acuña Centre-Back",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Carlos Labrín",
+    "position_raw": "Carlos Labrín Centre-Back",
+    "position": "DEF",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Matías Cortés",
+    "position_raw": "Matías Cortés Left-Back",
+    "position": "N/A",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Agustín Mora",
+    "position_raw": "Agustín Mora Left-Back",
+    "position": "DEL",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "José Navarrete",
+    "position_raw": "José Navarrete Right-Back",
+    "position": "N/A",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€325k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Claudio Servetti",
+    "position_raw": "Claudio Servetti Right-Back",
+    "position": "N/A",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Kevin Vásquez",
+    "position_raw": "Kevin Vásquez Right-Back",
+    "position": "N/A",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Alonso Rodríguez",
+    "position_raw": "Alonso Rodríguez Defensive Midfield",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Juan Méndez",
+    "position_raw": "Juan Méndez Central Midfield",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Gary Moya",
+    "position_raw": "Gary Moya Central Midfield",
+    "position": "DEF",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Diego Plaza",
+    "position_raw": "Diego Plaza Central Midfield",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Alejandro Márquez",
+    "position_raw": "Alejandro Márquez Central Midfield",
+    "position": "DEF",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Mauro González",
+    "position_raw": "Mauro González Attacking Midfield",
+    "position": "MED",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Manuel Vicuña",
+    "position_raw": "Manuel Vicuña Left Winger",
+    "position": "DEL",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€325k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Damián González",
+    "position_raw": "Damián González Left Winger",
+    "position": "MED",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Javier Araya",
+    "position_raw": "Javier Araya Left Winger",
+    "position": "DEL",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Ignacio Ibáñez",
+    "position_raw": "Ignacio Ibáñez Right Winger",
+    "position": "DEL",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Cristóbal Muñoz",
+    "position_raw": "Cristóbal Muñoz Centre-Forward",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Ribas",
+    "position_raw": "Sebastián Ribas Centre-Forward",
+    "position": "DEL",
+    "age": "37",
+    "number": "N/A",
+    "market_value": "€10k",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  },
+  {
+    "name": "José Tomás Herrera",
+    "position_raw": "José Tomás Herrera Centre-Forward",
+    "position": "DEL",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/rangers-de-talca/kader/verein/18720/saison_id/2025"
+  }
+]

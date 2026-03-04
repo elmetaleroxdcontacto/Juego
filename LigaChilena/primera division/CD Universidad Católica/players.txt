@@ -1,0 +1,28 @@
+- Vicente Bernedo | ARQ (Vicente Bernedo Goalkeeper) | Edad: 25 | Nº: N/A | Valor: €600k
+- Darío Melo | ARQ (Darío Melo Goalkeeper) | Edad: 32 | Nº: N/A | Valor: €100k
+- Daniel González | DEF (Daniel González Centre-Back) | Edad: 24 | Nº: N/A | Valor: €1.80m
+- Branco Ampuero | DEF (Branco Ampuero Centre-Back) | Edad: 32 | Nº: N/A | Valor: €600k
+- Juan Ignacio Díaz | DEF (Juan Ignacio Díaz Centre-Back) | Edad: 27 | Nº: N/A | Valor: €450k
+- Tomás Asta-Buruaga | DEF (Tomás Asta-Buruaga Centre-Back) | Edad: 29 | Nº: N/A | Valor: €400k
+- Ignacio Pérez | DEF (Ignacio Pérez Centre-Back) | Edad: 19 | Nº: N/A | Valor: €75k
+- Gary Medel | DEF (Gary Medel Centre-Back) | Edad: 38 | Nº: N/A | Valor: €50k
+- Nicolás L'Huillier | N/A (Nicolás L'Huillier Left-Back) | Edad: 21 | Nº: N/A | Valor: €250k
+- Eugenio Mena | N/A (Eugenio Mena Left-Back) | Edad: 37 | Nº: N/A | Valor: €200k
+- Sebastián Arancibia | DEL (Sebastián Arancibia Right-Back) | Edad: 19 | Nº: N/A | Valor: €700k
+- Bernardo Cerezo | N/A (Bernardo Cerezo Right-Back) | Edad: 31 | Nº: N/A | Valor: €550k
+- Jhojan Valencia | DEF (Jhojan Valencia Defensive Midfield) | Edad: 29 | Nº: N/A | Valor: €1.00m
+- Alfred Canales | DEF (Alfred Canales Defensive Midfield) | Edad: 25 | Nº: N/A | Valor: €800k
+- Agustín Farías | DEF (Agustín Farías Defensive Midfield) | Edad: 38 | Nº: N/A | Valor: €50k
+- Jimmy Martínez | DEF (Jimmy Martínez Central Midfield) | Edad: 29 | Nº: N/A | Valor: €600k
+- Fernando Zuqui | DEF (Fernando Zuqui Central Midfield) | Edad: 34 | Nº: N/A | Valor: €400k
+- Bryan González | DEF (Bryan González Central Midfield) | Edad: 23 | Nº: N/A | Valor: €200k
+- Justo Giani | MED (Justo Giani Attacking Midfield) | Edad: 26 | Nº: N/A | Valor: €2.00m
+- Matías Palavecino | MED (Matías Palavecino Attacking Midfield) | Edad: 27 | Nº: N/A | Valor: €1.00m
+- Juan Francisco Rossel | MED (Juan Francisco Rossel Attacking Midfield) | Edad: 20 | Nº: N/A | Valor: €600k
+- Vicente Cárcamo | MED (Vicente Cárcamo Attacking Midfield) | Edad: 20 | Nº: N/A | Valor: -
+- Clemente Montes | DEL (Clemente Montes Left Winger) | Edad: 24 | Nº: N/A | Valor: €1.00m
+- Cristian Cuevas | DEL (Cristian Cuevas Left Winger) | Edad: 30 | Nº: N/A | Valor: €800k
+- Diego Corral | DEL (Diego Corral Left Winger) | Edad: 20 | Nº: N/A | Valor: €400k
+- Diego Valencia | DEL (Diego Valencia Centre-Forward) | Edad: 26 | Nº: N/A | Valor: €700k
+- Fernando Zampedri | MED (Fernando Zampedri Centre-Forward) | Edad: 38 | Nº: N/A | Valor: €250k
+- Milan Tudor | DEL (Milan Tudor Centre-Forward) | Edad: 22 | Nº: N/A | Valor: -

@@ -1,0 +1,26 @@
+- Sebastián Pérez | ARQ (Sebastián Pérez Goalkeeper) | Edad: 35 | Nº: N/A | Valor: €250k
+- Sebastián Salas | ARQ (Sebastián Salas Goalkeeper) | Edad: 24 | Nº: N/A | Valor: €100k
+- Antonio Ceza | DEF (Antonio Ceza Centre-Back) | Edad: 23 | Nº: N/A | Valor: €600k
+- Enzo Roco | DEF (Enzo Roco Centre-Back) | Edad: 33 | Nº: N/A | Valor: €400k
+- José Bizama | DEF (José Bizama Centre-Back) | Edad: 31 | Nº: N/A | Valor: €200k
+- Fernando Meza | DEF (Fernando Meza Centre-Back) | Edad: 35 | Nº: N/A | Valor: €100k
+- Dilan Zúñiga | N/A (Dilan Zúñiga Left-Back) | Edad: 29 | Nº: N/A | Valor: €750k
+- Jason León | N/A (Jason León Left-Back) | Edad: 25 | Nº: N/A | Valor: €650k
+- Alan Riquelme | MED (Alan Riquelme Left-Back) | Edad: 22 | Nº: N/A | Valor: €100k
+- Ian Garguez | N/A (Ian Garguez Right-Back) | Edad: 21 | Nº: N/A | Valor: €800k
+- Vicente Espinoza | N/A (Vicente Espinoza Right-Back) | Edad: 22 | Nº: N/A | Valor: €250k
+- Simón Pinto | N/A (Simón Pinto Right-Back) | Edad: 20 | Nº: N/A | Valor: -
+- Julián Fernández | DEF (Julián Fernández Defensive Midfield) | Edad: 30 | Nº: N/A | Valor: €500k
+- Francisco Montes | DEF (Francisco Montes Defensive Midfield) | Edad: 21 | Nº: N/A | Valor: €150k
+- Ariel Martínez | DEF (Ariel Martínez Central Midfield) | Edad: 32 | Nº: N/A | Valor: €400k
+- Sebastián Gallegos | DEF (Sebastián Gallegos Central Midfield) | Edad: 34 | Nº: N/A | Valor: €200k
+- Nicolás Meza | DEF (Nicolás Meza Central Midfield) | Edad: 23 | Nº: N/A | Valor: €100k
+- Joe Abrigo | MED (Joe Abrigo Attacking Midfield) | Edad: 30 | Nº: N/A | Valor: €800k
+- César Munder | DEL (César Munder Left Winger) | Edad: 26 | Nº: N/A | Valor: €850k
+- Jonathan Benítez | DEL (Jonathan Benítez Left Winger) | Edad: 34 | Nº: N/A | Valor: €300k
+- Dilan Salgado | DEL (Dilan Salgado Left Winger) | Edad: 22 | Nº: N/A | Valor: €250k
+- Martín Araya | DEL (Martín Araya Left Winger) | Edad: 20 | Nº: N/A | Valor: €200k
+- Bryan Carrasco | DEL (Bryan Carrasco Right Winger) | Edad: 35 | Nº: N/A | Valor: €300k
+- Gonzalo Tapia | DEL (Gonzalo Tapia Centre-Forward) | Edad: 30 | Nº: N/A | Valor: €500k
+- Nelson Da Silva | DEL (Nelson Da Silva Centre-Forward) | Edad: 29 | Nº: N/A | Valor: €450k
+- Ronnie Fernández | DEL (Ronnie Fernández Centre-Forward) | Edad: 35 | Nº: N/A | Valor: €250k

@@ -1,0 +1,64 @@
+- Emiliano Flores Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Franco Aguirre Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Martínez Marín Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Ricardo Olivares Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Jeyson Quijano Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Juan Silva Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Richard Ramírez Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Gonzalo Peña Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Freddy Iturrieta Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Héctor Ledezma Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Nicolás Agüero Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- José Luis Olivares Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Miguel Baeza Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Manuel Gallardo Vera Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Nicolás Collao Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Jorge Muñoz Peña Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Esquivel Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Patricio Carrasco Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Cristóbal Rodríguez Carrizo Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Mathías Cortez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Roberto Rozas Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Eduardo Ibaceta Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Barraza Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Gaete Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Cristóbal Villalobos Astudillo Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Axel Pavez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Ítalo Lobos Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Sergio León Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Brandon Ulloa Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Yanko Zamora Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Cristhofer Vega Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Nelson Cossio Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Emiliano Flores | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jeyson Quijano | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Freddy Iturrieta | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Héctor Ledezma | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Ítalo Lobos | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Nicolás Agüero | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- José Luis Olivares | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Miguel Baeza | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Manuel Gallardo Vera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Nicolás Collao | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sergio León | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jorge Muñoz Peña | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Brandon Ulloa | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Esquivel | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Patricio Carrasco | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Cristóbal Rodríguez Carrizo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Juan Silva | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Nelson Cossio | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Franco Aguirre | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Mathías Cortez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Roberto Rozas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Eduardo Ibaceta | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Barraza | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Martínez Marín | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Richard Ramírez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Gonzalo Peña | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Gaete | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Cristóbal Villalobos Astudillo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Axel Pavez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Yanko Zamora | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Cristhofer Vega | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Ricardo Olivares | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A

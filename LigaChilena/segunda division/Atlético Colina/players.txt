@@ -1,0 +1,18 @@
+- Julio Bórquez | ARQ (Julio Bórquez Goalkeeper) | Edad: 25 | N??: N/A | Valor: -
+- Tomás López | ARQ (Tomás López Goalkeeper) | Edad: 23 | N??: N/A | Valor: -
+- Cristóbal Finch | DEF (Cristóbal Finch Centre-Back) | Edad: 23 | N??: N/A | Valor: -
+- César Evans | DEF (César Evans Centre-Back) | Edad: 25 | N??: N/A | Valor: -
+- Luciano Meza | DEF (Luciano Meza Centre-Back) | Edad: 23 | N??: N/A | Valor: -
+- Bayron Velásquez | DEF (Bayron Velásquez Centre-Back) | Edad: 24 | N??: N/A | Valor: -
+- Andrés Segovia | N/A (Andrés Segovia Left-Back) | Edad: 28 | N??: N/A | Valor: -
+- Gonzalo Mura | N/A (Gonzalo Mura Left-Back) | Edad: 24 | N??: N/A | Valor: -
+- Janson Garrido | N/A (Janson Garrido Right-Back) | Edad: 23 | N??: N/A | Valor: -
+- Ignacio Vallejos | DEF (Ignacio Vallejos Defensive Midfield) | Edad: 23 | N??: N/A | Valor: -
+- Matías Godoy | DEF (Matías Godoy Central Midfield) | Edad: 24 | N??: N/A | Valor: -
+- Alexis Hormazábal | DEF (Alexis Hormazábal Central Midfield) | Edad: 22 | N??: N/A | Valor: -
+- Franco Gutierrez | DEF (Franco Gutierrez Central Midfield) | Edad: 24 | N??: N/A | Valor: -
+- Joaquín Zamorano | MED (Joaquín Zamorano Left Winger) | Edad: - | N??: N/A | Valor: -
+- Matías Colossi | DEL (Matías Colossi Right Winger) | Edad: 24 | N??: N/A | Valor: -
+- Ignacio Contreras | DEL (Ignacio Contreras Right Winger) | Edad: 25 | N??: N/A | Valor: -
+- Rodrigo Diaz | DEL (Rodrigo Diaz Centre-Forward) | Edad: 23 | N??: N/A | Valor: -
+- Canterano Atlético Colina 01 | MED (MED) | Edad: 23 | N??: N/A | Valor: ?50k

@@ -1,0 +1,290 @@
+[
+  {
+    "name": "Joaquín Muñoz",
+    "position_raw": "Joaquín Muñoz Goalkeeper",
+    "position": "ARQ",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Matías Olguín",
+    "position_raw": "Matías Olguín Goalkeeper",
+    "position": "ARQ",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Martín Riffo",
+    "position_raw": "Martín Riffo Goalkeeper",
+    "position": "ARQ",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Matías Vásquez",
+    "position_raw": "Matías Vásquez Centre-Back",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Alonso Walters",
+    "position_raw": "Alonso Walters Centre-Back",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Jeremías James",
+    "position_raw": "Jeremías James Centre-Back",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Claudio Meneses",
+    "position_raw": "Claudio Meneses Centre-Back",
+    "position": "DEF",
+    "age": "38",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Martín López",
+    "position_raw": "Martín López Centre-Back",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Felipe Yáñez",
+    "position_raw": "Felipe Yáñez Left-Back",
+    "position": "N/A",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Matías Osorio",
+    "position_raw": "Matías Osorio Left-Back",
+    "position": "N/A",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Hans Salinas",
+    "position_raw": "Hans Salinas Left-Back",
+    "position": "N/A",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Martín Arévalo",
+    "position_raw": "Martín Arévalo Left-Back",
+    "position": "N/A",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Diego Figueroa",
+    "position_raw": "Diego Figueroa Right-Back",
+    "position": "N/A",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Elías Berríos",
+    "position_raw": "Elías Berríos Right-Back",
+    "position": "N/A",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Javier Quiroz",
+    "position_raw": "Javier Quiroz Defensive Midfield",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Gamalier Guzmán",
+    "position_raw": "Gamalier Guzmán Defensive Midfield",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Diego Fernández",
+    "position_raw": "Diego Fernández Central Midfield",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Martín González",
+    "position_raw": "Martín González Central Midfield",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Bruno Liuzzi",
+    "position_raw": "Bruno Liuzzi Central Midfield",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Esteban Neira",
+    "position_raw": "Esteban Neira Central Midfield",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Santiago Coronel",
+    "position_raw": "Santiago Coronel Left Midfield",
+    "position": "MED",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Cristóbal Jorquera",
+    "position_raw": "Cristóbal Jorquera Attacking Midfield",
+    "position": "MED",
+    "age": "37",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Fabián Abarca",
+    "position_raw": "Fabián Abarca Left Winger",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Máximo Espínola",
+    "position_raw": "Máximo Espínola Left Winger",
+    "position": "DEL",
+    "age": "17",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Buddy Galdames",
+    "position_raw": "Buddy Galdames Left Winger",
+    "position": "MED",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Alessandro Toledo",
+    "position_raw": "Alessandro Toledo Right Winger",
+    "position": "DEL",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Rubén Farfán",
+    "position_raw": "Rubén Farfán Right Winger",
+    "position": "DEL",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Matías Fredes",
+    "position_raw": "Matías Fredes Right Winger",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Agustín Rodríguez",
+    "position_raw": "Agustín Rodríguez Right Winger",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Facundo Peraza",
+    "position_raw": "Facundo Peraza Centre-Forward",
+    "position": "DEL",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Milton Alegre",
+    "position_raw": "Milton Alegre Centre-Forward",
+    "position": "DEL",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  },
+  {
+    "name": "Alonso Barría",
+    "position_raw": "Alonso Barría Centre-Forward",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/magallanes-cf/kader/verein/13394/saison_id/2025"
+  }
+]

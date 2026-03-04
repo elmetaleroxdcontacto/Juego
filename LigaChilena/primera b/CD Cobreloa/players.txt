@@ -1,0 +1,20 @@
+- Hugo Araya | ARQ (Hugo Araya Goalkeeper) | Edad: 25 | Nº: N/A | Valor: €275k
+- Diego Tapia | ARQ (Diego Tapia Goalkeeper) | Edad: 30 | Nº: N/A | Valor: €200k
+- Cristián Alarcón | ARQ (Cristián Alarcón Goalkeeper) | Edad: 19 | Nº: N/A | Valor: -
+- Bastián San Juan | DEF (Bastián San Juan Centre-Back) | Edad: 31 | Nº: N/A | Valor: €300k
+- Diego García | DEF (Diego García Centre-Back) | Edad: 29 | Nº: N/A | Valor: €300k
+- Rodolfo González | DEF (Rodolfo González Centre-Back) | Edad: 36 | Nº: N/A | Valor: €50k
+- Lucas Cornejo | DEF (Lucas Cornejo Centre-Back) | Edad: 19 | Nº: N/A | Valor: -
+- Felipe Fritz | N/A (Felipe Fritz Left-Back) | Edad: 28 | Nº: N/A | Valor: €300k
+- David Tapia | N/A (David Tapia Right-Back) | Edad: 28 | Nº: N/A | Valor: €325k
+- Cristian Muga | DEF (Cristian Muga Defensive Midfield) | Edad: 30 | Nº: N/A | Valor: €350k
+- Jorge Gatica | DEF (Jorge Gatica Central Midfield) | Edad: 29 | Nº: N/A | Valor: €450k
+- Tomás Aránguiz | DEF (Tomás Aránguiz Central Midfield) | Edad: 28 | Nº: N/A | Valor: €400k
+- Sebastián Zúñiga | MED (Sebastián Zúñiga Attacking Midfield) | Edad: 35 | Nº: N/A | Valor: €50k
+- Francisco Matamoros | MED (Francisco Matamoros Attacking Midfield) | Edad: 21 | Nº: N/A | Valor: -
+- Cristian Insaurralde | DEL (Cristian Insaurralde Left Winger) | Edad: 34 | Nº: N/A | Valor: €200k
+- Yastin Navarro | DEL (Yastin Navarro Left Winger) | Edad: 18 | Nº: N/A | Valor: €50k
+- Álvaro Delgado | DEL (Álvaro Delgado Right Winger) | Edad: 30 | Nº: N/A | Valor: €250k
+- Matías Sandoval | DEL (Matías Sandoval Right Winger) | Edad: 28 | Nº: N/A | Valor: €75k
+- Gustavo Gotti | DEL (Gustavo Gotti Centre-Forward) | Edad: 32 | Nº: N/A | Valor: €350k
+- Vicente Conelli | DEL (Vicente Conelli Centre-Forward) | Edad: 23 | Nº: N/A | Valor: €150k

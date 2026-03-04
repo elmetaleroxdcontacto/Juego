@@ -1,0 +1,84 @@
+- Jonathan Gallardo Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Pablo Sepúlveda Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Peña Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Aránguiz Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Carlos Agüero Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Bustos Castro Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Máximo Ahumada Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Tomás Alarcón Cáceres Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- David Rojas Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Joaquín Lara Gamboa Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Bruno Cruz Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Balladares Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Oliver Vera Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Leandro Poblete Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Óscar Muñoz Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián González Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Lisboa Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Pablo Gutiérrez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Vargas Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Kevin Aravena Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Araos Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Jean Franco Sepúlveda Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Juan Díaz García Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Vidal Henríquez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Sánchez Carrasco Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Oscar Véliz Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Leonel Gutiérrez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Tobías Córdoba Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Nicolás Solís Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Miguel Ángel Retamal Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Hugo Arias Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Pedro Vergara Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Ángel Fernández Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Yimmy Colihuinca Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Bastián Nova Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Martín Villalobos Maldonado Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Dylan Berríos Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Díaz Pailamilla Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Aguayo Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Astorga Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Berríos Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Marcelo Miranda Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Aránguiz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Leandro Poblete | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Óscar Muñoz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Yimmy Colihuinca | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Carlos Agüero | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián González | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Lisboa | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Bustos Castro | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Bastián Nova | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Pablo Gutiérrez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Máximo Ahumada | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Vargas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Tomás Alarcón Cáceres | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Kevin Aravena | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Araos | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jonathan Gallardo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Pablo Sepúlveda | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- David Rojas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jean Franco Sepúlveda | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Juan Díaz García | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Vidal Henríquez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Sánchez Carrasco | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Oscar Véliz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Martín Villalobos Maldonado | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Dylan Berríos | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Díaz Pailamilla | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Leonel Gutiérrez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Tobías Córdoba | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Aguayo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Astorga | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Marcelo Miranda | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Peña | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Joaquín Lara Gamboa | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Bruno Cruz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Nicolás Solís | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Berríos | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Miguel Ángel Retamal | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Balladares | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Oliver Vera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Hugo Arias | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Pedro Vergara | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Ángel Fernández | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A

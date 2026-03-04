@@ -1,0 +1,21 @@
+- Rodrigo Cancino | ARQ (Rodrigo Cancino Goalkeeper) | Edad: 26 | Nº: N/A | Valor: -
+- José Tomás Quezada | ARQ (José Tomás Quezada Goalkeeper) | Edad: 23 | Nº: N/A | Valor: -
+- Manuel Olea | DEF (Manuel Olea Centre-Back) | Edad: 32 | Nº: N/A | Valor: -
+- Carlos Rodríguez | DEF (Carlos Rodríguez Centre-Back) | Edad: 24 | Nº: N/A | Valor: -
+- Mateo Martín | N/A (Mateo Martín Left-Back) | Edad: 21 | Nº: N/A | Valor: -
+- Santiago Medina | MED (Santiago Medina Left-Back) | Edad: 20 | Nº: N/A | Valor: -
+- Ricardo Segovia | N/A (Ricardo Segovia Right-Back) | Edad: 24 | Nº: N/A | Valor: -
+- Carlos Opazo | DEF (Carlos Opazo Defensive Midfield) | Edad: 36 | Nº: N/A | Valor: -
+- Osvaldo Carrasco | DEF (Osvaldo Carrasco Defensive Midfield) | Edad: 26 | Nº: N/A | Valor: -
+- Cristóbal Marín | DEF (Cristóbal Marín Central Midfield) | Edad: 31 | Nº: N/A | Valor: -
+- Juan Tobar | DEF (Juan Tobar Central Midfield) | Edad: 24 | Nº: N/A | Valor: -
+- Renato Díaz | MED (Renato Díaz Attacking Midfield) | Edad: 21 | Nº: N/A | Valor: -
+- Rodrigo Diaz Desidel | MED (Rodrigo Diaz Desidel Attacking Midfield) | Edad: 23 | Nº: N/A | Valor: -
+- Claudio Pavez | MED (Claudio Pavez Attacking Midfield) | Edad: 20 | Nº: N/A | Valor: -
+- Jhon Alegría | DEL (Jhon Alegría Left Winger) | Edad: 28 | Nº: N/A | Valor: -
+- Alexis Ponce | DEL (Alexis Ponce Left Winger) | Edad: 24 | Nº: N/A | Valor: -
+- Matías Pérez V. | DEL (Matías Pérez V. Right Winger) | Edad: 28 | Nº: N/A | Valor: -
+- Cristián Yáñez | DEL (Cristián Yáñez Right Winger) | Edad: 22 | Nº: N/A | Valor: -
+- Javier Medina | MED (Javier Medina Right Winger) | Edad: 22 | Nº: N/A | Valor: -
+- Matías Belmar | MED (Matías Belmar Centre-Forward) | Edad: 23 | Nº: N/A | Valor: -
+- Juan José Sánchez | DEL (Juan José Sánchez Centre-Forward) | Edad: 22 | Nº: N/A | Valor: -

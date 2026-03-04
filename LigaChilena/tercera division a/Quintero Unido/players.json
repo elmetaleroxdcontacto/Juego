@@ -1,0 +1,2432 @@
+[
+  {
+    "name": "Alexander Fernández",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Claudio Estay",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "12. Cristóbal Navarrete Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Ariel Rossi Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "25. Bastián Cáceres Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "12. Sebastián Valle Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Bastián Cartagena Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Leandro Rodríguez Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "1. Cristóbal Díaz Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "David Seguel Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Hans Schnaidt Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Cristóbal Huerta Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "13. Claudio Estay Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Sebastián González Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Diego Bravo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Bryan Vega Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "3. David Méndez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Felipe Cuadros Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "5. Diego Bravo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Alejandro Báez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Stian Zamora Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "13. Luis Núñez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "3. Byron Vega Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "2. René Cárcamo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "30. Allan Latín Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Odswart Canessa Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Matías Benítez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "4. Ignacio Silva Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "18. Esteban Madrid Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "2. Renzo Carabelli Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "16. Claudio Rojas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "6. Fabián Moreno Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "24. Johnny Navarrete Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "20. Nicholas Moreno Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Francisco Arenas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "8. Michael Cerda Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "22. Luis Vásquez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "5. César Pizarro Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "20. Cristopher Silva Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Cristóbal Orellana Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Sebastián Arancibia Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "5. Benjamín Lemus Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "6. Jeremy Rey Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "14. Nicolás Pozo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Cristopher Cornejo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "62. Ítalo Machuca Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Álex Zavala Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Francisco Gallardo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "5. Samuel Catricura Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "3. Cristóbal Cornejo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Tomás Marchant Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Luis Vásquez Zamorano Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Sergio Dilan Alvarado Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Jeremy Rey Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "4. Gonzalo Novoa Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "19. Cristóbal Yáñez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Cristóbal Sánchez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Giahn Valencia Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Marco Castillo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Allan Manzo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Ignacio Pizarro Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Vicente Lazo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Elías Llopis Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Ian Aguirre Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Camilo Venegas Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Mathew Diaz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "2. Yerko Veas Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "19. Nicolás Villacura Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Bastián Marchant Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "10. José Ignacio Milla Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Manuel Espina Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Luciano López Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "2. Demis Carrión Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Joaquín Llanos (2000) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "14. Jian Vergara Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "6. Matew Diaz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "17. Fabrizio Galindo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Darío Venegas Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "19. Bastián Oneto Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Felipe Chacana Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Alexander Espinoza Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Renato Beltrán Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "13. Matías Jorquera Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "29. Luis Carroza Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Ángelo González Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "21. Benjamín Álvarez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "30. Benjamín Arredondo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Isaac Nahuelpi Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Samuel Marabolí Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Ignacio Soto Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "23. Guillermo Véliz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Gianfranco Sepúlveda (2002) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Hamlet Castillo (2000) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Martín González Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Matías Leiva Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "18. Agustín Brito Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "14. Carlos Retamales Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Gonzalo Guerra Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Vicente Peña Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "4. Jean Chambrillard Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Daniel Barrios Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Matías Tapia Velásquez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Benjamín Navarro Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Alessandro Maggini Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Yeremy Valenti Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Guillermo Cancino Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Manuel Sepúlveda Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Yeiko Cartagena Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Ignacio Lagos Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "7. Sergio Bravo Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "9. Diego Iván Palma Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "16. Juan Ignacio Pínnola Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Felipe Moraga Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "24. Javier Arancibia Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Alonso Lagos Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "21. Cristóbal Beltrán Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Jerko Cárdenas Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "41. Stián Zamora Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Javier Ramírez Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "15. Kevyn Espinoza Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Marco Contreras Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "19. José Ignacio Bobadilla Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Simón García Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Óscar Vega Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Kevin Jara Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Benjamín Díaz Araya Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Miguel Figueroa Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Paolo Peralta Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Sergio Lobos Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "DT. Juan Pinnola Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "DT. Gerardo Astudillo Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "DT. Miguel Corvalán Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "DT. Ignacio Benavente Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "DT. Felipe Luengo Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "DT. Julio Villarroel Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "DT. Felipe Gutiérrez Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "7. Sergio Bravo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Allan Manzo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "9. Diego Iván Palma",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Ignacio Pizarro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "16. Juan Ignacio Pínnola",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Felipe Moraga",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "13. Claudio Estay",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Sebastián González",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Vicente Lazo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Elías Llopis",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Ian Aguirre",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Diego Bravo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "12. Cristóbal Navarrete",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Bryan Vega",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "3. David Méndez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Felipe Cuadros",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "DT. Juan Pinnola",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "5. Diego Bravo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Ariel Rossi",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Alejandro Báez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "24. Javier Arancibia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Stian Zamora",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Camilo Venegas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Mathew Diaz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "DT. Gerardo Astudillo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "2. Yerko Veas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "13. Luis Núñez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "3. Byron Vega",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Alonso Lagos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "2. René Cárcamo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "30. Allan Latín",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "19. Nicolás Villacura",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Odswart Canessa",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Matías Benítez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "25. Bastián Cáceres",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "12. Sebastián Valle",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Bastián Marchant",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "10. José Ignacio Milla",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "4. Ignacio Silva",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "18. Esteban Madrid",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "21. Cristóbal Beltrán",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "2. Renzo Carabelli",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "DT. Miguel Corvalán",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Manuel Espina",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Luciano López",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "16. Claudio Rojas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "6. Fabián Moreno",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Jerko Cárdenas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "41. Stián Zamora",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "24. Johnny Navarrete",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "2. Demis Carrión",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "20. Nicholas Moreno",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Francisco Arenas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Joaquín Llanos (2000)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "8. Michael Cerda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "22. Luis Vásquez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "5. César Pizarro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "20. Cristopher Silva",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "14. Jian Vergara",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Javier Ramírez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Bastián Cartagena",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Cristóbal Orellana",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "6. Matew Diaz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "17. Fabrizio Galindo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Darío Venegas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "19. Bastián Oneto",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Leandro Rodríguez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Felipe Chacana",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Sebastián Arancibia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "5. Benjamín Lemus",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "6. Jeremy Rey",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "14. Nicolás Pozo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "15. Kevyn Espinoza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Alexander Espinoza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Marco Contreras",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Renato Beltrán",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Cristopher Cornejo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "13. Matías Jorquera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "DT. Ignacio Benavente",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "29. Luis Carroza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Ángelo González",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "62. Ítalo Machuca",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "21. Benjamín Álvarez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "30. Benjamín Arredondo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "1. Cristóbal Díaz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Isaac Nahuelpi",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Samuel Marabolí",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Ignacio Soto",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "19. José Ignacio Bobadilla",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Álex Zavala",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "23. Guillermo Véliz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Francisco Gallardo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "DT. Felipe Luengo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "5. Samuel Catricura",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Gianfranco Sepúlveda (2002)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "3. Cristóbal Cornejo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Simón García",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Hamlet Castillo (2000)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Óscar Vega",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Martín González",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Matías Leiva",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "18. Agustín Brito",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Tomás Marchant",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Luis Vásquez Zamorano",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Sergio Dilan Alvarado",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Jeremy Rey",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "14. Carlos Retamales",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Gonzalo Guerra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "David Seguel",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "DT. Julio Villarroel",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "4. Gonzalo Novoa",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Vicente Peña",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "4. Jean Chambrillard",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Kevin Jara",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "19. Cristóbal Yáñez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Hans Schnaidt",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Daniel Barrios",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Matías Tapia Velásquez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Benjamín Navarro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Benjamín Díaz Araya",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Cristóbal Sánchez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Giahn Valencia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Cristóbal Huerta",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Alessandro Maggini",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Yeremy Valenti",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Guillermo Cancino",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Manuel Sepúlveda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Miguel Figueroa",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Paolo Peralta",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Marco Castillo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Yeiko Cartagena",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "DT. Felipe Gutiérrez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Sergio Lobos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  },
+  {
+    "name": "Ignacio Lagos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/quintero-unido/?sid=161334"
+  }
+]

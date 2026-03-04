@@ -1,0 +1,227 @@
+[
+  {
+    "name": "Juan Dobboletta",
+    "position_raw": "Juan Dobboletta Goalkeeper",
+    "position": "ARQ",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Maximiliano Henríquez",
+    "position_raw": "Maximiliano Henríquez Goalkeeper",
+    "position": "ARQ",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Hardy Cavero",
+    "position_raw": "Hardy Cavero Centre-Back",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Esteban Flores",
+    "position_raw": "Esteban Flores Centre-Back",
+    "position": "DEF",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Braian Camisassa",
+    "position_raw": "Braian Camisassa Centre-Back",
+    "position": "DEF",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Guerrero",
+    "position_raw": "Nicolás Guerrero Centre-Back",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Felipe Alvarado",
+    "position_raw": "Felipe Alvarado Left-Back",
+    "position": "N/A",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Icker Quiroz",
+    "position_raw": "Icker Quiroz Right-Back",
+    "position": "N/A",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "David Tati",
+    "position_raw": "David Tati Right-Back",
+    "position": "N/A",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Gino Alucema",
+    "position_raw": "Gino Alucema Defensive Midfield",
+    "position": "DEF",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Diego Acevedo",
+    "position_raw": "Diego Acevedo Central Midfield",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Hugo Herrera",
+    "position_raw": "Hugo Herrera Central Midfield",
+    "position": "DEF",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Diego Plaza Ramos",
+    "position_raw": "Diego Plaza Ramos Central Midfield",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Felipe Orellana",
+    "position_raw": "Felipe Orellana Central Midfield",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Dilan Guzmán",
+    "position_raw": "Dilan Guzmán Attacking Midfield",
+    "position": "MED",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Santiago Mederos",
+    "position_raw": "Santiago Mederos Attacking Midfield",
+    "position": "MED",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Barrios",
+    "position_raw": "Nicolás Barrios Left Winger",
+    "position": "DEL",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Cristóbal Moreno",
+    "position_raw": "Cristóbal Moreno Left Winger",
+    "position": "DEL",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Benjamín Miranda",
+    "position_raw": "Benjamín Miranda Left Winger",
+    "position": "MED",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Joaquín González O.",
+    "position_raw": "Joaquín González O. Left Winger",
+    "position": "DEL",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Mathías Pinto",
+    "position_raw": "Mathías Pinto Right Winger",
+    "position": "DEL",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Cristián Pardo",
+    "position_raw": "Cristián Pardo Right Winger",
+    "position": "DEL",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Juan Delgado",
+    "position_raw": "Juan Delgado Right Winger",
+    "position": "DEL",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Diego Arias",
+    "position_raw": "Diego Arias Centre-Forward",
+    "position": "DEL",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  },
+  {
+    "name": "Nadir Zeineddin",
+    "position_raw": "Nadir Zeineddin Centre-Forward",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-santa-cruz/kader/verein/20683/saison_id/2025"
+  }
+]

@@ -1,0 +1,68 @@
+- Maximiliano Samamé Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Iker Ortiz Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Samuel Córdova Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Ramírez Yáñez Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Brandon Gómez Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Medina Nahuelhual Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Ignacio Aguilar Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Cristóbal Ríos Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Isaías Arias Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Vicente Celedón Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Arnaldo Ramírez Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Simón Valenzuela Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Kevin Leiva Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Rocha Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Vicente Ortega Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Javier González Bucarey Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Astorga Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Harry Carnarton Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Michael Fuentes Sandoval Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Nelson Azócar Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Jerick Nancuante Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Raúl Maldonado Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Jesrrel Gálvez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Zamorano Domínguez Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Venegas Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Lukas Román Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Tomás Navarro Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Ángel Melo Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Vicente Fernández Cortés Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Luciano Cárcamo Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Yerko Rojas Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Pérez Poblete Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Ignacio Parada Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Gerardo Febrero Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Rocha | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Brandon Gómez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Zamorano Domínguez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Venegas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Vicente Ortega | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Javier González Bucarey | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Medina Nahuelhual | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Astorga | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Harry Carnarton | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Lukas Román | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Maximiliano Samamé | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Ignacio Aguilar | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Michael Fuentes Sandoval | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Cristóbal Ríos | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Tomás Navarro | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Ángel Melo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Iker Ortiz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Isaías Arias | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Vicente Celedón | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Nelson Azócar | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jerick Nancuante | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Vicente Fernández Cortés | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Luciano Cárcamo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Raúl Maldonado | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Yerko Rojas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Samuel Córdova | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Arnaldo Ramírez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Pérez Poblete | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Ramírez Yáñez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Gerardo Febrero | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Simón Valenzuela | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jesrrel Gálvez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Kevin Leiva | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Ignacio Parada | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A

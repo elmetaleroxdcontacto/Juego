@@ -1,0 +1,25 @@
+- Alejandro Santander | ARQ (Alejandro Santander Goalkeeper) | Edad: 23 | Nº: N/A | Valor: €100k
+- Jorge Pinos | ARQ (Jorge Pinos Goalkeeper) | Edad: 36 | Nº: N/A | Valor: €100k
+- José Tiznado | DEF (José Tiznado Centre-Back) | Edad: 31 | Nº: N/A | Valor: €400k
+- Christian Moreno | DEF (Christian Moreno Centre-Back) | Edad: 29 | Nº: N/A | Valor: €250k
+- Franco Bechtholdt | DEF (Franco Bechtholdt Centre-Back) | Edad: 32 | Nº: N/A | Valor: €200k
+- Antonio Castillo | DEL (Antonio Castillo Left-Back) | Edad: 27 | Nº: N/A | Valor: €250k
+- Rodrigo Sandoval | N/A (Rodrigo Sandoval Left-Back) | Edad: 25 | Nº: N/A | Valor: €175k
+- Aníbal Gajardo | N/A (Aníbal Gajardo Left-Back) | Edad: 21 | Nº: N/A | Valor: €50k
+- Aaron Astudillo | DEL (Aaron Astudillo Right-Back) | Edad: 25 | Nº: N/A | Valor: €300k
+- Guillermo Pacheco | MED (Guillermo Pacheco Right-Back) | Edad: 36 | Nº: N/A | Valor: €100k
+- Agustín Nadruz | DEF (Agustín Nadruz Defensive Midfield) | Edad: 29 | Nº: N/A | Valor: €500k
+- Juan Fuentes | DEF (Juan Fuentes Defensive Midfield) | Edad: 30 | Nº: N/A | Valor: €400k
+- Ignacio Pacheco | DEF (Ignacio Pacheco Defensive Midfield) | Edad: 21 | Nº: N/A | Valor: -
+- Esteban Valencia | DEF (Esteban Valencia Central Midfield) | Edad: 26 | Nº: N/A | Valor: €400k
+- Benjamín Valenzuela | DEF (Benjamín Valenzuela Central Midfield) | Edad: 20 | Nº: N/A | Valor: €150k
+- Milan Roki | DEF (Milan Roki Central Midfield) | Edad: 18 | Nº: N/A | Valor: €25k
+- Bryan Carvallo | MED (Bryan Carvallo Attacking Midfield) | Edad: 29 | Nº: N/A | Valor: €200k
+- César Yanis | DEL (César Yanis Right Winger) | Edad: 30 | Nº: N/A | Valor: €350k
+- Julián Brea | DEL (Julián Brea Right Winger) | Edad: 26 | Nº: N/A | Valor: €350k
+- Renato Huerta | DEL (Renato Huerta Right Winger) | Edad: 22 | Nº: N/A | Valor: €300k
+- Carlos Navarrete | DEL (Carlos Navarrete Right Winger) | Edad: 21 | Nº: N/A | Valor: -
+- Yair Guzmán | DEL (Yair Guzmán Right Winger) | Edad: 17 | Nº: N/A | Valor: -
+- Steffan Pino | DEL (Steffan Pino Centre-Forward) | Edad: 31 | Nº: N/A | Valor: €450k
+- Franco Frías | DEL (Franco Frías Centre-Forward) | Edad: 23 | Nº: N/A | Valor: €400k
+- Sergio Carrasco | DEL (Sergio Carrasco Centre-Forward) | Edad: 21 | Nº: N/A | Valor: €250k

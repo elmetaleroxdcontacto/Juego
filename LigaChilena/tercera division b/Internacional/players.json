@@ -1,0 +1,740 @@
+[
+  {
+    "name": "Vladimir Godoy Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Juan Salvador Penroz Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Oscar Yáñez Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Felipe Ramos Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Matías Pesse Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Fabián Burgos Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Tito Donoso Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Franco Gallardo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Danilo Cisternas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Steven Miranda Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Guido Burgos Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Martín Mancilla Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Erick Silva Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Sebastián Alacid Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Matías Guzmán Encina Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Leonardo Retamal Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Alberto Palma Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Luis Felipe Candia Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Juan Carlos Fernández Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Vicente López Fuentes Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Luciano López Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Carlos Cariaga Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Baruc Inostroza Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Mauricio Díaz Álvarez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Martín Herrera Castillo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Benjamín Quiroga Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Matías Navia Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Demian Sepúlveda Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Axel Trincado Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Philippe Maleville Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Benjamín Vásquez Parra Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Benjamín Arancibia Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Ángel Henríquez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Nicolás Vidal Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Andrés Cuero Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Bastián Cayulén Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "De Alexsandro Lepileo Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Claudio Pizarro Almarza Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Jeffri Maturana Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "DT. Jairo Zamorano Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "DT. Israel Orellana Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Vladimir Godoy",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Fabián Burgos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Tito Donoso",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Franco Gallardo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Danilo Cisternas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Leonardo Retamal",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Alberto Palma",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Luis Felipe Candia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Nicolás Vidal",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Andrés Cuero",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Steven Miranda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Juan Carlos Fernández",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Vicente López Fuentes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Luciano López",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Carlos Cariaga",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Baruc Inostroza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "DT. Jairo Zamorano",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Juan Salvador Penroz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Bastián Cayulén",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Mauricio Díaz Álvarez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Martín Herrera Castillo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Benjamín Quiroga",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Guido Burgos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Oscar Yáñez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Martín Mancilla",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "De Alexsandro Lepileo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Matías Navia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Erick Silva",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Sebastián Alacid",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Demian Sepúlveda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Axel Trincado",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Philippe Maleville",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Claudio Pizarro Almarza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Benjamín Vásquez Parra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Felipe Ramos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Benjamín Arancibia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Matías Guzmán Encina",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Jeffri Maturana",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Matías Pesse",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "Ángel Henríquez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  },
+  {
+    "name": "DT. Israel Orellana",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/internacional-2/?sid=166009"
+  }
+]

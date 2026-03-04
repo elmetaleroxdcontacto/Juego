@@ -1,0 +1,236 @@
+[
+  {
+    "name": "Rodrigo Saracho",
+    "position_raw": "Rodrigo Saracho Goalkeeper",
+    "position": "ARQ",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Benjamín Tapia",
+    "position_raw": "Benjamín Tapia Goalkeeper",
+    "position": "ARQ",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Martín Dedes",
+    "position_raw": "Martín Dedes Goalkeeper",
+    "position": "ARQ",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Javier Rivera",
+    "position_raw": "Javier Rivera Centre-Back",
+    "position": "DEF",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€325k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Álvaro Cazula",
+    "position_raw": "Álvaro Cazula Centre-Back",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Matías Moya Godoy",
+    "position_raw": "Matías Moya Godoy Centre-Back",
+    "position": "DEF",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Aguirre",
+    "position_raw": "Nicolás Aguirre Centre-Back",
+    "position": "DEF",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Yerko Águila",
+    "position_raw": "Yerko Águila Left-Back",
+    "position": "N/A",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Korben Rojas",
+    "position_raw": "Korben Rojas Left-Back",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Rivera",
+    "position_raw": "Nicolás Rivera Left-Back",
+    "position": "N/A",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Cristóbal Guerra",
+    "position_raw": "Cristóbal Guerra Right-Back",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Reiner Campos",
+    "position_raw": "Reiner Campos Right-Back",
+    "position": "MED",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Guillermo Cubillos",
+    "position_raw": "Guillermo Cubillos Right-Back",
+    "position": "MED",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Mauricio Iturra",
+    "position_raw": "Mauricio Iturra Defensive Midfield",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Camilo Rencoret",
+    "position_raw": "Camilo Rencoret Defensive Midfield",
+    "position": "DEF",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Augusto Barrios",
+    "position_raw": "Augusto Barrios Central Midfield",
+    "position": "DEF",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "D'Hidier Pereira",
+    "position_raw": "D'Hidier Pereira Attacking Midfield",
+    "position": "MED",
+    "age": "17",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Nahuel Donadell",
+    "position_raw": "Nahuel Donadell Attacking Midfield",
+    "position": "MED",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Agustín Maidana",
+    "position_raw": "Agustín Maidana Attacking Midfield",
+    "position": "MED",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Boris Sagredo",
+    "position_raw": "Boris Sagredo Attacking Midfield",
+    "position": "MED",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Alfredo Ábalos",
+    "position_raw": "Alfredo Ábalos Left Winger",
+    "position": "DEL",
+    "age": "39",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Gonzalo Reyes",
+    "position_raw": "Gonzalo Reyes Right Winger",
+    "position": "DEL",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Orrego",
+    "position_raw": "Nicolás Orrego Right Winger",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Bairon Monroy",
+    "position_raw": "Bairon Monroy Centre-Forward",
+    "position": "DEL",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Camilo Melivilú",
+    "position_raw": "Camilo Melivilú Centre-Forward",
+    "position": "MED",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Zedan",
+    "position_raw": "Nicolás Zedan Centre-Forward",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-marcos-de-arica/kader/verein/23162/saison_id/2025"
+  }
+]

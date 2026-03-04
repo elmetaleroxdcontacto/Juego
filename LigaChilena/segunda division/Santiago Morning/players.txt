@@ -1,0 +1,19 @@
+- Alejandro Arana | ARQ (Alejandro Arana Goalkeeper) | Edad: 28 | Nº: N/A | Valor: €100k
+- Lautaro Rigazzi | DEF (Lautaro Rigazzi Centre-Back) | Edad: 27 | Nº: N/A | Valor: €200k
+- Gonzalo Santelices | DEF (Gonzalo Santelices Centre-Back) | Edad: 29 | Nº: N/A | Valor: €100k
+- Max Gatica | DEF (Max Gatica Centre-Back) | Edad: 30 | Nº: N/A | Valor: €75k
+- Martín Delgado | DEF (Martín Delgado Centre-Back) | Edad: 24 | Nº: N/A | Valor: €50k
+- Douglas Estay | DEL (Douglas Estay Left-Back) | Edad: 33 | Nº: N/A | Valor: €150k
+- Edgardo Carreño | N/A (Edgardo Carreño Left-Back) | Edad: 23 | Nº: N/A | Valor: -
+- Diego Álvarez | N/A (Diego Álvarez Right-Back) | Edad: 24 | Nº: N/A | Valor: €25k
+- Joaquín Monje | DEF (Joaquín Monje Central Midfield) | Edad: 22 | Nº: N/A | Valor: €25k
+- Diego Faúndez | DEF (Diego Faúndez Central Midfield) | Edad: 22 | Nº: N/A | Valor: €25k
+- Fernando Manríquez | DEF (Fernando Manríquez Central Midfield) | Edad: 42 | Nº: N/A | Valor: €10k
+- Sebastián Salazar | MED (Sebastián Salazar Attacking Midfield) | Edad: 24 | Nº: N/A | Valor: €100k
+- Paulo Violante | MED (Paulo Violante Attacking Midfield) | Edad: 23 | Nº: N/A | Valor: -
+- Matías Coronado | DEL (Matías Coronado Left Winger) | Edad: 23 | Nº: N/A | Valor: €150k
+- Gustavo Escobar | DEL (Gustavo Escobar Left Winger) | Edad: 21 | Nº: N/A | Valor: -
+- Martín Arancibia | DEL (Martín Arancibia Right Winger) | Edad: 21 | Nº: N/A | Valor: €200k
+- Nicolás Forttes | DEL (Nicolás Forttes Right Winger) | Edad: 28 | Nº: N/A | Valor: €25k
+- Joaquín Barrientos | DEL (Joaquín Barrientos Centre-Forward) | Edad: 20 | Nº: N/A | Valor: €150k
+- Carlos Muñoz | DEL (Carlos Muñoz Centre-Forward) | Edad: 36 | Nº: N/A | Valor: -

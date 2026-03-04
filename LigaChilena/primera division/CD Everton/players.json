@@ -1,0 +1,254 @@
+[
+  {
+    "name": "Ignacio González",
+    "position_raw": "Ignacio González Goalkeeper",
+    "position": "ARQ",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Isaac Esquenazi",
+    "position_raw": "Isaac Esquenazi Goalkeeper",
+    "position": "ARQ",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Esteban Kirkman",
+    "position_raw": "Esteban Kirkman Goalkeeper",
+    "position": "ARQ",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Hugo Magallanes",
+    "position_raw": "Hugo Magallanes Centre-Back",
+    "position": "DEF",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Valentín Vidal",
+    "position_raw": "Valentín Vidal Centre-Back",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Diego Oyarzún",
+    "position_raw": "Diego Oyarzún Centre-Back",
+    "position": "DEF",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Ramiro González",
+    "position_raw": "Ramiro González Centre-Back",
+    "position": "DEF",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Vicente Vega",
+    "position_raw": "Vicente Vega Centre-Back",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Vicente Fernández",
+    "position_raw": "Vicente Fernández Left-Back",
+    "position": "N/A",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Baeza",
+    "position_raw": "Nicolás Baeza Left-Back",
+    "position": "N/A",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Byron Navarro",
+    "position_raw": "Byron Navarro Left-Back",
+    "position": "N/A",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Cristopher Barrera",
+    "position_raw": "Cristopher Barrera Right-Back",
+    "position": "DEL",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Lucas Soto",
+    "position_raw": "Lucas Soto Right-Back",
+    "position": "N/A",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Martín Guzmán",
+    "position_raw": "Martín Guzmán Right-Back",
+    "position": "N/A",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Óscar Opazo",
+    "position_raw": "Óscar Opazo Right-Back",
+    "position": "N/A",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Diéter Villalpando",
+    "position_raw": "Diéter Villalpando Central Midfield",
+    "position": "DEF",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€600k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Benjamín Berríos",
+    "position_raw": "Benjamín Berríos Central Midfield",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€600k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Joaquín Moya",
+    "position_raw": "Joaquín Moya Central Midfield",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Felipe Villagrán",
+    "position_raw": "Felipe Villagrán Central Midfield",
+    "position": "DEF",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Emiliano Ramos",
+    "position_raw": "Emiliano Ramos Left Winger",
+    "position": "MED",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Braian Martínez",
+    "position_raw": "Braian Martínez Left Winger",
+    "position": "DEL",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Alan Medina",
+    "position_raw": "Alan Medina Right Winger",
+    "position": "MED",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€1.30m",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Julián Alfaro",
+    "position_raw": "Julián Alfaro Right Winger",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Sosa",
+    "position_raw": "Sebastián Sosa Centre-Forward",
+    "position": "DEL",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Martín Cárcamo",
+    "position_raw": "Martín Cárcamo Centre-Forward",
+    "position": "MED",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Cristian Palacios",
+    "position_raw": "Cristian Palacios Centre-Forward",
+    "position": "DEL",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Montiel",
+    "position_raw": "Nicolás Montiel Centre-Forward",
+    "position": "DEL",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  },
+  {
+    "name": "Cristóbal Chadwick",
+    "position_raw": "Cristóbal Chadwick Centre-Forward",
+    "position": "DEL",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-everton/kader/verein/7020/saison_id/2025"
+  }
+]

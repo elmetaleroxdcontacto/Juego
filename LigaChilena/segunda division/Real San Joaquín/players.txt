@@ -1,0 +1,23 @@
+- Elías Hartard | ARQ (Elías Hartard Goalkeeper) | Edad: 38 | Nº: N/A | Valor: -
+- Benjamín Reyes | ARQ (Benjamín Reyes Goalkeeper) | Edad: 27 | Nº: N/A | Valor: -
+- Andy Saul | ARQ (Andy Saul Goalkeeper) | Edad: 21 | Nº: N/A | Valor: -
+- Alexandro Benavente | DEF (Alexandro Benavente Centre-Back) | Edad: 21 | Nº: N/A | Valor: -
+- Tomás Pino | N/A (Tomás Pino Left-Back) | Edad: 25 | Nº: N/A | Valor: -
+- Vicente Cabrera | N/A (Vicente Cabrera Right-Back) | Edad: 23 | Nº: N/A | Valor: -
+- José Duarte | DEF (José Duarte Defensive Midfield) | Edad: 28 | Nº: N/A | Valor: -
+- Israel Muñoz | DEF (Israel Muñoz Central Midfield) | Edad: 29 | Nº: N/A | Valor: -
+- Vicente Quevedo | DEF (Vicente Quevedo Central Midfield) | Edad: 20 | Nº: N/A | Valor: -
+- Javier Maulén | DEF (Javier Maulén Central Midfield) | Edad: 27 | Nº: N/A | Valor: -
+- Jaison Millares | DEF (Jaison Millares Central Midfield) | Edad: 26 | Nº: N/A | Valor: -
+- Luis Pacheco | DEF (Luis Pacheco Central Midfield) | Edad: 33 | Nº: N/A | Valor: -
+- Francisco Reyes | DEF (Francisco Reyes Central Midfield) | Edad: 21 | Nº: N/A | Valor: -
+- Marcelo Carvajal | MED (Marcelo Carvajal Attacking Midfield) | Edad: 29 | Nº: N/A | Valor: -
+- Joao Ugarte | MED (Joao Ugarte Attacking Midfield) | Edad: 23 | Nº: N/A | Valor: -
+- Benjamín Márquez | MED (Benjamín Márquez Attacking Midfield) | Edad: 18 | Nº: N/A | Valor: -
+- Pablo Contreras E. | MED (Pablo Contreras E. Attacking Midfield) | Edad: 22 | Nº: N/A | Valor: -
+- Luis Pérez | DEL (Luis Pérez Left Winger) | Edad: 26 | Nº: N/A | Valor: -
+- Javier Fica | DEL (Javier Fica Left Winger) | Edad: 21 | Nº: N/A | Valor: -
+- Diego Pizarro | DEL (Diego Pizarro Right Winger) | Edad: 22 | Nº: N/A | Valor: -
+- Alberto Delus | DEF (Alberto Delus Centre-Forward) | Edad: 20 | Nº: N/A | Valor: -
+- Héctor Molina | DEL (Héctor Molina Centre-Forward) | Edad: 33 | Nº: N/A | Valor: -
+- Rubén Cobo | DEL (Rubén Cobo Centre-Forward) | Edad: 30 | Nº: N/A | Valor: -

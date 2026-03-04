@@ -1,6 +1,0 @@
-Team: Deportivo Tercera A2
-Players:
-- Name: Miguel Torres, Position: FW, Attack: 72, Defense: 42, Stamina: 68, Skill: 63, Age: 25, Value: 290000
-- Name: Diego Flores, Position: MF, Attack: 63, Defense: 57, Stamina: 73, Skill: 58, Age: 27, Value: 270000
-- Name: Alejandro Ruiz, Position: DF, Attack: 48, Defense: 72, Stamina: 63, Skill: 53, Age: 29, Value: 240000
-- Name: Roberto Vega, Position: GK, Attack: 38, Defense: 82, Stamina: 58, Skill: 48, Age: 31, Value: 190000

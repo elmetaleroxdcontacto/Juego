@@ -1,0 +1,17 @@
+﻿# teams.txt - one team folder name per line
+# optional format: Display Name|Folder Name
+
+Atlético Colina
+Brujas de Salamanca
+Club Deportes Rengo
+Colchagua CD
+Concón National
+Deportes Linares
+Deportes Melipilla
+General Velásquez
+Provincial Osorno
+Provincial Ovalle
+Real San Joaquín
+Santiago City
+Santiago Morning
+Trasandino de Los Andes

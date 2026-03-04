@@ -38,3 +38,28 @@ Step-by-step guide to install MinGW-w64 on Windows and compile your C++ program:
 This will launch your Football Manager Game console application.
 
 If you want, I can help you with the commands to compile and run once MinGW-w64 is installed.
+
+================================================================================
+IMPORTANTE: Si ya tienes MinGW en C:\MinGW, ¡no necesitas reinstallar!
+================================================================================
+
+Tu instalación de MinGW ya está en C:\MinGW y tiene todo lo necesario:
+- C:\MinGW\bin\g++.exe (compilador C++)
+- C:\MinGW\lib\gcc\mingw32\6.3.0\include\c++\iostream (headers C++)
+
+Solo necesitas configurar el PATH:
+
+METODO 1: Variables de Entorno
+1. Presiona Win + R
+2. Escribe sysdm.cpl y presiona Enter
+3. Ve a "Opciones avanzadas" > "Variables de entorno"
+4. En "Variables del sistema", selecciona "Path" y haz clic en "Editar"
+5. Haz clic en "Nuevo" y agrega: C:\MinGW\bin
+6. Acepta todo y REINICIA VSCode
+
+METODO 2: PowerShell (como Administrador)
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\MinGW\bin", "Machine")
+
+VERIFICAR:
+Abre una terminal nueva y escribe: g++ --version
+Si ves la versión, el PATH está configurado.

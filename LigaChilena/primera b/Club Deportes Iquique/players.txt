@@ -1,0 +1,23 @@
+- Zacarías López | ARQ (Zacarías López Goalkeeper) | Edad: 27 | Nº: N/A | Valor: €150k
+- Daniel Castillo | ARQ (Daniel Castillo Goalkeeper) | Edad: 35 | Nº: N/A | Valor: €50k
+- Jorge Ayala | DEF (Jorge Ayala Centre-Back) | Edad: 30 | Nº: N/A | Valor: €300k
+- Vicente Concha | DEF (Vicente Concha Centre-Back) | Edad: 23 | Nº: N/A | Valor: €150k
+- Franco Ledesma | DEF (Franco Ledesma Centre-Back) | Edad: 33 | Nº: N/A | Valor: €150k
+- Matías Blázquez | DEF (Matías Blázquez Centre-Back) | Edad: 34 | Nº: N/A | Valor: €100k
+- Felipe Espinoza | N/A (Felipe Espinoza Left-Back) | Edad: 26 | Nº: N/A | Valor: €400k
+- Alonso López | N/A (Alonso López Left-Back) | Edad: 20 | Nº: N/A | Valor: €150k
+- Dilan Rojas | N/A (Dilan Rojas Right-Back) | Edad: 21 | Nº: N/A | Valor: €450k
+- Simón Contreras | N/A (Simón Contreras Right-Back) | Edad: 23 | Nº: N/A | Valor: €100k
+- Joaquín Pereyra | DEF (Joaquín Pereyra Defensive Midfield) | Edad: 31 | Nº: N/A | Valor: €300k
+- Juan David Bacca | DEF (Juan David Bacca Defensive Midfield) | Edad: 21 | Nº: N/A | Valor: €25k
+- Diego Orellana | DEF (Diego Orellana Central Midfield) | Edad: 32 | Nº: N/A | Valor: €375k
+- Brayan Garrido | DEF (Brayan Garrido Central Midfield) | Edad: 27 | Nº: N/A | Valor: €350k
+- David Tello | DEF (David Tello Central Midfield) | Edad: 21 | Nº: N/A | Valor: -
+- Agustín Venezia | MED (Agustín Venezia Attacking Midfield) | Edad: 22 | Nº: N/A | Valor: €200k
+- Leonardo Troncoso | MED (Leonardo Troncoso Attacking Midfield) | Edad: 20 | Nº: N/A | Valor: -
+- Iam González | MED (Iam González Left Winger) | Edad: 21 | Nº: N/A | Valor: €500k
+- Edson Puch | DEL (Edson Puch Left Winger) | Edad: 39 | Nº: N/A | Valor: €10k
+- César González | DEL (César González Right Winger) | Edad: 29 | Nº: N/A | Valor: €450k
+- Antony Henríquez | DEL (Antony Henríquez Right Winger) | Edad: 19 | Nº: N/A | Valor: €50k
+- Álvaro Ramos | MED (Álvaro Ramos Centre-Forward) | Edad: 33 | Nº: N/A | Valor: €150k
+- Isaac Díaz | DEL (Isaac Díaz Centre-Forward) | Edad: 35 | Nº: N/A | Valor: €100k

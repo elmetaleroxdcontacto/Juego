@@ -1,0 +1,245 @@
+[
+  {
+    "name": "Gonzalo Collao",
+    "position_raw": "Gonzalo Collao Goalkeeper",
+    "position": "ARQ",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Luis Ureta",
+    "position_raw": "Luis Ureta Goalkeeper",
+    "position": "ARQ",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Vicente Castillo",
+    "position_raw": "Vicente Castillo Goalkeeper",
+    "position": "ARQ",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Jesús Pino",
+    "position_raw": "Jesús Pino Centre-Back",
+    "position": "DEF",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Ariel Morales",
+    "position_raw": "Ariel Morales Centre-Back",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Maximiliano Riveros",
+    "position_raw": "Maximiliano Riveros Centre-Back",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Francisco Calisto",
+    "position_raw": "Francisco Calisto Centre-Back",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Kevin Egaña",
+    "position_raw": "Kevin Egaña Left-Back",
+    "position": "N/A",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Daniel Bahamonde",
+    "position_raw": "Daniel Bahamonde Left-Back",
+    "position": "MED",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Vicente Yáñez",
+    "position_raw": "Vicente Yáñez Left-Back",
+    "position": "N/A",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Byron Nieto",
+    "position_raw": "Byron Nieto Right-Back",
+    "position": "N/A",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€325k",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Juan Jaime",
+    "position_raw": "Juan Jaime Defensive Midfield",
+    "position": "DEF",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "José Cárdenas",
+    "position_raw": "José Cárdenas Defensive Midfield",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Danilo Díaz",
+    "position_raw": "Danilo Díaz Central Midfield",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Gabriel Castillo",
+    "position_raw": "Gabriel Castillo Central Midfield",
+    "position": "DEF",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Alexis Sabella",
+    "position_raw": "Alexis Sabella Attacking Midfield",
+    "position": "MED",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Cristóbal Vargas",
+    "position_raw": "Cristóbal Vargas Attacking Midfield",
+    "position": "MED",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Jason Flores",
+    "position_raw": "Jason Flores Left Winger",
+    "position": "DEL",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Reiner Castro",
+    "position_raw": "Reiner Castro Left Winger",
+    "position": "DEL",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Pérez",
+    "position_raw": "Sebastián Pérez Left Winger",
+    "position": "DEL",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Juan Alberto González",
+    "position_raw": "Juan Alberto González Left Winger",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Salvador Negrete",
+    "position_raw": "Salvador Negrete Left Winger",
+    "position": "DEL",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Juan Arias",
+    "position_raw": "Juan Arias Right Winger",
+    "position": "DEL",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Manley Clerveaux",
+    "position_raw": "Manley Clerveaux Right Winger",
+    "position": "DEL",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Richard Paredes",
+    "position_raw": "Richard Paredes Centre-Forward",
+    "position": "DEL",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Luciano Vásquez",
+    "position_raw": "Luciano Vásquez Centre-Forward",
+    "position": "DEL",
+    "age": "40",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  },
+  {
+    "name": "Lucas Mansilla",
+    "position_raw": "Lucas Mansilla Centre-Forward",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-puerto-montt/kader/verein/11657/saison_id/2025"
+  }
+]

@@ -1,0 +1,614 @@
+[
+  {
+    "name": "Maximiliano Samamé Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Iker Ortiz Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Samuel Córdova Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Matías Ramírez Yáñez Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Brandon Gómez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Sebastián Medina Nahuelhual Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Ignacio Aguilar Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Cristóbal Ríos Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Isaías Arias Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Vicente Celedón Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Arnaldo Ramírez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Simón Valenzuela Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Kevin Leiva Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Sebastián Rocha Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Vicente Ortega Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Javier González Bucarey Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Sebastián Astorga Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Harry Carnarton Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Michael Fuentes Sandoval Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Nelson Azócar Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Jerick Nancuante Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Raúl Maldonado Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Jesrrel Gálvez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Matías Zamorano Domínguez Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Felipe Venegas Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Lukas Román Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Tomás Navarro Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Ángel Melo Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Vicente Fernández Cortés Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Luciano Cárcamo Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Yerko Rojas Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Benjamín Pérez Poblete Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Ignacio Parada Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "DT. Gerardo Febrero Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Sebastián Rocha",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Brandon Gómez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Matías Zamorano Domínguez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Felipe Venegas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Vicente Ortega",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Javier González Bucarey",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Sebastián Medina Nahuelhual",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Sebastián Astorga",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Harry Carnarton",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Lukas Román",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Maximiliano Samamé",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Ignacio Aguilar",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Michael Fuentes Sandoval",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Cristóbal Ríos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Tomás Navarro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Ángel Melo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Iker Ortiz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Isaías Arias",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Vicente Celedón",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Nelson Azócar",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Jerick Nancuante",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Vicente Fernández Cortés",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Luciano Cárcamo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Raúl Maldonado",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Yerko Rojas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Samuel Córdova",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Arnaldo Ramírez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Benjamín Pérez Poblete",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Matías Ramírez Yáñez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "DT. Gerardo Febrero",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Simón Valenzuela",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Jesrrel Gálvez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Kevin Leiva",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  },
+  {
+    "name": "Ignacio Parada",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/futuro/?sid=166009"
+  }
+]

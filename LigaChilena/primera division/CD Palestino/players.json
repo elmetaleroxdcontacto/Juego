@@ -1,0 +1,236 @@
+[
+  {
+    "name": "Sebastián Pérez",
+    "position_raw": "Sebastián Pérez Goalkeeper",
+    "position": "ARQ",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Salas",
+    "position_raw": "Sebastián Salas Goalkeeper",
+    "position": "ARQ",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Antonio Ceza",
+    "position_raw": "Antonio Ceza Centre-Back",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€600k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Enzo Roco",
+    "position_raw": "Enzo Roco Centre-Back",
+    "position": "DEF",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "José Bizama",
+    "position_raw": "José Bizama Centre-Back",
+    "position": "DEF",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Fernando Meza",
+    "position_raw": "Fernando Meza Centre-Back",
+    "position": "DEF",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Dilan Zúñiga",
+    "position_raw": "Dilan Zúñiga Left-Back",
+    "position": "N/A",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€750k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Jason León",
+    "position_raw": "Jason León Left-Back",
+    "position": "N/A",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€650k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Alan Riquelme",
+    "position_raw": "Alan Riquelme Left-Back",
+    "position": "MED",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Ian Garguez",
+    "position_raw": "Ian Garguez Right-Back",
+    "position": "N/A",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€800k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Vicente Espinoza",
+    "position_raw": "Vicente Espinoza Right-Back",
+    "position": "N/A",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Simón Pinto",
+    "position_raw": "Simón Pinto Right-Back",
+    "position": "N/A",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Julián Fernández",
+    "position_raw": "Julián Fernández Defensive Midfield",
+    "position": "DEF",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Francisco Montes",
+    "position_raw": "Francisco Montes Defensive Midfield",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Ariel Martínez",
+    "position_raw": "Ariel Martínez Central Midfield",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Gallegos",
+    "position_raw": "Sebastián Gallegos Central Midfield",
+    "position": "DEF",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Meza",
+    "position_raw": "Nicolás Meza Central Midfield",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Joe Abrigo",
+    "position_raw": "Joe Abrigo Attacking Midfield",
+    "position": "MED",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€800k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "César Munder",
+    "position_raw": "César Munder Left Winger",
+    "position": "DEL",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€850k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Jonathan Benítez",
+    "position_raw": "Jonathan Benítez Left Winger",
+    "position": "DEL",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Dilan Salgado",
+    "position_raw": "Dilan Salgado Left Winger",
+    "position": "DEL",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Martín Araya",
+    "position_raw": "Martín Araya Left Winger",
+    "position": "DEL",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Bryan Carrasco",
+    "position_raw": "Bryan Carrasco Right Winger",
+    "position": "DEL",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Gonzalo Tapia",
+    "position_raw": "Gonzalo Tapia Centre-Forward",
+    "position": "DEL",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Nelson Da Silva",
+    "position_raw": "Nelson Da Silva Centre-Forward",
+    "position": "DEL",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  },
+  {
+    "name": "Ronnie Fernández",
+    "position_raw": "Ronnie Fernández Centre-Forward",
+    "position": "DEL",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/cd-palestino/kader/verein/6536/saison_id/2025"
+  }
+]

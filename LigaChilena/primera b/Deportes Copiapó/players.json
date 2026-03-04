@@ -1,0 +1,209 @@
+[
+  {
+    "name": "Nicolás Temperini",
+    "position_raw": "Nicolás Temperini Goalkeeper",
+    "position": "ARQ",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Richard Leyton",
+    "position_raw": "Richard Leyton Goalkeeper",
+    "position": "ARQ",
+    "age": "39",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Suárez",
+    "position_raw": "Nicolás Suárez Centre-Back",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Diego Opazo",
+    "position_raw": "Diego Opazo Centre-Back",
+    "position": "DEF",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Nozomi Kimura",
+    "position_raw": "Nozomi Kimura Centre-Back",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Fabián Torres",
+    "position_raw": "Fabián Torres Centre-Back",
+    "position": "DEF",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "John Santander",
+    "position_raw": "John Santander Left-Back",
+    "position": "N/A",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Agustín Ortiz",
+    "position_raw": "Agustín Ortiz Right-Back",
+    "position": "DEL",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Marcelo Filla",
+    "position_raw": "Marcelo Filla Right-Back",
+    "position": "N/A",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Axl Ríos",
+    "position_raw": "Axl Ríos Defensive Midfield",
+    "position": "DEF",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Gastón Pérez",
+    "position_raw": "Gastón Pérez Defensive Midfield",
+    "position": "DEF",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Claudio Zamorano",
+    "position_raw": "Claudio Zamorano Defensive Midfield",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Iván Ledezma",
+    "position_raw": "Iván Ledezma Central Midfield",
+    "position": "DEF",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€325k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Enzo Fernández",
+    "position_raw": "Enzo Fernández Central Midfield",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Jorge Ortiz",
+    "position_raw": "Jorge Ortiz Attacking Midfield",
+    "position": "MED",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "John Valladares Moya",
+    "position_raw": "John Valladares Moya Left Winger",
+    "position": "DEL",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Espinoza",
+    "position_raw": "Sebastián Espinoza Left Winger",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Carlos Soza",
+    "position_raw": "Carlos Soza Left Winger",
+    "position": "DEL",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Carlos Ross",
+    "position_raw": "Carlos Ross Right Winger",
+    "position": "DEL",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Damián Sáez",
+    "position_raw": "Damián Sáez Right Winger",
+    "position": "MED",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Lautaro Palacios",
+    "position_raw": "Lautaro Palacios Centre-Forward",
+    "position": "DEL",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Manuel López",
+    "position_raw": "Manuel López Centre-Forward",
+    "position": "DEL",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  },
+  {
+    "name": "Rodrigo Orellana",
+    "position_raw": "Rodrigo Orellana Centre-Forward",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/deportes-copiapo/kader/verein/20694/saison_id/2025"
+  }
+]

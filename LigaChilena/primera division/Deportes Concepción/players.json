@@ -1,0 +1,281 @@
+[
+  {
+    "name": "Nicolás Araya",
+    "position_raw": "Nicolás Araya Goalkeeper",
+    "position": "ARQ",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Nery Veloso",
+    "position_raw": "Nery Veloso Goalkeeper",
+    "position": "ARQ",
+    "age": "38",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "César",
+    "position_raw": "César Goalkeeper",
+    "position": "ARQ",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Norman Rodríguez",
+    "position_raw": "Norman Rodríguez Centre-Back",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Diego Carrasco",
+    "position_raw": "Diego Carrasco Centre-Back",
+    "position": "DEF",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Fausto Grillo",
+    "position_raw": "Fausto Grillo Centre-Back",
+    "position": "DEF",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Silva",
+    "position_raw": "Sebastián Silva Centre-Back",
+    "position": "DEF",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Cristian Suárez",
+    "position_raw": "Cristian Suárez Centre-Back",
+    "position": "DEF",
+    "age": "39",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Brayan Véjar",
+    "position_raw": "Brayan Véjar Left-Back",
+    "position": "N/A",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Jonathan Espínola",
+    "position_raw": "Jonathan Espínola Left-Back",
+    "position": "N/A",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Javier Rojas",
+    "position_raw": "Javier Rojas Left-Back",
+    "position": "N/A",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Ariel Cáceres",
+    "position_raw": "Ariel Cáceres Right-Back",
+    "position": "N/A",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€225k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Mateo González",
+    "position_raw": "Mateo González Right-Back",
+    "position": "N/A",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Yonatan Rodríguez",
+    "position_raw": "Yonatan Rodríguez Defensive Midfield",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Martínez",
+    "position_raw": "Sebastián Martínez Defensive Midfield",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Misael Dávila",
+    "position_raw": "Misael Dávila Central Midfield",
+    "position": "DEF",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Fabrizio Manzo",
+    "position_raw": "Fabrizio Manzo Central Midfield",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Nelson Sepúlveda",
+    "position_raw": "Nelson Sepúlveda Central Midfield",
+    "position": "DEF",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Mario Sandoval",
+    "position_raw": "Mario Sandoval Central Midfield",
+    "position": "DEF",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Fuentes",
+    "position_raw": "Nicolás Fuentes Central Midfield",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Leonardo Valencia",
+    "position_raw": "Leonardo Valencia Attacking Midfield",
+    "position": "MED",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Jorge Henríquez",
+    "position_raw": "Jorge Henríquez Attacking Midfield",
+    "position": "MED",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Leenhan Romero",
+    "position_raw": "Leenhan Romero Attacking Midfield",
+    "position": "MED",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Ethan Espinoza",
+    "position_raw": "Ethan Espinoza Left Winger",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Ángel Gillard",
+    "position_raw": "Ángel Gillard Left Winger",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Franco Cáceres",
+    "position_raw": "Franco Cáceres Left Winger",
+    "position": "DEL",
+    "age": "18",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Aldrix Jara",
+    "position_raw": "Aldrix Jara Right Winger",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Matías Cavalleri",
+    "position_raw": "Matías Cavalleri Right Winger",
+    "position": "DEL",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Ignacio Mesías",
+    "position_raw": "Ignacio Mesías Centre-Forward",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Carlos Escobar",
+    "position_raw": "Carlos Escobar Centre-Forward",
+    "position": "DEL",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  },
+  {
+    "name": "Joaquín Larrivey",
+    "position_raw": "Joaquín Larrivey Centre-Forward",
+    "position": "DEL",
+    "age": "41",
+    "number": "N/A",
+    "market_value": "€10k",
+    "source": "https://www.transfermarkt.com/deportes-concepcion/kader/verein/14604/saison_id/2025"
+  }
+]

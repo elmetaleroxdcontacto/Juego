@@ -1,0 +1,191 @@
+[
+  {
+    "name": "Leandro Cañete",
+    "position_raw": "Leandro Cañete Goalkeeper",
+    "position": "ARQ",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Andrés Fernández",
+    "position_raw": "Andrés Fernández Goalkeeper",
+    "position": "ARQ",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Valentín Perales",
+    "position_raw": "Valentín Perales Centre-Back",
+    "position": "DEF",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Byron Guajardo",
+    "position_raw": "Byron Guajardo Centre-Back",
+    "position": "DEF",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Kevin Serrano",
+    "position_raw": "Kevin Serrano Centre-Back",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Diego Bravo",
+    "position_raw": "Diego Bravo Left-Back",
+    "position": "N/A",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Diego Pereira",
+    "position_raw": "Diego Pereira Left-Back",
+    "position": "N/A",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Martín Ramirez",
+    "position_raw": "Martín Ramirez Right-Back",
+    "position": "MED",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Valentín Sánchez",
+    "position_raw": "Valentín Sánchez Right-Back",
+    "position": "N/A",
+    "age": "18",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Luis García",
+    "position_raw": "Luis García Defensive Midfield",
+    "position": "DEF",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Axel León",
+    "position_raw": "Axel León Defensive Midfield",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Norberto Palmieri",
+    "position_raw": "Norberto Palmieri Defensive Midfield",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Fernando Sanguinetti",
+    "position_raw": "Fernando Sanguinetti Defensive Midfield",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Brun",
+    "position_raw": "Nicolás Brun Left Midfield",
+    "position": "MED",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Ignacio Jara",
+    "position_raw": "Ignacio Jara Attacking Midfield",
+    "position": "MED",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Bairo Riveros",
+    "position_raw": "Bairo Riveros Left Winger",
+    "position": "DEL",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Gonzalo Jara",
+    "position_raw": "Gonzalo Jara Right Winger",
+    "position": "DEL",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Jordan Mella",
+    "position_raw": "Jordan Mella Right Winger",
+    "position": "DEL",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Benjamín Aravena",
+    "position_raw": "Benjamín Aravena Right Winger",
+    "position": "MED",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Bruno Vides",
+    "position_raw": "Bruno Vides Centre-Forward",
+    "position": "DEL",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  },
+  {
+    "name": "Patricio Muñoz",
+    "position_raw": "Patricio Muñoz Centre-Forward",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+  }
+]

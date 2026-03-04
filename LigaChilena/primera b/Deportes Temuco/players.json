@@ -1,0 +1,245 @@
+[
+  {
+    "name": "Yerko Urra",
+    "position_raw": "Yerko Urra Goalkeeper",
+    "position": "ARQ",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Juan José Garrido",
+    "position_raw": "Juan José Garrido Goalkeeper",
+    "position": "ARQ",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "José Tomás Martínez",
+    "position_raw": "José Tomás Martínez Goalkeeper",
+    "position": "ARQ",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Enzo Lettieri",
+    "position_raw": "Enzo Lettieri Centre-Back",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Miguel Sanhueza",
+    "position_raw": "Miguel Sanhueza Centre-Back",
+    "position": "DEF",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Diego Zambrano",
+    "position_raw": "Diego Zambrano Centre-Back",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Vicente Lavín",
+    "position_raw": "Vicente Lavín Centre-Back",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Frank Valenzuela",
+    "position_raw": "Frank Valenzuela Centre-Back",
+    "position": "DEF",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Brayan Troncoso",
+    "position_raw": "Brayan Troncoso Left-Back",
+    "position": "N/A",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Franco Ortega",
+    "position_raw": "Franco Ortega Left-Back",
+    "position": "N/A",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Brian Torrealba",
+    "position_raw": "Brian Torrealba Right-Back",
+    "position": "DEF",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Rodrigo González",
+    "position_raw": "Rodrigo González Right-Back",
+    "position": "N/A",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Maximiliano Torrealba",
+    "position_raw": "Maximiliano Torrealba Right-Back",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Camilo Núñez",
+    "position_raw": "Camilo Núñez Defensive Midfield",
+    "position": "DEF",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Paulo Contreras",
+    "position_raw": "Paulo Contreras Defensive Midfield",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Julio Velásquez",
+    "position_raw": "Julio Velásquez Central Midfield",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Astete",
+    "position_raw": "Nicolás Astete Central Midfield",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Félix Triñanes",
+    "position_raw": "Félix Triñanes Attacking Midfield",
+    "position": "MED",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Diego Buonanotte",
+    "position_raw": "Diego Buonanotte Attacking Midfield",
+    "position": "MED",
+    "age": "37",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Molina",
+    "position_raw": "Sebastián Molina Left Winger",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Rivera",
+    "position_raw": "Nicolás Rivera Left Winger",
+    "position": "DEL",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Brayan Valdivia",
+    "position_raw": "Brayan Valdivia Right Winger",
+    "position": "DEL",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€325k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Felipe Reynero",
+    "position_raw": "Felipe Reynero Right Winger",
+    "position": "DEL",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Luis Acevedo",
+    "position_raw": "Luis Acevedo Centre-Forward",
+    "position": "DEL",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€375k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Maximiliano Cuadra",
+    "position_raw": "Maximiliano Cuadra Centre-Forward",
+    "position": "DEL",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "César Huanca",
+    "position_raw": "César Huanca Centre-Forward",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  },
+  {
+    "name": "Emilio Moreno",
+    "position_raw": "Emilio Moreno Centre-Forward",
+    "position": "DEL",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/deportes-temuco/kader/verein/13554/saison_id/2025"
+  }
+]

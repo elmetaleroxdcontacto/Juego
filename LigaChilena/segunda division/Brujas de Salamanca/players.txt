@@ -1,0 +1,27 @@
+- Leandro Requena | ARQ (Leandro Requena Goalkeeper) | Edad: 38 | Nº: N/A | Valor: -
+- Sebastián Aravena | ARQ (Sebastián Aravena Goalkeeper) | Edad: 24 | Nº: N/A | Valor: -
+- Joshua Tapia | ARQ (Joshua Tapia Goalkeeper) | Edad: 22 | Nº: N/A | Valor: -
+- Hugo Rojo | DEF (Hugo Rojo Centre-Back) | Edad: 24 | Nº: N/A | Valor: €150k
+- Joaquín Aros | DEF (Joaquín Aros Centre-Back) | Edad: 30 | Nº: N/A | Valor: -
+- César Molina | DEF (César Molina Centre-Back) | Edad: 28 | Nº: N/A | Valor: -
+- Josué González | DEF (Josué González Centre-Back) | Edad: 22 | Nº: N/A | Valor: -
+- Leonel Macaya | DEF (Leonel Macaya Centre-Back) | Edad: 20 | Nº: N/A | Valor: -
+- Miguel Espinoza | DEF (Miguel Espinoza Centre-Back) | Edad: 19 | Nº: N/A | Valor: -
+- Mauro Tapia | DEF (Mauro Tapia Centre-Back) | Edad: 22 | Nº: N/A | Valor: -
+- Nicolás Barrios J. | N/A (Nicolás Barrios J. Left-Back) | Edad: 23 | Nº: N/A | Valor: -
+- Víctor Araya | N/A (Víctor Araya Right-Back) | Edad: 27 | Nº: N/A | Valor: -
+- Juan Pablo Miño | DEF (Juan Pablo Miño Defensive Midfield) | Edad: 38 | Nº: N/A | Valor: -
+- Francisco Arenas | DEF (Francisco Arenas Central Midfield) | Edad: 25 | Nº: N/A | Valor: -
+- Mauricio Arias | DEF (Mauricio Arias Central Midfield) | Edad: 24 | Nº: N/A | Valor: -
+- Javier Meléndez | DEF (Javier Meléndez Central Midfield) | Edad: 23 | Nº: N/A | Valor: -
+- Ignacio Morales | DEF (Ignacio Morales Central Midfield) | Edad: 21 | Nº: N/A | Valor: -
+- Omar Pastén | DEF (Omar Pastén Central Midfield) | Edad: 23 | Nº: N/A | Valor: -
+- Fabián Carmona | MED (Fabián Carmona Attacking Midfield) | Edad: 31 | Nº: N/A | Valor: -
+- Diego Ortiz | MED (Diego Ortiz Attacking Midfield) | Edad: 20 | Nº: N/A | Valor: -
+- César Díaz | DEL (César Díaz Left Winger) | Edad: 24 | Nº: N/A | Valor: €150k
+- Benjamín Osses | MED (Benjamín Osses Left Winger) | Edad: 23 | Nº: N/A | Valor: -
+- Felipe Durán | DEL (Felipe Durán Right Winger) | Edad: 28 | Nº: N/A | Valor: -
+- Bastián Valdés | DEL (Bastián Valdés Right Winger) | Edad: 25 | Nº: N/A | Valor: -
+- Alejandro Valencia | DEL (Alejandro Valencia Right Winger) | Edad: 21 | Nº: N/A | Valor: -
+- Wladimir Cid | DEL (Wladimir Cid Centre-Forward) | Edad: 28 | Nº: N/A | Valor: -
+- Bastián Pinnola | DEL (Bastián Pinnola Centre-Forward) | Edad: 21 | Nº: N/A | Valor: -

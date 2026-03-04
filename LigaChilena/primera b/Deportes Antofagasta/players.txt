@@ -1,0 +1,25 @@
+- Juan Pablo Cisternas | ARQ (Juan Pablo Cisternas Goalkeeper) | Edad: 23 | Nº: N/A | Valor: €50k
+- Cristóbal Marín | ARQ (Cristóbal Marín Goalkeeper) | Edad: 22 | Nº: N/A | Valor: €25k
+- Fernando Hurtado | ARQ (Fernando Hurtado Goalkeeper) | Edad: 42 | Nº: N/A | Valor: €10k
+- Bastián Tapia | DEF (Bastián Tapia Centre-Back) | Edad: 23 | Nº: N/A | Valor: €300k
+- Cristián Díaz | DEF (Cristián Díaz Centre-Back) | Edad: 23 | Nº: N/A | Valor: €250k
+- Rodrigo Astorga | DEF (Rodrigo Astorga Centre-Back) | Edad: 21 | Nº: N/A | Valor: €125k
+- Diego Salvia | DEF (Diego Salvia Centre-Back) | Edad: 25 | Nº: N/A | Valor: -
+- Zacarías Abuhadba | N/A (Zacarías Abuhadba Left-Back) | Edad: 20 | Nº: N/A | Valor: €150k
+- Mathías Suárez | N/A (Mathías Suárez Right-Back) | Edad: 29 | Nº: N/A | Valor: €200k
+- Manuel Maluenda | N/A (Manuel Maluenda Right-Back) | Edad: 23 | Nº: N/A | Valor: €175k
+- Franko Siegler | N/A (Franko Siegler Right-Back) | Edad: 20 | Nº: N/A | Valor: €100k
+- Sebastián Leyton | DEF (Sebastián Leyton Defensive Midfield) | Edad: 32 | Nº: N/A | Valor: €200k
+- Fabián Manzano | DEF (Fabián Manzano Defensive Midfield) | Edad: 32 | Nº: N/A | Valor: €200k
+- Iván Rozas | DEF (Iván Rozas Central Midfield) | Edad: 27 | Nº: N/A | Valor: €300k
+- Adrián Cuadra | DEF (Adrián Cuadra Central Midfield) | Edad: 28 | Nº: N/A | Valor: €225k
+- Sergio Hinojosa | DEF (Sergio Hinojosa Central Midfield) | Edad: 21 | Nº: N/A | Valor: €100k
+- Patricio Castro | DEF (Patricio Castro Central Midfield) | Edad: 21 | Nº: N/A | Valor: €75k
+- Diego Rojas | MED (Diego Rojas Attacking Midfield) | Edad: 31 | Nº: N/A | Valor: €300k
+- José Bandez | DEL (José Bandez Left Winger) | Edad: 26 | Nº: N/A | Valor: €275k
+- Brayan Hurtado | DEL (Brayan Hurtado Left Winger) | Edad: 26 | Nº: N/A | Valor: €200k
+- Kevin Campillay | MED (Kevin Campillay Right Winger) | Edad: 24 | Nº: N/A | Valor: €375k
+- Christian Bravo | DEL (Christian Bravo Right Winger) | Edad: 32 | Nº: N/A | Valor: €200k
+- Matías Gallegos | DEL (Matías Gallegos Centre-Forward) | Edad: 28 | Nº: N/A | Valor: €375k
+- Josepablo Monreal | DEL (Josepablo Monreal Centre-Forward) | Edad: 29 | Nº: N/A | Valor: €250k
+- Felipe Álvarez | DEL (Felipe Álvarez Centre-Forward) | Edad: 21 | Nº: N/A | Valor: €100k

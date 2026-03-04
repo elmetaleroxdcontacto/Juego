@@ -1,0 +1,245 @@
+[
+  {
+    "name": "Leandro Requena",
+    "position_raw": "Leandro Requena Goalkeeper",
+    "position": "ARQ",
+    "age": "38",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Aravena",
+    "position_raw": "Sebastián Aravena Goalkeeper",
+    "position": "ARQ",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Joshua Tapia",
+    "position_raw": "Joshua Tapia Goalkeeper",
+    "position": "ARQ",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Hugo Rojo",
+    "position_raw": "Hugo Rojo Centre-Back",
+    "position": "DEF",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Joaquín Aros",
+    "position_raw": "Joaquín Aros Centre-Back",
+    "position": "DEF",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "César Molina",
+    "position_raw": "César Molina Centre-Back",
+    "position": "DEF",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Josué González",
+    "position_raw": "Josué González Centre-Back",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Leonel Macaya",
+    "position_raw": "Leonel Macaya Centre-Back",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Miguel Espinoza",
+    "position_raw": "Miguel Espinoza Centre-Back",
+    "position": "DEF",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Mauro Tapia",
+    "position_raw": "Mauro Tapia Centre-Back",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Barrios J.",
+    "position_raw": "Nicolás Barrios J. Left-Back",
+    "position": "N/A",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Víctor Araya",
+    "position_raw": "Víctor Araya Right-Back",
+    "position": "N/A",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Juan Pablo Miño",
+    "position_raw": "Juan Pablo Miño Defensive Midfield",
+    "position": "DEF",
+    "age": "38",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Francisco Arenas",
+    "position_raw": "Francisco Arenas Central Midfield",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Mauricio Arias",
+    "position_raw": "Mauricio Arias Central Midfield",
+    "position": "DEF",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Javier Meléndez",
+    "position_raw": "Javier Meléndez Central Midfield",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Ignacio Morales",
+    "position_raw": "Ignacio Morales Central Midfield",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Omar Pastén",
+    "position_raw": "Omar Pastén Central Midfield",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Fabián Carmona",
+    "position_raw": "Fabián Carmona Attacking Midfield",
+    "position": "MED",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Diego Ortiz",
+    "position_raw": "Diego Ortiz Attacking Midfield",
+    "position": "MED",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "César Díaz",
+    "position_raw": "César Díaz Left Winger",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Benjamín Osses",
+    "position_raw": "Benjamín Osses Left Winger",
+    "position": "MED",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Felipe Durán",
+    "position_raw": "Felipe Durán Right Winger",
+    "position": "DEL",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Bastián Valdés",
+    "position_raw": "Bastián Valdés Right Winger",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Alejandro Valencia",
+    "position_raw": "Alejandro Valencia Right Winger",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Wladimir Cid",
+    "position_raw": "Wladimir Cid Centre-Forward",
+    "position": "DEL",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  },
+  {
+    "name": "Bastián Pinnola",
+    "position_raw": "Bastián Pinnola Centre-Forward",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/brujas-de-salamanca/kader/verein/76406/saison_id/2025"
+  }
+]

@@ -1,0 +1,23 @@
+- Matías Bórquez | ARQ (Matías Bórquez Goalkeeper) | Edad: 27 | Nº: N/A | Valor: €400k
+- Claudio González | ARQ (Claudio González Goalkeeper) | Edad: 35 | Nº: N/A | Valor: €50k
+- Augusto Aguirre | DEF (Augusto Aguirre Centre-Back) | Edad: 26 | Nº: N/A | Valor: €450k
+- Axel Alfonzo | DEF (Axel Alfonzo Centre-Back) | Edad: 21 | Nº: N/A | Valor: €400k
+- Benjamín Molina | DEF (Benjamín Molina Centre-Back) | Edad: 20 | Nº: N/A | Valor: -
+- Alfonso Parot | N/A (Alfonso Parot Left-Back) | Edad: 36 | Nº: N/A | Valor: €100k
+- Marcelo Flores | N/A (Marcelo Flores Left-Back) | Edad: 24 | Nº: N/A | Valor: €50k
+- Yerko González | N/A (Yerko González Right-Back) | Edad: 24 | Nº: N/A | Valor: €275k
+- Carlos Morales | N/A (Carlos Morales Right-Back) | Edad: 25 | Nº: N/A | Valor: €250k
+- Misael Llantén | DEF (Misael Llantén Defensive Midfield) | Edad: 27 | Nº: N/A | Valor: €500k
+- César Fuentes | DEF (César Fuentes Defensive Midfield) | Edad: 32 | Nº: N/A | Valor: €250k
+- Ramón Martínez | DEF (Ramón Martínez Defensive Midfield) | Edad: 30 | Nº: N/A | Valor: €250k
+- Flavio Moya | DEF (Flavio Moya Central Midfield) | Edad: 20 | Nº: N/A | Valor: €450k
+- Danilo Catalán | DEF (Danilo Catalán Central Midfield) | Edad: 28 | Nº: N/A | Valor: €200k
+- César Pinares | MED (César Pinares Attacking Midfield) | Edad: 34 | Nº: N/A | Valor: €300k
+- Jean Meneses | DEL (Jean Meneses Left Winger) | Edad: 32 | Nº: N/A | Valor: €1.60m
+- Daniel Castro | DEL (Daniel Castro Left Winger) | Edad: 31 | Nº: N/A | Valor: €750k
+- Joaquín Montecinos | DEL (Joaquín Montecinos Right Winger) | Edad: 30 | Nº: N/A | Valor: €300k
+- Vicente Álvarez | DEL (Vicente Álvarez Right Winger) | Edad: 19 | Nº: N/A | Valor: €200k
+- Facundo Marín | DEL (Facundo Marín Right Winger) | Edad: 25 | Nº: N/A | Valor: -
+- Marcos Arturia | DEL (Marcos Arturia Centre-Forward) | Edad: 28 | Nº: N/A | Valor: €150k
+- Gonzalo Sosa | DEL (Gonzalo Sosa Centre-Forward) | Edad: 37 | Nº: N/A | Valor: €125k
+- Joaquín Plaza | DEL (Joaquín Plaza Centre-Forward) | Edad: 21 | Nº: N/A | Valor: €75k

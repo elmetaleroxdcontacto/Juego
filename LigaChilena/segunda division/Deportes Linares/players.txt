@@ -1,0 +1,19 @@
+- Celso Castillo | ARQ (Celso Castillo Goalkeeper) | Edad: 27 | Nº: N/A | Valor: -
+- Kurt González | ARQ (Kurt González Goalkeeper) | Edad: 21 | Nº: N/A | Valor: -
+- Flavio Rojas | DEF (Flavio Rojas Centre-Back) | Edad: 32 | Nº: N/A | Valor: -
+- Felipe Lee-Chong | DEF (Felipe Lee-Chong Centre-Back) | Edad: 28 | Nº: N/A | Valor: -
+- Fernando Valdivia | N/A (Fernando Valdivia Left-Back) | Edad: 21 | Nº: N/A | Valor: -
+- Axel Cortés Urqueta | N/A (Axel Cortés Urqueta Right-Back) | Edad: 26 | Nº: N/A | Valor: -
+- Bastián Bravo | DEF (Bastián Bravo Defensive Midfield) | Edad: 21 | Nº: N/A | Valor: -
+- José Molina | DEF (José Molina Central Midfield) | Edad: 25 | Nº: N/A | Valor: -
+- Ricardo Sánchez | DEF (Ricardo Sánchez Central Midfield) | Edad: 26 | Nº: N/A | Valor: -
+- Matías Pavez | DEF (Matías Pavez Central Midfield) | Edad: 26 | Nº: N/A | Valor: -
+- Gustavo Gallardo | DEF (Gustavo Gallardo Central Midfield) | Edad: 24 | Nº: N/A | Valor: -
+- Álvaro Espinoza | DEF (Álvaro Espinoza Central Midfield) | Edad: - | Nº: N/A | Valor: -
+- Benjamín Vásquez | DEF (Benjamín Vásquez Central Midfield) | Edad: 21 | Nº: N/A | Valor: -
+- Bryan Figueroa | MED (Bryan Figueroa Attacking Midfield) | Edad: 26 | Nº: N/A | Valor: -
+- Willian Gama | MED (Willian Gama Right Winger) | Edad: 25 | Nº: N/A | Valor: -
+- Cristóbal Díaz | DEL (Cristóbal Díaz Right Winger) | Edad: 24 | Nº: N/A | Valor: -
+- Diego Vallejos | DEL (Diego Vallejos Centre-Forward) | Edad: 35 | Nº: N/A | Valor: -
+- Hugo Toro | DEL (Hugo Toro Centre-Forward) | Edad: 28 | Nº: N/A | Valor: -
+- José Palma | MED (José Palma Centre-Forward) | Edad: 21 | Nº: N/A | Valor: -

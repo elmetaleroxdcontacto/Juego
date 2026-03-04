@@ -1,0 +1,28 @@
+- Ignacio González | ARQ (Ignacio González Goalkeeper) | Edad: 36 | Nº: N/A | Valor: €100k
+- Isaac Esquenazi | ARQ (Isaac Esquenazi Goalkeeper) | Edad: 21 | Nº: N/A | Valor: €25k
+- Esteban Kirkman | ARQ (Esteban Kirkman Goalkeeper) | Edad: 23 | Nº: N/A | Valor: €25k
+- Hugo Magallanes | DEF (Hugo Magallanes Centre-Back) | Edad: 28 | Nº: N/A | Valor: €400k
+- Valentín Vidal | DEF (Valentín Vidal Centre-Back) | Edad: 21 | Nº: N/A | Valor: €400k
+- Diego Oyarzún | DEF (Diego Oyarzún Centre-Back) | Edad: 33 | Nº: N/A | Valor: €275k
+- Ramiro González | DEF (Ramiro González Centre-Back) | Edad: 35 | Nº: N/A | Valor: €150k
+- Vicente Vega | DEF (Vicente Vega Centre-Back) | Edad: 21 | Nº: N/A | Valor: €150k
+- Vicente Fernández | N/A (Vicente Fernández Left-Back) | Edad: 27 | Nº: N/A | Valor: €450k
+- Nicolás Baeza | N/A (Nicolás Baeza Left-Back) | Edad: 28 | Nº: N/A | Valor: €350k
+- Byron Navarro | N/A (Byron Navarro Left-Back) | Edad: 22 | Nº: N/A | Valor: €75k
+- Cristopher Barrera | DEL (Cristopher Barrera Right-Back) | Edad: 27 | Nº: N/A | Valor: €400k
+- Lucas Soto | N/A (Lucas Soto Right-Back) | Edad: 23 | Nº: N/A | Valor: €400k
+- Martín Guzmán | N/A (Martín Guzmán Right-Back) | Edad: 21 | Nº: N/A | Valor: €200k
+- Óscar Opazo | N/A (Óscar Opazo Right-Back) | Edad: 35 | Nº: N/A | Valor: €125k
+- Diéter Villalpando | DEF (Diéter Villalpando Central Midfield) | Edad: 34 | Nº: N/A | Valor: €600k
+- Benjamín Berríos | DEF (Benjamín Berríos Central Midfield) | Edad: 27 | Nº: N/A | Valor: €600k
+- Joaquín Moya | DEF (Joaquín Moya Central Midfield) | Edad: 32 | Nº: N/A | Valor: €350k
+- Felipe Villagrán | DEF (Felipe Villagrán Central Midfield) | Edad: 28 | Nº: N/A | Valor: €300k
+- Emiliano Ramos | MED (Emiliano Ramos Left Winger) | Edad: 20 | Nº: N/A | Valor: €500k
+- Braian Martínez | DEL (Braian Martínez Left Winger) | Edad: 26 | Nº: N/A | Valor: €450k
+- Alan Medina | MED (Alan Medina Right Winger) | Edad: 27 | Nº: N/A | Valor: €1.30m
+- Julián Alfaro | DEL (Julián Alfaro Right Winger) | Edad: 25 | Nº: N/A | Valor: €400k
+- Sebastián Sosa | DEL (Sebastián Sosa Centre-Forward) | Edad: 31 | Nº: N/A | Valor: €450k
+- Martín Cárcamo | MED (Martín Cárcamo Centre-Forward) | Edad: 22 | Nº: N/A | Valor: €125k
+- Cristian Palacios | DEL (Cristian Palacios Centre-Forward) | Edad: 35 | Nº: N/A | Valor: €100k
+- Nicolás Montiel | DEL (Nicolás Montiel Centre-Forward) | Edad: 20 | Nº: N/A | Valor: €50k
+- Cristóbal Chadwick | DEL (Cristóbal Chadwick Centre-Forward) | Edad: 20 | Nº: N/A | Valor: -

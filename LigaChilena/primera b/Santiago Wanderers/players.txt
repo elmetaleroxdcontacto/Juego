@@ -1,0 +1,21 @@
+- Eduardo Miranda | ARQ (Eduardo Miranda Goalkeeper) | Edad: 33 | Nº: N/A | Valor: €300k
+- Raúl Olivares | ARQ (Raúl Olivares Goalkeeper) | Edad: 37 | Nº: N/A | Valor: €50k
+- Vicente Castellano | ARQ (Vicente Castellano Goalkeeper) | Edad: 23 | Nº: N/A | Valor: -
+- Víctor Espinoza | DEF (Víctor Espinoza Centre-Back) | Edad: 26 | Nº: N/A | Valor: €125k
+- Sergio Felipe | DEF (Sergio Felipe Centre-Back) | Edad: 35 | Nº: N/A | Valor: €100k
+- Luis Margas | DEF (Luis Margas Centre-Back) | Edad: 20 | Nº: N/A | Valor: €50k
+- Pedro Navarro | N/A (Pedro Navarro Left-Back) | Edad: 24 | Nº: N/A | Valor: €275k
+- Axel Herrera | N/A (Axel Herrera Right-Back) | Edad: 24 | Nº: N/A | Valor: €200k
+- Cristóbal Cáceres | DEF (Cristóbal Cáceres Defensive Midfield) | Edad: 29 | Nº: N/A | Valor: €250k
+- Leandro Navarro | DEF (Leandro Navarro Defensive Midfield) | Edad: 33 | Nº: N/A | Valor: €175k
+- Joaquín Silva | DEF (Joaquín Silva Central Midfield) | Edad: 20 | Nº: N/A | Valor: €400k
+- Ricardo Parra | DEF (Ricardo Parra Central Midfield) | Edad: 23 | Nº: N/A | Valor: €125k
+- Martín Villarroel | DEF (Martín Villarroel Central Midfield) | Edad: 24 | Nº: N/A | Valor: €100k
+- Jorge Luna | MED (Jorge Luna Attacking Midfield) | Edad: 39 | Nº: N/A | Valor: €25k
+- Franco Lobos | DEL (Franco Lobos Left Winger) | Edad: 27 | Nº: N/A | Valor: €300k
+- Esteban Luco | DEL (Esteban Luco Left Winger) | Edad: 21 | Nº: N/A | Valor: -
+- Diego Opazo | DEL (Diego Opazo Right Winger) | Edad: 19 | Nº: N/A | Valor: €275k
+- Cristóbal Ponce | DEL (Cristóbal Ponce Right Winger) | Edad: 19 | Nº: N/A | Valor: €100k
+- Marcos Camarda | MED (Marcos Camarda Centre-Forward) | Edad: 25 | Nº: N/A | Valor: €450k
+- Javier Parraguez | DEL (Javier Parraguez Centre-Forward) | Edad: 36 | Nº: N/A | Valor: €75k
+- Camilo Astroza | MED (Camilo Astroza Centre-Forward) | Edad: 22 | Nº: N/A | Valor: €50k

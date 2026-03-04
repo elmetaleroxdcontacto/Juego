@@ -1,0 +1,578 @@
+[
+  {
+    "name": "Emiliano Flores Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Franco Aguirre Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Benjamín Martínez Marín Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Ricardo Olivares Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Jeyson Quijano Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Juan Silva Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Richard Ramírez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Gonzalo Peña Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Freddy Iturrieta Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Héctor Ledezma Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Nicolás Agüero Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "José Luis Olivares Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Miguel Baeza Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Manuel Gallardo Vera Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Nicolás Collao Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Jorge Muñoz Peña Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Matías Esquivel Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Patricio Carrasco Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Cristóbal Rodríguez Carrizo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Mathías Cortez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Roberto Rozas Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Eduardo Ibaceta Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Diego Barraza Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Felipe Gaete Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Cristóbal Villalobos Astudillo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Axel Pavez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Ítalo Lobos Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Sergio León Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Brandon Ulloa Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Yanko Zamora Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Cristhofer Vega Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "DT. Nelson Cossio Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Emiliano Flores",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Jeyson Quijano",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Freddy Iturrieta",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Héctor Ledezma",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Ítalo Lobos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Nicolás Agüero",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "José Luis Olivares",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Miguel Baeza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Manuel Gallardo Vera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Nicolás Collao",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Sergio León",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Jorge Muñoz Peña",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Brandon Ulloa",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Matías Esquivel",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Patricio Carrasco",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Cristóbal Rodríguez Carrizo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Juan Silva",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "DT. Nelson Cossio",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Franco Aguirre",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Mathías Cortez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Roberto Rozas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Eduardo Ibaceta",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Diego Barraza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Benjamín Martínez Marín",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Richard Ramírez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Gonzalo Peña",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Felipe Gaete",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Cristóbal Villalobos Astudillo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Axel Pavez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Yanko Zamora",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Cristhofer Vega",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  },
+  {
+    "name": "Ricardo Olivares",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/audax-paipote/?sid=166009"
+  }
+]

@@ -1,0 +1,272 @@
+[
+  {
+    "name": "Nicolás Peranic",
+    "position_raw": "Nicolás Peranic Goalkeeper",
+    "position": "ARQ",
+    "age": "40",
+    "number": "N/A",
+    "market_value": "€10k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Fernando Abarzúa",
+    "position_raw": "Fernando Abarzúa Goalkeeper",
+    "position": "ARQ",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Tomás Charpentier",
+    "position_raw": "Tomás Charpentier Goalkeeper",
+    "position": "ARQ",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Ignacio Meza",
+    "position_raw": "Ignacio Meza Centre-Back",
+    "position": "DEF",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Luis Muñoz",
+    "position_raw": "Luis Muñoz Centre-Back",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Cristian González",
+    "position_raw": "Cristian González Centre-Back",
+    "position": "DEF",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Mateo Guerra",
+    "position_raw": "Mateo Guerra Centre-Back",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Lucciano Moreno",
+    "position_raw": "Lucciano Moreno Centre-Back",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Alonso Villegas",
+    "position_raw": "Alonso Villegas Centre-Back",
+    "position": "DEF",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Vicente Durán",
+    "position_raw": "Vicente Durán Left-Back",
+    "position": "N/A",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Diego Zamorano",
+    "position_raw": "Diego Zamorano Left-Back",
+    "position": "MED",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Muñoz Alister",
+    "position_raw": "Nicolás Muñoz Alister Right-Back",
+    "position": "DEL",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Guillermo Avello",
+    "position_raw": "Guillermo Avello Right-Back",
+    "position": "MED",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Gonzalo Bustos",
+    "position_raw": "Gonzalo Bustos Defensive Midfield",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€225k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Pablo Millán",
+    "position_raw": "Pablo Millán Defensive Midfield",
+    "position": "DEF",
+    "age": "-",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Franco Cortés",
+    "position_raw": "Franco Cortés Central Midfield",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Daniel Monardes",
+    "position_raw": "Daniel Monardes Central Midfield",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Carlos Hormazábal",
+    "position_raw": "Carlos Hormazábal Central Midfield",
+    "position": "DEF",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Joel Torres",
+    "position_raw": "Joel Torres Central Midfield",
+    "position": "DEF",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Fabián Pastenes",
+    "position_raw": "Fabián Pastenes Attacking Midfield",
+    "position": "MED",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Gamal Plaza",
+    "position_raw": "Gamal Plaza Attacking Midfield",
+    "position": "MED",
+    "age": "18",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Fabián González",
+    "position_raw": "Fabián González Attacking Midfield",
+    "position": "MED",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Gael Acosta",
+    "position_raw": "Gael Acosta Left Winger",
+    "position": "DEL",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Yerald Pinilla",
+    "position_raw": "Yerald Pinilla Left Winger",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Martín Carreño",
+    "position_raw": "Martín Carreño Right Winger",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Sergio Vergara",
+    "position_raw": "Sergio Vergara Right Winger",
+    "position": "DEL",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Parada",
+    "position_raw": "Sebastián Parada Centre-Forward",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Diego González",
+    "position_raw": "Diego González Centre-Forward",
+    "position": "DEL",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Luis Guillermo Madrigal",
+    "position_raw": "Luis Guillermo Madrigal Centre-Forward",
+    "position": "MED",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  },
+  {
+    "name": "Felipe Flores",
+    "position_raw": "Felipe Flores Centre-Forward",
+    "position": "DEL",
+    "age": "39",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/cd-san-luis-de-quillota/kader/verein/19280/saison_id/2025"
+  }
+]

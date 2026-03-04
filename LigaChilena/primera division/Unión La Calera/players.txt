@@ -1,0 +1,24 @@
+- Nicolás Avellaneda | ARQ (Nicolás Avellaneda Goalkeeper) | Edad: 33 | Nº: N/A | Valor: €250k
+- Nelson Espinoza | ARQ (Nelson Espinoza Goalkeeper) | Edad: 30 | Nº: N/A | Valor: €150k
+- Rodrigo Cáseres | DEF (Rodrigo Cáseres Centre-Back) | Edad: 28 | Nº: N/A | Valor: €450k
+- Daniel Gutiérrez | DEF (Daniel Gutiérrez Centre-Back) | Edad: 23 | Nº: N/A | Valor: €400k
+- Nicolás Palma | DEF (Nicolás Palma Centre-Back) | Edad: 24 | Nº: N/A | Valor: €325k
+- Alexander Pastene | DEF (Alexander Pastene Centre-Back) | Edad: 25 | Nº: N/A | Valor: -
+- Cristián Gutiérrez | DEL (Cristián Gutiérrez Left-Back) | Edad: 29 | Nº: N/A | Valor: €200k
+- Michael Maturana | N/A (Michael Maturana Left-Back) | Edad: 21 | Nº: N/A | Valor: €50k
+- Christopher Díaz | DEL (Christopher Díaz Right-Back) | Edad: 30 | Nº: N/A | Valor: €400k
+- Javier Saldías | N/A (Javier Saldías Right-Back) | Edad: 24 | Nº: N/A | Valor: €275k
+- Camilo Moya | DEF (Camilo Moya Defensive Midfield) | Edad: 27 | Nº: N/A | Valor: €400k
+- Juan Manuel Requena | DEF (Juan Manuel Requena Defensive Midfield) | Edad: 27 | Nº: N/A | Valor: €400k
+- Yerko Leiva | DEF (Yerko Leiva Central Midfield) | Edad: 27 | Nº: N/A | Valor: €450k
+- Joaquín Soto | DEF (Joaquín Soto Central Midfield) | Edad: 18 | Nº: N/A | Valor: €50k
+- Carlo Villanueva | MED (Carlo Villanueva Attacking Midfield) | Edad: 26 | Nº: N/A | Valor: €400k
+- Joan Cruz | MED (Joan Cruz Attacking Midfield) | Edad: 22 | Nº: N/A | Valor: €300k
+- Axel Encinas | MED (Axel Encinas Attacking Midfield) | Edad: 21 | Nº: N/A | Valor: €250k
+- Alan Brítez | MED (Alan Brítez Attacking Midfield) | Edad: 22 | Nº: N/A | Valor: €25k
+- Martín Hiriart | DEL (Martín Hiriart Left Winger) | Edad: 21 | Nº: N/A | Valor: €75k
+- Kevin Méndez | DEL (Kevin Méndez Right Winger) | Edad: 30 | Nº: N/A | Valor: €500k
+- Bayron Oyarzo | DEL (Bayron Oyarzo Right Winger) | Edad: 30 | Nº: N/A | Valor: €400k
+- Matías Campos López | MED (Matías Campos López Centre-Forward) | Edad: 34 | Nº: N/A | Valor: €150k
+- Sebastián Sáez | DEL (Sebastián Sáez Centre-Forward) | Edad: 41 | Nº: N/A | Valor: €10k
+- Francisco Pozzo | DEL (Francisco Pozzo Centre-Forward) | Edad: 22 | Nº: N/A | Valor: -

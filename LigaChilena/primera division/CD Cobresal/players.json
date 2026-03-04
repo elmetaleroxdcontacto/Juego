@@ -1,0 +1,227 @@
+[
+  {
+    "name": "Alejandro Santander",
+    "position_raw": "Alejandro Santander Goalkeeper",
+    "position": "ARQ",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Jorge Pinos",
+    "position_raw": "Jorge Pinos Goalkeeper",
+    "position": "ARQ",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "José Tiznado",
+    "position_raw": "José Tiznado Centre-Back",
+    "position": "DEF",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Christian Moreno",
+    "position_raw": "Christian Moreno Centre-Back",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Franco Bechtholdt",
+    "position_raw": "Franco Bechtholdt Centre-Back",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Antonio Castillo",
+    "position_raw": "Antonio Castillo Left-Back",
+    "position": "DEL",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Rodrigo Sandoval",
+    "position_raw": "Rodrigo Sandoval Left-Back",
+    "position": "N/A",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Aníbal Gajardo",
+    "position_raw": "Aníbal Gajardo Left-Back",
+    "position": "N/A",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Aaron Astudillo",
+    "position_raw": "Aaron Astudillo Right-Back",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Guillermo Pacheco",
+    "position_raw": "Guillermo Pacheco Right-Back",
+    "position": "MED",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Agustín Nadruz",
+    "position_raw": "Agustín Nadruz Defensive Midfield",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Juan Fuentes",
+    "position_raw": "Juan Fuentes Defensive Midfield",
+    "position": "DEF",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Ignacio Pacheco",
+    "position_raw": "Ignacio Pacheco Defensive Midfield",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Esteban Valencia",
+    "position_raw": "Esteban Valencia Central Midfield",
+    "position": "DEF",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Benjamín Valenzuela",
+    "position_raw": "Benjamín Valenzuela Central Midfield",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Milan Roki",
+    "position_raw": "Milan Roki Central Midfield",
+    "position": "DEF",
+    "age": "18",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Bryan Carvallo",
+    "position_raw": "Bryan Carvallo Attacking Midfield",
+    "position": "MED",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "César Yanis",
+    "position_raw": "César Yanis Right Winger",
+    "position": "DEL",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Julián Brea",
+    "position_raw": "Julián Brea Right Winger",
+    "position": "DEL",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Renato Huerta",
+    "position_raw": "Renato Huerta Right Winger",
+    "position": "DEL",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Carlos Navarrete",
+    "position_raw": "Carlos Navarrete Right Winger",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Yair Guzmán",
+    "position_raw": "Yair Guzmán Right Winger",
+    "position": "DEL",
+    "age": "17",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Steffan Pino",
+    "position_raw": "Steffan Pino Centre-Forward",
+    "position": "DEL",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Franco Frías",
+    "position_raw": "Franco Frías Centre-Forward",
+    "position": "DEL",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  },
+  {
+    "name": "Sergio Carrasco",
+    "position_raw": "Sergio Carrasco Centre-Forward",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/cd-cobresal/kader/verein/17482/saison_id/2025"
+  }
+]

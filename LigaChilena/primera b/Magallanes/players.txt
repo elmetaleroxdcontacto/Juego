@@ -1,0 +1,32 @@
+- Joaquín Muñoz | ARQ (Joaquín Muñoz Goalkeeper) | Edad: 35 | Nº: N/A | Valor: €75k
+- Matías Olguín | ARQ (Matías Olguín Goalkeeper) | Edad: 29 | Nº: N/A | Valor: -
+- Martín Riffo | ARQ (Martín Riffo Goalkeeper) | Edad: 22 | Nº: N/A | Valor: -
+- Matías Vásquez | DEF (Matías Vásquez Centre-Back) | Edad: 23 | Nº: N/A | Valor: €300k
+- Alonso Walters | DEF (Alonso Walters Centre-Back) | Edad: 21 | Nº: N/A | Valor: €275k
+- Jeremías James | DEF (Jeremías James Centre-Back) | Edad: 25 | Nº: N/A | Valor: €200k
+- Claudio Meneses | DEF (Claudio Meneses Centre-Back) | Edad: 38 | Nº: N/A | Valor: €25k
+- Martín López | DEF (Martín López Centre-Back) | Edad: 20 | Nº: N/A | Valor: -
+- Felipe Yáñez | N/A (Felipe Yáñez Left-Back) | Edad: 21 | Nº: N/A | Valor: €400k
+- Matías Osorio | N/A (Matías Osorio Left-Back) | Edad: 21 | Nº: N/A | Valor: €200k
+- Hans Salinas | N/A (Hans Salinas Left-Back) | Edad: 35 | Nº: N/A | Valor: €75k
+- Martín Arévalo | N/A (Martín Arévalo Left-Back) | Edad: 21 | Nº: N/A | Valor: -
+- Diego Figueroa | N/A (Diego Figueroa Right-Back) | Edad: 22 | Nº: N/A | Valor: €100k
+- Elías Berríos | N/A (Elías Berríos Right-Back) | Edad: 20 | Nº: N/A | Valor: €75k
+- Javier Quiroz | DEF (Javier Quiroz Defensive Midfield) | Edad: 25 | Nº: N/A | Valor: €300k
+- Gamalier Guzmán | DEF (Gamalier Guzmán Defensive Midfield) | Edad: 20 | Nº: N/A | Valor: -
+- Diego Fernández | DEF (Diego Fernández Central Midfield) | Edad: 27 | Nº: N/A | Valor: €350k
+- Martín González | DEF (Martín González Central Midfield) | Edad: 20 | Nº: N/A | Valor: €200k
+- Bruno Liuzzi | DEF (Bruno Liuzzi Central Midfield) | Edad: 25 | Nº: N/A | Valor: -
+- Esteban Neira | DEF (Esteban Neira Central Midfield) | Edad: 21 | Nº: N/A | Valor: -
+- Santiago Coronel | MED (Santiago Coronel Left Midfield) | Edad: 25 | Nº: N/A | Valor: €250k
+- Cristóbal Jorquera | MED (Cristóbal Jorquera Attacking Midfield) | Edad: 37 | Nº: N/A | Valor: €25k
+- Fabián Abarca | DEL (Fabián Abarca Left Winger) | Edad: 21 | Nº: N/A | Valor: €100k
+- Máximo Espínola | DEL (Máximo Espínola Left Winger) | Edad: 17 | Nº: N/A | Valor: €50k
+- Buddy Galdames | MED (Buddy Galdames Left Winger) | Edad: 21 | Nº: N/A | Valor: -
+- Alessandro Toledo | DEL (Alessandro Toledo Right Winger) | Edad: 23 | Nº: N/A | Valor: €175k
+- Rubén Farfán | DEL (Rubén Farfán Right Winger) | Edad: 34 | Nº: N/A | Valor: €150k
+- Matías Fredes | DEL (Matías Fredes Right Winger) | Edad: 24 | Nº: N/A | Valor: €125k
+- Agustín Rodríguez | DEL (Agustín Rodríguez Right Winger) | Edad: 21 | Nº: N/A | Valor: -
+- Facundo Peraza | DEL (Facundo Peraza Centre-Forward) | Edad: 33 | Nº: N/A | Valor: €100k
+- Milton Alegre | DEL (Milton Alegre Centre-Forward) | Edad: 34 | Nº: N/A | Valor: €100k
+- Alonso Barría | DEL (Alonso Barría Centre-Forward) | Edad: 21 | Nº: N/A | Valor: €75k

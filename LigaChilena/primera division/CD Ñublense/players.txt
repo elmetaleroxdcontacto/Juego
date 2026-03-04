@@ -1,0 +1,24 @@
+- Nicola Pérez | ARQ (Nicola Pérez Goalkeeper) | Edad: 36 | Nº: N/A | Valor: €250k
+- Hernán Muñoz | ARQ (Hernán Muñoz Goalkeeper) | Edad: 37 | Nº: N/A | Valor: €25k
+- Claudio Chandía | ARQ (Claudio Chandía Goalkeeper) | Edad: 19 | Nº: N/A | Valor: -
+- Osvaldo Bosso | DEF (Osvaldo Bosso Centre-Back) | Edad: 32 | Nº: N/A | Valor: €350k
+- Pablo Calderón | DEF (Pablo Calderón Centre-Back) | Edad: 27 | Nº: N/A | Valor: €350k
+- Felipe Campos | DEF (Felipe Campos Centre-Back) | Edad: 32 | Nº: N/A | Valor: €300k
+- Carlos Salomón | DEF (Carlos Salomón Centre-Back) | Edad: 25 | Nº: N/A | Valor: €250k
+- Sebastián Valencia | DEF (Sebastián Valencia Centre-Back) | Edad: 26 | Nº: N/A | Valor: €100k
+- Jovany Campusano | MED (Jovany Campusano Left-Back) | Edad: 33 | Nº: N/A | Valor: €350k
+- Diego Sanhueza | N/A (Diego Sanhueza Right-Back) | Edad: 23 | Nº: N/A | Valor: €375k
+- Joaquín González | N/A (Joaquín González Right-Back) | Edad: 24 | Nº: N/A | Valor: €225k
+- Diego Céspedes | DEF (Diego Céspedes Defensive Midfield) | Edad: 27 | Nº: N/A | Valor: €450k
+- Lorenzo Reyes | DEF (Lorenzo Reyes Defensive Midfield) | Edad: 34 | Nº: N/A | Valor: €225k
+- Manuel Rivera | DEF (Manuel Rivera Central Midfield) | Edad: 30 | Nº: N/A | Valor: €500k
+- Daniel Saavedra | DEF (Daniel Saavedra Central Midfield) | Edad: 22 | Nº: N/A | Valor: €150k
+- Matías Plaza | MED (Matías Plaza Attacking Midfield) | Edad: 25 | Nº: N/A | Valor: €450k
+- Ignacio Tapia | MED (Ignacio Tapia Attacking Midfield) | Edad: 21 | Nº: N/A | Valor: €75k
+- Alex Valdés | DEL (Alex Valdés Left Winger) | Edad: 23 | Nº: N/A | Valor: €225k
+- Lucas Molina Canto | DEL (Lucas Molina Canto Left Winger) | Edad: 19 | Nº: N/A | Valor: €100k
+- Giovanny Ávalos | DEL (Giovanny Ávalos Left Winger) | Edad: 20 | Nº: N/A | Valor: €100k
+- Gabriel Graciani | DEL (Gabriel Graciani Right Winger) | Edad: 32 | Nº: N/A | Valor: €600k
+- Fernando Ovelar | DEL (Fernando Ovelar Right Winger) | Edad: 22 | Nº: N/A | Valor: €400k
+- Ignacio Jeraldino | DEL (Ignacio Jeraldino Centre-Forward) | Edad: 30 | Nº: N/A | Valor: €450k
+- Franco Rami | MED (Franco Rami Centre-Forward) | Edad: 22 | Nº: N/A | Valor: €225k

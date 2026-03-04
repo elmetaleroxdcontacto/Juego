@@ -1,0 +1,29 @@
+- Gonzalo Flores | ARQ (Gonzalo Flores Goalkeeper) | Edad: 25 | Nº: N/A | Valor: €250k
+- Diego Sánchez | ARQ (Diego Sánchez Goalkeeper) | Edad: 38 | Nº: N/A | Valor: €50k
+- Cristóbal Dorador | ARQ (Cristóbal Dorador Goalkeeper) | Edad: 19 | Nº: N/A | Valor: -
+- Benjamín Gazzolo | DEF (Benjamín Gazzolo Centre-Back) | Edad: 28 | Nº: N/A | Valor: €600k
+- Elvis Hernández | DEF (Elvis Hernández Centre-Back) | Edad: 26 | Nº: N/A | Valor: €400k
+- Matías Fracchia | DEF (Matías Fracchia Centre-Back) | Edad: 30 | Nº: N/A | Valor: €250k
+- Manuel Fernández | DEF (Manuel Fernández Centre-Back) | Edad: 37 | Nº: N/A | Valor: €50k
+- Joshua Arancibia | DEF (Joshua Arancibia Centre-Back) | Edad: 21 | Nº: N/A | Valor: -
+- Sebastián Cabrera | DEL (Sebastián Cabrera Left-Back) | Edad: 27 | Nº: N/A | Valor: €750k
+- Juan Cornejo | N/A (Juan Cornejo Left-Back) | Edad: 35 | Nº: N/A | Valor: €125k
+- Francisco Salinas | N/A (Francisco Salinas Right-Back) | Edad: 26 | Nº: N/A | Valor: €1.20m
+- Dylan Escobar | N/A (Dylan Escobar Right-Back) | Edad: 25 | Nº: N/A | Valor: €450k
+- Lukas Soza | N/A (Lukas Soza Right-Back) | Edad: 28 | Nº: N/A | Valor: €200k
+- Sebastián Galani | DEF (Sebastián Galani Defensive Midfield) | Edad: 28 | Nº: N/A | Valor: €1.00m
+- Dylan Glaby | DEF (Dylan Glaby Defensive Midfield) | Edad: 29 | Nº: N/A | Valor: €450k
+- Salvador Cordero | DEF (Salvador Cordero Defensive Midfield) | Edad: 29 | Nº: N/A | Valor: €350k
+- Alejandro Camargo | DEF (Alejandro Camargo Defensive Midfield) | Edad: 36 | Nº: N/A | Valor: €100k
+- Matías Zepeda | DEF (Matías Zepeda Central Midfield) | Edad: 21 | Nº: N/A | Valor: €600k
+- Guido Vadalá | MED (Guido Vadalá Attacking Midfield) | Edad: 29 | Nº: N/A | Valor: €375k
+- Pablo Rodríguez | MED (Pablo Rodríguez Attacking Midfield) | Edad: 19 | Nº: N/A | Valor: €100k
+- Benjamín Chandía | MED (Benjamín Chandía Left Winger) | Edad: 23 | Nº: N/A | Valor: €1.20m
+- Martín Mundaca | DEL (Martín Mundaca Left Winger) | Edad: 19 | Nº: N/A | Valor: €650k
+- Matías Alvarado | DEL (Matías Alvarado Left Winger) | Edad: 22 | Nº: N/A | Valor: €300k
+- Cristián Zavala | DEL (Cristián Zavala Right Winger) | Edad: 26 | Nº: N/A | Valor: €900k
+- Alejandro Azócar | DEL (Alejandro Azócar Right Winger) | Edad: 25 | Nº: N/A | Valor: €800k
+- Luis Riveros | DEL (Luis Riveros Right Winger) | Edad: 27 | Nº: N/A | Valor: €350k
+- Nicolás Johansen | DEL (Nicolás Johansen Centre-Forward) | Edad: 27 | Nº: N/A | Valor: €700k
+- Rodrigo Holgado | DEL (Rodrigo Holgado Centre-Forward) | Edad: 30 | Nº: N/A | Valor: €250k
+- Lucas Pratto | DEL (Lucas Pratto Centre-Forward) | Edad: 37 | Nº: N/A | Valor: €100k

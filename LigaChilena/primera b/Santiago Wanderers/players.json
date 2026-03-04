@@ -1,0 +1,191 @@
+[
+  {
+    "name": "Eduardo Miranda",
+    "position_raw": "Eduardo Miranda Goalkeeper",
+    "position": "ARQ",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Raúl Olivares",
+    "position_raw": "Raúl Olivares Goalkeeper",
+    "position": "ARQ",
+    "age": "37",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Vicente Castellano",
+    "position_raw": "Vicente Castellano Goalkeeper",
+    "position": "ARQ",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Víctor Espinoza",
+    "position_raw": "Víctor Espinoza Centre-Back",
+    "position": "DEF",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Sergio Felipe",
+    "position_raw": "Sergio Felipe Centre-Back",
+    "position": "DEF",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Luis Margas",
+    "position_raw": "Luis Margas Centre-Back",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Pedro Navarro",
+    "position_raw": "Pedro Navarro Left-Back",
+    "position": "N/A",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Axel Herrera",
+    "position_raw": "Axel Herrera Right-Back",
+    "position": "N/A",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Cristóbal Cáceres",
+    "position_raw": "Cristóbal Cáceres Defensive Midfield",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Leandro Navarro",
+    "position_raw": "Leandro Navarro Defensive Midfield",
+    "position": "DEF",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Joaquín Silva",
+    "position_raw": "Joaquín Silva Central Midfield",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Ricardo Parra",
+    "position_raw": "Ricardo Parra Central Midfield",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Martín Villarroel",
+    "position_raw": "Martín Villarroel Central Midfield",
+    "position": "DEF",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Jorge Luna",
+    "position_raw": "Jorge Luna Attacking Midfield",
+    "position": "MED",
+    "age": "39",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Franco Lobos",
+    "position_raw": "Franco Lobos Left Winger",
+    "position": "DEL",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Esteban Luco",
+    "position_raw": "Esteban Luco Left Winger",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Diego Opazo",
+    "position_raw": "Diego Opazo Right Winger",
+    "position": "DEL",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Cristóbal Ponce",
+    "position_raw": "Cristóbal Ponce Right Winger",
+    "position": "DEL",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Marcos Camarda",
+    "position_raw": "Marcos Camarda Centre-Forward",
+    "position": "MED",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Javier Parraguez",
+    "position_raw": "Javier Parraguez Centre-Forward",
+    "position": "DEL",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  },
+  {
+    "name": "Camilo Astroza",
+    "position_raw": "Camilo Astroza Centre-Forward",
+    "position": "MED",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+  }
+]

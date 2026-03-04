@@ -1,0 +1,23 @@
+- Jaime Vargas | ARQ (Jaime Vargas Goalkeeper) | Edad: 21 | Nº: N/A | Valor: €250k
+- Álvaro Salazar | ARQ (Álvaro Salazar Goalkeeper) | Edad: 32 | Nº: N/A | Valor: €100k
+- José Narr | ARQ (José Narr Goalkeeper) | Edad: 22 | Nº: N/A | Valor: €25k
+- Brayams Viveros | DEF (Brayams Viveros Centre-Back) | Edad: 34 | Nº: N/A | Valor: €150k
+- Francisco Alarcón | DEF (Francisco Alarcón Centre-Back) | Edad: 36 | Nº: N/A | Valor: €75k
+- Fabrizio Tomarelli | DEF (Fabrizio Tomarelli Centre-Back) | Edad: 24 | Nº: N/A | Valor: €75k
+- Christian Cepeda | DEF (Christian Cepeda Centre-Back) | Edad: 35 | Nº: N/A | Valor: €75k
+- Ignacio Lara | N/A (Ignacio Lara Left-Back) | Edad: 29 | Nº: N/A | Valor: €325k
+- Felipe Saavedra | N/A (Felipe Saavedra Left-Back) | Edad: 29 | Nº: N/A | Valor: €125k
+- Daniel Viveros | N/A (Daniel Viveros Right-Back) | Edad: 25 | Nº: N/A | Valor: €225k
+- Camilo Rodríguez | MED (Camilo Rodríguez Right-Back) | Edad: 30 | Nº: N/A | Valor: €225k
+- Federico Martin | DEF (Federico Martin Defensive Midfield) | Edad: 35 | Nº: N/A | Valor: €100k
+- Javier Espinoza | DEF (Javier Espinoza Defensive Midfield) | Edad: 21 | Nº: N/A | Valor: -
+- Nicolás Carvajal | DEF (Nicolás Carvajal Central Midfield) | Edad: 28 | Nº: N/A | Valor: €300k
+- Branco Provoste | DEF (Branco Provoste Central Midfield) | Edad: 25 | Nº: N/A | Valor: €175k
+- Felipe Báez | DEF (Felipe Báez Central Midfield) | Edad: 35 | Nº: N/A | Valor: €75k
+- Mikel Arguinarena | MED (Mikel Arguinarena Attacking Midfield) | Edad: 34 | Nº: N/A | Valor: €150k
+- Gonzalo Álvarez | DEL (Gonzalo Álvarez Right Winger) | Edad: 29 | Nº: N/A | Valor: €300k
+- Carlos González | DEL (Carlos González Right Winger) | Edad: 23 | Nº: N/A | Valor: €25k
+- Pedro Sánchez | DEL (Pedro Sánchez Centre-Forward) | Edad: 28 | Nº: N/A | Valor: €450k
+- Germán Estigarribia | MED (Germán Estigarribia Centre-Forward) | Edad: 28 | Nº: N/A | Valor: €275k
+- Víctor Vásquez | DEL (Víctor Vásquez Centre-Forward) | Edad: 21 | Nº: N/A | Valor: €25k
+- Ignacio Parada | DEL (Ignacio Parada Centre-Forward) | Edad: 23 | Nº: N/A | Valor: -

@@ -1,0 +1,245 @@
+[
+  {
+    "name": "Santiago Silva",
+    "position_raw": "Santiago Silva Goalkeeper",
+    "position": "ARQ",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "José Sanhueza",
+    "position_raw": "José Sanhueza Goalkeeper",
+    "position": "ARQ",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€225k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Moisés González",
+    "position_raw": "Moisés González Centre-Back",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€600k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Bastián Ubal",
+    "position_raw": "Bastián Ubal Centre-Back",
+    "position": "DEF",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Leonel González",
+    "position_raw": "Leonel González Centre-Back",
+    "position": "DEF",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "David Retamal",
+    "position_raw": "David Retamal Centre-Back",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Osvaldo González",
+    "position_raw": "Osvaldo González Centre-Back",
+    "position": "DEF",
+    "age": "41",
+    "number": "N/A",
+    "market_value": "€10k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Antonio Díaz",
+    "position_raw": "Antonio Díaz Left-Back",
+    "position": "N/A",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Yerco Oyanedel",
+    "position_raw": "Yerco Oyanedel Left-Back",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Patricio Romero",
+    "position_raw": "Patricio Romero Left-Back",
+    "position": "N/A",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Lucas Molina",
+    "position_raw": "Lucas Molina Left-Back",
+    "position": "N/A",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Jorge Espejo",
+    "position_raw": "Jorge Espejo Right-Back",
+    "position": "N/A",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€750k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Benjamín Sáez",
+    "position_raw": "Benjamín Sáez Right-Back",
+    "position": "MED",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Jeison Fuentealba",
+    "position_raw": "Jeison Fuentealba Central Midfield",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Cristhofer Mesías",
+    "position_raw": "Cristhofer Mesías Central Midfield",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Bryan Ogaz",
+    "position_raw": "Bryan Ogaz Central Midfield",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Facundo Mater",
+    "position_raw": "Facundo Mater Right Midfield",
+    "position": "MED",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€900k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Pablo Parra",
+    "position_raw": "Pablo Parra Attacking Midfield",
+    "position": "MED",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Luis Rojas",
+    "position_raw": "Luis Rojas Attacking Midfield",
+    "position": "MED",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Agustín Urzi",
+    "position_raw": "Agustín Urzi Left Winger",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€1.00m",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Harol Salgado",
+    "position_raw": "Harol Salgado Left Winger",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Ariel Uribe",
+    "position_raw": "Ariel Uribe Right Winger",
+    "position": "DEL",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€800k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Rodrigo Olivares",
+    "position_raw": "Rodrigo Olivares Right Winger",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Luca Kmet",
+    "position_raw": "Luca Kmet Right Winger",
+    "position": "DEL",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Daniel Barrea",
+    "position_raw": "Daniel Barrea Centre-Forward",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€700k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Cecilio Waterman",
+    "position_raw": "Cecilio Waterman Centre-Forward",
+    "position": "MED",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  },
+  {
+    "name": "Diego Sabando",
+    "position_raw": "Diego Sabando Centre-Forward",
+    "position": "DEL",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/universidad-concepcion/kader/verein/5622/saison_id/2025"
+  }
+]

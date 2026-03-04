@@ -44,6 +44,15 @@
 - [x] Asegurar que la tabla de liga se actualiza después de cada partido simulado.
 - [x] Agregar opción de retiro de jugador al cumplir entre 35 y 45 años.
 - [x] Crear archivo Colo-Colo.txt en primera_division con la plantilla actual de Colo-Colo de la Primera División Chilena.
+- [x] Corregir duplicados en XI al completar la alineacion inicial.
+- [x] Ampliar la normalizacion de posiciones (laterales, carrileros, etc.).
+- [x] Priorizar position_raw cuando position y position_raw difieren.
+- [x] Mejorar el scraper para inferir posiciones desde el nombre en Tercera A/B.
+- [x] Re-scrapear LigaChilena completa con las nuevas reglas.
+- [x] Implementar asignacion automatica de posiciones para jugadores N/A al cargar equipos.
+- [x] Validar todas las ligas y equipos (0 N/A tras asignacion).
+- [x] Completar plantillas con <18 jugadores en Segunda Division (3 equipos).
+Resumen: Se corrigio el XI, se amplio la normalizacion de posiciones, se mejoro el scraper, se re-scrapeo la liga y se validaron/ajustaron plantillas en todas las divisiones.
 
 - Actualizar las plantillas de todos los equipos de la Primera División con los jugadores reales actuales de la temporada 2024/2025, obtenidos de transfermarkt.com.
 
@@ -52,9 +61,13 @@
 - teams.txt tiene 16 equipos para Primera División.
 - Original: Primera 9 (0-8), Segunda 10 (9-18), Primera B 12 (19-30), Total 31.
 - Nuevo: Primera 16 (0-15), Segunda 10 (16-25), Primera B 12 (26-37), Total 38.
+- Plantillas canonicas: players.csv (players.txt/players.json quedan como referencia).
+- Equipos por division se leen desde LigaChilena/<division>/teams.txt.
 
 - [x] Agregar Tercera División A con equipos y jugadores
 - [x] Agregar Tercera División B con equipos y jugadores
 - [x] Verificar que la API incluya las nuevas divisiones
 
 - [x] Documentar todo el trabajo realizado en español en TODO.md
+Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
+- [x] Modularizacion del codigo en archivos (models/io/simulation/ui) y uso de std::filesystem.

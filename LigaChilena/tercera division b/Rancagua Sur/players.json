@@ -1,0 +1,2423 @@
+[
+  {
+    "name": "Matías Guajardo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "1. Jaime Arriagada Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "33. Eric Jorquera Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "1. Patricio Puentes Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "12. Robin Bernazar Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Diego Lara Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Jordan Santander Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Thomas Flores (2004) Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Luis Kovacic Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Benjamín Sepulveda Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Joan Flores Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Enrique Contreras Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "2. Diego Bernard Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "6. José Acosta Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "22. Cristofer Ahumada Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "16. Claudio Cerda Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "3. Víctor Fuentes Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "22. Carlos Arce Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Lucas Espinoza Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "2. José Araya Ahumada Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "19. Camilo Olmedo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "24. Benjamín Jerez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "2. Nehemías Hernández Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "24. Issan Carrasco Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Jaime Muñoz Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "José Basualto Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Bryan Cerda Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Pablo Tapia Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Rodrigo Alvear Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Mauricio Catalán Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Harold Barra Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "3. Julio Guzmán Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "19. Martín Valenzuela Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "2. Carlos Pérez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Matías Ortiz Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "25. Kevin Caro Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "16. Jesrrei Gálvez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Javier Salazar Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Benjamín Jiménez Salinas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Sebastián Mardones Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "35. Iván Ruiz Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Martín Piña Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Marco Castillo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Ariel Inostroza Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Daniel Reyes Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Raúl Peralta Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Argel Muñoz Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Ignacio Moya Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Martín Olate Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Jonathan Riquelme García Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Sebastián Cantillana Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Jorge Díaz Orellana Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Maikol González Llancavil Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Jonathan Riquelme Anguita Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "14. Jorge Pacheco Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "10. Pablo Rivera Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "28. Nicolás Pérez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "29. Diego Urrutia Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "27. Vicente Alarcón Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Mario Contreras Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Camilo Fuentes Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Matías Miranda Núñez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Pablo Olivares Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "10. Bryan Cabello Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Bryan Mardones Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "20. Matías Palma Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "6. Tomás Parra Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "18. Mauricio Cano Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "21. Gabriel López Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "8. Nicolás Silva Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "8. Germán Cristi Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "12. Deivid Moya Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Bayron Plaza Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "6. Esteban Améstica Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Kevin Valdés Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "10. Martín Chirino Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "5. Christian Labra Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Ariel Pizarro Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "8. Mario Tobar Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "20. Javier Arzola Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Javier Acevedo Neira (2004) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Martin Espinoza (2005) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "20. Erick Godoy Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Joaquín León Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Diego Muñoz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Gabriel Garín Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Joaquín Galaz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Marcelo Cabezas Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Pablo Celis Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Bastián Valdés Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Lucas Valdebenito Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Giovanne Hernández Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Gonzalo Muñoz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Carlos Yaupe Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Bastián Adams Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Alan Morales Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Ignacio Becerra Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Facundo Arroyo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Benjamín Salinas Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Juan Carlos Tello Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Bastián Cid Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Martín Brenni Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Fernando Bravo Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Luis Pérez Duque Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "11. Ignacio Arce Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Lucas Celis Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Benjamín Inostroza Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "23. Matías Jeria Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "14. Javier Hernández Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "11. Cristián Retamal Poblete Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "16. Paulo Villalón Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "9. Pablo Paredes Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "9. Axl Lehue Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Diego Cabezas Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "30. Sebastián Garretón Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Matías Bernal Pino Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "César Jofré Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "9. Bairon Herrera Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "23. Bastián Saavedra Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Sebastián Rojas Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "29. Christopher López Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Juan Pablo Lorca (2003) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "24. Alonso Arancibia Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "17. Diego Portilla Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Arón Díaz Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Fernando Pozo Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Joaquín Catejo Moscoso Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Mauricio San Martín Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Javier Sánchez Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Francisco Peñaloza Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "DT. Rodrigo Pérez Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "DT. Carlos Peña Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "DT. Nelson Fuentes Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "DT. Marcelo Jara Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "DT. Claudio Agüero Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Fernando Bravo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Luis Pérez Duque",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "1. Jaime Arriagada",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "2. Diego Bernard",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "6. José Acosta",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "22. Cristofer Ahumada",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Jonathan Riquelme Anguita",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "14. Jorge Pacheco",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "11. Ignacio Arce",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "10. Pablo Rivera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "33. Eric Jorquera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Lucas Celis",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Benjamín Inostroza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "16. Claudio Cerda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "23. Matías Jeria",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "28. Nicolás Pérez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "29. Diego Urrutia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "DT. Rodrigo Pérez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "3. Víctor Fuentes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "22. Carlos Arce",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "27. Vicente Alarcón",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "14. Javier Hernández",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Lucas Espinoza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "2. José Araya Ahumada",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "11. Cristián Retamal Poblete",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "1. Patricio Puentes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Mario Contreras",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "16. Paulo Villalón",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Camilo Fuentes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Matías Miranda Núñez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Pablo Olivares",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "19. Camilo Olmedo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "DT. Carlos Peña",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "12. Robin Bernazar",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Diego Lara",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "10. Bryan Cabello",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Bryan Mardones",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "20. Matías Palma",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "6. Tomás Parra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "24. Benjamín Jerez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "9. Pablo Paredes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "18. Mauricio Cano",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "2. Nehemías Hernández",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "21. Gabriel López",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "24. Issan Carrasco",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Jaime Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "José Basualto",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "8. Nicolás Silva",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "9. Axl Lehue",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Bryan Cerda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Pablo Tapia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Rodrigo Alvear",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Diego Cabezas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Mauricio Catalán",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "30. Sebastián Garretón",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Harold Barra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "8. Germán Cristi",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "12. Deivid Moya",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Bayron Plaza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "6. Esteban Améstica",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "3. Julio Guzmán",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Kevin Valdés",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "DT. Nelson Fuentes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "19. Martín Valenzuela",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "10. Martín Chirino",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Jordan Santander",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "5. Christian Labra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Matías Bernal Pino",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "César Jofré",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Ariel Pizarro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "2. Carlos Pérez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "8. Mario Tobar",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "9. Bairon Herrera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Thomas Flores (2004)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Matías Ortiz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "25. Kevin Caro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "16. Jesrrei Gálvez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "23. Bastián Saavedra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Sebastián Rojas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "20. Javier Arzola",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Javier Salazar",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Benjamín Jiménez Salinas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Sebastián Mardones",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Javier Acevedo Neira (2004)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "35. Iván Ruiz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "29. Christopher López",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Martín Piña",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Marco Castillo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Juan Pablo Lorca (2003)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "24. Alonso Arancibia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Martin Espinoza (2005)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "17. Diego Portilla",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "20. Erick Godoy",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Joaquín León",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "DT. Marcelo Jara",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Arón Díaz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Diego Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Gabriel Garín",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Fernando Pozo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Luis Kovacic",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Joaquín Catejo Moscoso",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Ariel Inostroza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Mauricio San Martín",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Joaquín Galaz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Marcelo Cabezas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Daniel Reyes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Raúl Peralta",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Pablo Celis",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Bastián Valdés",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Lucas Valdebenito",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Benjamín Sepulveda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Giovanne Hernández",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Argel Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Gonzalo Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Carlos Yaupe",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Ignacio Moya",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Bastián Adams",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Martín Olate",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Jonathan Riquelme García",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "DT. Claudio Agüero",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Javier Sánchez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Alan Morales",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Sebastián Cantillana",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Joan Flores",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Ignacio Becerra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Jorge Díaz Orellana",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Facundo Arroyo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Benjamín Salinas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Juan Carlos Tello",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Maikol González Llancavil",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Enrique Contreras",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Bastián Cid",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Francisco Peñaloza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  },
+  {
+    "name": "Martín Brenni",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/rancagua-sur/?sid=166009"
+  }
+]

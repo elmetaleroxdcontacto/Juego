@@ -1,0 +1,28 @@
+- Fernando de Paul | ARQ (Fernando de Paul Goalkeeper) | Edad: 34 | Nº: N/A | Valor: €300k
+- Eduardo Villanueva | ARQ (Eduardo Villanueva Goalkeeper) | Edad: 21 | Nº: N/A | Valor: -
+- Benjamín Morales | ARQ (Benjamín Morales Goalkeeper) | Edad: 22 | Nº: N/A | Valor: -
+- Jonathan Villagra | DEF (Jonathan Villagra Centre-Back) | Edad: 24 | Nº: N/A | Valor: €800k
+- Joaquín Sosa | DEF (Joaquín Sosa Centre-Back) | Edad: 24 | Nº: N/A | Valor: €550k
+- Javier Méndez | DEF (Javier Méndez Centre-Back) | Edad: 31 | Nº: N/A | Valor: €450k
+- Miguel Toledo | DEF (Miguel Toledo Centre-Back) | Edad: 22 | Nº: N/A | Valor: -
+- Diego Ulloa | N/A (Diego Ulloa Left-Back) | Edad: 22 | Nº: N/A | Valor: €500k
+- Erick Wiemberg | N/A (Erick Wiemberg Left-Back) | Edad: 31 | Nº: N/A | Valor: €400k
+- Cristián Riquelme | MED (Cristián Riquelme Left-Back) | Edad: 22 | Nº: N/A | Valor: €300k
+- Matías Fernández | N/A (Matías Fernández Right-Back) | Edad: 30 | Nº: N/A | Valor: €400k
+- Jeyson Rojas | N/A (Jeyson Rojas Right-Back) | Edad: 24 | Nº: N/A | Valor: €400k
+- Víctor Méndez | DEF (Víctor Méndez Defensive Midfield) | Edad: 26 | Nº: N/A | Valor: €1.20m
+- Tomás Alarcón | DEF (Tomás Alarcón Defensive Midfield) | Edad: 27 | Nº: N/A | Valor: €500k
+- Álvaro Madrid | DEF (Álvaro Madrid Central Midfield) | Edad: 30 | Nº: N/A | Valor: €500k
+- Bastián Silva | DEF (Bastián Silva Central Midfield) | Edad: 22 | Nº: N/A | Valor: €300k
+- Arturo Vidal | DEF (Arturo Vidal Central Midfield) | Edad: 38 | Nº: N/A | Valor: €175k
+- Dylan Portilla | ARQ (Dylan Portilla Central Midfield) | Edad: 21 | Nº: N/A | Valor: €175k
+- Claudio Aquino | MED (Claudio Aquino Attacking Midfield) | Edad: 34 | Nº: N/A | Valor: €900k
+- Lautaro Pastrán | DEL (Lautaro Pastrán Left Winger) | Edad: 23 | Nº: N/A | Valor: €600k
+- Leandro Hernández | DEL (Leandro Hernández Left Winger) | Edad: 20 | Nº: N/A | Valor: €350k
+- Francisco Marchant | DEL (Francisco Marchant Right Winger) | Edad: 19 | Nº: N/A | Valor: €700k
+- Marcos Bolados | DEL (Marcos Bolados Right Winger) | Edad: 29 | Nº: N/A | Valor: €350k
+- Francisco Rivera | DEL (Francisco Rivera Right Winger) | Edad: 22 | Nº: N/A | Valor: €25k
+- Maximiliano Romero | DEL (Maximiliano Romero Centre-Forward) | Edad: 27 | Nº: N/A | Valor: €2.00m
+- Javier Correa | DEL (Javier Correa Centre-Forward) | Edad: 33 | Nº: N/A | Valor: €1.00m
+- Cristian Alarcón | DEL (Cristian Alarcón Centre-Forward) | Edad: 22 | Nº: N/A | Valor: -
+- Yastin Cuevas | DEL (Yastin Cuevas Centre-Forward) | Edad: 17 | Nº: N/A | Valor: -

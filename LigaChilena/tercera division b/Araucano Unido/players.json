@@ -1,0 +1,632 @@
+[
+  {
+    "name": "Erwin Neira Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Maximiliano Torres Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Matías Lincopi Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Patryck Salazar Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Marco Solís Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Vicente Belmar Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Bayron Aqueveque Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Luciano Vidal Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Oscar Soto Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Sebastián Guerrero Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Jairo Alvarado Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Lucas Viveros Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Felipe Carreño Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Eduardo Riquelme Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Sebastián Inostroza Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Agustín Galianu Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Marcelo Gómez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Nicolás Fernández Rosales Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Davy Alonzo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Ignacio Navarrete Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Matías Aguilera Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Roberto Coloma Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Jeremías Arzola Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Matías Arzola Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Lucas Fernández Barrientos Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Luis Lingue Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Álvaro Melipil Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Juan Carlos Martínez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Alexis Alarcón Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Vicente Marín Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Nicolás Aguayo Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Claudio Silva Cabrera Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Marcelo Chivailao Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Emilio Ibáñez Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "DT. Mauro Astrada Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Erwin Neira",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Patryck Salazar",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Marco Solís",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Vicente Belmar",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Bayron Aqueveque",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Luciano Vidal",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Agustín Galianu",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Marcelo Gómez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Nicolás Fernández Rosales",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Alexis Alarcón",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Vicente Marín",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Maximiliano Torres",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Oscar Soto",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Davy Alonzo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Nicolás Aguayo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Ignacio Navarrete",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Claudio Silva Cabrera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Sebastián Guerrero",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Matías Aguilera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "DT. Mauro Astrada",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Roberto Coloma",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Marcelo Chivailao",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Emilio Ibáñez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Jairo Alvarado",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Jeremías Arzola",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Matías Arzola",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Lucas Fernández Barrientos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Matías Lincopi",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Luis Lingue",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Álvaro Melipil",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Lucas Viveros",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Felipe Carreño",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Eduardo Riquelme",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Sebastián Inostroza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  },
+  {
+    "name": "Juan Carlos Martínez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/araucano-unido/?sid=166009"
+  }
+]

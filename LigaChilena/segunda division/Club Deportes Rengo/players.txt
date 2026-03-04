@@ -1,0 +1,23 @@
+- Federico Molina | ARQ (Federico Molina Goalkeeper) | Edad: 21 | Nº: N/A | Valor: -
+- Bryan Escobar | ARQ (Bryan Escobar Goalkeeper) | Edad: 23 | Nº: N/A | Valor: -
+- Paulo Magalhães | DEF (Paulo Magalhães Centre-Back) | Edad: 36 | Nº: N/A | Valor: -
+- Francisco Sepúlveda | DEF (Francisco Sepúlveda Centre-Back) | Edad: 34 | Nº: N/A | Valor: -
+- Javier Herrera | DEF (Javier Herrera Centre-Back) | Edad: 21 | Nº: N/A | Valor: -
+- Ignacio Carrasco | N/A (Ignacio Carrasco Left-Back) | Edad: 23 | Nº: N/A | Valor: -
+- Kurt Zimmermann | MED (Kurt Zimmermann Left-Back) | Edad: 24 | Nº: N/A | Valor: -
+- Damián Aldana | MED (Damián Aldana Right-Back) | Edad: 23 | Nº: N/A | Valor: -
+- Efraín Navarrete | N/A (Efraín Navarrete Right-Back) | Edad: 23 | Nº: N/A | Valor: -
+- Rubén Cepeda | DEF (Rubén Cepeda Defensive Midfield) | Edad: 31 | Nº: N/A | Valor: -
+- Bernardo Mendoza | DEF (Bernardo Mendoza Central Midfield) | Edad: 29 | Nº: N/A | Valor: -
+- Ian Núñez | DEF (Ian Núñez Central Midfield) | Edad: 18 | Nº: N/A | Valor: -
+- Luis Valenzuela | MED (Luis Valenzuela Attacking Midfield) | Edad: 38 | Nº: N/A | Valor: -
+- Yoel Guirrimán | MED (Yoel Guirrimán Attacking Midfield) | Edad: 20 | Nº: N/A | Valor: -
+- Jeckar Amaya | MED (Jeckar Amaya Attacking Midfield) | Edad: 23 | Nº: N/A | Valor: -
+- Martín Alfaro | DEL (Martín Alfaro Left Winger) | Edad: 21 | Nº: N/A | Valor: -
+- Massami Gutiérrez | MED (Massami Gutiérrez Right Winger) | Edad: 22 | Nº: N/A | Valor: -
+- Renato Araya | DEL (Renato Araya Right Winger) | Edad: 23 | Nº: N/A | Valor: -
+- Sebastián Núñez | DEL (Sebastián Núñez Right Winger) | Edad: 23 | Nº: N/A | Valor: -
+- Juan Pablo Lorca | DEL (Juan Pablo Lorca Right Winger) | Edad: 22 | Nº: N/A | Valor: -
+- Camilo Ponce | MED (Camilo Ponce Centre-Forward) | Edad: 35 | Nº: N/A | Valor: -
+- Hernán Ramírez | MED (Hernán Ramírez Centre-Forward) | Edad: 26 | Nº: N/A | Valor: -
+- Nicolás Ibarra | DEL (Nicolás Ibarra Centre-Forward) | Edad: 20 | Nº: N/A | Valor: -

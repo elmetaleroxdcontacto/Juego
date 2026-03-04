@@ -1,0 +1,26 @@
+- Rodrigo Saracho | ARQ (Rodrigo Saracho Goalkeeper) | Edad: 32 | Nº: N/A | Valor: €150k
+- Benjamín Tapia | ARQ (Benjamín Tapia Goalkeeper) | Edad: 21 | Nº: N/A | Valor: €25k
+- Martín Dedes | ARQ (Martín Dedes Goalkeeper) | Edad: 20 | Nº: N/A | Valor: -
+- Javier Rivera | DEF (Javier Rivera Centre-Back) | Edad: 26 | Nº: N/A | Valor: €325k
+- Álvaro Cazula | DEF (Álvaro Cazula Centre-Back) | Edad: 29 | Nº: N/A | Valor: €100k
+- Matías Moya Godoy | DEF (Matías Moya Godoy Centre-Back) | Edad: 24 | Nº: N/A | Valor: €25k
+- Nicolás Aguirre | DEF (Nicolás Aguirre Centre-Back) | Edad: 34 | Nº: N/A | Valor: -
+- Yerko Águila | N/A (Yerko Águila Left-Back) | Edad: 29 | Nº: N/A | Valor: €275k
+- Korben Rojas | DEF (Korben Rojas Left-Back) | Edad: 25 | Nº: N/A | Valor: €150k
+- Nicolás Rivera | N/A (Nicolás Rivera Left-Back) | Edad: 24 | Nº: N/A | Valor: -
+- Cristóbal Guerra | DEL (Cristóbal Guerra Right-Back) | Edad: 25 | Nº: N/A | Valor: €300k
+- Reiner Campos | MED (Reiner Campos Right-Back) | Edad: 22 | Nº: N/A | Valor: €300k
+- Guillermo Cubillos | MED (Guillermo Cubillos Right-Back) | Edad: 31 | Nº: N/A | Valor: €150k
+- Mauricio Iturra | DEF (Mauricio Iturra Defensive Midfield) | Edad: 29 | Nº: N/A | Valor: €175k
+- Camilo Rencoret | DEF (Camilo Rencoret Defensive Midfield) | Edad: 35 | Nº: N/A | Valor: €125k
+- Augusto Barrios | DEF (Augusto Barrios Central Midfield) | Edad: 34 | Nº: N/A | Valor: €175k
+- D'Hidier Pereira | MED (D'Hidier Pereira Attacking Midfield) | Edad: 17 | Nº: N/A | Valor: €200k
+- Nahuel Donadell | MED (Nahuel Donadell Attacking Midfield) | Edad: 34 | Nº: N/A | Valor: €125k
+- Agustín Maidana | MED (Agustín Maidana Attacking Midfield) | Edad: 24 | Nº: N/A | Valor: €50k
+- Boris Sagredo | MED (Boris Sagredo Attacking Midfield) | Edad: 36 | Nº: N/A | Valor: €25k
+- Alfredo Ábalos | DEL (Alfredo Ábalos Left Winger) | Edad: 39 | Nº: N/A | Valor: €25k
+- Gonzalo Reyes | DEL (Gonzalo Reyes Right Winger) | Edad: 30 | Nº: N/A | Valor: €300k
+- Nicolás Orrego | DEL (Nicolás Orrego Right Winger) | Edad: 24 | Nº: N/A | Valor: €150k
+- Bairon Monroy | DEL (Bairon Monroy Centre-Forward) | Edad: 26 | Nº: N/A | Valor: €300k
+- Camilo Melivilú | MED (Camilo Melivilú Centre-Forward) | Edad: 32 | Nº: N/A | Valor: €300k
+- Nicolás Zedan | DEL (Nicolás Zedan Centre-Forward) | Edad: 25 | Nº: N/A | Valor: -

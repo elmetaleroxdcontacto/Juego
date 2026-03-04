@@ -1,0 +1,236 @@
+[
+  {
+    "name": "Martín Parra",
+    "position_raw": "Martín Parra Goalkeeper",
+    "position": "ARQ",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Julio Fierro",
+    "position_raw": "Julio Fierro Goalkeeper",
+    "position": "ARQ",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Martín Rodríguez",
+    "position_raw": "Martín Rodríguez Goalkeeper",
+    "position": "ARQ",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Enzo Uribe",
+    "position_raw": "Enzo Uribe Goalkeeper",
+    "position": "ARQ",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Pereira",
+    "position_raw": "Sebastián Pereira Centre-Back",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "José Aja",
+    "position_raw": "José Aja Centre-Back",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Bastián Roco",
+    "position_raw": "Bastián Roco Centre-Back",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Milovan Celis",
+    "position_raw": "Milovan Celis Centre-Back",
+    "position": "DEF",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Rodrigo Alarcón",
+    "position_raw": "Rodrigo Alarcón Centre-Back",
+    "position": "DEF",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Gabriel Norambuena",
+    "position_raw": "Gabriel Norambuena Left-Back",
+    "position": "MED",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Kevin Contreras",
+    "position_raw": "Kevin Contreras Right-Back",
+    "position": "N/A",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Martín Ormeño",
+    "position_raw": "Martín Ormeño Right-Back",
+    "position": "MED",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Bruno Jáuregui",
+    "position_raw": "Bruno Jáuregui Defensive Midfield",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "William Machado",
+    "position_raw": "William Machado Defensive Midfield",
+    "position": "DEF",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Ignacio Núñez",
+    "position_raw": "Ignacio Núñez Central Midfield",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Felipe Massri",
+    "position_raw": "Felipe Massri Central Midfield",
+    "position": "DEF",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Leonardo Naranjo",
+    "position_raw": "Leonardo Naranjo Central Midfield",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Ulises Ojeda",
+    "position_raw": "Ulises Ojeda Attacking Midfield",
+    "position": "MED",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Rodrigo Vásquez",
+    "position_raw": "Rodrigo Vásquez Attacking Midfield",
+    "position": "MED",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Benjamín Droguett",
+    "position_raw": "Benjamín Droguett Attacking Midfield",
+    "position": "MED",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Pablo Aránguiz",
+    "position_raw": "Pablo Aránguiz Left Winger",
+    "position": "DEL",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€600k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Mitchell Wassenne",
+    "position_raw": "Mitchell Wassenne Right Winger",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Patricio Rubio",
+    "position_raw": "Patricio Rubio Centre-Forward",
+    "position": "DEL",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Andrés Vilches",
+    "position_raw": "Andrés Vilches Centre-Forward",
+    "position": "DEL",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Diego Robles",
+    "position_raw": "Diego Robles Centre-Forward",
+    "position": "DEL",
+    "age": "18",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  },
+  {
+    "name": "Tomás Tolosa",
+    "position_raw": "Tomás Tolosa Centre-Forward",
+    "position": "DEL",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/union-espanola/kader/verein/4321/saison_id/2025"
+  }
+]

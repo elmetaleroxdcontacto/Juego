@@ -1,0 +1,218 @@
+[
+  {
+    "name": "Nicola Pérez",
+    "position_raw": "Nicola Pérez Goalkeeper",
+    "position": "ARQ",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Hernán Muñoz",
+    "position_raw": "Hernán Muñoz Goalkeeper",
+    "position": "ARQ",
+    "age": "37",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Claudio Chandía",
+    "position_raw": "Claudio Chandía Goalkeeper",
+    "position": "ARQ",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Osvaldo Bosso",
+    "position_raw": "Osvaldo Bosso Centre-Back",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Pablo Calderón",
+    "position_raw": "Pablo Calderón Centre-Back",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Felipe Campos",
+    "position_raw": "Felipe Campos Centre-Back",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Carlos Salomón",
+    "position_raw": "Carlos Salomón Centre-Back",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Valencia",
+    "position_raw": "Sebastián Valencia Centre-Back",
+    "position": "DEF",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Jovany Campusano",
+    "position_raw": "Jovany Campusano Left-Back",
+    "position": "MED",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Diego Sanhueza",
+    "position_raw": "Diego Sanhueza Right-Back",
+    "position": "N/A",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€375k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Joaquín González",
+    "position_raw": "Joaquín González Right-Back",
+    "position": "N/A",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€225k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Diego Céspedes",
+    "position_raw": "Diego Céspedes Defensive Midfield",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Lorenzo Reyes",
+    "position_raw": "Lorenzo Reyes Defensive Midfield",
+    "position": "DEF",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "€225k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Manuel Rivera",
+    "position_raw": "Manuel Rivera Central Midfield",
+    "position": "DEF",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Daniel Saavedra",
+    "position_raw": "Daniel Saavedra Central Midfield",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Matías Plaza",
+    "position_raw": "Matías Plaza Attacking Midfield",
+    "position": "MED",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Ignacio Tapia",
+    "position_raw": "Ignacio Tapia Attacking Midfield",
+    "position": "MED",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Alex Valdés",
+    "position_raw": "Alex Valdés Left Winger",
+    "position": "DEL",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€225k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Lucas Molina Canto",
+    "position_raw": "Lucas Molina Canto Left Winger",
+    "position": "DEL",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Giovanny Ávalos",
+    "position_raw": "Giovanny Ávalos Left Winger",
+    "position": "DEL",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Gabriel Graciani",
+    "position_raw": "Gabriel Graciani Right Winger",
+    "position": "DEL",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€600k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Fernando Ovelar",
+    "position_raw": "Fernando Ovelar Right Winger",
+    "position": "DEL",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Ignacio Jeraldino",
+    "position_raw": "Ignacio Jeraldino Centre-Forward",
+    "position": "DEL",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  },
+  {
+    "name": "Franco Rami",
+    "position_raw": "Franco Rami Centre-Forward",
+    "position": "MED",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€225k",
+    "source": "https://www.transfermarkt.com/cd-nublense/kader/verein/14723/saison_id/2025"
+  }
+]

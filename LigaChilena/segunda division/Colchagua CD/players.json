@@ -1,0 +1,191 @@
+[
+  {
+    "name": "Rodrigo Cancino",
+    "position_raw": "Rodrigo Cancino Goalkeeper",
+    "position": "ARQ",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "José Tomás Quezada",
+    "position_raw": "José Tomás Quezada Goalkeeper",
+    "position": "ARQ",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Manuel Olea",
+    "position_raw": "Manuel Olea Centre-Back",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Carlos Rodríguez",
+    "position_raw": "Carlos Rodríguez Centre-Back",
+    "position": "DEF",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Mateo Martín",
+    "position_raw": "Mateo Martín Left-Back",
+    "position": "N/A",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Santiago Medina",
+    "position_raw": "Santiago Medina Left-Back",
+    "position": "MED",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Ricardo Segovia",
+    "position_raw": "Ricardo Segovia Right-Back",
+    "position": "N/A",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Carlos Opazo",
+    "position_raw": "Carlos Opazo Defensive Midfield",
+    "position": "DEF",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Osvaldo Carrasco",
+    "position_raw": "Osvaldo Carrasco Defensive Midfield",
+    "position": "DEF",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Cristóbal Marín",
+    "position_raw": "Cristóbal Marín Central Midfield",
+    "position": "DEF",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Juan Tobar",
+    "position_raw": "Juan Tobar Central Midfield",
+    "position": "DEF",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Renato Díaz",
+    "position_raw": "Renato Díaz Attacking Midfield",
+    "position": "MED",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Rodrigo Diaz Desidel",
+    "position_raw": "Rodrigo Diaz Desidel Attacking Midfield",
+    "position": "MED",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Claudio Pavez",
+    "position_raw": "Claudio Pavez Attacking Midfield",
+    "position": "MED",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Jhon Alegría",
+    "position_raw": "Jhon Alegría Left Winger",
+    "position": "DEL",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Alexis Ponce",
+    "position_raw": "Alexis Ponce Left Winger",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Matías Pérez V.",
+    "position_raw": "Matías Pérez V. Right Winger",
+    "position": "DEL",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Cristián Yáñez",
+    "position_raw": "Cristián Yáñez Right Winger",
+    "position": "DEL",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Javier Medina",
+    "position_raw": "Javier Medina Right Winger",
+    "position": "MED",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Matías Belmar",
+    "position_raw": "Matías Belmar Centre-Forward",
+    "position": "MED",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  },
+  {
+    "name": "Juan José Sánchez",
+    "position_raw": "Juan José Sánchez Centre-Forward",
+    "position": "DEL",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/colchagua-club-de-deportes/kader/verein/24425/saison_id/2025"
+  }
+]

@@ -1,0 +1,4394 @@
+[
+  {
+    "name": "Autogol",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ignacia Consterla",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Andrés Fernández Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Jonathan Salvador Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martín Ibacache Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "25. Bastián Cáceres Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "12. Tomás Leiva Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "27. Nicolás Rodríguez (ARG) Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "1. Lucas Giovini Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "12. Maximiliano Mori Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Darío Melo Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Pablo Heredia Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "22. Patricio Cortés Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martín Moreno (Sub 21) Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Nayaret Henríquez Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Álvaro Salazar Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martín Dedes (2005) Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Máximo Pantoja (2006) Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Paulo Garcés Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Fernanda Muñoz Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Christian Fuentes Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Isabella Grinberg Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Leandro Cañete Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Benjamín Gazzolo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "28. David Fernández Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Francisco Salinas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gonzalo Villegas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Jesús Pino Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "4. José Martínez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "3. José Vargas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Matías Silva Álamos (2000) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "24. Sergio Catalán Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Eduardo Bastita (URU) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Sergio Cordero Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "4. Juan Ureta Pizarro (Sub-20) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Cesar González Silva (2002) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Bastián Roco Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "20. Víctor Morales Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Fernando Quiroz Baigorria Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Matías Torres Medina (2000) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Flavio Rojas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Nicolás Díaz García Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Pablo Sanhueza Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "23. Sebastián Toro Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ariel Torrijos (Sub 21) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Yerko González Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Kevin Egaña Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "25. Kevin Ceceri (ARG) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ignacio Meza Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Camila Godoy Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Camilo Saldaña Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Christian Cepeda (ARG) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gabriel Rojas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ítalo Müller Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Maximiliano Riveros Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Nicolás Garrido Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Luana Peña Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Antonia Calderón Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Estefanía Varas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Catalina Molina Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Brandon Gómez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "4. Trinidad Cárdenas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Pía Palma Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Reinaldo Ahumada Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Cristián Dubó Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Guillermo Guaiquil Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Amatis Díaz Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Yair Marín (ARG) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Facundo Monteseirín (ARG) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Bastián Valladares (2003) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Trinidad Caldera Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Maite Gaete Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Sebastián Contreras Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Iván Zafarana (ARG) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Pedro Navarro Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Juan Córdova Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Hernán Ulloa Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Manuel Olea Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Camila Munita Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Valentina Muñoz Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Johanna Villagra Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Jonathan Ferrari (ARG) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Mauro Alfonso (URU) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Byron Guajardo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Diego Bravo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Diego Pereira Fuentes Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Kevin Serrano Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martín Ramírez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Valentín Perales (ARG) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Bryan Cortés Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "10. Cristián Muñoz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Emmanuel Pio (ARG) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Enzo Ormeño Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Jimmy Cisterna Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "6. Leandro Fioravantti (ARG) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Osvaldo Carrasco Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gonzalo Álvarez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "27. Bruno Martini Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "7. Jefferson Hoyos (COL) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "27. Joffre Monroy (ECU) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "23. José Duarte Fuenzalida Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Lenes Miranda Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "16. Nicolás Astudillo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "5. Diego González Garcés Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Manuel Santander (2004) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Esteban Antilef (2003) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Luciano Romero (ARG) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "8. Tomás Lanzini (ARG) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "28. Gabriel Cañete (ARG) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "10. Sergio Astudillo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Juan Méndez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "10. Matt Lagos Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "10. Hernán Fredes (ARG) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "30. Lucas Wilchez (ARG) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ricardo Rosales Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "28. Bastián Muñoz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ignacio Avilés Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Álvaro Césped Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Sebastián Gallegos (URU) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "17. Gabriel Suárez (ARG) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Diego Plaza Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Felipe Maureira (2003) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "26. Eloy Roige (ARG) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Kiara Tapia Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Yaritza Astudillo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Máximo Hernández (Sub 21) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "César Valenzuela Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Facundo Gómez (ARG) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gerardo Cortés Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gonzalo Espinoza Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gonzalo Jara González Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Hugo Herrera Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Brandon Martínez (2003) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Axel León Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "16. Camila Maldonado Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Camila Morales Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Paula Díaz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "18. Emilia Aravena Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Francisco Valdés Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martina Carvacho Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Emilia Ponce Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Valentín Demateis (ARG) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Axel Herrera Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Sebastián Pino Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Andrew Zamorano (URU) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Iván Vásquez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ángelo Quiñones Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Valentín Sánchez (2007) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Pablo Rodríguez (2006) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Richard Palacios (COL) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Jordan Mella Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Catalina Báez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Michelle Suárez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Juan Pablo Miño Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Thiare Quiroz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Mayeiza Torrijos Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martin Molina (2004) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Bruno Ponce (2008) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martin Herrera (2004) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gonzalo Baglivo (ARG) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Boris Sagredo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Alex Rubén Díaz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Matías Ruiz (ARG) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Bryan González Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Lissette Flores Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Valentina León Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Muriel Rodríguez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Tatiana Zura Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Lesney Padrón Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Amanda Pinto Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Nayra Gómez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Tonka Romero Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Fernando Sanguinetti (2005) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ignacio Jara Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Luis García Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Mariano Galleguillos (2007) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Nicolás Brun (URU) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Norberto Palmieri (ARG) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Raimundo Díaz (2006) Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "9. Ángel Vildozo (ARG) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Bairo Riveros Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "21. Franco Caballero (ARG) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ignacio Mesías Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "26. José Luis Silva Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Lautaro Palacios (ARG) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Miguel Ángel Orellana Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "9. Juan Puga Marchant (Sub-20) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "15. Bruno Nasta (ARG) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Julio Castro Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "11. Pablo Vergara Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Alejandro Azócar Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Daniel Opazo (ARG) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gonzalo Reyes Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "19. Sebastián Romero Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "David Llanos Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "9. Diego Aguirre (ARG) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Jean Paul Pineda Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Karina Morales Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Mario Briceño Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Franco Sosa (ARG) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "José Pablo Monreal Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Matías Sandoval (ARG) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Nahuel Luján (ARG) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Zederick Vega (2000) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Isidora Vega Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Antonella Díaz Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "César Huanca Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "David Salazar Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Vicente Álvarez (2006) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Karen Elgueta Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Leandro Basan (ARG) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ignacio Parada Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Sergio Vergara Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Diego González Miranda (URU) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Cristóbal Muñoz Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martín Cárcamo Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Maite Torres Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Oscar Henríquez (2007) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Mauro Lopes Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Diego Cuéllar Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Benjamín Aravena (2005) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Bruno Vides (ARG) Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Patricio Muñoz Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Andrés Yllana (ARG) Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Mauro Peralta Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Germán Corengia (ARG) Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Erwin Durán Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Héctor Roco Lucero Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Tomás Arrotea (ARG) Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Jorge Acuña Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Víctor Rivero Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Jonathan Orellana Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Nicolás Suárez Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Germán Cavalieri (ARG) Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Miguel Sánchez Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Juan Manuel López (ARG) Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Leslie González Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Christian Lovrincevich (ARG) Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Ricardo González Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Pablo Álvarez (ARG) Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Damián Muñoz Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Ítalo Pinochet Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Francisco Palladino (URU) Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Luis Landeros Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Vanessa Araya Delantera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Andrés Yllana (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Andrés Fernández",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "9. Ángel Vildozo (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Bairo Riveros",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Benjamín Gazzolo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Bryan Cortés",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "10. Cristián Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "28. David Fernández",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Emmanuel Pio (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Enzo Ormeño",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Francisco Salinas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "21. Franco Caballero (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gonzalo Villegas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ignacio Mesías",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Jesús Pino",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Jimmy Cisterna",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Jonathan Salvador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "26. José Luis Silva",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "4. José Martínez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "3. José Vargas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Lautaro Palacios (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "6. Leandro Fioravantti (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Matías Silva Álamos (2000)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Miguel Ángel Orellana",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Osvaldo Carrasco",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "24. Sergio Catalán",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gonzalo Álvarez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Eduardo Bastita (URU)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martín Ibacache",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Sergio Cordero",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Mauro Peralta",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "27. Bruno Martini",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Germán Corengia (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "7. Jefferson Hoyos (COL)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "27. Joffre Monroy (ECU)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "25. Bastián Cáceres",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "4. Juan Ureta Pizarro (Sub-20)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Cesar González Silva (2002)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "23. José Duarte Fuenzalida",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "9. Juan Puga Marchant (Sub-20)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "12. Tomás Leiva",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Lenes Miranda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "16. Nicolás Astudillo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "5. Diego González Garcés",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Manuel Santander (2004)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Esteban Antilef (2003)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Bastián Roco",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "15. Bruno Nasta (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Luciano Romero (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "8. Tomás Lanzini (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "28. Gabriel Cañete (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "10. Sergio Astudillo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Erwin Durán",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Juan Méndez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "20. Víctor Morales",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "10. Matt Lagos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "27. Nicolás Rodríguez (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Julio Castro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "11. Pablo Vergara",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Fernando Quiroz Baigorria",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "10. Hernán Fredes (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Alejandro Azócar",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Matías Torres Medina (2000)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "30. Lucas Wilchez (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Flavio Rojas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Daniel Opazo (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Nicolás Díaz García",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Héctor Roco Lucero",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Tomás Arrotea (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gonzalo Reyes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "1. Lucas Giovini",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "12. Maximiliano Mori",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Pablo Sanhueza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ricardo Rosales",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "19. Sebastián Romero",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "23. Sebastián Toro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Jorge Acuña",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "David Llanos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ariel Torrijos (Sub 21)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Víctor Rivero",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Yerko González",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "28. Bastián Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Darío Melo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Pablo Heredia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Kevin Egaña",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "25. Kevin Ceceri (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ignacio Meza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ignacio Avilés",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Álvaro Césped",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Sebastián Gallegos (URU)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "17. Gabriel Suárez (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Diego Plaza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "9. Diego Aguirre (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Jean Paul Pineda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Jonathan Orellana",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "22. Patricio Cortés",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Felipe Maureira (2003)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Nicolás Suárez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Camila Godoy",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Karina Morales",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Mario Briceño",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "26. Eloy Roige (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Kiara Tapia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Yaritza Astudillo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Máximo Hernández (Sub 21)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Camilo Saldaña",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "César Valenzuela",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Christian Cepeda (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Germán Cavalieri (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Facundo Gómez (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Franco Sosa (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gabriel Rojas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gerardo Cortés",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gonzalo Espinoza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gonzalo Jara González",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Hugo Herrera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ítalo Müller",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "José Pablo Monreal",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martín Moreno (Sub 21)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Matías Sandoval (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Maximiliano Riveros",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Nahuel Luján (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Nicolás Garrido",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Zederick Vega (2000)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Miguel Sánchez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Juan Manuel López (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Brandon Martínez (2003)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Axel León",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Vanessa Araya",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Luana Peña",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Antonia Calderón",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Nayaret Henríquez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Estefanía Varas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Catalina Molina",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "16. Camila Maldonado",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Brandon Gómez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Camila Morales",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Isidora Vega",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Leslie González",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Paula Díaz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "4. Trinidad Cárdenas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "18. Emilia Aravena",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Francisco Valdés",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martina Carvacho",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Emilia Ponce",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Pía Palma",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Antonella Díaz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Álvaro Salazar",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Reinaldo Ahumada",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Valentín Demateis (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Cristián Dubó",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Axel Herrera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Sebastián Pino",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Andrew Zamorano (URU)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "César Huanca",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "David Salazar",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Vicente Álvarez (2006)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Guillermo Guaiquil",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Iván Vásquez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ángelo Quiñones",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Karen Elgueta",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Christian Lovrincevich (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Amatis Díaz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Valentín Sánchez (2007)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martín Dedes (2005)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Pablo Rodríguez (2006)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Máximo Pantoja (2006)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Richard Palacios (COL)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Ricardo González",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Jordan Mella",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Catalina Báez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Michelle Suárez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Pablo Álvarez (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Paulo Garcés",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Juan Pablo Miño",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Thiare Quiroz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Mayeiza Torrijos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Yair Marín (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Leandro Basan (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Facundo Monteseirín (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Damián Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ignacio Parada",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Bastián Valladares (2003)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Trinidad Caldera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Maite Gaete",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Fernanda Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martin Molina (2004)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Bruno Ponce (2008)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martin Herrera (2004)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Christian Fuentes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Sebastián Contreras",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Iván Zafarana (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Pedro Navarro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Juan Córdova",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Hernán Ulloa",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Gonzalo Baglivo (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Boris Sagredo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Alex Rubén Díaz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Matías Ruiz (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Bryan González",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Sergio Vergara",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Diego González Miranda (URU)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Cristóbal Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martín Cárcamo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Ítalo Pinochet",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Manuel Olea",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Lissette Flores",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Isabella Grinberg",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Valentina León",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Camila Munita",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Valentina Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Muriel Rodríguez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Maite Torres",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Johanna Villagra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Tatiana Zura",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Lesney Padrón",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Francisco Palladino (URU)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Amanda Pinto",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Nayra Gómez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Tonka Romero",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Oscar Henríquez (2007)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Jonathan Ferrari (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Mauro Alfonso (URU)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Mauro Lopes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Diego Cuéllar",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Benjamín Aravena (2005)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Bruno Vides (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Byron Guajardo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Diego Bravo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Diego Pereira Fuentes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Fernando Sanguinetti (2005)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Ignacio Jara",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Kevin Serrano",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Leandro Cañete",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Luis García",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Mariano Galleguillos (2007)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Martín Ramírez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Nicolás Brun (URU)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Norberto Palmieri (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Patricio Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Raimundo Díaz (2006)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "Valentín Perales (ARG)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  },
+  {
+    "name": "DT. Luis Landeros",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/union-san-felipe/?sid=161379"
+  }
+]

@@ -1,0 +1,27 @@
+- Yerko Urra | ARQ (Yerko Urra Goalkeeper) | Edad: 29 | Nº: N/A | Valor: €250k
+- Juan José Garrido | ARQ (Juan José Garrido Goalkeeper) | Edad: 22 | Nº: N/A | Valor: €50k
+- José Tomás Martínez | ARQ (José Tomás Martínez Goalkeeper) | Edad: 23 | Nº: N/A | Valor: -
+- Enzo Lettieri | DEF (Enzo Lettieri Centre-Back) | Edad: 27 | Nº: N/A | Valor: €250k
+- Miguel Sanhueza | DEF (Miguel Sanhueza Centre-Back) | Edad: 34 | Nº: N/A | Valor: €125k
+- Diego Zambrano | DEF (Diego Zambrano Centre-Back) | Edad: 27 | Nº: N/A | Valor: €125k
+- Vicente Lavín | DEF (Vicente Lavín Centre-Back) | Edad: 23 | Nº: N/A | Valor: €75k
+- Frank Valenzuela | DEF (Frank Valenzuela Centre-Back) | Edad: 24 | Nº: N/A | Valor: -
+- Brayan Troncoso | N/A (Brayan Troncoso Left-Back) | Edad: 25 | Nº: N/A | Valor: €200k
+- Franco Ortega | N/A (Franco Ortega Left-Back) | Edad: 29 | Nº: N/A | Valor: €200k
+- Brian Torrealba | DEF (Brian Torrealba Right-Back) | Edad: 28 | Nº: N/A | Valor: €350k
+- Rodrigo González | N/A (Rodrigo González Right-Back) | Edad: 30 | Nº: N/A | Valor: €275k
+- Maximiliano Torrealba | DEF (Maximiliano Torrealba Right-Back) | Edad: 23 | Nº: N/A | Valor: €100k
+- Camilo Núñez | DEF (Camilo Núñez Defensive Midfield) | Edad: 31 | Nº: N/A | Valor: €300k
+- Paulo Contreras | DEF (Paulo Contreras Defensive Midfield) | Edad: 20 | Nº: N/A | Valor: €50k
+- Julio Velásquez | DEF (Julio Velásquez Central Midfield) | Edad: 22 | Nº: N/A | Valor: €150k
+- Nicolás Astete | DEF (Nicolás Astete Central Midfield) | Edad: 32 | Nº: N/A | Valor: €100k
+- Félix Triñanes | MED (Félix Triñanes Attacking Midfield) | Edad: 21 | Nº: N/A | Valor: €200k
+- Diego Buonanotte | MED (Diego Buonanotte Attacking Midfield) | Edad: 37 | Nº: N/A | Valor: €25k
+- Sebastián Molina | DEL (Sebastián Molina Left Winger) | Edad: 24 | Nº: N/A | Valor: €450k
+- Nicolás Rivera | DEL (Nicolás Rivera Left Winger) | Edad: 27 | Nº: N/A | Valor: €250k
+- Brayan Valdivia | DEL (Brayan Valdivia Right Winger) | Edad: 31 | Nº: N/A | Valor: €325k
+- Felipe Reynero | DEL (Felipe Reynero Right Winger) | Edad: 36 | Nº: N/A | Valor: €75k
+- Luis Acevedo | DEL (Luis Acevedo Centre-Forward) | Edad: 29 | Nº: N/A | Valor: €375k
+- Maximiliano Cuadra | DEL (Maximiliano Cuadra Centre-Forward) | Edad: 30 | Nº: N/A | Valor: €200k
+- César Huanca | DEL (César Huanca Centre-Forward) | Edad: 24 | Nº: N/A | Valor: €150k
+- Emilio Moreno | DEL (Emilio Moreno Centre-Forward) | Edad: 22 | Nº: N/A | Valor: -

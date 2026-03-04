@@ -1,0 +1,173 @@
+[
+  {
+    "name": "Cristóbal Lecaros",
+    "position_raw": "Cristóbal Lecaros Goalkeeper",
+    "position": "ARQ",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Felipe Abarca",
+    "position_raw": "Felipe Abarca Goalkeeper",
+    "position": "ARQ",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Gonzalo Medina",
+    "position_raw": "Gonzalo Medina Centre-Back",
+    "position": "DEF",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Vicente Orrego",
+    "position_raw": "Vicente Orrego Centre-Back",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Díaz García",
+    "position_raw": "Nicolás Díaz García Left-Back",
+    "position": "N/A",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Diego Salas",
+    "position_raw": "Diego Salas Left-Back",
+    "position": "N/A",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Lucas Leguizamón",
+    "position_raw": "Lucas Leguizamón Left-Back",
+    "position": "MED",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Ignacio Carvajal",
+    "position_raw": "Ignacio Carvajal Right-Back",
+    "position": "N/A",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Michel Quezada",
+    "position_raw": "Michel Quezada Right-Back",
+    "position": "N/A",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Juan Pablo Carrasco",
+    "position_raw": "Juan Pablo Carrasco Defensive Midfield",
+    "position": "DEF",
+    "age": "37",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Ignacio Cataldo",
+    "position_raw": "Ignacio Cataldo Defensive Midfield",
+    "position": "DEF",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Ángel Orellana",
+    "position_raw": "Ángel Orellana Central Midfield",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Benjamín Pinto",
+    "position_raw": "Benjamín Pinto Central Midfield",
+    "position": "DEF",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Patricio Troncoso",
+    "position_raw": "Patricio Troncoso Attacking Midfield",
+    "position": "MED",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Hamlet Castillo",
+    "position_raw": "Hamlet Castillo Attacking Midfield",
+    "position": "MED",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Junio Lopes",
+    "position_raw": "Junio Lopes Left Winger",
+    "position": "DEL",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Jaime Droguett",
+    "position_raw": "Jaime Droguett Right Winger",
+    "position": "DEL",
+    "age": "37",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Benjamín Campos",
+    "position_raw": "Benjamín Campos Centre-Forward",
+    "position": "MED",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  },
+  {
+    "name": "Mateo González Peña",
+    "position_raw": "Mateo González Peña Centre-Forward",
+    "position": "DEL",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+  }
+]

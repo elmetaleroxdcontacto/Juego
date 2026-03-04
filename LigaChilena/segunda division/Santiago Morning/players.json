@@ -1,0 +1,173 @@
+[
+  {
+    "name": "Alejandro Arana",
+    "position_raw": "Alejandro Arana Goalkeeper",
+    "position": "ARQ",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Lautaro Rigazzi",
+    "position_raw": "Lautaro Rigazzi Centre-Back",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Gonzalo Santelices",
+    "position_raw": "Gonzalo Santelices Centre-Back",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Max Gatica",
+    "position_raw": "Max Gatica Centre-Back",
+    "position": "DEF",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Martín Delgado",
+    "position_raw": "Martín Delgado Centre-Back",
+    "position": "DEF",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Douglas Estay",
+    "position_raw": "Douglas Estay Left-Back",
+    "position": "DEL",
+    "age": "33",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Edgardo Carreño",
+    "position_raw": "Edgardo Carreño Left-Back",
+    "position": "N/A",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Diego Álvarez",
+    "position_raw": "Diego Álvarez Right-Back",
+    "position": "N/A",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Joaquín Monje",
+    "position_raw": "Joaquín Monje Central Midfield",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Diego Faúndez",
+    "position_raw": "Diego Faúndez Central Midfield",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Fernando Manríquez",
+    "position_raw": "Fernando Manríquez Central Midfield",
+    "position": "DEF",
+    "age": "42",
+    "number": "N/A",
+    "market_value": "€10k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Salazar",
+    "position_raw": "Sebastián Salazar Attacking Midfield",
+    "position": "MED",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Paulo Violante",
+    "position_raw": "Paulo Violante Attacking Midfield",
+    "position": "MED",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Matías Coronado",
+    "position_raw": "Matías Coronado Left Winger",
+    "position": "DEL",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Gustavo Escobar",
+    "position_raw": "Gustavo Escobar Left Winger",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Martín Arancibia",
+    "position_raw": "Martín Arancibia Right Winger",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Forttes",
+    "position_raw": "Nicolás Forttes Right Winger",
+    "position": "DEL",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€25k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Joaquín Barrientos",
+    "position_raw": "Joaquín Barrientos Centre-Forward",
+    "position": "DEL",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€150k",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  },
+  {
+    "name": "Carlos Muñoz",
+    "position_raw": "Carlos Muñoz Centre-Forward",
+    "position": "DEL",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-santiago-morning/kader/verein/13337/saison_id/2025"
+  }
+]

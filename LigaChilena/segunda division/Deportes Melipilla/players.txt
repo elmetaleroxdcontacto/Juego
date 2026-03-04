@@ -1,0 +1,18 @@
+- Luis Santelices | ARQ (Luis Santelices Goalkeeper) | Edad: 40 | N??: N/A | Valor: -
+- Tomás Chacón | ARQ (Tomás Chacón Goalkeeper) | Edad: 23 | N??: N/A | Valor: -
+- Sebastián Tapia | ARQ (Sebastián Tapia Goalkeeper) | Edad: 21 | N??: N/A | Valor: -
+- Carlos Gutiérrez | DEF (Carlos Gutiérrez Centre-Back) | Edad: 28 | N??: N/A | Valor: -
+- Miguel Escalona | DEF (Miguel Escalona Centre-Back) | Edad: 35 | N??: N/A | Valor: -
+- Cristian Magaña | DEF (Cristian Magaña Centre-Back) | Edad: 34 | N??: N/A | Valor: -
+- Lucas Martínez Á. | DEF (Lucas Martínez Á. Centre-Back) | Edad: 19 | N??: N/A | Valor: -
+- Brandon Cáceres | N/A (Brandon Cáceres Left-Back) | Edad: 23 | N??: N/A | Valor: -
+- Maximiliano Valencia | N/A (Maximiliano Valencia Right-Back) | Edad: 23 | N??: N/A | Valor: -
+- Benjamín Fuentes | MED (Benjamín Fuentes Right-Back) | Edad: 23 | N??: N/A | Valor: -
+- Nicolás Basaure | DEF (Nicolás Basaure Central Midfield) | Edad: 22 | N??: N/A | Valor: -
+- Benjamín Jaque | DEF (Benjamín Jaque Central Midfield) | Edad: 22 | N??: N/A | Valor: -
+- Jarol Pizarro | DEL (Jarol Pizarro Left Winger) | Edad: 20 | N??: N/A | Valor: -
+- Nicolás Maturana | DEL (Nicolás Maturana Right Winger) | Edad: 32 | N??: N/A | Valor: -
+- Vicente Becerra | DEL (Vicente Becerra Right Winger) | Edad: 22 | N??: N/A | Valor: -
+- Luis Vargas | DEL (Luis Vargas Centre-Forward) | Edad: 25 | N??: N/A | Valor: -
+- Gustavo Luarte | DEL (Gustavo Luarte Centre-Forward) | Edad: 19 | N??: N/A | Valor: -
+- Canterano Deportes Melipilla 01 | MED (MED) | Edad: 18 | N??: N/A | Valor: ?50k

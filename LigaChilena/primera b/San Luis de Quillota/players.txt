@@ -1,0 +1,30 @@
+- Nicolás Peranic | ARQ (Nicolás Peranic Goalkeeper) | Edad: 40 | Nº: N/A | Valor: €10k
+- Fernando Abarzúa | ARQ (Fernando Abarzúa Goalkeeper) | Edad: 23 | Nº: N/A | Valor: -
+- Tomás Charpentier | ARQ (Tomás Charpentier Goalkeeper) | Edad: 19 | Nº: N/A | Valor: -
+- Ignacio Meza | DEF (Ignacio Meza Centre-Back) | Edad: 30 | Nº: N/A | Valor: €275k
+- Luis Muñoz | DEF (Luis Muñoz Centre-Back) | Edad: 22 | Nº: N/A | Valor: €75k
+- Cristian González | DEF (Cristian González Centre-Back) | Edad: 36 | Nº: N/A | Valor: €50k
+- Mateo Guerra | DEF (Mateo Guerra Centre-Back) | Edad: 21 | Nº: N/A | Valor: €25k
+- Lucciano Moreno | DEF (Lucciano Moreno Centre-Back) | Edad: 22 | Nº: N/A | Valor: -
+- Alonso Villegas | DEF (Alonso Villegas Centre-Back) | Edad: 19 | Nº: N/A | Valor: -
+- Vicente Durán | N/A (Vicente Durán Left-Back) | Edad: 26 | Nº: N/A | Valor: €250k
+- Diego Zamorano | MED (Diego Zamorano Left-Back) | Edad: 20 | Nº: N/A | Valor: -
+- Nicolás Muñoz Alister | DEL (Nicolás Muñoz Alister Right-Back) | Edad: 27 | Nº: N/A | Valor: €150k
+- Guillermo Avello | MED (Guillermo Avello Right-Back) | Edad: 29 | Nº: N/A | Valor: €150k
+- Gonzalo Bustos | DEF (Gonzalo Bustos Defensive Midfield) | Edad: 25 | Nº: N/A | Valor: €225k
+- Pablo Millán | DEF (Pablo Millán Defensive Midfield) | Edad: - | Nº: N/A | Valor: -
+- Franco Cortés | DEF (Franco Cortés Central Midfield) | Edad: 25 | Nº: N/A | Valor: €250k
+- Daniel Monardes | DEF (Daniel Monardes Central Midfield) | Edad: 25 | Nº: N/A | Valor: -
+- Carlos Hormazábal | DEF (Carlos Hormazábal Central Midfield) | Edad: 24 | Nº: N/A | Valor: -
+- Joel Torres | DEF (Joel Torres Central Midfield) | Edad: 26 | Nº: N/A | Valor: -
+- Fabián Pastenes | MED (Fabián Pastenes Attacking Midfield) | Edad: 20 | Nº: N/A | Valor: -
+- Gamal Plaza | MED (Gamal Plaza Attacking Midfield) | Edad: 18 | Nº: N/A | Valor: -
+- Fabián González | MED (Fabián González Attacking Midfield) | Edad: 23 | Nº: N/A | Valor: -
+- Gael Acosta | DEL (Gael Acosta Left Winger) | Edad: 33 | Nº: N/A | Valor: €175k
+- Yerald Pinilla | DEL (Yerald Pinilla Left Winger) | Edad: 21 | Nº: N/A | Valor: €100k
+- Martín Carreño | DEL (Martín Carreño Right Winger) | Edad: 21 | Nº: N/A | Valor: €300k
+- Sergio Vergara | DEL (Sergio Vergara Right Winger) | Edad: 31 | Nº: N/A | Valor: €150k
+- Sebastián Parada | DEL (Sebastián Parada Centre-Forward) | Edad: 25 | Nº: N/A | Valor: €450k
+- Diego González | DEL (Diego González Centre-Forward) | Edad: 29 | Nº: N/A | Valor: €275k
+- Luis Guillermo Madrigal | MED (Luis Guillermo Madrigal Centre-Forward) | Edad: 33 | Nº: N/A | Valor: €125k
+- Felipe Flores | DEL (Felipe Flores Centre-Forward) | Edad: 39 | Nº: N/A | Valor: €25k

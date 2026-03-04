@@ -1,0 +1,21 @@
+- Leandro Cañete | ARQ (Leandro Cañete Goalkeeper) | Edad: 30 | Nº: N/A | Valor: €150k
+- Andrés Fernández | ARQ (Andrés Fernández Goalkeeper) | Edad: 27 | Nº: N/A | Valor: -
+- Valentín Perales | DEF (Valentín Perales Centre-Back) | Edad: 30 | Nº: N/A | Valor: €125k
+- Byron Guajardo | DEF (Byron Guajardo Centre-Back) | Edad: 33 | Nº: N/A | Valor: €100k
+- Kevin Serrano | DEF (Kevin Serrano Centre-Back) | Edad: 27 | Nº: N/A | Valor: -
+- Diego Bravo | N/A (Diego Bravo Left-Back) | Edad: 29 | Nº: N/A | Valor: €250k
+- Diego Pereira | N/A (Diego Pereira Left-Back) | Edad: 27 | Nº: N/A | Valor: -
+- Martín Ramirez | MED (Martín Ramirez Right-Back) | Edad: 22 | Nº: N/A | Valor: €100k
+- Valentín Sánchez | N/A (Valentín Sánchez Right-Back) | Edad: 18 | Nº: N/A | Valor: -
+- Luis García | DEF (Luis García Defensive Midfield) | Edad: 30 | Nº: N/A | Valor: €250k
+- Axel León | DEF (Axel León Defensive Midfield) | Edad: 22 | Nº: N/A | Valor: €250k
+- Norberto Palmieri | DEF (Norberto Palmieri Defensive Midfield) | Edad: 29 | Nº: N/A | Valor: €50k
+- Fernando Sanguinetti | DEF (Fernando Sanguinetti Defensive Midfield) | Edad: 20 | Nº: N/A | Valor: -
+- Nicolás Brun | MED (Nicolás Brun Left Midfield) | Edad: 26 | Nº: N/A | Valor: €350k
+- Ignacio Jara | MED (Ignacio Jara Attacking Midfield) | Edad: 29 | Nº: N/A | Valor: €175k
+- Bairo Riveros | DEL (Bairo Riveros Left Winger) | Edad: 27 | Nº: N/A | Valor: €100k
+- Gonzalo Jara | DEL (Gonzalo Jara Right Winger) | Edad: 27 | Nº: N/A | Valor: €500k
+- Jordan Mella | DEL (Jordan Mella Right Winger) | Edad: 22 | Nº: N/A | Valor: €50k
+- Benjamín Aravena | MED (Benjamín Aravena Right Winger) | Edad: 21 | Nº: N/A | Valor: -
+- Bruno Vides | DEL (Bruno Vides Centre-Forward) | Edad: 33 | Nº: N/A | Valor: €100k
+- Patricio Muñoz | DEL (Patricio Muñoz Centre-Forward) | Edad: 24 | Nº: N/A | Valor: -

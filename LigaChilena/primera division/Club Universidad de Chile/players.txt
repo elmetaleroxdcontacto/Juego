@@ -1,0 +1,25 @@
+- Gabriel Castellón | ARQ (Gabriel Castellón Goalkeeper) | Edad: 32 | Nº: N/A | Valor: €600k
+- Ignacio Sáez | ARQ (Ignacio Sáez Goalkeeper) | Edad: 20 | Nº: N/A | Valor: €300k
+- Cristopher Toselli | ARQ (Cristopher Toselli Goalkeeper) | Edad: 37 | Nº: N/A | Valor: €50k
+- Franco Calderón | DEF (Franco Calderón Centre-Back) | Edad: 27 | Nº: N/A | Valor: €1.80m
+- Nicolás Ramírez | DEF (Nicolás Ramírez Centre-Back) | Edad: 28 | Nº: N/A | Valor: €800k
+- Bianneider Tamayo | DEF (Bianneider Tamayo Centre-Back) | Edad: 21 | Nº: N/A | Valor: €500k
+- Matías Zaldivia | DEF (Matías Zaldivia Centre-Back) | Edad: 35 | Nº: N/A | Valor: €400k
+- Marcelo Morales | N/A (Marcelo Morales Left-Back) | Edad: 22 | Nº: N/A | Valor: €1.80m
+- Felipe Salomoni | N/A (Felipe Salomoni Left-Back) | Edad: 22 | Nº: N/A | Valor: €700k
+- Diego Vargas | N/A (Diego Vargas Left-Back) | Edad: 19 | Nº: N/A | Valor: -
+- Fabián Hormazábal | MED (Fabián Hormazábal Right-Back) | Edad: 29 | Nº: N/A | Valor: €2.50m
+- Nicolás Fernández | N/A (Nicolás Fernández Right-Back) | Edad: 26 | Nº: N/A | Valor: €600k
+- Lucas Romero | DEF (Lucas Romero Defensive Midfield) | Edad: 23 | Nº: N/A | Valor: €350k
+- Renato Cordero | DEF (Renato Cordero Defensive Midfield) | Edad: 22 | Nº: N/A | Valor: €325k
+- Marcelo Díaz | DEF (Marcelo Díaz Defensive Midfield) | Edad: 39 | Nº: N/A | Valor: €25k
+- Israel Poblete | DEF (Israel Poblete Central Midfield) | Edad: 30 | Nº: N/A | Valor: €900k
+- Charles Aránguiz | DEF (Charles Aránguiz Central Midfield) | Edad: 36 | Nº: N/A | Valor: €600k
+- Lucas Assadi | MED (Lucas Assadi Attacking Midfield) | Edad: 22 | Nº: N/A | Valor: €3.00m
+- Javier Altamirano | MED (Javier Altamirano Attacking Midfield) | Edad: 26 | Nº: N/A | Valor: €2.30m
+- Agustín Arce | MED (Agustín Arce Attacking Midfield) | Edad: 21 | Nº: N/A | Valor: €400k
+- Ignacio Vásquez | DEL (Ignacio Vásquez Left Winger) | Edad: 19 | Nº: N/A | Valor: €350k
+- Maximiliano Guerrero | DEL (Maximiliano Guerrero Right Winger) | Edad: 26 | Nº: N/A | Valor: €1.00m
+- Juan Martín Lucero | DEL (Juan Martín Lucero Centre-Forward) | Edad: 34 | Nº: N/A | Valor: €900k
+- Octavio Rivero | DEL (Octavio Rivero Centre-Forward) | Edad: 34 | Nº: N/A | Valor: €700k
+- Eduardo Vargas | DEL (Eduardo Vargas Centre-Forward) | Edad: 36 | Nº: N/A | Valor: €200k

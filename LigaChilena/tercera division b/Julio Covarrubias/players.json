@@ -1,0 +1,758 @@
+[
+  {
+    "name": "Jonathan Gallardo Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Pablo Sepúlveda Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Diego Peña Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Diego Aránguiz Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Carlos Agüero Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Benjamín Bustos Castro Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Máximo Ahumada Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Tomás Alarcón Cáceres Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "David Rojas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Joaquín Lara Gamboa Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Bruno Cruz Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Sebastián Balladares Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Oliver Vera Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Leandro Poblete Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Óscar Muñoz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Sebastián González Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Sebastián Lisboa Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Pablo Gutiérrez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Diego Vargas Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Kevin Aravena Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Benjamín Araos Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Jean Franco Sepúlveda Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Juan Díaz García Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Benjamín Vidal Henríquez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Matías Sánchez Carrasco Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Oscar Véliz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Leonel Gutiérrez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Tobías Córdoba Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Nicolás Solís Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Miguel Ángel Retamal Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Hugo Arias Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Pedro Vergara Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Ángel Fernández Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Yimmy Colihuinca Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Bastián Nova Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Martín Villalobos Maldonado Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Dylan Berríos Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Benjamín Díaz Pailamilla Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Felipe Aguayo Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Matías Astorga Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Matías Berríos Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "DT. Marcelo Miranda Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Diego Aránguiz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Leandro Poblete",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Óscar Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Yimmy Colihuinca",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Carlos Agüero",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Sebastián González",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Sebastián Lisboa",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Benjamín Bustos Castro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Bastián Nova",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Pablo Gutiérrez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Máximo Ahumada",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Diego Vargas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Tomás Alarcón Cáceres",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Kevin Aravena",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Benjamín Araos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Jonathan Gallardo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Pablo Sepúlveda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "David Rojas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Jean Franco Sepúlveda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Juan Díaz García",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Benjamín Vidal Henríquez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Matías Sánchez Carrasco",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Oscar Véliz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Martín Villalobos Maldonado",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Dylan Berríos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Benjamín Díaz Pailamilla",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Leonel Gutiérrez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Tobías Córdoba",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Felipe Aguayo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Matías Astorga",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "DT. Marcelo Miranda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Diego Peña",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Joaquín Lara Gamboa",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Bruno Cruz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Nicolás Solís",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Matías Berríos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Miguel Ángel Retamal",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Sebastián Balladares",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Oliver Vera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Hugo Arias",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Pedro Vergara",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  },
+  {
+    "name": "Ángel Fernández",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/julio-covarrubias/?sid=166009"
+  }
+]

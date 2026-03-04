@@ -1,0 +1,227 @@
+[
+  {
+    "name": "Tomás Ahumada",
+    "position_raw": "Tomás Ahumada Goalkeeper",
+    "position": "ARQ",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€1.20m",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Martín Ballesteros",
+    "position_raw": "Martín Ballesteros Goalkeeper",
+    "position": "ARQ",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Pedro Garrido",
+    "position_raw": "Pedro Garrido Goalkeeper",
+    "position": "ARQ",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€50k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Enzo Ferrario",
+    "position_raw": "Enzo Ferrario Centre-Back",
+    "position": "DEF",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€800k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Cristóbal Muñoz",
+    "position_raw": "Cristóbal Muñoz Centre-Back",
+    "position": "DEF",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Daniel Piña",
+    "position_raw": "Daniel Piña Centre-Back",
+    "position": "DEF",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Marcelo Ortiz",
+    "position_raw": "Marcelo Ortiz Centre-Back",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Diego Monreal",
+    "position_raw": "Diego Monreal Centre-Back",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Esteban Matus",
+    "position_raw": "Esteban Matus Left-Back",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€900k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Oliver Rojas",
+    "position_raw": "Oliver Rojas Right-Back",
+    "position": "N/A",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€600k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Raimundo Rebolledo",
+    "position_raw": "Raimundo Rebolledo Right-Back",
+    "position": "N/A",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€175k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Martín Jiménez",
+    "position_raw": "Martín Jiménez Right-Back",
+    "position": "N/A",
+    "age": "18",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Bryan Soto",
+    "position_raw": "Bryan Soto Defensive Midfield",
+    "position": "DEF",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Mario Sandoval",
+    "position_raw": "Mario Sandoval Defensive Midfield",
+    "position": "DEF",
+    "age": "18",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Marco Collao",
+    "position_raw": "Marco Collao Central Midfield",
+    "position": "DEF",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€800k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Orellana",
+    "position_raw": "Nicolás Orellana Central Midfield",
+    "position": "DEF",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Federico Mateos",
+    "position_raw": "Federico Mateos Central Midfield",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Favian Loyola",
+    "position_raw": "Favian Loyola Attacking Midfield",
+    "position": "MED",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Aedo",
+    "position_raw": "Nicolás Aedo Attacking Midfield",
+    "position": "MED",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€100k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Michael Vadulli",
+    "position_raw": "Michael Vadulli Left Winger",
+    "position": "DEL",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€750k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Rodrigo Cabral",
+    "position_raw": "Rodrigo Cabral Left Winger",
+    "position": "DEL",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€550k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Paolo Guajardo",
+    "position_raw": "Paolo Guajardo Right Winger",
+    "position": "DEL",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Giovani Chiaverano",
+    "position_raw": "Giovani Chiaverano Right Winger",
+    "position": "DEL",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Diego Coelho",
+    "position_raw": "Diego Coelho Centre-Forward",
+    "position": "DEL",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€700k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  },
+  {
+    "name": "Franco Troyansky",
+    "position_raw": "Franco Troyansky Centre-Forward",
+    "position": "DEL",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€225k",
+    "source": "https://www.transfermarkt.com/audax-italiano/kader/verein/6363/saison_id/2025"
+  }
+]

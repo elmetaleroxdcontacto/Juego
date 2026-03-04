@@ -1,0 +1,18 @@
+- Mauricio Maslovski | ARQ (Mauricio Maslovski Goalkeeper) | Edad: 25 | N??: N/A | Valor: -
+- Alonso Montecinos | ARQ (Alonso Montecinos Goalkeeper) | Edad: 26 | N??: N/A | Valor: -
+- Diego González Torres | DEF (Diego González Torres Centre-Back) | Edad: 27 | N??: N/A | Valor: -
+- Ítalo Müller | DEF (Ítalo Müller Centre-Back) | Edad: 26 | N??: N/A | Valor: -
+- Diego Muñoz H. | DEF (Diego Muñoz H. Centre-Back) | Edad: 27 | N??: N/A | Valor: -
+- Víctor González Chang | DEF (Víctor González Chang Centre-Back) | Edad: 31 | N??: N/A | Valor: -
+- David Montoya | DEF (David Montoya Centre-Back) | Edad: 30 | N??: N/A | Valor: -
+- Miguel Arias | N/A (Miguel Arias Left-Back) | Edad: 23 | N??: N/A | Valor: -
+- Eugenio Orellana | N/A (Eugenio Orellana Left-Back) | Edad: 21 | N??: N/A | Valor: -
+- Pablo Cárdenas | N/A (Pablo Cárdenas Right-Back) | Edad: 26 | N??: N/A | Valor: -
+- Andrés Díaz | DEF (Andrés Díaz Defensive Midfield) | Edad: 31 | N??: N/A | Valor: -
+- Nicolás Clavería | DEF (Nicolás Clavería Defensive Midfield) | Edad: 25 | N??: N/A | Valor: -
+- Marco Medel | DEF (Marco Medel Central Midfield) | Edad: 36 | N??: N/A | Valor: -
+- Fabián Núñez | DEL (Fabián Núñez Left Winger) | Edad: 33 | N??: N/A | Valor: -
+- Matías Sáez | DEL (Matías Sáez Left Winger) | Edad: 24 | N??: N/A | Valor: -
+- Bryan Taiva | DEL (Bryan Taiva Centre-Forward) | Edad: 30 | N??: N/A | Valor: -
+- Jayden Vasquez | DEL (Jayden Vasquez Centre-Forward) | Edad: 18 | N??: N/A | Valor: -
+- Canterano Santiago City 01 | MED (MED) | Edad: 18 | N??: N/A | Valor: ?50k

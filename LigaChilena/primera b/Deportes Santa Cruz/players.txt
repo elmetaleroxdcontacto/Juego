@@ -1,0 +1,25 @@
+- Juan Dobboletta | ARQ (Juan Dobboletta Goalkeeper) | Edad: 33 | Nº: N/A | Valor: €75k
+- Maximiliano Henríquez | ARQ (Maximiliano Henríquez Goalkeeper) | Edad: 20 | Nº: N/A | Valor: -
+- Hardy Cavero | DEF (Hardy Cavero Centre-Back) | Edad: 29 | Nº: N/A | Valor: €150k
+- Esteban Flores | DEF (Esteban Flores Centre-Back) | Edad: 33 | Nº: N/A | Valor: -
+- Braian Camisassa | DEF (Braian Camisassa Centre-Back) | Edad: 28 | Nº: N/A | Valor: -
+- Nicolás Guerrero | DEF (Nicolás Guerrero Centre-Back) | Edad: 20 | Nº: N/A | Valor: -
+- Felipe Alvarado | N/A (Felipe Alvarado Left-Back) | Edad: 27 | Nº: N/A | Valor: €125k
+- Icker Quiroz | N/A (Icker Quiroz Right-Back) | Edad: 19 | Nº: N/A | Valor: €25k
+- David Tati | N/A (David Tati Right-Back) | Edad: 23 | Nº: N/A | Valor: -
+- Gino Alucema | DEF (Gino Alucema Defensive Midfield) | Edad: 33 | Nº: N/A | Valor: €200k
+- Diego Acevedo | DEF (Diego Acevedo Central Midfield) | Edad: 25 | Nº: N/A | Valor: €200k
+- Hugo Herrera | DEF (Hugo Herrera Central Midfield) | Edad: 28 | Nº: N/A | Valor: €200k
+- Diego Plaza Ramos | DEF (Diego Plaza Ramos Central Midfield) | Edad: 23 | Nº: N/A | Valor: €50k
+- Felipe Orellana | DEF (Felipe Orellana Central Midfield) | Edad: 25 | Nº: N/A | Valor: -
+- Dilan Guzmán | MED (Dilan Guzmán Attacking Midfield) | Edad: 20 | Nº: N/A | Valor: €100k
+- Santiago Mederos | MED (Santiago Mederos Attacking Midfield) | Edad: 28 | Nº: N/A | Valor: -
+- Nicolás Barrios | DEL (Nicolás Barrios Left Winger) | Edad: 22 | Nº: N/A | Valor: €150k
+- Cristóbal Moreno | DEL (Cristóbal Moreno Left Winger) | Edad: 19 | Nº: N/A | Valor: €50k
+- Benjamín Miranda | MED (Benjamín Miranda Left Winger) | Edad: 21 | Nº: N/A | Valor: €50k
+- Joaquín González O. | DEL (Joaquín González O. Left Winger) | Edad: 20 | Nº: N/A | Valor: -
+- Mathías Pinto | DEL (Mathías Pinto Right Winger) | Edad: 27 | Nº: N/A | Valor: €250k
+- Cristián Pardo | DEL (Cristián Pardo Right Winger) | Edad: 23 | Nº: N/A | Valor: €175k
+- Juan Delgado | DEL (Juan Delgado Right Winger) | Edad: 32 | Nº: N/A | Valor: €125k
+- Diego Arias | DEL (Diego Arias Centre-Forward) | Edad: 26 | Nº: N/A | Valor: €125k
+- Nadir Zeineddin | DEL (Nadir Zeineddin Centre-Forward) | Edad: 25 | Nº: N/A | Valor: -

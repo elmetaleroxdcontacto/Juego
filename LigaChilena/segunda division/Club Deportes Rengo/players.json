@@ -1,0 +1,209 @@
+[
+  {
+    "name": "Federico Molina",
+    "position_raw": "Federico Molina Goalkeeper",
+    "position": "ARQ",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Bryan Escobar",
+    "position_raw": "Bryan Escobar Goalkeeper",
+    "position": "ARQ",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Paulo Magalhães",
+    "position_raw": "Paulo Magalhães Centre-Back",
+    "position": "DEF",
+    "age": "36",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Francisco Sepúlveda",
+    "position_raw": "Francisco Sepúlveda Centre-Back",
+    "position": "DEF",
+    "age": "34",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Javier Herrera",
+    "position_raw": "Javier Herrera Centre-Back",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Ignacio Carrasco",
+    "position_raw": "Ignacio Carrasco Left-Back",
+    "position": "N/A",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Kurt Zimmermann",
+    "position_raw": "Kurt Zimmermann Left-Back",
+    "position": "MED",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Damián Aldana",
+    "position_raw": "Damián Aldana Right-Back",
+    "position": "MED",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Efraín Navarrete",
+    "position_raw": "Efraín Navarrete Right-Back",
+    "position": "N/A",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Rubén Cepeda",
+    "position_raw": "Rubén Cepeda Defensive Midfield",
+    "position": "DEF",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Bernardo Mendoza",
+    "position_raw": "Bernardo Mendoza Central Midfield",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Ian Núñez",
+    "position_raw": "Ian Núñez Central Midfield",
+    "position": "DEF",
+    "age": "18",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Luis Valenzuela",
+    "position_raw": "Luis Valenzuela Attacking Midfield",
+    "position": "MED",
+    "age": "38",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Yoel Guirrimán",
+    "position_raw": "Yoel Guirrimán Attacking Midfield",
+    "position": "MED",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Jeckar Amaya",
+    "position_raw": "Jeckar Amaya Attacking Midfield",
+    "position": "MED",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Martín Alfaro",
+    "position_raw": "Martín Alfaro Left Winger",
+    "position": "DEL",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Massami Gutiérrez",
+    "position_raw": "Massami Gutiérrez Right Winger",
+    "position": "MED",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Renato Araya",
+    "position_raw": "Renato Araya Right Winger",
+    "position": "DEL",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Sebastián Núñez",
+    "position_raw": "Sebastián Núñez Right Winger",
+    "position": "DEL",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Juan Pablo Lorca",
+    "position_raw": "Juan Pablo Lorca Right Winger",
+    "position": "DEL",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Camilo Ponce",
+    "position_raw": "Camilo Ponce Centre-Forward",
+    "position": "MED",
+    "age": "35",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Hernán Ramírez",
+    "position_raw": "Hernán Ramírez Centre-Forward",
+    "position": "MED",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Ibarra",
+    "position_raw": "Nicolás Ibarra Centre-Forward",
+    "position": "DEL",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/club-deportes-rengo/kader/verein/31295/saison_id/2025"
+  }
+]

@@ -1,0 +1,541 @@
+- Jorge Deschamps Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- André Jerez Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- 13. Nelson Rebolledo Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- 30. Luis Santelices Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Tapia Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- 13. Jorge Deschamps Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Luis Santelices Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Thomas Vergara Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Paulo Garcés Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Fabián Cerda Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Gonzalo Mall Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- 1. Pablo Martín Perafán (ARG) Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Juan Ruz (2004) Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- 30. Juan Ruz (Sub 21) Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Paula Sierra Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Daniela Gómez Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Sofía Pavez Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Isidora Barriga Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Durby Durán Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Hernán Muñoz Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Paola Hinojosa Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Damián Tello (ARG) Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- 2. Diego Díaz Ahumada Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 3. Yerson Opazo Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Eric Godoy Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Daniel Franco Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Christopher Díaz Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Alexander Pastene Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- João Ortiz Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 21. Kennet Lara Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Daniel Franco (ARG) Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Díaz Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Saavedra Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Franco Bechtholdt Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Jens Buss Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Jorge Catejo Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Kennet Lara Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 25. Mario Parra Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Ormazábal Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 19. Byron Hernández Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego García Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 29. Héctor Urrego Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 13. José Rojas Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Álex Ibacache Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Leonel Galeano Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 4. Jordan Barriolhet Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Ronald De la Fuente Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 19. Alexander del Río Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 17. Juan Carlos Espinoza Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Pablo Cabrera Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Muñoz Quezada Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Claudia Manqueo Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Paula Mira Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Anahí Ramírez Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 4. Carla Rojas Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 12. Francisca Zenteno Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Romina Moraga Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Sofía Torres Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Cahais (ARG) Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Juan Pablo Gómez Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Omar Merlo Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Augusto Barrios Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Cabrera Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Christopher Barrera Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Jorge Alarcón (Sub 21) Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Estephanía Fuentealba Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Natalia Lizana Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Francisca Pérez Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 4. Paulina Soto Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 4. Colomba Vergara Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Darko Fiamengo (2003) Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- John Salas Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Claudio Meneses Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Pérez (2005) Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Williams Sáez Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Marcela Rivera Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- José Mejías (2004) Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Henry Sanhueza Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Lionel Hidalgo (2007) Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Francisco Oliver (ARG) Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Daiana Masselli (ARG) Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Valentina Bruna Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Clara Elgueta Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- María Navarrete Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Esthefanía Espinoza Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Pía Jofré Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Guzmán Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Cristopher Medina Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Gabriel Sarria Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Jorge Caroca Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Leonel Barrera Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Rodrigo Colombo (ARG) Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Ronald Guzmán Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- 5. Francisco Rolando Silva Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 8. Carlos Matías Pavez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Zúñiga Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 8. Diego Pezoa Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 11. Ricardo Blanco (ARG) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 11. Nicolás Gauna Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 14. Carlos Espinosa Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 16. Franco Bechtholdt Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 17. Martín Cortés Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Ormazábal Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 26. Carlos Cisternas Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Carlos Espinosa Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 17. Carlos Suárez (VEN) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Urzúa Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 14. Heber García (VEN) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Luis Gonzalo Bustamante (ARG) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Martín Cortés Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Yerson Opazo Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Carlos Herrera Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 27. Kevin Martínez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 22. Nicolás Núñez Gutiérrez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Pablo Corral Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Fernando Godoy (ARG) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 31. Fernando Lazcano Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Pablo Parra Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Ortíz Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 16. Adrián Sánchez (ARG) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Barrientos Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Villagrán Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 35. Leonardo Angulo (COL) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- José Luis Gutiérrez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Yerko Leiva Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Fritz Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Agustín Nadruz (URU) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Catalina Rodríguez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 8. Natalia Rodríguez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Belén Gutiérrez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Constanza Alvarado Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Scarlet Castro Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 14. Verónica Herrera Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Camila Cabrera Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 16. Isidora Vásquez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Josefina Silva Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Antonia Opazo Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Krishna Espina Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Bárbara Pavez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Denisse Gómez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 13. Sofía Cáceres Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 13. Estefanía Sandoval Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Camila Vergara Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Mario Sandoval Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Alejandra Orellana Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 18. Tiare Morán Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Janitza Contreras Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Constanza Diaz Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Jason Flores Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Iván Garrido (2003) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Daniela Cofré Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 10. Nayely Orellana Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Katalina Alarcón Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 6. Martina Rivas Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Valentina Pizarro Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Aracelis Araya Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Ayline Sepúlveda Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Jorge Henríquez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Florencia Rojas Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 8. Jhosefa González Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Maira Pereyra Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Ballini (ARG) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Juan Méndez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Rojas Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Mathías Vidangossy Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Sigridt Muñoz Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- María Escobar Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Bastián Bustos (2005) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Pía Viera Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Monserrath Figueroa Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Thiare Reyes Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Francisco Valdés Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Hans Ibarra (2005) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Braulio Guisolfo (URU) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Carla Pizarro Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Carla Márquez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Sofía Valderas Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Alonso López (2005) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Maira Pereira Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Johan Fuentes Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Joaquín Alfaro (2005) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Lía Cofré Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Juliana Muñoz Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Antonio Ramírez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Enzo Ormeño Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Javier Retamales Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Joaquín Romo Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Lian Vergara Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Lucas López Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Martin Gómez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Cofre (2007) Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- 9. Mauro Quiroga Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Reynero Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Yashir Islame Pinto​ Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- 23. Gabriel Vargas Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- 24. Matías Cavalleri Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- 31. Felipe Ferreyra Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Neri Bandiera Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Francisco Rivera (Sub-20) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Vallejos Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Gabriel Harding (2000) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Gabriel Vargas Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Cavalleri Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- 23. Sebastián Jaime Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Mauro Quiroga (ARG) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Vera (URU) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Federico Castro (ARG) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Bayron Oyarzo Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Ortiz Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Rony Albornoz Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Leandro Benegas Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Joaquín González Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Cristián Bustamante Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- 46. Fabio Cabral (ARG) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Fernando Coniglio (ARG) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Jean Paul Pineda Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Ian Aliaga Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Vanessa Riquelme Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Danae Baeza Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Elizabeth Gallardo Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Antonia Escalona Leyton Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Coelho (URU) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Rodrigo Holgado (ARG) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Nicolás Barrios Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Tobías Figueroa (ARG) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Sergio Vergara Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Cristián Zavala Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Isidora Iglesias Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Millaray Moya Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Noelia Valdés Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Fernanda Letelier Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Dilan Acevedo Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- David Escalante (ARG) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Parada Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Kevin Harbottle Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Nildo Viera (PAR) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Retamal (2006) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Vicente Saldivia (2006) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Javiera Mandujano Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Anaís Figueroa Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Maximiliano Quinteros Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Francis Pérez Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Nicolás Fernández (ARG) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Avendaño (2009) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Eugenio Isnaldo (ARG) Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Inostroza Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Mauro Lopes Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Roberto Riveros Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Jaime Vera Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Dalcio Giovagnoli Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Hugo Vilches Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Nicolás Larcamón (ARG) Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Nicolás Larcamon (ARG) Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Javier Bergés (ARG) Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Damián Muñoz Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Martín Palermo (ARG) Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Patricio Silva Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Juan José Ribera Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Fernando Solis Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Miguel Riffo Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Francisco Bozán Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Héctor Almandoz (ARG) Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Miguel Ormazábal Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Mauricio Benavente Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Emiliano Astorga Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 1. Ivana González Portera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 29. Francisca Abarca Portera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 7. Antonia Maldonado Delantera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Javiera Fuentes Delantera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Tania Saavedra Delantera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Yanitza Contreras Delantera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jorge Deschamps | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 2. Diego Díaz Ahumada | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 3. Yerson Opazo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Eric Godoy | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 5. Francisco Rolando Silva | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 8. Carlos Matías Pavez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Zúñiga | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 8. Diego Pezoa | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 9. Mauro Quiroga | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 11. Ricardo Blanco (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 11. Nicolás Gauna | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- André Jerez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 13. Nelson Rebolledo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 14. Carlos Espinosa | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Daniel Franco | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 16. Franco Bechtholdt | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 17. Martín Cortés | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Ormazábal | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Reynero | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Yashir Islame Pinto​ | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Christopher Díaz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 23. Gabriel Vargas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 24. Matías Cavalleri | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Alexander Pastene | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 26. Carlos Cisternas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- João Ortiz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 21. Kennet Lara | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 30. Luis Santelices | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 31. Felipe Ferreyra | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Neri Bandiera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Jaime Vera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Francisco Rivera (Sub-20) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Carlos Espinosa | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 17. Carlos Suárez (VEN) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Daniel Franco (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Díaz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Tapia | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Urzúa | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Vallejos | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Saavedra | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Franco Bechtholdt | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Gabriel Harding (2000) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Gabriel Vargas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 14. Heber García (VEN) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jens Buss | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jorge Catejo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 13. Jorge Deschamps | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Kennet Lara | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Luis Gonzalo Bustamante (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Luis Santelices | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 25. Mario Parra | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Martín Cortés | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Cavalleri | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 23. Sebastián Jaime | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Mauro Quiroga (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Thomas Vergara | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Yerson Opazo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Dalcio Giovagnoli | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 19. Byron Hernández | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Carlos Herrera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 27. Kevin Martínez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Vera (URU) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 22. Nicolás Núñez Gutiérrez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Hugo Vilches | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Nicolás Larcamón (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Pablo Corral | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Federico Castro (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Bayron Oyarzo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego García | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Paulo Garcés | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Fernando Godoy (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Fabián Cerda | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 29. Héctor Urrego | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Gonzalo Mall | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 31. Fernando Lazcano | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Ortiz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Nicolás Larcamon (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 13. José Rojas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Pablo Parra | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Álex Ibacache | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Ortíz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Javier Bergés (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Damián Muñoz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Martín Palermo (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Leonel Galeano | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Rony Albornoz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 16. Adrián Sánchez (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Barrientos | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Villagrán | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 4. Jordan Barriolhet | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Leandro Benegas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 1. Pablo Martín Perafán (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Ronald De la Fuente | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Juan Ruz (2004) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 19. Alexander del Río | DEL (del) | Edad: N/A | N??: N/A | Valor: N/A
+- 35. Leonardo Angulo (COL) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- José Luis Gutiérrez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Joaquín González | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Yerko Leiva | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 17. Juan Carlos Espinoza | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Cristián Bustamante | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 46. Fabio Cabral (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Fernando Coniglio (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Pablo Cabrera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Fritz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 30. Juan Ruz (Sub 21) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Agustín Nadruz (URU) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jean Paul Pineda | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Ian Aliaga | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Muñoz Quezada | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Catalina Rodríguez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 1. Ivana González | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Claudia Manqueo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Paula Mira | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Anahí Ramírez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 4. Carla Rojas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 8. Natalia Rodríguez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Belén Gutiérrez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 7. Antonia Maldonado | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Constanza Alvarado | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Vanessa Riquelme | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 12. Francisca Zenteno | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Scarlet Castro | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 14. Verónica Herrera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Camila Cabrera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 16. Isidora Vásquez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Danae Baeza | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 29. Francisca Abarca | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Patricio Silva | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Josefina Silva | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Romina Moraga | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sofía Torres | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Antonia Opazo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Krishna Espina | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Bárbara Pavez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Denisse Gómez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Elizabeth Gallardo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Javiera Fuentes | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Tania Saavedra | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 13. Sofía Cáceres | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 13. Estefanía Sandoval | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Camila Vergara | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Antonia Escalona Leyton | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Cahais (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Juan Pablo Gómez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Mario Sandoval | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Coelho (URU) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Rodrigo Holgado (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Nicolás Barrios | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Alejandra Orellana | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 18. Tiare Morán | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Janitza Contreras | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Constanza Diaz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Omar Merlo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Augusto Barrios | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Cabrera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Christopher Barrera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Tobías Figueroa (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jason Flores | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sergio Vergara | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Cristián Zavala | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jorge Alarcón (Sub 21) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Iván Garrido (2003) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Juan José Ribera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Paula Sierra | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Estephanía Fuentealba | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Natalia Lizana | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Francisca Pérez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Daniela Cofré | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 10. Nayely Orellana | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Katalina Alarcón | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Daniela Gómez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 4. Paulina Soto | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 6. Martina Rivas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Valentina Pizarro | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Isidora Iglesias | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Aracelis Araya | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Millaray Moya | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Ayline Sepúlveda | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sofía Pavez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Noelia Valdés | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 4. Colomba Vergara | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Yanitza Contreras | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Darko Fiamengo (2003) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jorge Henríquez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Isidora Barriga | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Florencia Rojas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 8. Jhosefa González | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- 15. Maira Pereyra | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Fernanda Letelier | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Fernando Solis | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Miguel Riffo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Dilan Acevedo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- John Salas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Ballini (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- David Escalante (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Juan Méndez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Claudio Meneses | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Parada | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Rojas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Mathías Vidangossy | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Kevin Harbottle | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Francisco Bozán | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Pérez (2005) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Nildo Viera (PAR) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Retamal (2006) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sigridt Muñoz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Vicente Saldivia (2006) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Héctor Almandoz (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Williams Sáez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- María Escobar | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Bastián Bustos (2005) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Durby Durán | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Pía Viera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Monserrath Figueroa | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Marcela Rivera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Javiera Mandujano | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Anaís Figueroa | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Thiare Reyes | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- José Mejías (2004) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Hernán Muñoz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Henry Sanhueza | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Lionel Hidalgo (2007) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Francisco Oliver (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Francisco Valdés | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Hans Ibarra (2005) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Braulio Guisolfo (URU) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Maximiliano Quinteros | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Francis Pérez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Nicolás Fernández (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Paola Hinojosa | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Daiana Masselli (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Carla Pizarro | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Valentina Bruna | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Clara Elgueta | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- María Navarrete | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Carla Márquez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sofía Valderas | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Esthefanía Espinoza | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Miguel Ormazábal | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Alonso López (2005) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Maira Pereira | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Johan Fuentes | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Mauricio Benavente | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Pía Jofré | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Emiliano Astorga | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Diego Avendaño (2009) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Joaquín Alfaro (2005) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Lía Cofré | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Juliana Muñoz | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Eugenio Isnaldo (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Antonio Ramírez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Guzmán | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Benjamín Inostroza | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Cristopher Medina | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Damián Tello (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Enzo Ormeño | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Gabriel Sarria | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Javier Retamales | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Joaquín Romo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jorge Caroca | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Leonel Barrera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Lian Vergara | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Lucas López | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Martin Gómez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Mauro Lopes | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Roberto Riveros | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Rodrigo Colombo (ARG) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Ronald Guzmán | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Cofre (2007) | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A

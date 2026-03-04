@@ -1,0 +1,254 @@
+[
+  {
+    "name": "Jorge Peña",
+    "position_raw": "Jorge Peña Goalkeeper",
+    "position": "ARQ",
+    "age": "25",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Omar Carabalí",
+    "position_raw": "Omar Carabalí Goalkeeper",
+    "position": "ARQ",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Diego Carreño",
+    "position_raw": "Diego Carreño Goalkeeper",
+    "position": "ARQ",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€75k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Miguel Brizuela",
+    "position_raw": "Miguel Brizuela Centre-Back",
+    "position": "DEF",
+    "age": "29",
+    "number": "N/A",
+    "market_value": "€600k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Alan Robledo",
+    "position_raw": "Alan Robledo Centre-Back",
+    "position": "DEF",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Nicolás Garrido",
+    "position_raw": "Nicolás Garrido Centre-Back",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "José Tomás Movillo",
+    "position_raw": "José Tomás Movillo Centre-Back",
+    "position": "DEF",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "-",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Leandro Díaz",
+    "position_raw": "Leandro Díaz Left-Back",
+    "position": "N/A",
+    "age": "26",
+    "number": "N/A",
+    "market_value": "€450k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Luis Pavez Muñoz",
+    "position_raw": "Luis Pavez Muñoz Left-Back",
+    "position": "N/A",
+    "age": "30",
+    "number": "N/A",
+    "market_value": "€400k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Felipe Faúndez",
+    "position_raw": "Felipe Faúndez Right-Back",
+    "position": "N/A",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "€550k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Benjamín Rojas",
+    "position_raw": "Benjamín Rojas Right-Back",
+    "position": "MED",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Cristián Morales",
+    "position_raw": "Cristián Morales Right-Back",
+    "position": "DEL",
+    "age": "19",
+    "number": "N/A",
+    "market_value": "€125k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Benjamín Schamine",
+    "position_raw": "Benjamín Schamine Defensive Midfield",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€275k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Gabriel Pinto",
+    "position_raw": "Gabriel Pinto Defensive Midfield",
+    "position": "DEF",
+    "age": "21",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Cristóbal Castillo",
+    "position_raw": "Cristóbal Castillo Defensive Midfield",
+    "position": "DEF",
+    "age": "23",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Juan Leiva",
+    "position_raw": "Juan Leiva Central Midfield",
+    "position": "DEF",
+    "age": "32",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Felipe Ogaz",
+    "position_raw": "Felipe Ogaz Central Midfield",
+    "position": "DEF",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€200k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Bryan Rabello",
+    "position_raw": "Bryan Rabello Attacking Midfield",
+    "position": "MED",
+    "age": "31",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Martín Maturana",
+    "position_raw": "Martín Maturana Attacking Midfield",
+    "position": "MED",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Martín Sarrafiore",
+    "position_raw": "Martín Sarrafiore Left Winger",
+    "position": "DEL",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€800k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Rodrigo Godoy",
+    "position_raw": "Rodrigo Godoy Left Winger",
+    "position": "DEL",
+    "age": "20",
+    "number": "N/A",
+    "market_value": "€550k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Bastián Yáñez",
+    "position_raw": "Bastián Yáñez Left Winger",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€350k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Francisco González",
+    "position_raw": "Francisco González Right Winger",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€1.70m",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Joaquín Tapia",
+    "position_raw": "Joaquín Tapia Right Winger",
+    "position": "DEL",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Esteban Calderón",
+    "position_raw": "Esteban Calderón Centre-Forward",
+    "position": "DEL",
+    "age": "22",
+    "number": "N/A",
+    "market_value": "€700k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Thiago Vecino",
+    "position_raw": "Thiago Vecino Centre-Forward",
+    "position": "DEL",
+    "age": "27",
+    "number": "N/A",
+    "market_value": "€500k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Esteban Moreira",
+    "position_raw": "Esteban Moreira Centre-Forward",
+    "position": "DEL",
+    "age": "24",
+    "number": "N/A",
+    "market_value": "€300k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  },
+  {
+    "name": "Arnaldo Castillo",
+    "position_raw": "Arnaldo Castillo Centre-Forward",
+    "position": "DEL",
+    "age": "28",
+    "number": "N/A",
+    "market_value": "€250k",
+    "source": "https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+  }
+]

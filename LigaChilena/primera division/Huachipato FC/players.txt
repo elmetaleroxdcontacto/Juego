@@ -1,0 +1,27 @@
+- Sebastián Mella | ARQ (Sebastián Mella Goalkeeper) | Edad: 20 | Nº: N/A | Valor: €150k
+- Rodrigo Odriozola | ARQ (Rodrigo Odriozola Goalkeeper) | Edad: 37 | Nº: N/A | Valor: €50k
+- Christian Bravo | ARQ (Christian Bravo Goalkeeper) | Edad: 19 | Nº: N/A | Valor: -
+- Renzo Malanca | DEF (Renzo Malanca Centre-Back) | Edad: 22 | Nº: N/A | Valor: €750k
+- Cristián Toro | DEF (Cristián Toro Centre-Back) | Edad: 25 | Nº: N/A | Valor: €350k
+- Nicolás Vargas | DEF (Nicolás Vargas Centre-Back) | Edad: 32 | Nº: N/A | Valor: €200k
+- Rafael Caroca | DEF (Rafael Caroca Centre-Back) | Edad: 36 | Nº: N/A | Valor: €100k
+- Benjamín Mellado | DEF (Benjamín Mellado Centre-Back) | Edad: 22 | Nº: N/A | Valor: €50k
+- Lucas Velásquez | N/A (Lucas Velásquez Left-Back) | Edad: 20 | Nº: N/A | Valor: €300k
+- José Ignacio Castro | DEL (José Ignacio Castro Left-Back) | Edad: 24 | Nº: N/A | Valor: €250k
+- Maicol León | N/A (Maicol León Right-Back) | Edad: 22 | Nº: N/A | Valor: €225k
+- Guillermo Guaiquil | MED (Guillermo Guaiquil Right-Back) | Edad: 23 | Nº: N/A | Valor: €75k
+- Santiago Silva | DEF (Santiago Silva Defensive Midfield) | Edad: 21 | Nº: N/A | Valor: €650k
+- Carlos Herrera | DEF (Carlos Herrera Defensive Midfield) | Edad: 25 | Nº: N/A | Valor: €300k
+- Claudio Sepúlveda | DEF (Claudio Sepúlveda Defensive Midfield) | Edad: 33 | Nº: N/A | Valor: €200k
+- Ezequiel Cañete | DEF (Ezequiel Cañete Central Midfield) | Edad: 26 | Nº: N/A | Valor: €150k
+- Javier Cárcamo | DEF (Javier Cárcamo Central Midfield) | Edad: 21 | Nº: N/A | Valor: €150k
+- Benjamín Ampuero | DEF (Benjamín Ampuero Central Midfield) | Edad: 19 | Nº: N/A | Valor: €25k
+- Kevin Altez | MED (Kevin Altez Attacking Midfield) | Edad: 21 | Nº: N/A | Valor: €250k
+- Mario Briceño | DEL (Mario Briceño Left Winger) | Edad: 29 | Nº: N/A | Valor: €600k
+- Cris Martínez | DEL (Cris Martínez Left Winger) | Edad: 32 | Nº: N/A | Valor: €450k
+- Harold Antiñirre | DEL (Harold Antiñirre Left Winger) | Edad: 23 | Nº: N/A | Valor: -
+- Juan Ignacio Figueroa | DEL (Juan Ignacio Figueroa Right Winger) | Edad: 22 | Nº: N/A | Valor: €400k
+- Claudio Torres | DEL (Claudio Torres Right Winger) | Edad: 22 | Nº: N/A | Valor: €350k
+- Lionel Altamirano | MED (Lionel Altamirano Centre-Forward) | Edad: 33 | Nº: N/A | Valor: €500k
+- Maximiliano Rodríguez | DEL (Maximiliano Rodríguez Centre-Forward) | Edad: 25 | Nº: N/A | Valor: €400k
+- Luciano Arriagada | DEL (Luciano Arriagada Centre-Forward) | Edad: 23 | Nº: N/A | Valor: €300k

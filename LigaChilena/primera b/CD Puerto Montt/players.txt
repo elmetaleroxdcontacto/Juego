@@ -1,0 +1,27 @@
+- Gonzalo Collao | ARQ (Gonzalo Collao Goalkeeper) | Edad: 28 | Nº: N/A | Valor: €75k
+- Luis Ureta | ARQ (Luis Ureta Goalkeeper) | Edad: 26 | Nº: N/A | Valor: -
+- Vicente Castillo | ARQ (Vicente Castillo Goalkeeper) | Edad: 20 | Nº: N/A | Valor: -
+- Jesús Pino | DEF (Jesús Pino Centre-Back) | Edad: 34 | Nº: N/A | Valor: €125k
+- Ariel Morales | DEF (Ariel Morales Centre-Back) | Edad: 29 | Nº: N/A | Valor: -
+- Maximiliano Riveros | DEF (Maximiliano Riveros Centre-Back) | Edad: 27 | Nº: N/A | Valor: -
+- Francisco Calisto | DEF (Francisco Calisto Centre-Back) | Edad: 21 | Nº: N/A | Valor: -
+- Kevin Egaña | N/A (Kevin Egaña Left-Back) | Edad: 29 | Nº: N/A | Valor: €200k
+- Daniel Bahamonde | MED (Daniel Bahamonde Left-Back) | Edad: 24 | Nº: N/A | Valor: -
+- Vicente Yáñez | N/A (Vicente Yáñez Left-Back) | Edad: 21 | Nº: N/A | Valor: -
+- Byron Nieto | N/A (Byron Nieto Right-Back) | Edad: 28 | Nº: N/A | Valor: €325k
+- Juan Jaime | DEF (Juan Jaime Defensive Midfield) | Edad: 33 | Nº: N/A | Valor: €300k
+- José Cárdenas | DEF (José Cárdenas Defensive Midfield) | Edad: 22 | Nº: N/A | Valor: -
+- Danilo Díaz | DEF (Danilo Díaz Central Midfield) | Edad: 23 | Nº: N/A | Valor: -
+- Gabriel Castillo | DEF (Gabriel Castillo Central Midfield) | Edad: 28 | Nº: N/A | Valor: -
+- Alexis Sabella | MED (Alexis Sabella Attacking Midfield) | Edad: 24 | Nº: N/A | Valor: €200k
+- Cristóbal Vargas | MED (Cristóbal Vargas Attacking Midfield) | Edad: 25 | Nº: N/A | Valor: -
+- Jason Flores | DEL (Jason Flores Left Winger) | Edad: 28 | Nº: N/A | Valor: €200k
+- Reiner Castro | DEL (Reiner Castro Left Winger) | Edad: 32 | Nº: N/A | Valor: -
+- Sebastián Pérez | DEL (Sebastián Pérez Left Winger) | Edad: 26 | Nº: N/A | Valor: -
+- Juan Alberto González | DEF (Juan Alberto González Left Winger) | Edad: 21 | Nº: N/A | Valor: -
+- Salvador Negrete | DEL (Salvador Negrete Left Winger) | Edad: 19 | Nº: N/A | Valor: -
+- Juan Arias | DEL (Juan Arias Right Winger) | Edad: 23 | Nº: N/A | Valor: -
+- Manley Clerveaux | DEL (Manley Clerveaux Right Winger) | Edad: 19 | Nº: N/A | Valor: -
+- Richard Paredes | DEL (Richard Paredes Centre-Forward) | Edad: 28 | Nº: N/A | Valor: €300k
+- Luciano Vásquez | DEL (Luciano Vásquez Centre-Forward) | Edad: 40 | Nº: N/A | Valor: -
+- Lucas Mansilla | DEL (Lucas Mansilla Centre-Forward) | Edad: 21 | Nº: N/A | Valor: -

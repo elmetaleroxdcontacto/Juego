@@ -1,0 +1,19 @@
+﻿# teams.txt - one team folder name per line
+# optional format: Display Name|Folder Name
+
+Audax Italiano
+CD Cobresal
+CD Everton
+CD Ñublense
+CD O'Higgins
+CD Palestino
+CD Universidad Católica
+Club Universidad de Chile
+Coquimbo Unido
+CSD Colo-Colo
+Deportes Concepción
+Deportes La Serena
+Deportes Limache
+Huachipato FC
+Unión La Calera
+Universidad de Concepción

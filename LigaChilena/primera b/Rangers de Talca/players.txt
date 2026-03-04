@@ -1,0 +1,23 @@
+- José Luis Gamonal | ARQ (José Luis Gamonal Goalkeeper) | Edad: 36 | Nº: N/A | Valor: €50k
+- Cristian Campestrini | ARQ (Cristian Campestrini Goalkeeper) | Edad: 45 | Nº: N/A | Valor: €10k
+- Martín Torres | ARQ (Martín Torres Goalkeeper) | Edad: 21 | Nº: N/A | Valor: -
+- Sebastián Acuña | DEF (Sebastián Acuña Centre-Back) | Edad: 22 | Nº: N/A | Valor: €250k
+- Carlos Labrín | DEF (Carlos Labrín Centre-Back) | Edad: 35 | Nº: N/A | Valor: €175k
+- Matías Cortés | N/A (Matías Cortés Left-Back) | Edad: 22 | Nº: N/A | Valor: €75k
+- Agustín Mora | DEL (Agustín Mora Left-Back) | Edad: 22 | Nº: N/A | Valor: €75k
+- José Navarrete | N/A (José Navarrete Right-Back) | Edad: 28 | Nº: N/A | Valor: €325k
+- Claudio Servetti | N/A (Claudio Servetti Right-Back) | Edad: 31 | Nº: N/A | Valor: €250k
+- Kevin Vásquez | N/A (Kevin Vásquez Right-Back) | Edad: 28 | Nº: N/A | Valor: €200k
+- Alonso Rodríguez | DEF (Alonso Rodríguez Defensive Midfield) | Edad: 27 | Nº: N/A | Valor: €250k
+- Juan Méndez | DEF (Juan Méndez Central Midfield) | Edad: 29 | Nº: N/A | Valor: €450k
+- Gary Moya | DEF (Gary Moya Central Midfield) | Edad: 24 | Nº: N/A | Valor: €350k
+- Diego Plaza | DEF (Diego Plaza Central Midfield) | Edad: 25 | Nº: N/A | Valor: €250k
+- Alejandro Márquez | DEF (Alejandro Márquez Central Midfield) | Edad: 34 | Nº: N/A | Valor: €100k
+- Mauro González | MED (Mauro González Attacking Midfield) | Edad: 29 | Nº: N/A | Valor: €200k
+- Manuel Vicuña | DEL (Manuel Vicuña Left Winger) | Edad: 26 | Nº: N/A | Valor: €325k
+- Damián González | MED (Damián González Left Winger) | Edad: 33 | Nº: N/A | Valor: €250k
+- Javier Araya | DEL (Javier Araya Left Winger) | Edad: 20 | Nº: N/A | Valor: €200k
+- Ignacio Ibáñez | DEL (Ignacio Ibáñez Right Winger) | Edad: 29 | Nº: N/A | Valor: €350k
+- Cristóbal Muñoz | DEL (Cristóbal Muñoz Centre-Forward) | Edad: 24 | Nº: N/A | Valor: €175k
+- Sebastián Ribas | DEL (Sebastián Ribas Centre-Forward) | Edad: 37 | Nº: N/A | Valor: €10k
+- José Tomás Herrera | DEL (José Tomás Herrera Centre-Forward) | Edad: 23 | Nº: N/A | Valor: -

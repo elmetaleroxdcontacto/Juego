@@ -1,0 +1,28 @@
+- Jorge Peña | ARQ (Jorge Peña Goalkeeper) | Edad: 25 | Nº: N/A | Valor: €500k
+- Omar Carabalí | ARQ (Omar Carabalí Goalkeeper) | Edad: 28 | Nº: N/A | Valor: €500k
+- Diego Carreño | ARQ (Diego Carreño Goalkeeper) | Edad: 23 | Nº: N/A | Valor: €75k
+- Miguel Brizuela | DEF (Miguel Brizuela Centre-Back) | Edad: 29 | Nº: N/A | Valor: €600k
+- Alan Robledo | DEF (Alan Robledo Centre-Back) | Edad: 28 | Nº: N/A | Valor: €500k
+- Nicolás Garrido | DEF (Nicolás Garrido Centre-Back) | Edad: 23 | Nº: N/A | Valor: €350k
+- José Tomás Movillo | DEF (José Tomás Movillo Centre-Back) | Edad: 19 | Nº: N/A | Valor: -
+- Leandro Díaz | N/A (Leandro Díaz Left-Back) | Edad: 26 | Nº: N/A | Valor: €450k
+- Luis Pavez Muñoz | N/A (Luis Pavez Muñoz Left-Back) | Edad: 30 | Nº: N/A | Valor: €400k
+- Felipe Faúndez | N/A (Felipe Faúndez Right-Back) | Edad: 19 | Nº: N/A | Valor: €550k
+- Benjamín Rojas | MED (Benjamín Rojas Right-Back) | Edad: 24 | Nº: N/A | Valor: €300k
+- Cristián Morales | DEL (Cristián Morales Right-Back) | Edad: 19 | Nº: N/A | Valor: €125k
+- Benjamín Schamine | DEF (Benjamín Schamine Defensive Midfield) | Edad: 22 | Nº: N/A | Valor: €275k
+- Gabriel Pinto | DEF (Gabriel Pinto Defensive Midfield) | Edad: 21 | Nº: N/A | Valor: €200k
+- Cristóbal Castillo | DEF (Cristóbal Castillo Defensive Midfield) | Edad: 23 | Nº: N/A | Valor: €200k
+- Juan Leiva | DEF (Juan Leiva Central Midfield) | Edad: 32 | Nº: N/A | Valor: €500k
+- Felipe Ogaz | DEF (Felipe Ogaz Central Midfield) | Edad: 22 | Nº: N/A | Valor: €200k
+- Bryan Rabello | MED (Bryan Rabello Attacking Midfield) | Edad: 31 | Nº: N/A | Valor: €500k
+- Martín Maturana | MED (Martín Maturana Attacking Midfield) | Edad: 22 | Nº: N/A | Valor: €350k
+- Martín Sarrafiore | DEL (Martín Sarrafiore Left Winger) | Edad: 28 | Nº: N/A | Valor: €800k
+- Rodrigo Godoy | DEL (Rodrigo Godoy Left Winger) | Edad: 20 | Nº: N/A | Valor: €550k
+- Bastián Yáñez | DEL (Bastián Yáñez Left Winger) | Edad: 24 | Nº: N/A | Valor: €350k
+- Francisco González | DEL (Francisco González Right Winger) | Edad: 24 | Nº: N/A | Valor: €1.70m
+- Joaquín Tapia | DEL (Joaquín Tapia Right Winger) | Edad: 22 | Nº: N/A | Valor: €250k
+- Esteban Calderón | DEL (Esteban Calderón Centre-Forward) | Edad: 22 | Nº: N/A | Valor: €700k
+- Thiago Vecino | DEL (Thiago Vecino Centre-Forward) | Edad: 27 | Nº: N/A | Valor: €500k
+- Esteban Moreira | DEL (Esteban Moreira Centre-Forward) | Edad: 24 | Nº: N/A | Valor: €300k
+- Arnaldo Castillo | DEL (Arnaldo Castillo Centre-Forward) | Edad: 28 | Nº: N/A | Valor: €250k

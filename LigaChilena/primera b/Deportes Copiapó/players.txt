@@ -1,0 +1,23 @@
+- Nicolás Temperini | ARQ (Nicolás Temperini Goalkeeper) | Edad: 31 | Nº: N/A | Valor: €300k
+- Richard Leyton | ARQ (Richard Leyton Goalkeeper) | Edad: 39 | Nº: N/A | Valor: €25k
+- Nicolás Suárez | DEF (Nicolás Suárez Centre-Back) | Edad: 20 | Nº: N/A | Valor: €150k
+- Diego Opazo | DEF (Diego Opazo Centre-Back) | Edad: 35 | Nº: N/A | Valor: €100k
+- Nozomi Kimura | DEF (Nozomi Kimura Centre-Back) | Edad: 29 | Nº: N/A | Valor: €75k
+- Fabián Torres | DEF (Fabián Torres Centre-Back) | Edad: 36 | Nº: N/A | Valor: €50k
+- John Santander | N/A (John Santander Left-Back) | Edad: 31 | Nº: N/A | Valor: €300k
+- Agustín Ortiz | DEL (Agustín Ortiz Right-Back) | Edad: 27 | Nº: N/A | Valor: €300k
+- Marcelo Filla | N/A (Marcelo Filla Right-Back) | Edad: 28 | Nº: N/A | Valor: €250k
+- Axl Ríos | DEF (Axl Ríos Defensive Midfield) | Edad: 26 | Nº: N/A | Valor: €350k
+- Gastón Pérez | DEF (Gastón Pérez Defensive Midfield) | Edad: 26 | Nº: N/A | Valor: €300k
+- Claudio Zamorano | DEF (Claudio Zamorano Defensive Midfield) | Edad: 27 | Nº: N/A | Valor: €200k
+- Iván Ledezma | DEF (Iván Ledezma Central Midfield) | Edad: 30 | Nº: N/A | Valor: €325k
+- Enzo Fernández | DEF (Enzo Fernández Central Midfield) | Edad: 23 | Nº: N/A | Valor: €250k
+- Jorge Ortiz | MED (Jorge Ortiz Attacking Midfield) | Edad: 22 | Nº: N/A | Valor: €200k
+- John Valladares Moya | DEL (John Valladares Moya Left Winger) | Edad: 22 | Nº: N/A | Valor: €350k
+- Sebastián Espinoza | DEL (Sebastián Espinoza Left Winger) | Edad: 21 | Nº: N/A | Valor: €150k
+- Carlos Soza | DEL (Carlos Soza Left Winger) | Edad: 36 | Nº: N/A | Valor: €50k
+- Carlos Ross | DEL (Carlos Ross Right Winger) | Edad: 35 | Nº: N/A | Valor: €150k
+- Damián Sáez | MED (Damián Sáez Right Winger) | Edad: 24 | Nº: N/A | Valor: -
+- Lautaro Palacios | DEL (Lautaro Palacios Centre-Forward) | Edad: 30 | Nº: N/A | Valor: €300k
+- Manuel López | DEL (Manuel López Centre-Forward) | Edad: 30 | Nº: N/A | Valor: €150k
+- Rodrigo Orellana | DEL (Rodrigo Orellana Centre-Forward) | Edad: 21 | Nº: N/A | Valor: €75k

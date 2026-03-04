@@ -1,0 +1,25 @@
+- Tomás Ahumada | ARQ (Tomás Ahumada Goalkeeper) | Edad: 24 | Nº: N/A | Valor: €1.20m
+- Martín Ballesteros | ARQ (Martín Ballesteros Goalkeeper) | Edad: 23 | Nº: N/A | Valor: €100k
+- Pedro Garrido | ARQ (Pedro Garrido Goalkeeper) | Edad: 22 | Nº: N/A | Valor: €50k
+- Enzo Ferrario | DEF (Enzo Ferrario Centre-Back) | Edad: 25 | Nº: N/A | Valor: €800k
+- Cristóbal Muñoz | DEF (Cristóbal Muñoz Centre-Back) | Edad: 26 | Nº: N/A | Valor: €350k
+- Daniel Piña | DEF (Daniel Piña Centre-Back) | Edad: 24 | Nº: N/A | Valor: €250k
+- Marcelo Ortiz | DEF (Marcelo Ortiz Centre-Back) | Edad: 32 | Nº: N/A | Valor: €250k
+- Diego Monreal | DEF (Diego Monreal Centre-Back) | Edad: 23 | Nº: N/A | Valor: €75k
+- Esteban Matus | DEL (Esteban Matus Left-Back) | Edad: 24 | Nº: N/A | Valor: €900k
+- Oliver Rojas | N/A (Oliver Rojas Right-Back) | Edad: 25 | Nº: N/A | Valor: €600k
+- Raimundo Rebolledo | N/A (Raimundo Rebolledo Right-Back) | Edad: 28 | Nº: N/A | Valor: €175k
+- Martín Jiménez | N/A (Martín Jiménez Right-Back) | Edad: 18 | Nº: N/A | Valor: €100k
+- Bryan Soto | DEF (Bryan Soto Defensive Midfield) | Edad: 24 | Nº: N/A | Valor: €300k
+- Mario Sandoval | DEF (Mario Sandoval Defensive Midfield) | Edad: 18 | Nº: N/A | Valor: €200k
+- Marco Collao | DEF (Marco Collao Central Midfield) | Edad: 27 | Nº: N/A | Valor: €800k
+- Nicolás Orellana | DEF (Nicolás Orellana Central Midfield) | Edad: 30 | Nº: N/A | Valor: €450k
+- Federico Mateos | DEF (Federico Mateos Central Midfield) | Edad: 32 | Nº: N/A | Valor: €350k
+- Favian Loyola | MED (Favian Loyola Attacking Midfield) | Edad: 20 | Nº: N/A | Valor: €100k
+- Nicolás Aedo | MED (Nicolás Aedo Attacking Midfield) | Edad: 24 | Nº: N/A | Valor: €100k
+- Michael Vadulli | DEL (Michael Vadulli Left Winger) | Edad: 27 | Nº: N/A | Valor: €750k
+- Rodrigo Cabral | DEL (Rodrigo Cabral Left Winger) | Edad: 25 | Nº: N/A | Valor: €550k
+- Paolo Guajardo | DEL (Paolo Guajardo Right Winger) | Edad: 22 | Nº: N/A | Valor: €500k
+- Giovani Chiaverano | DEL (Giovani Chiaverano Right Winger) | Edad: 20 | Nº: N/A | Valor: €200k
+- Diego Coelho | DEL (Diego Coelho Centre-Forward) | Edad: 31 | Nº: N/A | Valor: €700k
+- Franco Troyansky | DEL (Franco Troyansky Centre-Forward) | Edad: 28 | Nº: N/A | Valor: €225k

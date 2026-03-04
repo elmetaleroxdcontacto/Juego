@@ -1,6 +1,0 @@
-Team: Deportivo Tercera A1
-Players:
-- Name: Juan Perez, Position: FW, Attack: 75, Defense: 40, Stamina: 70, Skill: 65, Age: 24, Value: 300000
-- Name: Carlos Soto, Position: MF, Attack: 65, Defense: 55, Stamina: 75, Skill: 60, Age: 26, Value: 280000
-- Name: Luis Ramirez, Position: DF, Attack: 50, Defense: 70, Stamina: 65, Skill: 55, Age: 28, Value: 250000
-- Name: Pedro Gonzalez, Position: GK, Attack: 40, Defense: 80, Stamina: 60, Skill: 50, Age: 30, Value: 200000

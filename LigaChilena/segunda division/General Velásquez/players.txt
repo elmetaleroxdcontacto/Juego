@@ -1,0 +1,19 @@
+- Cristóbal Lecaros | ARQ (Cristóbal Lecaros Goalkeeper) | Edad: 26 | Nº: N/A | Valor: -
+- Felipe Abarca | ARQ (Felipe Abarca Goalkeeper) | Edad: 32 | Nº: N/A | Valor: -
+- Gonzalo Medina | DEF (Gonzalo Medina Centre-Back) | Edad: 28 | Nº: N/A | Valor: -
+- Vicente Orrego | DEF (Vicente Orrego Centre-Back) | Edad: 21 | Nº: N/A | Valor: -
+- Nicolás Díaz García | N/A (Nicolás Díaz García Left-Back) | Edad: 26 | Nº: N/A | Valor: -
+- Diego Salas | N/A (Diego Salas Left-Back) | Edad: 28 | Nº: N/A | Valor: -
+- Lucas Leguizamón | MED (Lucas Leguizamón Left-Back) | Edad: 24 | Nº: N/A | Valor: -
+- Ignacio Carvajal | N/A (Ignacio Carvajal Right-Back) | Edad: 28 | Nº: N/A | Valor: -
+- Michel Quezada | N/A (Michel Quezada Right-Back) | Edad: 27 | Nº: N/A | Valor: -
+- Juan Pablo Carrasco | DEF (Juan Pablo Carrasco Defensive Midfield) | Edad: 37 | Nº: N/A | Valor: -
+- Ignacio Cataldo | DEF (Ignacio Cataldo Defensive Midfield) | Edad: 26 | Nº: N/A | Valor: -
+- Ángel Orellana | DEF (Ángel Orellana Central Midfield) | Edad: 23 | Nº: N/A | Valor: -
+- Benjamín Pinto | DEF (Benjamín Pinto Central Midfield) | Edad: 26 | Nº: N/A | Valor: -
+- Patricio Troncoso | MED (Patricio Troncoso Attacking Midfield) | Edad: 33 | Nº: N/A | Valor: -
+- Hamlet Castillo | MED (Hamlet Castillo Attacking Midfield) | Edad: 25 | Nº: N/A | Valor: -
+- Junio Lopes | DEL (Junio Lopes Left Winger) | Edad: 26 | Nº: N/A | Valor: -
+- Jaime Droguett | DEL (Jaime Droguett Right Winger) | Edad: 37 | Nº: N/A | Valor: -
+- Benjamín Campos | MED (Benjamín Campos Centre-Forward) | Edad: 25 | Nº: N/A | Valor: -
+- Mateo González Peña | DEL (Mateo González Peña Centre-Forward) | Edad: 20 | Nº: N/A | Valor: -

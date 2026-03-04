@@ -1,0 +1,848 @@
+[
+  {
+    "name": "Felipe Arias Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "12. Matías Villegas Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Benjamín Prieto Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Ángelo Saldivia Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Matías Garcés Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Daniel Fehrmann Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Bastián Badilla Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "4. David Monsalvez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Mauricio Huinao Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "2. Anyelo Garnica Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "3. Bastián Carbullanca Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "20. Carlos Uribe Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Ángelo Garnica Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Eduardo Delgado Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Raúl Muñoz Lobos Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Max Bastias Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Marcos Cárdenas Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "18. Edson Lobos Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Aland Soto Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "8. Bryan Ortega Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "José Bustos Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "15. Ricardo Rojas Vargas Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "22. Gonzalo Varas Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "33. Rafael Reyes Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "14. Patricio Burgos Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Nicolás Sgombich Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Alex Llafquén Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "24. Rafael Reyes Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Demys Martínez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Bruno Navarro Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Brayan Martínez Cabezas Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "José Ignacio Martínez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Javier Reyes Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Máximo Seguel Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Vicente Uribe Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Lucas Benavides Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Walter López Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Jorge Roa Ramos Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Marco Sandoval Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Fernando Monsálvez Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "28. Nicolás Suárez Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "23. Armín Torres Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "César Chacón Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Matías Ramos Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Alejandro Huicatripai Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "DT. Pedro Pavez Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "DT. Pedro González Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Marcos Cárdenas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Lucas Benavides",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "18. Edson Lobos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Bastián Badilla",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Walter López",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Aland Soto",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "8. Bryan Ortega",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Jorge Roa Ramos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Felipe Arias",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "4. David Monsalvez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "José Bustos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Marco Sandoval",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "15. Ricardo Rojas Vargas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "22. Gonzalo Varas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Mauricio Huinao",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "33. Rafael Reyes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "DT. Pedro Pavez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "2. Anyelo Garnica",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "3. Bastián Carbullanca",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Fernando Monsálvez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "12. Matías Villegas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "14. Patricio Burgos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Benjamín Prieto",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "28. Nicolás Suárez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Nicolás Sgombich",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "23. Armín Torres",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "20. Carlos Uribe",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Alex Llafquén",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "24. Rafael Reyes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Ángelo Saldivia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Ángelo Garnica",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Eduardo Delgado",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Demys Martínez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Raúl Muñoz Lobos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Bruno Navarro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "César Chacón",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Matías Ramos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Matías Garcés",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "DT. Pedro González",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Brayan Martínez Cabezas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Max Bastias",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "José Ignacio Martínez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Javier Reyes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Máximo Seguel",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Alejandro Huicatripai",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Vicente Uribe",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  },
+  {
+    "name": "Daniel Fehrmann",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-de-paillaco/?sid=166009"
+  }
+]

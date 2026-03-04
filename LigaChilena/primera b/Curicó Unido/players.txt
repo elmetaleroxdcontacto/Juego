@@ -1,0 +1,27 @@
+- Damián Tello | ARQ (Damián Tello Goalkeeper) | Edad: 30 | Nº: N/A | Valor: €225k
+- Thomas Vergara | ARQ (Thomas Vergara Goalkeeper) | Edad: 23 | Nº: N/A | Valor: €125k
+- Juan Ruz | ARQ (Juan Ruz Goalkeeper) | Edad: 21 | Nº: N/A | Valor: -
+- Henry Sanhueza | DEF (Henry Sanhueza Centre-Back) | Edad: 29 | Nº: N/A | Valor: €300k
+- Gabriel Sarria | DEF (Gabriel Sarria Centre-Back) | Edad: 26 | Nº: N/A | Valor: €175k
+- Rodrigo Colombo | DEF (Rodrigo Colombo Centre-Back) | Edad: 33 | Nº: N/A | Valor: €150k
+- Diego Muñoz | DEF (Diego Muñoz Centre-Back) | Edad: 23 | Nº: N/A | Valor: €100k
+- Williams Sáez | MED (Williams Sáez Left-Back) | Edad: 22 | Nº: N/A | Valor: €200k
+- Ronald Guzmán | N/A (Ronald Guzmán Left-Back) | Edad: 24 | Nº: N/A | Valor: €150k
+- Ronald de la Fuente | N/A (Ronald de la Fuente Left-Back) | Edad: 35 | Nº: N/A | Valor: €150k
+- Cristopher Medina | MED (Cristopher Medina Right-Back) | Edad: 25 | Nº: N/A | Valor: €375k
+- Antonio Ramírez | MED (Antonio Ramírez Right-Back) | Edad: 27 | Nº: N/A | Valor: -
+- Braulio Guisolfo | DEF (Braulio Guisolfo Defensive Midfield) | Edad: 23 | Nº: N/A | Valor: €350k
+- Joaquín Romo | DEF (Joaquín Romo Central Midfield) | Edad: 26 | Nº: N/A | Valor: €300k
+- Enzo Ormeño | DEF (Enzo Ormeño Central Midfield) | Edad: 26 | Nº: N/A | Valor: €300k
+- Dilan Acevedo | DEF (Dilan Acevedo Central Midfield) | Edad: 22 | Nº: N/A | Valor: -
+- Javier Retamales | MED (Javier Retamales Attacking Midfield) | Edad: 28 | Nº: N/A | Valor: €200k
+- Bastián Bustos | MED (Bastián Bustos Attacking Midfield) | Edad: 20 | Nº: N/A | Valor: -
+- Mauro Lópes | DEL (Mauro Lópes Left Winger) | Edad: 29 | Nº: N/A | Valor: €25k
+- Hans Ibarra | DEL (Hans Ibarra Left Winger) | Edad: 20 | Nº: N/A | Valor: -
+- Nicolás Fernández | DEL (Nicolás Fernández Right Winger) | Edad: 26 | Nº: N/A | Valor: €150k
+- Francis Pérez | DEL (Francis Pérez Right Winger) | Edad: 23 | Nº: N/A | Valor: -
+- Benjamín Inostroza | MED (Benjamín Inostroza Second Striker) | Edad: 28 | Nº: N/A | Valor: -
+- Roberto Riveros | DEL (Roberto Riveros Centre-Forward) | Edad: 29 | Nº: N/A | Valor: €300k
+- Cristian Bustamante | MED (Cristian Bustamante Centre-Forward) | Edad: 23 | Nº: N/A | Valor: €150k
+- Leandro Benegas | DEL (Leandro Benegas Centre-Forward) | Edad: 37 | Nº: N/A | Valor: €75k
+- Ian Aliaga | DEL (Ian Aliaga Centre-Forward) | Edad: 23 | Nº: N/A | Valor: €50k

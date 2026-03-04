@@ -1,0 +1,70 @@
+- Erwin Neira Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Maximiliano Torres Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Lincopi Portero | ARQ (Portero) | Edad: N/A | N??: N/A | Valor: N/A
+- Patryck Salazar Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Marco Solís Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Vicente Belmar Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Bayron Aqueveque Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Luciano Vidal Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Oscar Soto Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Guerrero Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Jairo Alvarado Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Lucas Viveros Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Carreño Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Eduardo Riquelme Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Inostroza Defensa | DEF (Defensa) | Edad: N/A | N??: N/A | Valor: N/A
+- Agustín Galianu Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Marcelo Gómez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Nicolás Fernández Rosales Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Davy Alonzo Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Ignacio Navarrete Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Aguilera Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Roberto Coloma Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Jeremías Arzola Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Arzola Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Lucas Fernández Barrientos Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Luis Lingue Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Álvaro Melipil Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Juan Carlos Martínez Volante | MED (Volante) | Edad: N/A | N??: N/A | Valor: N/A
+- Alexis Alarcón Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Vicente Marín Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Nicolás Aguayo Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Claudio Silva Cabrera Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Marcelo Chivailao Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- Emilio Ibáñez Delantero | DEL (Delantero) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Mauro Astrada Entrenador | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Erwin Neira | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Patryck Salazar | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Marco Solís | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Vicente Belmar | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Bayron Aqueveque | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Luciano Vidal | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Agustín Galianu | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Marcelo Gómez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Nicolás Fernández Rosales | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Alexis Alarcón | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Vicente Marín | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Maximiliano Torres | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Oscar Soto | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Davy Alonzo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Nicolás Aguayo | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Ignacio Navarrete | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Claudio Silva Cabrera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Guerrero | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Aguilera | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- DT. Mauro Astrada | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Roberto Coloma | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Marcelo Chivailao | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Emilio Ibáñez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jairo Alvarado | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Jeremías Arzola | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Arzola | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Lucas Fernández Barrientos | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Matías Lincopi | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Luis Lingue | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Álvaro Melipil | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Lucas Viveros | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Felipe Carreño | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Eduardo Riquelme | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Sebastián Inostroza | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A
+- Juan Carlos Martínez | N/A (N/A) | Edad: N/A | N??: N/A | Valor: N/A

@@ -1,0 +1,26 @@
+- Martín Parra | ARQ (Martín Parra Goalkeeper) | Edad: 25 | Nº: N/A | Valor: €250k
+- Julio Fierro | ARQ (Julio Fierro Goalkeeper) | Edad: 23 | Nº: N/A | Valor: €250k
+- Martín Rodríguez | ARQ (Martín Rodríguez Goalkeeper) | Edad: 36 | Nº: N/A | Valor: €25k
+- Enzo Uribe | ARQ (Enzo Uribe Goalkeeper) | Edad: 21 | Nº: N/A | Valor: -
+- Sebastián Pereira | DEF (Sebastián Pereira Centre-Back) | Edad: 27 | Nº: N/A | Valor: €350k
+- José Aja | DEF (José Aja Centre-Back) | Edad: 32 | Nº: N/A | Valor: €300k
+- Bastián Roco | DEF (Bastián Roco Centre-Back) | Edad: 22 | Nº: N/A | Valor: €200k
+- Milovan Celis | DEF (Milovan Celis Centre-Back) | Edad: 19 | Nº: N/A | Valor: €150k
+- Rodrigo Alarcón | DEF (Rodrigo Alarcón Centre-Back) | Edad: 20 | Nº: N/A | Valor: -
+- Gabriel Norambuena | MED (Gabriel Norambuena Left-Back) | Edad: 22 | Nº: N/A | Valor: €275k
+- Kevin Contreras | N/A (Kevin Contreras Right-Back) | Edad: 21 | Nº: N/A | Valor: €175k
+- Martín Ormeño | MED (Martín Ormeño Right-Back) | Edad: 26 | Nº: N/A | Valor: -
+- Bruno Jáuregui | DEF (Bruno Jáuregui Defensive Midfield) | Edad: 22 | Nº: N/A | Valor: €350k
+- William Machado | DEF (William Machado Defensive Midfield) | Edad: 31 | Nº: N/A | Valor: €75k
+- Ignacio Núñez | DEF (Ignacio Núñez Central Midfield) | Edad: 27 | Nº: N/A | Valor: €300k
+- Felipe Massri | DEF (Felipe Massri Central Midfield) | Edad: 24 | Nº: N/A | Valor: €300k
+- Leonardo Naranjo | DEF (Leonardo Naranjo Central Midfield) | Edad: 21 | Nº: N/A | Valor: €75k
+- Ulises Ojeda | MED (Ulises Ojeda Attacking Midfield) | Edad: 30 | Nº: N/A | Valor: €300k
+- Rodrigo Vásquez | MED (Rodrigo Vásquez Attacking Midfield) | Edad: 20 | Nº: N/A | Valor: €275k
+- Benjamín Droguett | MED (Benjamín Droguett Attacking Midfield) | Edad: 22 | Nº: N/A | Valor: -
+- Pablo Aránguiz | DEL (Pablo Aránguiz Left Winger) | Edad: 28 | Nº: N/A | Valor: €600k
+- Mitchell Wassenne | DEL (Mitchell Wassenne Right Winger) | Edad: 24 | Nº: N/A | Valor: -
+- Patricio Rubio | DEL (Patricio Rubio Centre-Forward) | Edad: 36 | Nº: N/A | Valor: €100k
+- Andrés Vilches | DEL (Andrés Vilches Centre-Forward) | Edad: 34 | Nº: N/A | Valor: €100k
+- Diego Robles | DEL (Diego Robles Centre-Forward) | Edad: 18 | Nº: N/A | Valor: -
+- Tomás Tolosa | DEL (Tomás Tolosa Centre-Forward) | Edad: 23 | Nº: N/A | Valor: -

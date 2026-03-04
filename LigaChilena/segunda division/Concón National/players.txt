@@ -1,0 +1,26 @@
+- Pedro Pizarro | ARQ (Pedro Pizarro Goalkeeper) | Edad: 23 | Nº: N/A | Valor: -
+- Marcos Velásquez | DEF (Marcos Velásquez Centre-Back) | Edad: 37 | Nº: N/A | Valor: -
+- Matías Navarrete | DEF (Matías Navarrete Centre-Back) | Edad: 34 | Nº: N/A | Valor: -
+- Luciano Vargas | DEF (Luciano Vargas Centre-Back) | Edad: 27 | Nº: N/A | Valor: -
+- Cristián Díaz | DEF (Cristián Díaz Centre-Back) | Edad: 25 | Nº: N/A | Valor: -
+- Juan Pablo Andrade | DEF (Juan Pablo Andrade Centre-Back) | Edad: 37 | Nº: N/A | Valor: -
+- Brian Torres | DEF (Brian Torres Centre-Back) | Edad: 26 | Nº: N/A | Valor: -
+- Cristian Vega | DEL (Cristian Vega Left-Back) | Edad: 26 | Nº: N/A | Valor: -
+- Claudio Jopia | N/A (Claudio Jopia Left-Back) | Edad: 34 | Nº: N/A | Valor: -
+- Joaquín López | N/A (Joaquín López Left-Back) | Edad: 26 | Nº: N/A | Valor: -
+- Sebastián Contreras | DEL (Sebastián Contreras Left-Back) | Edad: 21 | Nº: N/A | Valor: -
+- Fernando Quiroz | N/A (Fernando Quiroz Right-Back) | Edad: 26 | Nº: N/A | Valor: -
+- Kevin Araya | N/A (Kevin Araya Right-Back) | Edad: 26 | Nº: N/A | Valor: -
+- Benjamín Rivera | DEF (Benjamín Rivera Defensive Midfield) | Edad: 26 | Nº: N/A | Valor: -
+- Piero Gárate | DEF (Piero Gárate Defensive Midfield) | Edad: 33 | Nº: N/A | Valor: -
+- Patricio Flores | DEF (Patricio Flores Defensive Midfield) | Edad: 24 | Nº: N/A | Valor: -
+- Valentín Demateis | DEF (Valentín Demateis Central Midfield) | Edad: 24 | Nº: N/A | Valor: -
+- Franco Ragusa | DEF (Franco Ragusa Central Midfield) | Edad: 33 | Nº: N/A | Valor: -
+- Giovanni Davis | DEF (Giovanni Davis Central Midfield) | Edad: 25 | Nº: N/A | Valor: -
+- Bruno Álvarez | DEF (Bruno Álvarez Central Midfield) | Edad: 23 | Nº: N/A | Valor: -
+- Joaquín Llanos | MED (Joaquín Llanos Attacking Midfield) | Edad: 25 | Nº: N/A | Valor: -
+- René Zúñiga | DEL (René Zúñiga Left Winger) | Edad: 25 | Nº: N/A | Valor: -
+- Jimmy Cisterna | DEL (Jimmy Cisterna Right Winger) | Edad: 32 | Nº: N/A | Valor: -
+- Sebastián Ubilla | DEL (Sebastián Ubilla Right Winger) | Edad: 35 | Nº: N/A | Valor: -
+- Vicente Vera | DEL (Vicente Vera Right Winger) | Edad: 21 | Nº: N/A | Valor: -
+- Rodrigo Gattas | DEL (Rodrigo Gattas Centre-Forward) | Edad: 34 | Nº: N/A | Valor: -

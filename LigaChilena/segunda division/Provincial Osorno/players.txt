@@ -1,0 +1,28 @@
+- Diego Lara | ARQ (Diego Lara Goalkeeper) | Edad: 28 | Nº: N/A | Valor: -
+- Daniel Retamal | ARQ (Daniel Retamal Goalkeeper) | Edad: 30 | Nº: N/A | Valor: -
+- Hugo Faúndez | ARQ (Hugo Faúndez Goalkeeper) | Edad: 23 | Nº: N/A | Valor: -
+- Eduardo Navarrete | DEF (Eduardo Navarrete Centre-Back) | Edad: 24 | Nº: N/A | Valor: -
+- Daniel Vicencio | DEF (Daniel Vicencio Centre-Back) | Edad: 33 | Nº: N/A | Valor: -
+- Bastián Melo | DEF (Bastián Melo Centre-Back) | Edad: 25 | Nº: N/A | Valor: -
+- Luciano Meneses | DEF (Luciano Meneses Centre-Back) | Edad: 29 | Nº: N/A | Valor: -
+- Juan Abarca | DEF (Juan Abarca Centre-Back) | Edad: 37 | Nº: N/A | Valor: -
+- Gonzalo Lauler | DEF (Gonzalo Lauler Centre-Back) | Edad: 37 | Nº: N/A | Valor: -
+- Mario Aguilar | DEF (Mario Aguilar Centre-Back) | Edad: 23 | Nº: N/A | Valor: -
+- Agustín Ambiado | MED (Agustín Ambiado Left-Back) | Edad: 25 | Nº: N/A | Valor: -
+- Brandon Cáceres | N/A (Brandon Cáceres Left-Back) | Edad: 24 | Nº: N/A | Valor: -
+- Marcel Cortéz | N/A (Marcel Cortéz Right-Back) | Edad: 30 | Nº: N/A | Valor: -
+- Paolo Fuentes | DEF (Paolo Fuentes Defensive Midfield) | Edad: 25 | Nº: N/A | Valor: -
+- Diego González Saavedra | DEF (Diego González Saavedra Central Midfield) | Edad: 27 | Nº: N/A | Valor: -
+- Diego Vergara | DEF (Diego Vergara Central Midfield) | Edad: 23 | Nº: N/A | Valor: -
+- Abel Moreno | DEF (Abel Moreno Central Midfield) | Edad: 23 | Nº: N/A | Valor: -
+- Carlos Soto Molina | DEF (Carlos Soto Molina Central Midfield) | Edad: 24 | Nº: N/A | Valor: -
+- Juan Gutiérrez | MED (Juan Gutiérrez Attacking Midfield) | Edad: 36 | Nº: N/A | Valor: -
+- Diego Pezoa | MED (Diego Pezoa Attacking Midfield) | Edad: 32 | Nº: N/A | Valor: -
+- Sebastián Namoncura | MED (Sebastián Namoncura Attacking Midfield) | Edad: 20 | Nº: N/A | Valor: -
+- Gastón Pedernera | DEL (Gastón Pedernera Left Winger) | Edad: 25 | Nº: N/A | Valor: -
+- Felipe Escobar | DEL (Felipe Escobar Left Winger) | Edad: 32 | Nº: N/A | Valor: -
+- Esteban Antilef | DEL (Esteban Antilef Right Winger) | Edad: 22 | Nº: N/A | Valor: -
+- Ricardo Fuenzalida | DEL (Ricardo Fuenzalida Right Winger) | Edad: 33 | Nº: N/A | Valor: -
+- Diego Bielkiewicz | DEL (Diego Bielkiewicz Centre-Forward) | Edad: 35 | Nº: N/A | Valor: -
+- Santiago Ayala | DEL (Santiago Ayala Centre-Forward) | Edad: 23 | Nº: N/A | Valor: -
+- Gustavo Castro | DEL (Gustavo Castro Centre-Forward) | Edad: 25 | Nº: N/A | Valor: -

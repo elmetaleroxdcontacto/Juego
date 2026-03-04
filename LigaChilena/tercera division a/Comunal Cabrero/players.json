@@ -1,0 +1,1550 @@
+[
+  {
+    "name": "Yerko Betancur",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Carlos Muñoz Henríquez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "John Sáez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Rubén Sepúlveda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Joham Parra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Víctor Abarzúa",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "25. Jeremy Cobo Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Tomás Meyer (2001) Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Benjamín Estuardo Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Jorge Nuñez Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "José Tomás Martínez Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "22. Arturo Vásquez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Francisco Álvarez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Felipe Montero Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "6. Ignacio Mella Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Jonathan Pérez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "3. Juan Bustos Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Franco Peñaloza Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "29. Sebastián Medina Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Luis Wills Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "27. Cristián Aguilera Méndez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "14. Mauricio Aedo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Richard Arenas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "30. Sebastián Rojas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Maximiliano Aravena Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Bastián Bravo González (2004) Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Joaquín Parra Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Ignacio Verdugo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Gonzalo Guzmán Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Guillermo Zuleta Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Pablo Cabrera Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "23. Jean Cares Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "20. Rodrigo Toloza Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "14. Pablo García Angulo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "15. Fabrizio Gallegos Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Brandon Muñoz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "10. Camilo Parra Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Patricio Ramos Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Luis Sánchez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Sebastián Herrera Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "15. Yonatan Riquelme Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Mario Oporto Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "14. Bastián Soto Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "17. Álvaro Garrido Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "10. Jordan Moreno Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "14. Sebastián Moya Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "14. Benjamín Triviño Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Cristián Muñoz Aravena Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Joaquín Iraira Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "26. Guillermo Ulloa Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Joaquín Abdala Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "8. Jordan Salcedo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Oscar Poblete Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Mauro Heredia Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Benjamín Padilla Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "11. Nicolás Muñoz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Ricardo Muñoz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "17. Carlos Pacheco Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "19. Jesús Saavedra Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Bastián Bravo Pereda Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Nicolás Torres Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Marco Riffo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Vicente Cortéz-Monrroy Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Bastián Valdés Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Fabián Quilaleo Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Cristián Pizarro Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Emmanuel Arismendi Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Benjamín Riquelme Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Álex Díaz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Diego Bravo Silva Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Pascual De Gregorio Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Franco Enríquez Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "10. Ricardo González Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "9. Agustín Urra Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Jerhal Oliva Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "22. Davis Sánchez Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Óscar Reyes Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "32. Mauro Molina Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Nicolás Muñoz Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Sebastián Rojas Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Jayson Luarte Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "9. Wilson Martínez Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Mauricio Cortez Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Darío Roa Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Jaime Caro Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "DT Edgardo Abdala Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "DT. Ricardo Rojas Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "DT. Fabián Seguel Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "DT. Carlos Véliz Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "22. Arturo Vásquez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "23. Jean Cares",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Francisco Álvarez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "20. Rodrigo Toloza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Pascual De Gregorio",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "14. Pablo García Angulo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Franco Enríquez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "10. Ricardo González",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "15. Fabrizio Gallegos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Felipe Montero",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "9. Agustín Urra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Brandon Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Jerhal Oliva",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "10. Camilo Parra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "6. Ignacio Mella",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Jonathan Pérez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "22. Davis Sánchez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Patricio Ramos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Luis Sánchez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Sebastián Herrera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "3. Juan Bustos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "15. Yonatan Riquelme",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Mario Oporto",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "14. Bastián Soto",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "25. Jeremy Cobo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Franco Peñaloza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "17. Álvaro Garrido",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "10. Jordan Moreno",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "14. Sebastián Moya",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Óscar Reyes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "29. Sebastián Medina",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Tomás Meyer (2001)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Luis Wills",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "14. Benjamín Triviño",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Cristián Muñoz Aravena",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Joaquín Iraira",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "DT Edgardo Abdala",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "27. Cristián Aguilera Méndez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "26. Guillermo Ulloa",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Joaquín Abdala",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "32. Mauro Molina",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Benjamín Estuardo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "8. Jordan Salcedo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Nicolás Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Sebastián Rojas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Oscar Poblete",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Jorge Nuñez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "14. Mauricio Aedo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Richard Arenas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Jayson Luarte",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Mauro Heredia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Benjamín Padilla",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "30. Sebastián Rojas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Maximiliano Aravena",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "11. Nicolás Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Ricardo Muñoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "17. Carlos Pacheco",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "19. Jesús Saavedra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "DT. Ricardo Rojas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Bastián Bravo González (2004)",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Bastián Bravo Pereda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "9. Wilson Martínez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Joaquín Parra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "DT. Fabián Seguel",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "DT. Carlos Véliz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Nicolás Torres",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Mauricio Cortez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Marco Riffo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Vicente Cortéz-Monrroy",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Ignacio Verdugo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Bastián Valdés",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Darío Roa",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Gonzalo Guzmán",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Fabián Quilaleo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Cristián Pizarro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Emmanuel Arismendi",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Benjamín Riquelme",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "José Tomás Martínez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Jaime Caro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Álex Díaz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Diego Bravo Silva",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Guillermo Zuleta",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  },
+  {
+    "name": "Pablo Cabrera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/comunal-cabrero/?sid=161334"
+  }
+]

@@ -1,0 +1,1766 @@
+[
+  {
+    "name": "2. José Barraza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "13. Nicolás Sierralta",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "12. Matías Carrasco Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "25. Nicolás Contreras Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Kevin Arqueros Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "12. Francisco Sanzana Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "22. Cristián Guerra Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Dylan Núñez Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Renato Huerta Portero",
+    "position_raw": "Portero",
+    "position": "ARQ",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "4. Josué Páez Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "28. Felipe Rojo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "7. Kevín Guajardo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Camilo Salazar Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "7. Diego Araya Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "19. Marcelo Tapia Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "4. Felipe Ibacache Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "3. Marcelo Salinas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "21. Freddy Iturrieta Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "5. Pedro Valladares Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Elías Rivera Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "29. Elías Herrera Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "15. Matías Araya De la Vega Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "2. Hugo Rojas Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "15. Bastián Fowler Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Tomás Aqueveque Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Gerson Valenzuela Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "18. Brandon Estay Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "21. Mikerson Miranda Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Pablo Álvarez Ocayo Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Vicente Zúñiga Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Marcelo Arriagada Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Lukcas Munizaga Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Ronald Quijada Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Rodrigo Huarache Defensa",
+    "position_raw": "Defensa",
+    "position": "DEF",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "15. Abraham Bolados Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "17. Dante Cortés Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "23. Matías Saavedra Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "8. David Villarroel Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "6. Jhon Checura Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "10. Jairo Guzmán Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Vicente Villalobos Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "23. Matías Álvarez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "14. Vicente Barrera Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "20. Tomás Rivera Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Matías Araya Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Sebastián Espinoza Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "David Alcota Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "11. Brian Villalobos Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Benjamín Miranda Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Sebastián Díaz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Rodrigo Albornoz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "8. Sebastián Páez Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Roberto Aguirre Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "6. Sebastián Díaz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Jordan Villanueva Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "16. Mickelson Miranda Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "18. Cristián Navarro Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Freddy Iturrieta Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Benjamín Barraza Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "8. Enzo Figueroa Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "8. Francisco Santrana Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "16. Tomás Rivera Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "David González Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "26. Sebastián Paéz Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Jonathan Oliden Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Guillermo Aros Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Andrés Varela Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Carlos González Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Diego Rosales Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Máximo Poblete Volante",
+    "position_raw": "Volante",
+    "position": "MED",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "11. José Pizarro Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "11. Hugo Valencia Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "7. Cristián Bravo Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "10. Matías Farfán Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Alejandro Melillanca Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "27. Bryan Sánchez Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "26. Jesús Gaete Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "22. Johann Barrera Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "9. Matías Malinarich Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "24. Alonso Arancibia Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "22. Daniel Carrera Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Iván Berríos Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "21. Ángel Rojas Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "24. Chriss Gutiérrez Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "3. Patricio Quezada Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "6. Matías Munizaga Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "24. Pedro Rojas Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "19. Bayron Contreras Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "11. Alan Peña Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Maná Hugueño Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Matías Álvarez Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "29. Bryan Meza Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "21. Benjamín Sanhueza Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "9. Diego Álvarez Veas Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Álvaro Mora Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Guillermo Monardes Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Alonso Caamaño Delantero",
+    "position_raw": "Delantero",
+    "position": "DEL",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "DT. Carlos Rojas Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "DT. Omar Tapia Entrenador",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "12. Matías Carrasco",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "4. Josué Páez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "28. Felipe Rojo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "7. Kevín Guajardo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Camilo Salazar",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "15. Abraham Bolados",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "17. Dante Cortés",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "23. Matías Saavedra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "8. David Villarroel",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "11. José Pizarro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "11. Hugo Valencia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "25. Nicolás Contreras",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "7. Cristián Bravo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "6. Jhon Checura",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "10. Matías Farfán",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Alejandro Melillanca",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "7. Diego Araya",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "19. Marcelo Tapia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "10. Jairo Guzmán",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Vicente Villalobos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "4. Felipe Ibacache",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "DT. Carlos Rojas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "27. Bryan Sánchez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "23. Matías Álvarez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "26. Jesús Gaete",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "3. Marcelo Salinas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "21. Freddy Iturrieta",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "22. Johann Barrera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "14. Vicente Barrera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "9. Matías Malinarich",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "20. Tomás Rivera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Kevin Arqueros",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "5. Pedro Valladares",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Matías Araya",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Elías Rivera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Sebastián Espinoza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "David Alcota",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "11. Brian Villalobos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Benjamín Miranda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "24. Alonso Arancibia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Sebastián Díaz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Rodrigo Albornoz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "29. Elías Herrera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "15. Matías Araya De la Vega",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "8. Sebastián Páez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "2. Hugo Rojas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Roberto Aguirre",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "22. Daniel Carrera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "15. Bastián Fowler",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "12. Francisco Sanzana",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Iván Berríos",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "6. Sebastián Díaz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Tomás Aqueveque",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "21. Ángel Rojas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Gerson Valenzuela",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Jordan Villanueva",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "16. Mickelson Miranda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "18. Cristián Navarro",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "24. Chriss Gutiérrez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "3. Patricio Quezada",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "6. Matías Munizaga",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "24. Pedro Rojas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "19. Bayron Contreras",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "22. Cristián Guerra",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "11. Alan Peña",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Freddy Iturrieta",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "18. Brandon Estay",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Benjamín Barraza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "8. Enzo Figueroa",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "21. Mikerson Miranda",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Maná Hugueño",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Matías Álvarez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "8. Francisco Santrana",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "16. Tomás Rivera",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "29. Bryan Meza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Pablo Álvarez Ocayo",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "David González",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "26. Sebastián Paéz",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Dylan Núñez",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "21. Benjamín Sanhueza",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "9. Diego Álvarez Veas",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Vicente Zúñiga",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Marcelo Arriagada",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Lukcas Munizaga",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Jonathan Oliden",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Guillermo Aros",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Álvaro Mora",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Guillermo Monardes",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Andrés Varela",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Carlos González",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Ronald Quijada",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Alonso Caamaño",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Renato Huerta",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Diego Rosales",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Rodrigo Huarache",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "Máximo Poblete",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  },
+  {
+    "name": "DT. Omar Tapia",
+    "position_raw": "N/A",
+    "position": "N/A",
+    "age": "N/A",
+    "number": "N/A",
+    "market_value": "N/A",
+    "source": "https://enelcamarin.cl/joomsport_team/municipal-mejillones/?sid=161334"
+  }
+]

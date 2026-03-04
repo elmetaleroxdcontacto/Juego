@@ -1,0 +1,19 @@
+﻿# teams.txt - one team folder name per line
+# optional format: Display Name|Folder Name
+
+CD Cobreloa
+CD Puerto Montt
+Club Deportes Iquique
+Curicó Unido
+Deportes Antofagasta
+Deportes Copiapó
+Deportes Recoleta
+Deportes Santa Cruz
+Deportes Temuco
+Magallanes
+Rangers de Talca
+San Luis de Quillota
+San Marcos de Arica
+Santiago Wanderers
+Unión Española
+Unión San Felipe

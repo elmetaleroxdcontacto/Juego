@@ -1,0 +1,27 @@
+- Santiago Silva | ARQ (Santiago Silva Goalkeeper) | Edad: 26 | Nº: N/A | Valor: €350k
+- José Sanhueza | ARQ (José Sanhueza Goalkeeper) | Edad: 24 | Nº: N/A | Valor: €225k
+- Moisés González | DEF (Moisés González Centre-Back) | Edad: 25 | Nº: N/A | Valor: €600k
+- Bastián Ubal | DEF (Bastián Ubal Centre-Back) | Edad: 24 | Nº: N/A | Valor: €350k
+- Leonel González | DEF (Leonel González Centre-Back) | Edad: 31 | Nº: N/A | Valor: €250k
+- David Retamal | DEF (David Retamal Centre-Back) | Edad: 22 | Nº: N/A | Valor: €250k
+- Osvaldo González | DEF (Osvaldo González Centre-Back) | Edad: 41 | Nº: N/A | Valor: €10k
+- Antonio Díaz | N/A (Antonio Díaz Left-Back) | Edad: 25 | Nº: N/A | Valor: €450k
+- Yerco Oyanedel | DEL (Yerco Oyanedel Left-Back) | Edad: 25 | Nº: N/A | Valor: €275k
+- Patricio Romero | N/A (Patricio Romero Left-Back) | Edad: 20 | Nº: N/A | Valor: €250k
+- Lucas Molina | N/A (Lucas Molina Left-Back) | Edad: 21 | Nº: N/A | Valor: €200k
+- Jorge Espejo | N/A (Jorge Espejo Right-Back) | Edad: 25 | Nº: N/A | Valor: €750k
+- Benjamín Sáez | MED (Benjamín Sáez Right-Back) | Edad: 20 | Nº: N/A | Valor: €50k
+- Jeison Fuentealba | DEF (Jeison Fuentealba Central Midfield) | Edad: 23 | Nº: N/A | Valor: €500k
+- Cristhofer Mesías | DEF (Cristhofer Mesías Central Midfield) | Edad: 27 | Nº: N/A | Valor: €500k
+- Bryan Ogaz | DEF (Bryan Ogaz Central Midfield) | Edad: 25 | Nº: N/A | Valor: €350k
+- Facundo Mater | MED (Facundo Mater Right Midfield) | Edad: 27 | Nº: N/A | Valor: €900k
+- Pablo Parra | MED (Pablo Parra Attacking Midfield) | Edad: 31 | Nº: N/A | Valor: €300k
+- Luis Rojas | MED (Luis Rojas Attacking Midfield) | Edad: 23 | Nº: N/A | Valor: €250k
+- Agustín Urzi | DEL (Agustín Urzi Left Winger) | Edad: 25 | Nº: N/A | Valor: €1.00m
+- Harol Salgado | DEL (Harol Salgado Left Winger) | Edad: 25 | Nº: N/A | Valor: €350k
+- Ariel Uribe | DEL (Ariel Uribe Right Winger) | Edad: 27 | Nº: N/A | Valor: €800k
+- Rodrigo Olivares | DEL (Rodrigo Olivares Right Winger) | Edad: 21 | Nº: N/A | Valor: €175k
+- Luca Kmet | DEL (Luca Kmet Right Winger) | Edad: 20 | Nº: N/A | Valor: -
+- Daniel Barrea | DEL (Daniel Barrea Centre-Forward) | Edad: 24 | Nº: N/A | Valor: €700k
+- Cecilio Waterman | MED (Cecilio Waterman Centre-Forward) | Edad: 34 | Nº: N/A | Valor: €350k
+- Diego Sabando | DEL (Diego Sabando Centre-Forward) | Edad: 20 | Nº: N/A | Valor: €25k

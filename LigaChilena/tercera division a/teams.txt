@@ -1,0 +1,64 @@
+﻿# teams.txt - one team folder name per line
+# optional format: Display Name|Folder Name
+
+AC Barnechea
+Aguará
+Atlético Colina
+Audax Italiano
+Brujas de Salamanca
+Chimbarongo F.C
+Cobreloa
+Cobresal
+Colchagua CD
+Colo-Colo
+Comunal Cabrero
+Con Con National
+Constitución Unido
+Coquimbo Unido
+Curicó Unido
+Deportes Antofagasta
+Deportes Concepción
+Deportes Copiapó
+Deportes Iquique
+Deportes La Serena
+Deportes Limache
+Deportes Linares
+Deportes Melipilla
+Deportes Puerto Montt
+Deportes Quillón
+Deportes Recoleta
+Deportes Rengo
+Deportes Santa Cruz
+Deportes Temuco
+Everton
+General Velásquez
+Huachipato
+Imperial Unido
+Lautaro de Buin
+Lota Schwager
+Magallanes
+Malleco Unido
+Municipal Mejillones
+Municipal Puente Alto
+Naval
+Ñublense
+O’Higgins
+Palestino
+Provincial Osorno
+Provincial Ovalle
+Quintero Unido
+Rangers
+Real San Joaquín
+San Antonio Unido
+San Luis
+San Marcos de Arica
+Santiago City
+Santiago Morning
+Santiago Wanderers
+Trasandino
+Unión Española
+Unión La Calera
+Unión San Felipe
+Universidad Católica
+Universidad de Chile
+Universidad de Concepción
