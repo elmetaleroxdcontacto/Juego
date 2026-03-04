@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <deque>
 #include <string>
@@ -11,14 +11,19 @@ struct Player {
     int attack;
     int defense;
     int stamina;
+    int fitness;
     int skill;
+    int potential;
     int age;
     long long value;
     bool injured;
+    std::string injuryType;
     int injuryWeeks;
     int goals;
     int assists;
     int matchesPlayed;
+    int lastTrainedSeason;
+    int lastTrainedWeek;
 };
 
 void applyPositionStats(Player& p);
@@ -32,6 +37,7 @@ public:
     std::string tactics;
     std::string formation;
     long long budget;
+    int morale;
     int points;
     int goalsFor;
     int goalsAgainst;

@@ -1,4 +1,4 @@
-# Lista de Tareas para Juego de Manager de Fútbol Carga de Equipos desde Archivo
+﻿# Lista de Tareas para Juego de Manager de Fútbol Carga de Equipos desde Archivo
 
 ## Tareas Completadas
 - [x] Analizar la tarea del usuario: Hacer que el juego cargue equipos desde un archivo en lugar de codificados.
@@ -84,3 +84,10 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - [x] Agregar pausa después de cada opción en los menús del juego
   - Modo Carrera: después de cada opción (excepto volver), muestra "Presiona Enter para continuar..."
   - Juego Rápido: después de cada opción (excepto volver), muestra "Presiona Enter para continuar..."
+- [x] Mejoras prioritarias: ventaja local y clima, fatiga/condicion persistente, eventos de partido, entrenamiento con rendimientos decrecientes y limite semanal, vista de equipo con XI, y riesgo de lesiones por edad/condicion/tactica.
+- [x] Mejoras prioritarias: ventaja local y clima, fatiga/condicion persistente, eventos de partido, entrenamiento con rendimientos decrecientes y limite semanal, vista de equipo con XI, y riesgo de lesiones por edad/condicion/tactica.
+- [x] Implementar moral de equipo, potencial de jugadores y desarrollo por partidos.
+- [x] Agregar ascensos/descensos con playoffs y ajustes de division.
+- [x] Incorporar finanzas semanales (ingresos + sueldos) y mercado con ofertas/CPU.
+- [x] Añadir lesiones con tipo y duracion; nuevas tacticas (Pressing/Counter).
+- [x] Incluir estadisticas post-partido y editor rapido de equipo/jugadores.

@@ -1,4 +1,4 @@
-#include "models.h"
+﻿#include "models.h"
 
 #include "io.h"
 #include "utils.h"
@@ -33,8 +33,10 @@ Player makeRandomPlayer(const string& position, int skillMin, int skillMax, int 
     p.name = "Jugador" + to_string(randInt(1000, 9999));
     p.position = position;
     p.skill = randInt(skillMin, skillMax);
+    p.potential = clampInt(p.skill + randInt(0, 12), p.skill, 95);
     p.age = randInt(ageMin, ageMax);
     p.stamina = clampInt(p.skill + randInt(-5, 5), 30, 99);
+    p.fitness = p.stamina;
     if (position == "ARQ") {
         p.attack = clampInt(p.skill - 30, 10, 70);
         p.defense = clampInt(p.skill + 10, 30, 99);
@@ -50,10 +52,13 @@ Player makeRandomPlayer(const string& position, int skillMin, int skillMax, int 
     }
     p.value = static_cast<long long>(p.skill) * 10000;
     p.injured = false;
+    p.injuryType = "";
     p.injuryWeeks = 0;
     p.goals = 0;
     p.assists = 0;
     p.matchesPlayed = 0;
+    p.lastTrainedSeason = -1;
+    p.lastTrainedWeek = -1;
     return p;
 }
 
@@ -63,6 +68,7 @@ Team::Team(string n)
       tactics("Balanced"),
       formation("4-4-2"),
       budget(0),
+      morale(50),
       points(0),
       goalsFor(0),
       goalsAgainst(0),
@@ -200,7 +206,7 @@ int Team::getAverageStamina() const {
     auto xi = getStartingXIIndices();
     if (xi.empty()) return 0;
     int total = 0;
-    for (int idx : xi) total += players[idx].stamina;
+    for (int idx : xi) total += players[idx].fitness;
     return total / static_cast<int>(xi.size());
 }
 
@@ -333,9 +339,12 @@ void Career::setActiveDivision(const string& id) {
 void Career::resetSeason() {
     for (auto* team : activeTeams) {
         team->resetSeasonStats();
+        team->morale = 50;
         for (auto& p : team->players) {
             p.injured = false;
             p.injuryWeeks = 0;
+            p.injuryType.clear();
+            p.fitness = p.stamina;
         }
     }
     buildSchedule();
@@ -349,6 +358,8 @@ void Career::agePlayers() {
                 player.skill = max(1, player.skill - 1);
                 player.stamina = max(1, player.stamina - 1);
             }
+            if (player.fitness > player.stamina) player.fitness = player.stamina;
+            if (player.potential < player.skill) player.potential = player.skill;
         }
     }
 }
@@ -368,13 +379,14 @@ void Career::saveCareer() {
 
     for (const auto& team : allTeams) {
         file << "TEAM " << team.name << "|" << team.division << "|" << team.tactics << "|" << team.formation
-             << "|" << team.budget << "|" << team.points << "|" << team.goalsFor << "|" << team.goalsAgainst
+             << "|" << team.budget << "|" << team.morale << "|" << team.points << "|" << team.goalsFor << "|" << team.goalsAgainst
              << "|" << team.wins << "|" << team.draws << "|" << team.losses << "\n";
         file << "PLAYERS " << team.players.size() << "\n";
         for (const auto& p : team.players) {
             file << "PLAYER " << p.name << "|" << p.position << "|" << p.attack << "|" << p.defense << "|"
-                 << p.stamina << "|" << p.skill << "|" << p.age << "|" << p.value << "|" << p.injured << "|"
-                 << p.injuryWeeks << "|" << p.goals << "|" << p.assists << "|" << p.matchesPlayed << "\n";
+                 << p.stamina << "|" << p.fitness << "|" << p.skill << "|" << p.potential << "|" << p.age << "|" << p.value << "|"
+                 << p.injured << "|" << p.injuryType << "|" << p.injuryWeeks << "|" << p.goals << "|" << p.assists << "|"
+                 << p.matchesPlayed << "|" << p.lastTrainedSeason << "|" << p.lastTrainedWeek << "\n";
         }
         file << "ENDTEAM\n";
     }
@@ -430,12 +442,19 @@ bool Career::loadCareer() {
             team.tactics = fields[2];
             team.formation = fields[3];
             team.budget = stoll(fields[4]);
-            team.points = stoi(fields[5]);
-            team.goalsFor = stoi(fields[6]);
-            team.goalsAgainst = stoi(fields[7]);
-            team.wins = stoi(fields[8]);
-            team.draws = stoi(fields[9]);
-            team.losses = stoi(fields[10]);
+            size_t base = 5;
+            if (fields.size() >= 12) {
+                team.morale = clampInt(stoi(fields[5]), 0, 100);
+                base = 6;
+            } else {
+                team.morale = 50;
+            }
+            team.points = stoi(fields[base + 0]);
+            team.goalsFor = stoi(fields[base + 1]);
+            team.goalsAgainst = stoi(fields[base + 2]);
+            team.wins = stoi(fields[base + 3]);
+            team.draws = stoi(fields[base + 4]);
+            team.losses = stoi(fields[base + 5]);
 
             if (!getline(file, line)) return false;
             if (line.rfind("PLAYERS ", 0) != 0) return false;
@@ -446,20 +465,55 @@ bool Career::loadCareer() {
                 auto pf = splitByDelimiter(trim(line.substr(7)), '|');
                 if (pf.size() < 13) continue;
                 Player p;
-                p.name = pf[0];
-                p.position = pf[1];
-                p.attack = stoi(pf[2]);
-                p.defense = stoi(pf[3]);
-                p.stamina = stoi(pf[4]);
-                p.skill = stoi(pf[5]);
-                p.age = stoi(pf[6]);
-                p.value = stoll(pf[7]);
-                string injuredStr = toLower(pf[8]);
+                size_t idx = 0;
+                p.name = pf[idx++];
+                p.position = pf[idx++];
+                p.attack = stoi(pf[idx++]);
+                p.defense = stoi(pf[idx++]);
+                p.stamina = stoi(pf[idx++]);
+
+                bool hasFitness = (pf.size() >= 16);
+                if (hasFitness) {
+                    p.fitness = stoi(pf[idx++]);
+                } else {
+                    p.fitness = p.stamina;
+                }
+
+                if (idx >= pf.size()) continue;
+                p.skill = stoi(pf[idx++]);
+
+                size_t remaining = (idx <= pf.size()) ? (pf.size() - idx) : 0;
+                bool hasPotential = (remaining >= 11);
+                if (hasPotential) {
+                    p.potential = stoi(pf[idx++]);
+                } else {
+                    p.potential = clampInt(p.skill + randInt(0, 8), p.skill, 95);
+                }
+
+                if (idx >= pf.size()) continue;
+                p.age = stoi(pf[idx++]);
+                if (idx >= pf.size()) continue;
+                p.value = stoll(pf[idx++]);
+                if (idx >= pf.size()) continue;
+                string injuredStr = toLower(pf[idx++]);
                 p.injured = (injuredStr == "1" || injuredStr == "true");
-                p.injuryWeeks = stoi(pf[9]);
-                p.goals = stoi(pf[10]);
-                p.assists = stoi(pf[11]);
-                p.matchesPlayed = stoi(pf[12]);
+
+                if (hasPotential && idx < pf.size()) {
+                    p.injuryType = pf[idx++];
+                } else {
+                    p.injuryType = p.injured ? "Leve" : "";
+                }
+                if (idx < pf.size()) p.injuryWeeks = stoi(pf[idx++]); else p.injuryWeeks = 0;
+                if (idx < pf.size()) p.goals = stoi(pf[idx++]); else p.goals = 0;
+                if (idx < pf.size()) p.assists = stoi(pf[idx++]); else p.assists = 0;
+                if (idx < pf.size()) p.matchesPlayed = stoi(pf[idx++]); else p.matchesPlayed = 0;
+                if (idx + 1 < pf.size()) {
+                    p.lastTrainedSeason = stoi(pf[idx++]);
+                    p.lastTrainedWeek = stoi(pf[idx++]);
+                } else {
+                    p.lastTrainedSeason = -1;
+                    p.lastTrainedWeek = -1;
+                }
                 team.addPlayer(p);
             }
             if (!getline(file, line)) return false;
@@ -517,17 +571,22 @@ bool Career::loadCareer() {
                 getline(ss, token, ','); p.attack = stoi(token);
                 getline(ss, token, ','); p.defense = stoi(token);
                 getline(ss, token, ','); p.stamina = stoi(token);
+                p.fitness = p.stamina;
                 getline(ss, token, ','); p.skill = stoi(token);
+                p.potential = clampInt(p.skill + randInt(0, 6), p.skill, 95);
                 getline(ss, token, ','); p.age = stoi(token);
                 getline(ss, token, ','); p.value = stoll(token);
                 string injuredStr;
                 getline(ss, injuredStr, ',');
                 injuredStr = toLower(trim(injuredStr));
                 p.injured = (injuredStr == "1" || injuredStr == "true");
+                p.injuryType = p.injured ? "Leve" : "";
                 getline(ss, token, ','); p.injuryWeeks = stoi(token);
                 getline(ss, token, ','); p.goals = stoi(token);
                 getline(ss, token, ','); p.assists = stoi(token);
                 getline(ss, token, ','); p.matchesPlayed = stoi(token);
+                p.lastTrainedSeason = -1;
+                p.lastTrainedWeek = -1;
                 myTeam->addPlayer(p);
             } catch (...) {
             }

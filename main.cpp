@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <limits>
 
 #include "io.h"
@@ -82,10 +82,10 @@ int main() {
                 do {
                     cout << "\nTemporada " << career.currentSeason << ", Semana " << career.currentWeek << endl;
                     displayCareerMenu();
-                    careerChoice = readInt("Elige una opcion: ", 1, 12);
+                    careerChoice = readInt("Elige una opcion: ", 1, 13);
                     switch (careerChoice) {
                         case 1: viewTeam(*career.myTeam); break;
-                        case 2: trainPlayer(*career.myTeam); break;
+                        case 2: trainPlayer(*career.myTeam, career.currentSeason, career.currentWeek); break;
                         case 3: changeTactics(*career.myTeam); break;
                         case 4: simulateCareerWeek(career); break;
                         case 5: career.leagueTable.displayTable(); break;
@@ -96,6 +96,7 @@ int main() {
                         case 10: career.saveCareer(); break;
                         case 11: retirePlayer(*career.myTeam); break;
                         case 12: cout << "Volviendo al menu principal." << endl; break;
+                        case 13: editTeam(*career.myTeam); break;
                         default: break;
                     }
                     if (careerChoice != 12) {
@@ -149,7 +150,7 @@ int main() {
             int gameChoice = 0;
             do {
                 displayGameMenu();
-                gameChoice = readInt("Elige una opcion: ", 1, 7);
+                gameChoice = readInt("Elige una opcion: ", 1, 8);
                 switch (gameChoice) {
                     case 1: viewTeam(myTeam); break;
                     case 2: addPlayer(myTeam); break;
@@ -165,14 +166,15 @@ int main() {
                         }
                         break;
                     }
-                    case 7: cout << "Volviendo al menu principal." << endl; break;
+                    case 7: editTeam(myTeam); break;
+                    case 8: cout << "Volviendo al menu principal." << endl; break;
                     default: break;
                 }
-                if (gameChoice != 7) {
+                if (gameChoice != 8) {
                     cout << "\nPresiona Enter para continuar...";
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 }
-            } while (gameChoice != 7);
+            } while (gameChoice != 8);
         }
     }
 

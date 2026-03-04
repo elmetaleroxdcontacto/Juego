@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "models.h"
 
@@ -11,8 +11,9 @@ void displayGameMenu();
 void displayCareerMenu();
 void viewTeam(Team& team);
 void addPlayer(Team& team);
-void trainPlayer(Team& team);
+void trainPlayer(Team& team, int season = -1, int week = -1);
 void changeTactics(Team& team);
+void editTeam(Team& team);
 void displayStatistics(Team& team);
 void displayAchievementsMenu(Career& career);
 void endSeason(Career& career);

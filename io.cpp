@@ -1,4 +1,4 @@
-#include "io.h"
+﻿#include "io.h"
 
 #include "utils.h"
 
@@ -177,14 +177,19 @@ bool loadTeamFromCsv(const string& filename, Team& team) {
         p.attack = attack;
         p.defense = defense;
         p.stamina = stamina;
+        p.fitness = stamina;
         p.skill = skill;
+        p.potential = clampInt(p.skill + randInt(0, 10), p.skill, 95);
         p.age = age;
         p.value = value;
         p.injured = false;
+        p.injuryType = "";
         p.injuryWeeks = 0;
         p.goals = 0;
         p.assists = 0;
         p.matchesPlayed = 0;
+        p.lastTrainedSeason = -1;
+        p.lastTrainedWeek = -1;
         team.addPlayer(p);
         seen.insert(key);
     }
@@ -265,14 +270,19 @@ bool loadTeamFromPlayersTxt(const string& filename, Team& team) {
         p.attack = attack;
         p.defense = defense;
         p.stamina = stamina;
+        p.fitness = stamina;
         p.skill = skill;
+        p.potential = clampInt(p.skill + randInt(0, 10), p.skill, 95);
         p.age = age;
         p.value = value;
         p.injured = false;
+        p.injuryType = "";
         p.injuryWeeks = 0;
         p.goals = 0;
         p.assists = 0;
         p.matchesPlayed = 0;
+        p.lastTrainedSeason = -1;
+        p.lastTrainedWeek = -1;
         team.addPlayer(p);
         seen.insert(key);
     }
@@ -317,10 +327,15 @@ bool loadTeamFromLegacyTxt(const string& filename, Team& team) {
                 p.value = static_cast<long long>(p.skill) * 10000;
             }
             p.injured = false;
+            p.injuryType = "";
             p.injuryWeeks = 0;
             p.goals = 0;
             p.assists = 0;
             p.matchesPlayed = 0;
+            p.fitness = p.stamina;
+            p.potential = clampInt(p.skill + randInt(0, 8), p.skill, 95);
+            p.lastTrainedSeason = -1;
+            p.lastTrainedWeek = -1;
             team.addPlayer(p);
         }
     }
