@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
+#include <unordered_map>
 
 using namespace std;
 
@@ -558,6 +559,9 @@ void displayStatistics(Team& team) {
     cout << "Derrotas: " << team.losses << endl;
     cout << "Goles a Favor: " << team.goalsFor << endl;
     cout << "Goles en Contra: " << team.goalsAgainst << endl;
+    cout << "Goles de Visita: " << team.awayGoals << endl;
+    cout << "Tarjetas Amarillas: " << team.yellowCards << endl;
+    cout << "Tarjetas Rojas: " << team.redCards << endl;
     cout << "Puntos: " << team.points << endl;
     cout << "\n--- Estadisticas de Jugadores ---" << endl;
     for (const auto& p : team.players) {
@@ -850,6 +854,13 @@ static vector<Team*> topByValue(vector<Team*> teams, int count) {
     return teams;
 }
 
+static vector<Team*> sortByValue(vector<Team*> teams) {
+    sort(teams.begin(), teams.end(), [](Team* a, Team* b) {
+        return a->getSquadValue() > b->getSquadValue();
+    });
+    return teams;
+}
+
 static vector<Team*> bottomByValue(vector<Team*> teams, int count) {
     sort(teams.begin(), teams.end(), [](Team* a, Team* b) {
         return a->getSquadValue() < b->getSquadValue();
@@ -934,35 +945,109 @@ static Team* simulateSingleLegKnockout(Team* home, Team* away, const string& lab
     return winner;
 }
 
-static Team* liguillaAscensoPrimeraB(const vector<Team*>& table) {
-    vector<Team*> seeds;
-    for (size_t i = 1; i < table.size() && i < 8; ++i) {
-        seeds.push_back(table[i]);
+static Team* simulateTwoLegTie(Team* firstHome, Team* firstAway, const string& label, bool extraTimeFinal) {
+    if (!firstHome) return firstAway;
+    if (!firstAway) return firstHome;
+    cout << label << ": " << firstAway->name << " vs " << firstHome->name << endl;
+
+    Team h1 = *firstHome;
+    Team a1 = *firstAway;
+    MatchResult r1 = playMatch(h1, a1, false, true);
+    Team h2 = *firstAway;
+    Team a2 = *firstHome;
+    MatchResult r2 = playMatch(h2, a2, false, true);
+
+    int homeAgg = r1.homeGoals + r2.awayGoals;
+    int awayAgg = r1.awayGoals + r2.homeGoals;
+
+    cout << "Ida: " << firstHome->name << " " << r1.homeGoals << " - " << r1.awayGoals << " " << firstAway->name << endl;
+    cout << "Vuelta: " << firstAway->name << " " << r2.homeGoals << " - " << r2.awayGoals << " " << firstHome->name << endl;
+    cout << "Global: " << firstHome->name << " " << homeAgg << " - " << awayAgg << " " << firstAway->name << endl;
+
+    if (homeAgg > awayAgg) return firstHome;
+    if (awayAgg > homeAgg) return firstAway;
+
+    if (extraTimeFinal) {
+        int etHome = randInt(0, 1);
+        int etAway = randInt(0, 1);
+        cout << "Prorroga: " << firstHome->name << " " << etHome << " - " << etAway << " " << firstAway->name << endl;
+        if (etHome > etAway) return firstHome;
+        if (etAway > etHome) return firstAway;
     }
-    if (seeds.empty()) return nullptr;
-    if (seeds.size() == 1) return seeds[0];
+
+    Team* winner = (randInt(0, 1) == 0) ? firstHome : firstAway;
+    cout << "Gana por penales: " << winner->name << endl;
+    return winner;
+}
+
+static Team* liguillaAscensoPrimeraB(const vector<Team*>& table) {
+    if (table.size() < 2) return table.empty() ? nullptr : table.front();
+
+    unordered_map<Team*, int> seedPos;
+    for (size_t i = 0; i < table.size(); ++i) seedPos[table[i]] = static_cast<int>(i) + 1;
+
+    Team* s2 = table.size() > 1 ? table[1] : nullptr;
+    Team* s3 = table.size() > 2 ? table[2] : nullptr;
+    Team* s4 = table.size() > 3 ? table[3] : nullptr;
+    Team* s5 = table.size() > 4 ? table[4] : nullptr;
+    Team* s6 = table.size() > 5 ? table[5] : nullptr;
+    Team* s7 = table.size() > 6 ? table[6] : nullptr;
+    Team* s8 = table.size() > 7 ? table[7] : nullptr;
 
     cout << "\nLiguilla de Ascenso (2°-8°)" << endl;
-    Team* s2 = seeds.size() > 0 ? seeds[0] : nullptr;
-    Team* s3 = seeds.size() > 1 ? seeds[1] : nullptr;
-    Team* s4 = seeds.size() > 2 ? seeds[2] : nullptr;
-    Team* s5 = seeds.size() > 3 ? seeds[3] : nullptr;
-    Team* s6 = seeds.size() > 4 ? seeds[4] : nullptr;
-    Team* s7 = seeds.size() > 5 ? seeds[5] : nullptr;
-    Team* s8 = seeds.size() > 6 ? seeds[6] : nullptr;
+    Team* w1 = simulateTwoLegTie(s8, s3, "Primera ronda 1 (3° vs 8°)", false);
+    Team* w2 = simulateTwoLegTie(s7, s4, "Primera ronda 2 (4° vs 7°)", false);
+    Team* w3 = simulateTwoLegTie(s6, s5, "Primera ronda 3 (5° vs 6°)", false);
 
-    Team* q1 = (s2 && s8) ? simulatePlayoffMatch(s2, s8, "Cuartos 1") : (s2 ? s2 : s8);
-    if (s2 && !s8) cout << "Cuartos 1: " << s2->name << " avanza por bye." << endl;
-    Team* q2 = (s3 && s7) ? simulatePlayoffMatch(s3, s7, "Cuartos 2") : (s3 ? s3 : s7);
-    if (s3 && !s7) cout << "Cuartos 2: " << s3->name << " avanza por bye." << endl;
-    Team* q3 = (s4 && s6) ? simulatePlayoffMatch(s4, s6, "Cuartos 3") : (s4 ? s4 : s6);
-    if (s4 && !s6) cout << "Cuartos 3: " << s4->name << " avanza por bye." << endl;
-    Team* q4 = s5;
-    if (s5) cout << "Cuartos 4: " << s5->name << " avanza por bye." << endl;
+    vector<Team*> winners;
+    if (w1) winners.push_back(w1);
+    if (w2) winners.push_back(w2);
+    if (w3) winners.push_back(w3);
 
-    Team* semi1 = simulatePlayoffMatch(q1, q4, "Semifinal 1");
-    Team* semi2 = simulatePlayoffMatch(q2, q3, "Semifinal 2");
-    Team* winner = simulatePlayoffMatch(semi1, semi2, "Final Liguilla");
+    auto seed = [&](Team* t) {
+        auto it = seedPos.find(t);
+        return it == seedPos.end() ? 99 : it->second;
+    };
+
+    Team* worst = nullptr;
+    int worstSeed = -1;
+    for (auto* w : winners) {
+        int s = seed(w);
+        if (s > worstSeed) {
+            worstSeed = s;
+            worst = w;
+        }
+    }
+
+    Team* semiA = nullptr;
+    if (s2 && worst) {
+        semiA = simulateTwoLegTie(worst, s2, "Semifinal A (2° vs peor clasificado)", false);
+    } else {
+        semiA = s2 ? s2 : worst;
+    }
+
+    vector<Team*> remaining;
+    for (auto* w : winners) {
+        if (w && w != worst) remaining.push_back(w);
+    }
+
+    Team* semiB = nullptr;
+    if (remaining.size() == 2) {
+        Team* a = remaining[0];
+        Team* b = remaining[1];
+        Team* firstHome = seed(a) > seed(b) ? a : b;
+        Team* firstAway = (firstHome == a) ? b : a;
+        semiB = simulateTwoLegTie(firstHome, firstAway, "Semifinal B", false);
+    } else if (remaining.size() == 1) {
+        semiB = remaining[0];
+    }
+
+    if (!semiA) return semiB;
+    if (!semiB) return semiA;
+
+    Team* firstHome = seed(semiA) > seed(semiB) ? semiA : semiB;
+    Team* firstAway = (firstHome == semiA) ? semiB : semiA;
+    Team* winner = simulateTwoLegTie(firstHome, firstAway, "Final Liguilla", true);
     if (winner) cout << "Ganador liguilla: " << winner->name << endl;
     return winner;
 }
@@ -1149,15 +1234,168 @@ static void endSeasonSegundaDivision(Career& career) {
     }
 }
 
+static void endSeasonPrimeraB(Career& career) {
+    cout << "\nFin de temporada (Primera B)!" << endl;
+    career.leagueTable.displayTable();
+
+    vector<Team*> table = career.leagueTable.teams;
+    vector<Team*> seeded = table;
+    Team* champion = nullptr;
+    if (!table.empty()) {
+        if (table.size() >= 2) {
+            int topPts = table[0]->points;
+            int tiedCount = 0;
+            for (auto* t : table) {
+                if (t->points == topPts) tiedCount++;
+                else break;
+            }
+            if (tiedCount >= 2) {
+                Team* a = table[0];
+                Team* b = table[1];
+                cout << "\nFinal por el titulo (empate en puntos):" << endl;
+                champion = simulateSingleLegKnockout(a, b, "Final", a == career.myTeam || b == career.myTeam);
+                if (champion && champion != seeded[0]) {
+                    auto it = find(seeded.begin(), seeded.end(), champion);
+                    if (it != seeded.end()) {
+                        Team* oldFirst = seeded[0];
+                        size_t idx = static_cast<size_t>(it - seeded.begin());
+                        seeded[idx] = oldFirst;
+                        seeded[0] = champion;
+                    }
+                }
+            } else {
+                champion = table[0];
+            }
+        } else {
+            champion = table[0];
+        }
+    }
+    if (champion) {
+        cout << "Campeon fase regular: " << champion->name << endl;
+    }
+
+    Team* liguillaWinner = liguillaAscensoPrimeraB(seeded);
+
+    Team* relegated = nullptr;
+    if (!table.empty()) {
+        int n = static_cast<int>(table.size());
+        int bottomPts = table[n - 1]->points;
+        int tied = 0;
+        for (int i = n - 1; i >= 0; --i) {
+            if (table[i]->points == bottomPts) tied++;
+            else break;
+        }
+        if (tied >= 2 && n >= 2) {
+            Team* a = table[n - 1];
+            Team* b = table[n - 2];
+            cout << "\nDefinicion de descenso (empate en el ultimo lugar):" << endl;
+            Team* winner = simulateSingleLegKnockout(a, b, "Definicion descenso", a == career.myTeam || b == career.myTeam);
+            relegated = (winner == a) ? b : a;
+        } else {
+            relegated = table[n - 1];
+        }
+    }
+
+    int idx = divisionIndex(career.activeDivision);
+    string higher = (idx > 0) ? kDivisions[idx - 1].id : "";
+    string lower = (idx >= 0 && idx + 1 < static_cast<int>(kDivisions.size())) ? kDivisions[idx + 1].id : "";
+
+    vector<Team*> promote;
+    if (!higher.empty() && champion) promote.push_back(champion);
+    if (!higher.empty() && liguillaWinner &&
+        find(promote.begin(), promote.end(), liguillaWinner) == promote.end()) {
+        promote.push_back(liguillaWinner);
+    }
+
+    vector<Team*> relegate;
+    if (!lower.empty() && relegated) relegate.push_back(relegated);
+
+    vector<Team*> fromHigher = higher.empty() ? vector<Team*>() : bottomByValue(career.getDivisionTeams(higher), static_cast<int>(promote.size()));
+    vector<Team*> fromLower = lower.empty() ? vector<Team*>() : topByValue(career.getDivisionTeams(lower), static_cast<int>(relegate.size()));
+
+    for (auto* t : promote) {
+        if (!higher.empty()) {
+            t->division = higher;
+            t->budget += 50000;
+            t->morale = 60;
+        }
+    }
+    for (auto* t : relegate) {
+        if (!lower.empty()) {
+            t->division = lower;
+            t->budget = max(0LL, t->budget - 20000);
+            t->morale = 40;
+        }
+    }
+    for (auto* t : fromHigher) {
+        t->division = career.activeDivision;
+        t->morale = 45;
+    }
+    for (auto* t : fromLower) {
+        t->division = career.activeDivision;
+        t->morale = 55;
+    }
+
+    if (!higher.empty() && !promote.empty()) {
+        cout << "Ascensos: ";
+        for (size_t i = 0; i < promote.size(); ++i) {
+            if (i) cout << ", ";
+            cout << promote[i]->name;
+        }
+        cout << endl;
+    }
+    if (!lower.empty() && !relegate.empty()) {
+        cout << "Descenso: " << relegate.front()->name << endl;
+    }
+
+    career.currentSeason++;
+    career.currentWeek = 1;
+    career.agePlayers();
+    if (career.myTeam) {
+        career.setActiveDivision(career.myTeam->division);
+    } else {
+        career.setActiveDivision(career.activeDivision);
+    }
+    career.resetSeason();
+    for (auto* team : career.activeTeams) {
+        addYouthPlayers(*team, 1);
+    }
+}
+
 void endSeason(Career& career) {
     if (isSegundaFormat(career)) {
         endSeasonSegundaDivision(career);
         return;
     }
+    if (career.activeDivision == "primera b") {
+        endSeasonPrimeraB(career);
+        return;
+    }
     cout << "\nFin de temporada!" << endl;
     career.leagueTable.displayTable();
+    Team* champion = nullptr;
     if (!career.leagueTable.teams.empty()) {
-        cout << "Campeon: " << career.leagueTable.teams.front()->name << endl;
+        if (career.activeDivision == "primera division" && career.leagueTable.teams.size() >= 2) {
+            int topPts = career.leagueTable.teams.front()->points;
+            int tiedCount = 0;
+            for (auto* t : career.leagueTable.teams) {
+                if (t->points == topPts) tiedCount++;
+                else break;
+            }
+            if (tiedCount >= 2) {
+                Team* a = career.leagueTable.teams[0];
+                Team* b = career.leagueTable.teams[1];
+                cout << "\nFinal por el titulo (empate en puntos):" << endl;
+                champion = simulateSingleLegKnockout(a, b, "Final", a == career.myTeam || b == career.myTeam);
+            } else {
+                champion = career.leagueTable.teams.front();
+            }
+        } else {
+            champion = career.leagueTable.teams.front();
+        }
+    }
+    if (champion) {
+        cout << "Campeon: " << champion->name << endl;
     }
     int idx = divisionIndex(career.activeDivision);
     string higher = (idx > 0) ? kDivisions[idx - 1].id : "";
@@ -1197,7 +1435,24 @@ void endSeason(Career& career) {
     }
 
     vector<Team*> fromHigher = higher.empty() ? vector<Team*>() : bottomByValue(career.getDivisionTeams(higher), actualPromote);
-    vector<Team*> fromLower = lower.empty() ? vector<Team*>() : topByValue(career.getDivisionTeams(lower), relegateCount);
+    vector<Team*> fromLower;
+    if (!lower.empty() && career.activeDivision == "primera division" && lower == "primera b") {
+        auto pbTable = sortByValue(career.getDivisionTeams(lower));
+        if (!pbTable.empty()) {
+            Team* pbChampion = pbTable[0];
+            Team* pbPlayoff = liguillaAscensoPrimeraB(pbTable);
+            if (pbChampion) fromLower.push_back(pbChampion);
+            if (pbPlayoff && pbPlayoff != pbChampion) fromLower.push_back(pbPlayoff);
+            for (size_t i = 1; i < pbTable.size() && static_cast<int>(fromLower.size()) < relegateCount; ++i) {
+                Team* candidate = pbTable[i];
+                if (find(fromLower.begin(), fromLower.end(), candidate) == fromLower.end()) {
+                    fromLower.push_back(candidate);
+                }
+            }
+        }
+    } else {
+        fromLower = lower.empty() ? vector<Team*>() : topByValue(career.getDivisionTeams(lower), relegateCount);
+    }
 
     for (auto* t : promote) {
         if (!higher.empty()) {

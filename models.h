@@ -47,9 +47,13 @@ public:
     int points;
     int goalsFor;
     int goalsAgainst;
+    int awayGoals;
     int wins;
     int draws;
     int losses;
+    int yellowCards;
+    int redCards;
+    int tiebreakerSeed;
     std::vector<std::string> achievements;
 
     Team(std::string n = "");
@@ -69,6 +73,7 @@ public:
 struct LeagueTable {
     std::vector<Team*> teams;
     std::string title;
+    std::string ruleId;
 
     void clear();
     void addTeam(Team* team);

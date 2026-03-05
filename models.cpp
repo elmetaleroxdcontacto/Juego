@@ -86,9 +86,13 @@ Team::Team(string n)
       points(0),
       goalsFor(0),
       goalsAgainst(0),
+      awayGoals(0),
       wins(0),
       draws(0),
-      losses(0) {}
+      losses(0),
+      yellowCards(0),
+      redCards(0),
+      tiebreakerSeed(0) {}
 
 void Team::addPlayer(const Player& p) {
     players.push_back(p);
@@ -98,9 +102,13 @@ void Team::resetSeasonStats() {
     points = 0;
     goalsFor = 0;
     goalsAgainst = 0;
+    awayGoals = 0;
     wins = 0;
     draws = 0;
     losses = 0;
+    yellowCards = 0;
+    redCards = 0;
+    tiebreakerSeed = randInt(0, 1000000);
 }
 
 static void parseFormation(const string& formation, int& defCount, int& midCount, int& fwdCount) {
@@ -239,6 +247,22 @@ void LeagueTable::addTeam(Team* team) {
 }
 
 void LeagueTable::sortTable() {
+    if (ruleId == "primera division" || ruleId == "primera b") {
+        sort(teams.begin(), teams.end(), [](Team* a, Team* b) {
+            if (a->points != b->points) return a->points > b->points;
+            int aGD = a->goalsFor - a->goalsAgainst;
+            int bGD = b->goalsFor - b->goalsAgainst;
+            if (aGD != bGD) return aGD > bGD;
+            if (a->wins != b->wins) return a->wins > b->wins;
+            if (a->goalsFor != b->goalsFor) return a->goalsFor > b->goalsFor;
+            if (a->awayGoals != b->awayGoals) return a->awayGoals > b->awayGoals;
+            if (a->redCards != b->redCards) return a->redCards < b->redCards;
+            if (a->yellowCards != b->yellowCards) return a->yellowCards < b->yellowCards;
+            if (a->tiebreakerSeed != b->tiebreakerSeed) return a->tiebreakerSeed < b->tiebreakerSeed;
+            return a->name < b->name;
+        });
+        return;
+    }
     sort(teams.begin(), teams.end(), [](Team* a, Team* b) {
         if (a->points != b->points) return a->points > b->points;
         int aGD = a->goalsFor - a->goalsAgainst;
@@ -391,6 +415,7 @@ void Career::setActiveDivision(const string& id) {
     activeTeams = getDivisionTeams(id);
     leagueTable.clear();
     leagueTable.title = divisionDisplay(id);
+    leagueTable.ruleId = id;
     for (auto* t : activeTeams) leagueTable.addTeam(t);
     leagueTable.sortTable();
     groupNorthIdx.clear();
@@ -443,7 +468,8 @@ void Career::saveCareer() {
     for (const auto& team : allTeams) {
         file << "TEAM " << team.name << "|" << team.division << "|" << team.tactics << "|" << team.formation
              << "|" << team.budget << "|" << team.morale << "|" << team.points << "|" << team.goalsFor << "|" << team.goalsAgainst
-             << "|" << team.wins << "|" << team.draws << "|" << team.losses << "|" << team.trainingFocus << "\n";
+             << "|" << team.wins << "|" << team.draws << "|" << team.losses << "|" << team.trainingFocus
+             << "|" << team.awayGoals << "|" << team.redCards << "|" << team.yellowCards << "|" << team.tiebreakerSeed << "\n";
         file << "PLAYERS " << team.players.size() << "\n";
         for (const auto& p : team.players) {
             file << "PLAYER " << p.name << "|" << p.position << "|" << p.attack << "|" << p.defense << "|"
@@ -522,6 +548,15 @@ bool Career::loadCareer() {
             size_t tfIndex = base + 6;
             if (fields.size() > tfIndex) team.trainingFocus = fields[tfIndex];
             else team.trainingFocus = "Balanceado";
+            size_t extra = tfIndex + 1;
+            if (fields.size() > extra) team.awayGoals = stoi(fields[extra]);
+            else team.awayGoals = 0;
+            if (fields.size() > extra + 1) team.redCards = stoi(fields[extra + 1]);
+            else team.redCards = 0;
+            if (fields.size() > extra + 2) team.yellowCards = stoi(fields[extra + 2]);
+            else team.yellowCards = 0;
+            if (fields.size() > extra + 3) team.tiebreakerSeed = stoi(fields[extra + 3]);
+            else team.tiebreakerSeed = randInt(0, 1000000);
 
             if (!getline(file, line)) return false;
             if (line.rfind("PLAYERS ", 0) != 0) return false;

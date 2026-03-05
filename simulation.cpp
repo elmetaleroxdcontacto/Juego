@@ -75,6 +75,22 @@ static void applyMatchFatigue(Team& team, const vector<int>& xi, const string& t
     }
 }
 
+static int cardsForTactics(const string& tactics, int minVal, int maxVal) {
+    int base = randInt(minVal, maxVal);
+    if (tactics == "Pressing") base += 1;
+    else if (tactics == "Offensive") base += 1;
+    else if (tactics == "Defensive") base -= 1;
+    return clampInt(base, 0, 6);
+}
+
+static int redChanceForTactics(const string& tactics) {
+    int chance = 5;
+    if (tactics == "Pressing") chance += 4;
+    else if (tactics == "Offensive") chance += 2;
+    else if (tactics == "Defensive") chance -= 1;
+    return clampInt(chance, 1, 15);
+}
+
 TeamStrength computeStrength(Team& team) {
     TeamStrength ts;
     ts.xi = team.getStartingXIIndices();
@@ -362,6 +378,16 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch) {
     home.goalsAgainst += awayGoals;
     away.goalsFor += awayGoals;
     away.goalsAgainst += homeGoals;
+    away.awayGoals += awayGoals;
+
+    int yellowHome = cardsForTactics(home.tactics, 0, 3);
+    int yellowAway = cardsForTactics(away.tactics, 0, 3);
+    int redHome = (randInt(1, 100) <= redChanceForTactics(home.tactics)) ? 1 : 0;
+    int redAway = (randInt(1, 100) <= redChanceForTactics(away.tactics)) ? 1 : 0;
+    home.yellowCards += yellowHome;
+    away.yellowCards += yellowAway;
+    home.redCards += redHome;
+    away.redCards += redAway;
 
     if (homeGoals > awayGoals) {
         home.points += 3;

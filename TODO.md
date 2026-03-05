@@ -95,3 +95,14 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - [x] Roles por jugador, salarios/contratos, historial de lesiones y plan de entrenamiento semanal.
 - [x] Scouting con incertidumbre, desarrollo juvenil, eventos de club y dashboard semanal.
 - [x] IA tactica adaptativa, partidos clave y modo Copa (eliminacion directa).
+ 
+## Cambios recientes (2026-03-05)
+- Implementado formato de Segunda División (14 equipos) con grupos Norte/Sur, calendario intra-grupo ida/vuelta (14 fechas), tablas por grupo y clasificación automática a playoff/descenso.
+- Playoff de Segunda División ahora con llaves ida y vuelta; repechaje 4° vs 4° a partido único.
+- Tablas especiales para Primera División y Primera B con nuevos criterios de desempate (DG, ganados, GF, goles visita, menos rojas/amarillas, sorteo).
+- Nuevos campos por equipo: goles de visita, tarjetas amarillas/rojas y semilla de sorteo; guardado/carga actualizado.
+- Simulación de tarjetas y registro de goles de visita en cada partido.
+- Final por el título en Primera División y Primera B si hay empate en puntos (partido único + penales).
+- Liguilla de Primera B (2°-8°) ida/vuelta con reglas de localía; final con prórroga + penales.
+- Descenso en Primera B: último lugar con definición si hay empate en puntos.
+- Ascensos/descensos actualizados: Primera División recibe campeón + liguilla de Primera B; Primera B asciende campeón + liguilla y desciende 1 a Segunda.
