@@ -91,3 +91,7 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - [x] Incorporar finanzas semanales (ingresos + sueldos) y mercado con ofertas/CPU.
 - [x] Añadir lesiones con tipo y duracion; nuevas tacticas (Pressing/Counter).
 - [x] Incluir estadisticas post-partido y editor rapido de equipo/jugadores.
+- [x] Scouting con incertidumbre, contratos/salarios y renovaciones.\n- [x] Roles por jugador y plan de entrenamiento semanal.\n- [x] Cantera, eventos de club y dashboard semanal.\n- [x] Ajuste de tacticas CPU segun rival/moral.\n- [x] Modo Copa (eliminacion directa).
+- [x] Roles por jugador, salarios/contratos, historial de lesiones y plan de entrenamiento semanal.
+- [x] Scouting con incertidumbre, desarrollo juvenil, eventos de club y dashboard semanal.
+- [x] IA tactica adaptativa, partidos clave y modo Copa (eliminacion directa).

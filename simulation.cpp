@@ -30,6 +30,35 @@ static int effectiveStamina(int avgStamina, double mul) {
     return clampInt(val, 20, 100);
 }
 
+static void applyRoleModifier(const Player& p, int& attack, int& defense) {
+    string role = toLower(trim(p.role));
+    if (role == "stopper") {
+        defense += 4;
+    } else if (role == "carrilero") {
+        attack += 3;
+        defense -= 2;
+    } else if (role == "enganche") {
+        attack += 5;
+        defense -= 3;
+    } else if (role == "boxtobox") {
+        attack += 2;
+        defense += 2;
+    } else if (role == "pivote") {
+        defense += 5;
+        attack -= 3;
+    } else if (role == "poacher") {
+        attack += 5;
+    } else if (role == "falso9") {
+        attack += 3;
+        defense += 2;
+    } else if (role == "pressing") {
+        attack += 2;
+        defense += 1;
+    }
+    attack = clampInt(attack, 1, 120);
+    defense = clampInt(defense, 1, 120);
+}
+
 static void applyMatchFatigue(Team& team, const vector<int>& xi, const string& tactics) {
     for (int idx : xi) {
         if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
@@ -57,8 +86,11 @@ TeamStrength computeStrength(Team& team) {
     int skill = 0;
     int stamina = 0;
     for (int idx : ts.xi) {
-        ts.attack += team.players[idx].attack;
-        ts.defense += team.players[idx].defense;
+        int att = team.players[idx].attack;
+        int def = team.players[idx].defense;
+        applyRoleModifier(team.players[idx], att, def);
+        ts.attack += att;
+        ts.defense += def;
         skill += team.players[idx].skill;
         stamina += clampInt(team.players[idx].fitness, 0, 100);
     }
@@ -118,6 +150,7 @@ bool simulateInjury(Player& player, const string& tactics, bool verbose, vector<
     if (player.fitness < 60) risk += 3;
     if (player.stamina < 60) risk += 2;
     if (player.age >= 32) risk += (player.age - 31) / 3;
+    risk += player.injuryHistory / 3;
     if (tactics == "Pressing") risk += 3;
     else if (tactics == "Offensive") risk += 2;
     else if (tactics == "Counter") risk += 1;
@@ -125,6 +158,7 @@ bool simulateInjury(Player& player, const string& tactics, bool verbose, vector<
     risk = clampInt(risk, 2, 15);
     if (randInt(1, 100) <= risk) {
         player.injured = true;
+        player.injuryHistory++;
         int roll = randInt(1, 100);
         if (roll <= 65) {
             player.injuryType = "Leve";

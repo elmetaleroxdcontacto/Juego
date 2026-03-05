@@ -12,3 +12,4 @@ g++ -std=c++17 -O2 main.cpp utils.cpp models.cpp io.cpp simulation.cpp ui.cpp -o
 - Finanzas semanales (ingresos/sueldos) y mercado con ofertas/CPU.
 - Lesiones con tipo/duracion y tacticas nuevas (Pressing/Counter).
 - Estadisticas post-partido y editor rapido de equipo/jugadores.
+- Scouting con incertidumbre, contratos y salarios.\n- Roles por jugador, plan de entrenamiento semanal y cantera.\n- Eventos de club, dashboard semanal y tacticas CPU adaptativas.\n- Modo Copa (eliminacion directa).

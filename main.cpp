@@ -23,8 +23,8 @@ int main() {
 
     while (true) {
         displayMainMenu();
-        int mainChoice = readInt("Elige una opcion: ", 1, 3);
-        if (mainChoice == 3) {
+        int mainChoice = readInt("Elige una opcion: ", 1, 4);
+        if (mainChoice == 4) {
             cout << "Saliendo del juego." << endl;
             break;
         }
@@ -82,7 +82,7 @@ int main() {
                 do {
                     cout << "\nTemporada " << career.currentSeason << ", Semana " << career.currentWeek << endl;
                     displayCareerMenu();
-                    careerChoice = readInt("Elige una opcion: ", 1, 13);
+                    careerChoice = readInt("Elige una opcion: ", 1, 14);
                     switch (careerChoice) {
                         case 1: viewTeam(*career.myTeam); break;
                         case 2: trainPlayer(*career.myTeam, career.currentSeason, career.currentWeek); break;
@@ -95,15 +95,16 @@ int main() {
                         case 9: displayAchievementsMenu(career); break;
                         case 10: career.saveCareer(); break;
                         case 11: retirePlayer(*career.myTeam); break;
-                        case 12: cout << "Volviendo al menu principal." << endl; break;
-                        case 13: editTeam(*career.myTeam); break;
+                        case 12: setTrainingPlan(*career.myTeam); break;
+                        case 13: cout << "Volviendo al menu principal." << endl; break;
+                        case 14: editTeam(*career.myTeam); break;
                         default: break;
                     }
-                    if (careerChoice != 12) {
+                    if (careerChoice != 13) {
                         cout << "\nPresiona Enter para continuar...";
                         cin.ignore(numeric_limits<streamsize>::max(), '\n');
                     }
-                } while (careerChoice != 12);
+                } while (careerChoice != 13);
             }
         } else if (mainChoice == 2) {
             if (career.divisions.empty()) {
@@ -175,6 +176,8 @@ int main() {
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 }
             } while (gameChoice != 8);
+        } else if (mainChoice == 3) {
+            playCupMode(career);
         }
     }
 

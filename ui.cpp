@@ -45,14 +45,18 @@ void transferMarket(Team& team) {
             p.defense = clampInt(p.skill - 10, 20, 90);
         }
         p.value = static_cast<long long>(p.skill) * 10000;
+        p.wage = static_cast<long long>(p.skill) * 150 + randInt(0, 600);
+        p.contractWeeks = randInt(52, 156);
         p.injured = false;
         p.injuryType = "";
         p.injuryWeeks = 0;
+        p.injuryHistory = 0;
         p.goals = 0;
         p.assists = 0;
         p.matchesPlayed = 0;
         p.lastTrainedSeason = -1;
         p.lastTrainedWeek = -1;
+        p.role = defaultRoleForPosition(p.position);
         if (team.budget >= p.value) {
             team.budget -= p.value;
             team.addPlayer(p);
@@ -96,8 +100,16 @@ void scoutPlayers(Team& team) {
         for (int i = 0; i < 3; ++i) {
             string pos = positions[randInt(0, static_cast<int>(positions.size()) - 1)];
             Player p = makeRandomPlayer(pos, minSkill, maxSkill, 18, 32);
-            cout << "Jugador encontrado: " << p.name << " (" << p.position << ") - Ataque: " << p.attack
-                 << ", Defensa: " << p.defense << ", Valor: $" << p.value << endl;
+            int err = randInt(3, 8);
+            int estAtkLo = clampInt(p.attack - err, 0, 100);
+            int estAtkHi = clampInt(p.attack + err, 0, 100);
+            int estDefLo = clampInt(p.defense - err, 0, 100);
+            int estDefHi = clampInt(p.defense + err, 0, 100);
+            int estSkillLo = clampInt(p.skill - err, 0, 100);
+            int estSkillHi = clampInt(p.skill + err, 0, 100);
+            cout << "Jugador encontrado: " << p.name << " (" << p.position << ") - Ataque: "
+                 << estAtkLo << "-" << estAtkHi << ", Defensa: " << estDefLo << "-" << estDefHi
+                 << ", Habilidad: " << estSkillLo << "-" << estSkillHi << ", Valor: $" << p.value << endl;
             int buy = readInt("Comprar? (1. Si, 2. No): ", 1, 2);
             if (buy == 1 && team.budget >= p.value) {
                 team.budget -= p.value;
@@ -145,7 +157,8 @@ void displayMainMenu() {
     cout << "\n=== Football Manager Game ===" << endl;
     cout << "1. Modo Carrera" << endl;
     cout << "2. Iniciar Juego Rapido" << endl;
-    cout << "3. Salir" << endl;
+    cout << "3. Modo Copa" << endl;
+    cout << "4. Salir" << endl;
 }
 
 void displayGameMenu() {
@@ -173,13 +186,15 @@ void displayCareerMenu() {
     cout << "9. Ver Logros" << endl;
     cout << "10. Guardar Carrera" << endl;
     cout << "11. Retirar Jugador" << endl;
-    cout << "12. Volver al Menu Principal" << endl;
-    cout << "13. Editar Equipo" << endl;
+    cout << "12. Plan de Entrenamiento" << endl;
+    cout << "13. Volver al Menu Principal" << endl;
+    cout << "14. Editar Equipo" << endl;
 }
 
 void viewTeam(Team& team) {
     cout << "\nEquipo: " << team.name << endl;
-    cout << "Tacticas: " << team.tactics << ", Formacion: " << team.formation << ", Presupuesto: $" << team.budget << endl;
+    cout << "Tacticas: " << team.tactics << ", Formacion: " << team.formation
+         << ", Plan: " << team.trainingFocus << ", Presupuesto: $" << team.budget << endl;
     cout << "Moral: " << team.morale << " | Temporada: " << team.wins << "G-" << team.draws << "E-" << team.losses << "P"
          << " | GF " << team.goalsFor << " / GA " << team.goalsAgainst << " | Pts " << team.points << endl;
     if (team.players.empty()) {
@@ -234,7 +249,8 @@ void viewTeam(Team& team) {
                  << (p.injured ? " [LES]" : "") << " - Atq " << p.attack
                  << ", Def " << p.defense << ", Res " << p.stamina
                  << ", Cond " << p.fitness << ", Hab " << p.skill << ", Pot " << p.potential
-                 << ", Edad " << p.age << ", Valor $" << p.value << endl;
+                 << ", Rol " << p.role << ", Edad " << p.age << ", Valor $" << p.value
+                 << ", Salario $" << p.wage << ", Contrato " << p.contractWeeks << " sem" << endl;
         }
     }
 }
@@ -252,14 +268,18 @@ void addPlayer(Team& team) {
     p.potential = clampInt(p.skill + randInt(0, 5), p.skill, 95);
     p.age = readInt("Edad: ", 15, 50);
     p.value = readLongLong("Valor: ", 0, 1000000000000LL);
+    p.wage = static_cast<long long>(p.skill) * 150 + randInt(0, 600);
+    p.contractWeeks = randInt(52, 156);
     p.injured = false;
     p.injuryType = "";
     p.injuryWeeks = 0;
+    p.injuryHistory = 0;
     p.goals = 0;
     p.assists = 0;
     p.matchesPlayed = 0;
     p.lastTrainedSeason = -1;
     p.lastTrainedWeek = -1;
+    p.role = defaultRoleForPosition(p.position);
     team.addPlayer(p);
     cout << "Jugador agregado!" << endl;
 }
@@ -355,6 +375,64 @@ void changeTactics(Team& team) {
     cout << "Tacticas cambiadas a " << team.tactics << endl;
 }
 
+void setTrainingPlan(Team& team) {
+    cout << "\nPlan de entrenamiento actual: " << team.trainingFocus << endl;
+    cout << "1. Balanceado" << endl;
+    cout << "2. Fisico" << endl;
+    cout << "3. Tecnico" << endl;
+    cout << "4. Tactico" << endl;
+    int choice = readInt("Elige plan: ", 1, 4);
+    switch (choice) {
+        case 1: team.trainingFocus = "Balanceado"; break;
+        case 2: team.trainingFocus = "Fisico"; break;
+        case 3: team.trainingFocus = "Tecnico"; break;
+        case 4: team.trainingFocus = "Tactico"; break;
+        default: break;
+    }
+    cout << "Plan actualizado a " << team.trainingFocus << endl;
+}
+
+static void applyTrainingPlan(Team& team) {
+    string focus = team.trainingFocus.empty() ? "Balanceado" : team.trainingFocus;
+    if (focus == "Fisico") {
+        for (auto& p : team.players) {
+            if (p.injured) continue;
+            p.fitness = clampInt(p.fitness + 2, 15, p.stamina);
+            if (randInt(1, 100) <= 12) {
+                p.stamina = min(100, p.stamina + 1);
+                if (p.fitness > p.stamina) p.fitness = p.stamina;
+            }
+        }
+    } else if (focus == "Tecnico") {
+        for (auto& p : team.players) {
+            if (p.injured) continue;
+            if (p.skill >= p.potential) continue;
+            if (randInt(1, 100) <= 18) {
+                p.skill = min(100, p.skill + 1);
+                string pos = normalizePosition(p.position);
+                if (pos == "ARQ" || pos == "DEF") p.defense = min(100, p.defense + 1);
+                else if (pos == "MED") {
+                    p.attack = min(100, p.attack + 1);
+                    p.defense = min(100, p.defense + 1);
+                } else {
+                    p.attack = min(100, p.attack + 1);
+                }
+            }
+        }
+    } else if (focus == "Tactico") {
+        team.morale = clampInt(team.morale + 2, 0, 100);
+        for (auto& p : team.players) {
+            if (p.injured) continue;
+            p.fitness = clampInt(p.fitness + 1, 15, p.stamina);
+        }
+    } else {
+        for (auto& p : team.players) {
+            if (p.injured) continue;
+            p.fitness = clampInt(p.fitness + 1, 15, p.stamina);
+        }
+    }
+}
+
 void editTeam(Team& team) {
     while (true) {
         cout << "\n=== Editor Rapido de Equipo ===" << endl;
@@ -395,9 +473,12 @@ void editTeam(Team& team) {
             cout << "8. Valor" << endl;
             cout << "9. Condicion" << endl;
             cout << "10. Potencial" << endl;
-            cout << "11. Volver" << endl;
-            int field = readInt("Campo a editar: ", 1, 11);
-            if (field == 11) continue;
+            cout << "11. Rol" << endl;
+            cout << "12. Salario" << endl;
+            cout << "13. Contrato (semanas)" << endl;
+            cout << "14. Volver" << endl;
+            int field = readInt("Campo a editar: ", 1, 14);
+            if (field == 14) continue;
             switch (field) {
                 case 1: {
                     string v = readLine("Nuevo nombre: ");
@@ -437,6 +518,17 @@ void editTeam(Team& team) {
                 case 10:
                     p.potential = readInt("Nuevo potencial (0-100): ", 0, 100);
                     if (p.potential < p.skill) p.potential = p.skill;
+                    break;
+                case 11: {
+                    string v = readLine("Nuevo rol: ");
+                    if (!v.empty()) p.role = v;
+                    break;
+                }
+                case 12:
+                    p.wage = readLongLong("Nuevo salario: ", 0, 1000000000000LL);
+                    break;
+                case 13:
+                    p.contractWeeks = readInt("Nuevo contrato (semanas): ", 0, 520);
                     break;
                 default:
                     break;
@@ -522,10 +614,10 @@ static int divisionWageFactor(const string& division) {
 }
 
 static long long weeklyWage(const Team& team) {
-    int factor = divisionWageFactor(team.division);
     long long sum = 0;
-    for (const auto& p : team.players) sum += p.skill;
-    return sum * factor;
+    for (const auto& p : team.players) sum += p.wage;
+    int factor = divisionWageFactor(team.division);
+    return sum * factor / 100;
 }
 
 static void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore) {
@@ -539,6 +631,81 @@ static void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore)
         if (career.myTeam == team) {
             cout << "Finanzas semanales: +" << income << " / -" << wages << " = " << net << endl;
         }
+    }
+}
+
+static void weeklyDashboard(const Career& career) {
+    if (!career.myTeam) return;
+    int rank = teamRank(career.leagueTable, career.myTeam);
+    int injured = 0;
+    int expiring = 0;
+    for (const auto& p : career.myTeam->players) {
+        if (p.injured) injured++;
+        if (p.contractWeeks > 0 && p.contractWeeks <= 4) expiring++;
+    }
+    cout << "\n--- Resumen Semanal ---" << endl;
+    cout << "Posicion: " << rank << " | Pts: " << career.myTeam->points
+         << " | Moral: " << career.myTeam->morale
+         << " | Presupuesto: $" << career.myTeam->budget << endl;
+    cout << "Lesionados: " << injured << " | Contratos por vencer (<=4 sem): " << expiring << endl;
+}
+
+static void applyClubEvent(Career& career) {
+    if (!career.myTeam) return;
+    if (randInt(1, 100) > 15) return;
+    int event = randInt(1, 4);
+    if (event == 1) {
+        long long bonus = 50000 + randInt(0, 30000);
+        career.myTeam->budget += bonus;
+        cout << "[Evento] Patrocinio sorpresa: +" << bonus << endl;
+    } else if (event == 2) {
+        career.myTeam->morale = clampInt(career.myTeam->morale - 5, 0, 100);
+        cout << "[Evento] Protesta de hinchas: moral -5." << endl;
+    } else if (event == 3) {
+        if (!career.myTeam->players.empty()) {
+            int idx = randInt(0, static_cast<int>(career.myTeam->players.size()) - 1);
+            Player& p = career.myTeam->players[idx];
+            p.injured = true;
+            p.injuryType = "Leve";
+            p.injuryWeeks = randInt(1, 2);
+            p.injuryHistory++;
+            cout << "[Evento] Accidente en entrenamiento: " << p.name << " fuera " << p.injuryWeeks << " semanas." << endl;
+        }
+    } else {
+        int minSkill, maxSkill;
+        getDivisionSkillRange(career.myTeam->division, minSkill, maxSkill);
+        Player youth = makeRandomPlayer("MED", minSkill, maxSkill, 16, 18);
+        youth.potential = clampInt(youth.skill + randInt(8, 15), youth.skill, 99);
+        career.myTeam->addPlayer(youth);
+        cout << "[Evento] Cantera: se unio " << youth.name << " (pot " << youth.potential << ")." << endl;
+    }
+}
+
+static void adjustCpuTactics(Team& team, const Team& opponent, const Team* myTeam) {
+    if (&team == myTeam) return;
+    int diff = team.getAverageSkill() - opponent.getAverageSkill();
+    if (team.morale >= 70) {
+        team.tactics = "Pressing";
+    } else if (diff >= 6) {
+        team.tactics = "Offensive";
+    } else if (diff <= -6) {
+        team.tactics = "Defensive";
+    } else if (team.morale <= 35) {
+        team.tactics = "Defensive";
+    } else {
+        team.tactics = "Balanced";
+    }
+}
+
+static void addYouthPlayers(Team& team, int count) {
+    int minSkill, maxSkill;
+    getDivisionSkillRange(team.division, minSkill, maxSkill);
+    for (int i = 0; i < count; ++i) {
+        vector<string> positions = {"ARQ", "DEF", "MED", "DEL"};
+        string pos = positions[randInt(0, static_cast<int>(positions.size()) - 1)];
+        Player youth = makeRandomPlayer(pos, minSkill, maxSkill, 16, 18);
+        youth.potential = clampInt(youth.skill + randInt(10, 18), youth.skill, 99);
+        team.addPlayer(youth);
     }
 }
 
@@ -586,6 +753,40 @@ static void processCpuTransfers(Career& career) {
     }
 }
 
+static void updateContracts(Career& career) {
+    for (auto* team : career.activeTeams) {
+        for (size_t i = 0; i < team->players.size();) {
+            Player& p = team->players[i];
+            if (p.contractWeeks > 0) p.contractWeeks--;
+            if (p.contractWeeks > 0) {
+                ++i;
+                continue;
+            }
+            if (team == career.myTeam) {
+                cout << "\nContrato expirado: " << p.name << " (Salario $" << p.wage << ")" << endl;
+                int choice = readInt("Renovar? (1. Si, 2. No): ", 1, 2);
+                if (choice == 1) {
+                    p.contractWeeks = randInt(52, 156);
+                    p.wage = static_cast<long long>(p.wage * (1.1 + randInt(0, 20) / 100.0));
+                    cout << "Renovado por " << p.contractWeeks << " semanas. Nuevo salario $" << p.wage << endl;
+                    ++i;
+                } else {
+                    cout << p.name << " deja el club." << endl;
+                    team->players.erase(team->players.begin() + i);
+                }
+            } else {
+                if (team->budget > p.wage * 8 && randInt(1, 100) <= 70) {
+                    p.contractWeeks = randInt(52, 156);
+                    p.wage = static_cast<long long>(p.wage * (1.05 + randInt(0, 15) / 100.0));
+                    ++i;
+                } else {
+                    team->players.erase(team->players.begin() + i);
+                }
+            }
+        }
+    }
+}
+
 static int divisionIndex(const string& id) {
     for (size_t i = 0; i < kDivisions.size(); ++i) {
         if (kDivisions[i].id == id) return static_cast<int>(i);
@@ -611,15 +812,68 @@ static vector<Team*> bottomByValue(vector<Team*> teams, int count) {
     return teams;
 }
 
-static int goalDiff(const Team* t) {
-    return t->goalsFor - t->goalsAgainst;
+static Team* simulatePlayoffMatch(Team* home, Team* away, const string& label) {
+    if (!home) return away;
+    if (!away) return home;
+    cout << label << ": " << home->name << " vs " << away->name << endl;
+    Team h1 = *home;
+    Team a1 = *away;
+    MatchResult r1 = playMatch(h1, a1, false, true);
+    Team h2 = *home;
+    Team a2 = *away;
+    MatchResult r2 = playMatch(a2, h2, false, true);
+
+    int homeAgg = r1.homeGoals + r2.awayGoals;
+    int awayAgg = r1.awayGoals + r2.homeGoals;
+
+    cout << "Ida: " << home->name << " " << r1.homeGoals << " - " << r1.awayGoals << " " << away->name << endl;
+    cout << "Vuelta: " << away->name << " " << r2.homeGoals << " - " << r2.awayGoals << " " << home->name << endl;
+    cout << "Global: " << home->name << " " << homeAgg << " - " << awayAgg << " " << away->name << endl;
+    if (homeAgg > awayAgg) return home;
+    if (awayAgg > homeAgg) return away;
+    Team* winner = (randInt(0, 1) == 0) ? home : away;
+    cout << "Gana por penales: " << winner->name << endl;
+    return winner;
+}
+
+static Team* liguillaAscensoPrimeraB(const vector<Team*>& table) {
+    vector<Team*> seeds;
+    for (size_t i = 1; i < table.size() && i < 8; ++i) {
+        seeds.push_back(table[i]);
+    }
+    if (seeds.empty()) return nullptr;
+    if (seeds.size() == 1) return seeds[0];
+
+    cout << "\nLiguilla de Ascenso (2°-8°)" << endl;
+    Team* s2 = seeds.size() > 0 ? seeds[0] : nullptr;
+    Team* s3 = seeds.size() > 1 ? seeds[1] : nullptr;
+    Team* s4 = seeds.size() > 2 ? seeds[2] : nullptr;
+    Team* s5 = seeds.size() > 3 ? seeds[3] : nullptr;
+    Team* s6 = seeds.size() > 4 ? seeds[4] : nullptr;
+    Team* s7 = seeds.size() > 5 ? seeds[5] : nullptr;
+    Team* s8 = seeds.size() > 6 ? seeds[6] : nullptr;
+
+    Team* q1 = (s2 && s8) ? simulatePlayoffMatch(s2, s8, "Cuartos 1") : (s2 ? s2 : s8);
+    if (s2 && !s8) cout << "Cuartos 1: " << s2->name << " avanza por bye." << endl;
+    Team* q2 = (s3 && s7) ? simulatePlayoffMatch(s3, s7, "Cuartos 2") : (s3 ? s3 : s7);
+    if (s3 && !s7) cout << "Cuartos 2: " << s3->name << " avanza por bye." << endl;
+    Team* q3 = (s4 && s6) ? simulatePlayoffMatch(s4, s6, "Cuartos 3") : (s4 ? s4 : s6);
+    if (s4 && !s6) cout << "Cuartos 3: " << s4->name << " avanza por bye." << endl;
+    Team* q4 = s5;
+    if (s5) cout << "Cuartos 4: " << s5->name << " avanza por bye." << endl;
+
+    Team* semi1 = simulatePlayoffMatch(q1, q4, "Semifinal 1");
+    Team* semi2 = simulatePlayoffMatch(q2, q3, "Semifinal 2");
+    Team* winner = simulatePlayoffMatch(semi1, semi2, "Final Liguilla");
+    if (winner) cout << "Ganador liguilla: " << winner->name << endl;
+    return winner;
 }
 
 void endSeason(Career& career) {
     cout << "\nFin de temporada!" << endl;
     career.leagueTable.displayTable();
-    if (career.myTeam && career.myTeam->points > 50) {
-        cout << "Tu equipo se clasifico para competiciones internacionales!" << endl;
+    if (!career.leagueTable.teams.empty()) {
+        cout << "Campeon: " << career.leagueTable.teams.front()->name << endl;
     }
     int idx = divisionIndex(career.activeDivision);
     string higher = (idx > 0) ? kDivisions[idx - 1].id : "";
@@ -629,49 +883,37 @@ void endSeason(Career& career) {
     int n = static_cast<int>(table.size());
     vector<Team*> promote;
     vector<Team*> relegate;
-    if (!higher.empty()) {
-        if (n >= 2) {
-            promote.push_back(table[0]);
-            promote.push_back(table[1]);
-        } else if (n == 1) {
-            promote.push_back(table[0]);
-        }
-        if (n >= 3) {
-            Team* second = table[1];
-            Team* third = table[2];
-            if (second->points == third->points && goalDiff(second) == goalDiff(third)) {
-                cout << "\nPlayoff Ascenso: " << second->name << " vs " << third->name << endl;
-                Team a = *second;
-                Team b = *third;
-                MatchResult r = playMatch(a, b, true, true);
-                if (r.awayGoals > r.homeGoals) promote[1] = third;
-            }
-        }
-    }
-    if (!lower.empty()) {
-        if (n >= 2) {
-            relegate.push_back(table[n - 2]);
-            relegate.push_back(table[n - 1]);
-        }
-        if (n >= 3) {
-            Team* thirdLast = table[n - 3];
-            Team* secondLast = table[n - 2];
-            if (thirdLast->points == secondLast->points && goalDiff(thirdLast) == goalDiff(secondLast)) {
-                cout << "\nPlayoff Descenso: " << thirdLast->name << " vs " << secondLast->name << endl;
-                Team a = *thirdLast;
-                Team b = *secondLast;
-                MatchResult r = playMatch(a, b, true, true);
-                if (r.homeGoals >= r.awayGoals) {
-                    relegate[0] = secondLast;
-                } else {
-                    relegate[0] = thirdLast;
+    int promoteSlots = higher.empty() ? 0 : 2;
+    int relegateSlots = lower.empty() ? 0 : (career.activeDivision == "primera b" ? 1 : 2);
+
+    if (promoteSlots > 0) {
+        if (career.activeDivision == "primera b") {
+            if (n > 0) promote.push_back(table[0]);
+            if (promoteSlots > 1) {
+                Team* playoffWinner = liguillaAscensoPrimeraB(table);
+                if (playoffWinner &&
+                    find(promote.begin(), promote.end(), playoffWinner) == promote.end()) {
+                    promote.push_back(playoffWinner);
+                } else if (n > 1 && promote.size() < static_cast<size_t>(promoteSlots)) {
+                    promote.push_back(table[1]);
                 }
+            }
+        } else {
+            int count = min(promoteSlots, n);
+            for (int i = 0; i < count; ++i) {
+                promote.push_back(table[i]);
             }
         }
     }
 
-    vector<Team*> fromHigher = higher.empty() ? vector<Team*>() : bottomByValue(career.getDivisionTeams(higher), 2);
-    vector<Team*> fromLower = lower.empty() ? vector<Team*>() : topByValue(career.getDivisionTeams(lower), 2);
+    int actualPromote = static_cast<int>(promote.size());
+    int relegateCount = min(relegateSlots, max(0, n - actualPromote));
+    for (int i = 0; i < relegateCount; ++i) {
+        relegate.push_back(table[n - 1 - i]);
+    }
+
+    vector<Team*> fromHigher = higher.empty() ? vector<Team*>() : bottomByValue(career.getDivisionTeams(higher), actualPromote);
+    vector<Team*> fromLower = lower.empty() ? vector<Team*>() : topByValue(career.getDivisionTeams(lower), relegateCount);
 
     for (auto* t : promote) {
         if (!higher.empty()) {
@@ -722,6 +964,9 @@ void endSeason(Career& career) {
         career.setActiveDivision(career.activeDivision);
     }
     career.resetSeason();
+    for (auto* team : career.activeTeams) {
+        addYouthPlayers(*team, 1);
+    }
 }
 
 void simulateCareerWeek(Career& career) {
@@ -744,6 +989,8 @@ void simulateCareerWeek(Career& career) {
         Team* home = career.activeTeams[match.first];
         Team* away = career.activeTeams[match.second];
         bool verbose = (home == career.myTeam || away == career.myTeam);
+        adjustCpuTactics(*home, *away, career.myTeam);
+        adjustCpuTactics(*away, *home, career.myTeam);
         bool key = isKeyMatch(career.leagueTable, home, away);
         if (verbose && key) {
             cout << "[Aviso] Partido clave de la semana." << endl;
@@ -753,14 +1000,79 @@ void simulateCareerWeek(Career& career) {
     for (auto* team : career.activeTeams) {
         healInjuries(*team, false);
         recoverFitness(*team, 7);
+        applyTrainingPlan(*team);
     }
+    updateContracts(career);
     processIncomingOffers(career);
     processCpuTransfers(career);
     applyWeeklyFinances(career, pointsBefore);
     career.leagueTable.sortTable();
+    weeklyDashboard(career);
+    applyClubEvent(career);
     career.currentWeek++;
     checkAchievements(career);
     if (career.currentWeek > static_cast<int>(career.schedule.size())) {
         endSeason(career);
     }
+}
+
+void playCupMode(Career& career) {
+    if (career.divisions.empty()) {
+        cout << "No hay divisiones disponibles." << endl;
+        return;
+    }
+    cout << "\nSelecciona la division para Copa:" << endl;
+    for (size_t i = 0; i < career.divisions.size(); ++i) {
+        cout << i + 1 << ". " << career.divisions[i].display << endl;
+    }
+    int divisionChoice = readInt("Elige una division: ", 1, static_cast<int>(career.divisions.size()));
+    string divisionId = career.divisions[divisionChoice - 1].id;
+    auto teams = career.getDivisionTeams(divisionId);
+    if (teams.size() < 2) {
+        cout << "No hay suficientes equipos para una copa." << endl;
+        return;
+    }
+    cout << "\nElige un equipo para seguir (0 para ninguno):" << endl;
+    for (size_t i = 0; i < teams.size(); ++i) {
+        cout << i + 1 << ". " << teams[i]->name << endl;
+    }
+    int followChoice = readInt("Equipo: ", 0, static_cast<int>(teams.size()));
+    int followIdx = (followChoice == 0) ? -1 : (followChoice - 1);
+
+    vector<Team> cupTeams;
+    cupTeams.reserve(teams.size());
+    for (auto* t : teams) cupTeams.push_back(*t);
+
+    vector<int> alive;
+    for (int i = 0; i < static_cast<int>(cupTeams.size()); ++i) alive.push_back(i);
+    int round = 1;
+    while (alive.size() > 1) {
+        cout << "\n--- Copa: Ronda " << round << " ---" << endl;
+        vector<int> next;
+        if (alive.size() % 2 == 1) {
+            int bye = alive.back();
+            alive.pop_back();
+            next.push_back(bye);
+            cout << "Pase directo: " << cupTeams[bye].name << endl;
+        }
+        for (size_t i = 0; i < alive.size(); i += 2) {
+            int aIdx = alive[i];
+            int bIdx = alive[i + 1];
+            Team& a = cupTeams[aIdx];
+            Team& b = cupTeams[bIdx];
+            bool verbose = (followIdx == aIdx || followIdx == bIdx);
+            cout << a.name << " vs " << b.name << endl;
+            MatchResult r = playMatch(a, b, verbose, true);
+            int winner = aIdx;
+            if (r.homeGoals < r.awayGoals) winner = bIdx;
+            else if (r.homeGoals == r.awayGoals) {
+                winner = (randInt(0, 1) == 0) ? aIdx : bIdx;
+                cout << "Gana por penales: " << cupTeams[winner].name << endl;
+            }
+            next.push_back(winner);
+        }
+        alive.swap(next);
+        round++;
+    }
+    cout << "\nCampeon de la Copa: " << cupTeams[alive.front()].name << endl;
 }

@@ -28,6 +28,15 @@ void applyPositionStats(Player& p) {
     }
 }
 
+string defaultRoleForPosition(const string& position) {
+    string norm = normalizePosition(position);
+    if (norm == "ARQ") return "Tradicional";
+    if (norm == "DEF") return "Stopper";
+    if (norm == "MED") return "BoxToBox";
+    if (norm == "DEL") return "Poacher";
+    return "Default";
+}
+
 Player makeRandomPlayer(const string& position, int skillMin, int skillMax, int ageMin, int ageMax) {
     Player p;
     p.name = "Jugador" + to_string(randInt(1000, 9999));
@@ -51,14 +60,18 @@ Player makeRandomPlayer(const string& position, int skillMin, int skillMax, int 
         p.defense = clampInt(p.skill - 10, 20, 90);
     }
     p.value = static_cast<long long>(p.skill) * 10000;
+    p.wage = static_cast<long long>(p.skill) * 150 + randInt(0, 800);
+    p.contractWeeks = randInt(52, 156);
     p.injured = false;
     p.injuryType = "";
     p.injuryWeeks = 0;
+    p.injuryHistory = 0;
     p.goals = 0;
     p.assists = 0;
     p.matchesPlayed = 0;
     p.lastTrainedSeason = -1;
     p.lastTrainedWeek = -1;
+    p.role = defaultRoleForPosition(position);
     return p;
 }
 
@@ -69,6 +82,7 @@ Team::Team(string n)
       formation("4-4-2"),
       budget(0),
       morale(50),
+      trainingFocus("Balanceado"),
       points(0),
       goalsFor(0),
       goalsAgainst(0),
@@ -380,13 +394,14 @@ void Career::saveCareer() {
     for (const auto& team : allTeams) {
         file << "TEAM " << team.name << "|" << team.division << "|" << team.tactics << "|" << team.formation
              << "|" << team.budget << "|" << team.morale << "|" << team.points << "|" << team.goalsFor << "|" << team.goalsAgainst
-             << "|" << team.wins << "|" << team.draws << "|" << team.losses << "\n";
+             << "|" << team.wins << "|" << team.draws << "|" << team.losses << "|" << team.trainingFocus << "\n";
         file << "PLAYERS " << team.players.size() << "\n";
         for (const auto& p : team.players) {
             file << "PLAYER " << p.name << "|" << p.position << "|" << p.attack << "|" << p.defense << "|"
                  << p.stamina << "|" << p.fitness << "|" << p.skill << "|" << p.potential << "|" << p.age << "|" << p.value << "|"
                  << p.injured << "|" << p.injuryType << "|" << p.injuryWeeks << "|" << p.goals << "|" << p.assists << "|"
-                 << p.matchesPlayed << "|" << p.lastTrainedSeason << "|" << p.lastTrainedWeek << "\n";
+                 << p.matchesPlayed << "|" << p.lastTrainedSeason << "|" << p.lastTrainedWeek << "|"
+                 << p.wage << "|" << p.contractWeeks << "|" << p.injuryHistory << "|" << p.role << "\n";
         }
         file << "ENDTEAM\n";
     }
@@ -455,6 +470,9 @@ bool Career::loadCareer() {
             team.wins = stoi(fields[base + 3]);
             team.draws = stoi(fields[base + 4]);
             team.losses = stoi(fields[base + 5]);
+            size_t tfIndex = base + 6;
+            if (fields.size() > tfIndex) team.trainingFocus = fields[tfIndex];
+            else team.trainingFocus = "Balanceado";
 
             if (!getline(file, line)) return false;
             if (line.rfind("PLAYERS ", 0) != 0) return false;
@@ -514,6 +532,15 @@ bool Career::loadCareer() {
                     p.lastTrainedSeason = -1;
                     p.lastTrainedWeek = -1;
                 }
+
+                if (idx < pf.size()) p.wage = stoll(pf[idx++]);
+                else p.wage = static_cast<long long>(p.skill) * 150 + randInt(0, 800);
+                if (idx < pf.size()) p.contractWeeks = stoi(pf[idx++]);
+                else p.contractWeeks = randInt(52, 156);
+                if (idx < pf.size()) p.injuryHistory = stoi(pf[idx++]);
+                else p.injuryHistory = 0;
+                if (idx < pf.size()) p.role = pf[idx++];
+                else p.role = defaultRoleForPosition(p.position);
                 team.addPlayer(p);
             }
             if (!getline(file, line)) return false;
@@ -587,6 +614,10 @@ bool Career::loadCareer() {
                 getline(ss, token, ','); p.matchesPlayed = stoi(token);
                 p.lastTrainedSeason = -1;
                 p.lastTrainedWeek = -1;
+                p.wage = static_cast<long long>(p.skill) * 150 + randInt(0, 800);
+                p.contractWeeks = randInt(52, 156);
+                p.injuryHistory = 0;
+                p.role = defaultRoleForPosition(p.position);
                 myTeam->addPlayer(p);
             } catch (...) {
             }

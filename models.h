@@ -16,17 +16,22 @@ struct Player {
     int potential;
     int age;
     long long value;
+    long long wage;
+    int contractWeeks;
     bool injured;
     std::string injuryType;
     int injuryWeeks;
+    int injuryHistory;
     int goals;
     int assists;
     int matchesPlayed;
     int lastTrainedSeason;
     int lastTrainedWeek;
+    std::string role;
 };
 
 void applyPositionStats(Player& p);
+std::string defaultRoleForPosition(const std::string& position);
 Player makeRandomPlayer(const std::string& position, int skillMin, int skillMax, int ageMin, int ageMax);
 
 class Team {
@@ -38,6 +43,7 @@ public:
     std::string formation;
     long long budget;
     int morale;
+    std::string trainingFocus;
     int points;
     int goalsFor;
     int goalsAgainst;
