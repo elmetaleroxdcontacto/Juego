@@ -88,7 +88,7 @@ int main() {
                         case 2: trainPlayer(*career.myTeam, career.currentSeason, career.currentWeek); break;
                         case 3: changeTactics(*career.myTeam); break;
                         case 4: simulateCareerWeek(career); break;
-                        case 5: career.leagueTable.displayTable(); break;
+                        case 5: displayLeagueTables(career); break;
                         case 6: transferMarket(*career.myTeam); break;
                         case 7: scoutPlayers(*career.myTeam); break;
                         case 8: displayStatistics(*career.myTeam); break;

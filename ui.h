@@ -17,6 +17,7 @@ void editTeam(Team& team);
 void setTrainingPlan(Team& team);
 void displayStatistics(Team& team);
 void displayAchievementsMenu(Career& career);
+void displayLeagueTables(Career& career);
 void endSeason(Career& career);
 void simulateCareerWeek(Career& career);
 void playCupMode(Career& career);

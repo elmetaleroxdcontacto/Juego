@@ -279,12 +279,28 @@ const vector<DivisionInfo> kDivisions = {
 
 Career::Career() : myTeam(nullptr), currentSeason(1), currentWeek(1), saveFile("career_save.txt"), initialized(false) {}
 
+bool Career::usesSegundaFormat() const {
+    return activeDivision == "segunda division" && activeTeams.size() == 14;
+}
+
+void Career::buildSegundaGroups() {
+    groupNorthIdx.clear();
+    groupSouthIdx.clear();
+    if (!usesSegundaFormat()) return;
+    for (int i = 0; i < static_cast<int>(activeTeams.size()); ++i) {
+        if (i < 7) groupNorthIdx.push_back(i);
+        else groupSouthIdx.push_back(i);
+    }
+}
+
 void Career::initializeLeague(bool forceReload) {
     if (initialized && !forceReload) return;
     allTeams.clear();
     activeTeams.clear();
     schedule.clear();
     leagueTable.clear();
+    groupNorthIdx.clear();
+    groupSouthIdx.clear();
     divisions.clear();
     activeDivision.clear();
 
@@ -306,14 +322,12 @@ vector<Team*> Career::getDivisionTeams(const string& id) {
     return out;
 }
 
-void Career::buildSchedule() {
-    schedule.clear();
-    int n = static_cast<int>(activeTeams.size());
-    if (n < 2) return;
+static vector<vector<pair<int, int>>> buildRoundRobinSchedule(const vector<int>& teamIdx, bool doubleRound) {
+    vector<vector<pair<int, int>>> out;
+    if (teamIdx.size() < 2) return out;
 
-    vector<int> idx;
-    for (int i = 0; i < n; ++i) idx.push_back(i);
-    if (n % 2 == 1) idx.push_back(-1);
+    vector<int> idx = teamIdx;
+    if (idx.size() % 2 == 1) idx.push_back(-1);
 
     int size = static_cast<int>(idx.size());
     int rounds = size - 1;
@@ -326,18 +340,50 @@ void Career::buildSchedule() {
             if (round % 2 == 0) matches.push_back({a, b});
             else matches.push_back({b, a});
         }
-        schedule.push_back(matches);
+        out.push_back(matches);
         int last = idx.back();
         for (int i = size - 1; i > 1; --i) idx[i] = idx[i - 1];
         idx[1] = last;
     }
 
-    int base = static_cast<int>(schedule.size());
-    for (int i = 0; i < base; ++i) {
-        vector<pair<int, int>> rev;
-        for (auto& m : schedule[i]) rev.push_back({m.second, m.first});
-        schedule.push_back(rev);
+    if (doubleRound) {
+        int base = static_cast<int>(out.size());
+        for (int i = 0; i < base; ++i) {
+            vector<pair<int, int>> rev;
+            for (auto& m : out[i]) rev.push_back({m.second, m.first});
+            out.push_back(rev);
+        }
     }
+    return out;
+}
+
+void Career::buildSchedule() {
+    schedule.clear();
+    int n = static_cast<int>(activeTeams.size());
+    if (n < 2) return;
+
+    if (usesSegundaFormat()) {
+        if (groupNorthIdx.empty() || groupSouthIdx.empty()) buildSegundaGroups();
+        auto north = buildRoundRobinSchedule(groupNorthIdx, true);
+        auto south = buildRoundRobinSchedule(groupSouthIdx, true);
+        int rounds = static_cast<int>(max(north.size(), south.size()));
+        for (int r = 0; r < rounds; ++r) {
+            vector<pair<int, int>> matches;
+            if (r < static_cast<int>(north.size())) {
+                matches.insert(matches.end(), north[r].begin(), north[r].end());
+            }
+            if (r < static_cast<int>(south.size())) {
+                matches.insert(matches.end(), south[r].begin(), south[r].end());
+            }
+            schedule.push_back(matches);
+        }
+        return;
+    }
+
+    vector<int> idx;
+    idx.reserve(n);
+    for (int i = 0; i < n; ++i) idx.push_back(i);
+    schedule = buildRoundRobinSchedule(idx, true);
 }
 
 void Career::setActiveDivision(const string& id) {
@@ -347,6 +393,9 @@ void Career::setActiveDivision(const string& id) {
     leagueTable.title = divisionDisplay(id);
     for (auto* t : activeTeams) leagueTable.addTeam(t);
     leagueTable.sortTable();
+    groupNorthIdx.clear();
+    groupSouthIdx.clear();
+    buildSegundaGroups();
     buildSchedule();
 }
 

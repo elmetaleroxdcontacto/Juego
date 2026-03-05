@@ -92,6 +92,8 @@ struct Career {
     std::deque<Team> allTeams;
     std::vector<Team*> activeTeams;
     std::vector<std::vector<std::pair<int, int>>> schedule;
+    std::vector<int> groupNorthIdx;
+    std::vector<int> groupSouthIdx;
     std::vector<DivisionInfo> divisions;
     std::string activeDivision;
     std::string saveFile;
@@ -100,6 +102,8 @@ struct Career {
 
     Career();
 
+    bool usesSegundaFormat() const;
+    void buildSegundaGroups();
     void initializeLeague(bool forceReload = false);
     std::vector<Team*> getDivisionTeams(const std::string& id);
     void buildSchedule();

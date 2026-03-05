@@ -581,6 +581,43 @@ void displayAchievementsMenu(Career& career) {
     }
 }
 
+static bool isSegundaFormat(const Career& career) {
+    return career.usesSegundaFormat();
+}
+
+static LeagueTable buildGroupTable(const Career& career, const vector<int>& idx, const string& title) {
+    LeagueTable table;
+    table.title = title;
+    for (int i : idx) {
+        if (i >= 0 && i < static_cast<int>(career.activeTeams.size())) {
+            table.addTeam(career.activeTeams[i]);
+        }
+    }
+    table.sortTable();
+    return table;
+}
+
+static int groupForTeam(const Career& career, const Team* team) {
+    for (int i : career.groupNorthIdx) {
+        if (i >= 0 && i < static_cast<int>(career.activeTeams.size()) && career.activeTeams[i] == team) return 0;
+    }
+    for (int i : career.groupSouthIdx) {
+        if (i >= 0 && i < static_cast<int>(career.activeTeams.size()) && career.activeTeams[i] == team) return 1;
+    }
+    return -1;
+}
+
+void displayLeagueTables(Career& career) {
+    if (!isSegundaFormat(career) || career.groupNorthIdx.empty() || career.groupSouthIdx.empty()) {
+        career.leagueTable.displayTable();
+        return;
+    }
+    LeagueTable north = buildGroupTable(career, career.groupNorthIdx, "Grupo Norte");
+    LeagueTable south = buildGroupTable(career, career.groupSouthIdx, "Grupo Sur");
+    north.displayTable();
+    south.displayTable();
+}
+
 static int teamRank(const LeagueTable& table, const Team* team) {
     for (size_t i = 0; i < table.teams.size(); ++i) {
         if (table.teams[i] == team) return static_cast<int>(i) + 1;
@@ -637,6 +674,16 @@ static void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore)
 static void weeklyDashboard(const Career& career) {
     if (!career.myTeam) return;
     int rank = teamRank(career.leagueTable, career.myTeam);
+    if (isSegundaFormat(career)) {
+        int group = groupForTeam(career, career.myTeam);
+        if (group == 0) {
+            LeagueTable north = buildGroupTable(career, career.groupNorthIdx, "Grupo Norte");
+            rank = teamRank(north, career.myTeam);
+        } else if (group == 1) {
+            LeagueTable south = buildGroupTable(career, career.groupSouthIdx, "Grupo Sur");
+            rank = teamRank(south, career.myTeam);
+        }
+    }
     int injured = 0;
     int expiring = 0;
     for (const auto& p : career.myTeam->players) {
@@ -836,6 +883,57 @@ static Team* simulatePlayoffMatch(Team* home, Team* away, const string& label) {
     return winner;
 }
 
+static vector<vector<pair<int, int>>> buildRoundRobinIndexSchedule(int teamCount, bool doubleRound) {
+    vector<vector<pair<int, int>>> out;
+    if (teamCount < 2) return out;
+    vector<int> idx;
+    idx.reserve(teamCount + 1);
+    for (int i = 0; i < teamCount; ++i) idx.push_back(i);
+    if (idx.size() % 2 == 1) idx.push_back(-1);
+
+    int size = static_cast<int>(idx.size());
+    int rounds = size - 1;
+    for (int round = 0; round < rounds; ++round) {
+        vector<pair<int, int>> matches;
+        for (int i = 0; i < size / 2; ++i) {
+            int a = idx[i];
+            int b = idx[size - 1 - i];
+            if (a == -1 || b == -1) continue;
+            if (round % 2 == 0) matches.push_back({a, b});
+            else matches.push_back({b, a});
+        }
+        out.push_back(matches);
+        int last = idx.back();
+        for (int i = size - 1; i > 1; --i) idx[i] = idx[i - 1];
+        idx[1] = last;
+    }
+
+    if (doubleRound) {
+        int base = static_cast<int>(out.size());
+        for (int i = 0; i < base; ++i) {
+            vector<pair<int, int>> rev;
+            for (auto& m : out[i]) rev.push_back({m.second, m.first});
+            out.push_back(rev);
+        }
+    }
+    return out;
+}
+
+static Team* simulateSingleLegKnockout(Team* home, Team* away, const string& label, bool verbose) {
+    if (!home) return away;
+    if (!away) return home;
+    cout << label << ": " << home->name << " vs " << away->name << endl;
+    Team h1 = *home;
+    Team a1 = *away;
+    MatchResult r = playMatch(h1, a1, verbose, true);
+    cout << "Resultado: " << home->name << " " << r.homeGoals << " - " << r.awayGoals << " " << away->name << endl;
+    if (r.homeGoals > r.awayGoals) return home;
+    if (r.awayGoals > r.homeGoals) return away;
+    Team* winner = (randInt(0, 1) == 0) ? home : away;
+    cout << "Gana por penales: " << winner->name << endl;
+    return winner;
+}
+
 static Team* liguillaAscensoPrimeraB(const vector<Team*>& table) {
     vector<Team*> seeds;
     for (size_t i = 1; i < table.size() && i < 8; ++i) {
@@ -869,7 +967,193 @@ static Team* liguillaAscensoPrimeraB(const vector<Team*>& table) {
     return winner;
 }
 
+static Team* teamAtPos(const LeagueTable& table, int pos) {
+    int idx = pos - 1;
+    if (idx < 0 || idx >= static_cast<int>(table.teams.size())) return nullptr;
+    return table.teams[idx];
+}
+
+static Team* simulateSegundaPlayoff(const vector<Team*>& seeds) {
+    if (seeds.empty()) return nullptr;
+    if (seeds.size() == 1) return seeds.front();
+
+    Team* s1 = seeds.size() > 0 ? seeds[0] : nullptr;
+    Team* s2 = seeds.size() > 1 ? seeds[1] : nullptr;
+    Team* s3 = seeds.size() > 2 ? seeds[2] : nullptr;
+    Team* s4 = seeds.size() > 3 ? seeds[3] : nullptr;
+    Team* s5 = seeds.size() > 4 ? seeds[4] : nullptr;
+    Team* s6 = seeds.size() > 5 ? seeds[5] : nullptr;
+    Team* s7 = seeds.size() > 6 ? seeds[6] : nullptr;
+
+    cout << "\n--- Playoff de Ascenso ---" << endl;
+    Team* q1 = simulatePlayoffMatch(s2, s7, "Cuartos 1");
+    Team* q2 = simulatePlayoffMatch(s3, s6, "Cuartos 2");
+    Team* q3 = simulatePlayoffMatch(s4, s5, "Cuartos 3");
+
+    Team* semi1 = simulatePlayoffMatch(s1, q3, "Semifinal 1");
+    Team* semi2 = simulatePlayoffMatch(q1, q2, "Semifinal 2");
+    Team* champion = simulatePlayoffMatch(semi1, semi2, "Final");
+    return champion;
+}
+
+static void endSeasonSegundaDivision(Career& career) {
+    cout << "\nFin de temporada (Segunda Division)!" << endl;
+    if (career.groupNorthIdx.empty() || career.groupSouthIdx.empty()) {
+        career.buildSegundaGroups();
+    }
+    LeagueTable north = buildGroupTable(career, career.groupNorthIdx, "Grupo Norte");
+    LeagueTable south = buildGroupTable(career, career.groupSouthIdx, "Grupo Sur");
+    north.displayTable();
+    south.displayTable();
+
+    vector<Team*> playoffTeams;
+    for (int pos = 1; pos <= 3; ++pos) {
+        if (Team* t = teamAtPos(north, pos)) playoffTeams.push_back(t);
+        if (Team* t = teamAtPos(south, pos)) playoffTeams.push_back(t);
+    }
+
+    Team* north4 = teamAtPos(north, 4);
+    Team* south4 = teamAtPos(south, 4);
+    Team* playoffExtra = nullptr;
+    Team* descensoExtra = nullptr;
+    if (north4 && south4) {
+        cout << "\nPartido 4° vs 4°:" << endl;
+        Team* winner = simulateSingleLegKnockout(north4, south4, "Repechaje 4°", north4 == career.myTeam || south4 == career.myTeam);
+        playoffExtra = winner;
+        descensoExtra = (winner == north4) ? south4 : north4;
+    } else if (north4 || south4) {
+        playoffExtra = north4 ? north4 : south4;
+    }
+    if (playoffExtra &&
+        find(playoffTeams.begin(), playoffTeams.end(), playoffExtra) == playoffTeams.end()) {
+        playoffTeams.push_back(playoffExtra);
+    }
+
+    vector<Team*> descensoTeams;
+    for (int pos = 5; pos <= 7; ++pos) {
+        if (Team* t = teamAtPos(north, pos)) descensoTeams.push_back(t);
+        if (Team* t = teamAtPos(south, pos)) descensoTeams.push_back(t);
+    }
+    if (descensoExtra) descensoTeams.push_back(descensoExtra);
+
+    vector<Team*> playoffSeeds = playoffTeams;
+    if (!playoffSeeds.empty()) {
+        LeagueTable seedTable;
+        for (auto* t : playoffSeeds) seedTable.addTeam(t);
+        seedTable.sortTable();
+        playoffSeeds = seedTable.teams;
+    }
+
+    for (auto* team : career.activeTeams) {
+        team->resetSeasonStats();
+    }
+
+    Team* champion = simulateSegundaPlayoff(playoffSeeds);
+    if (champion) {
+        cout << "Campeon del playoff: " << champion->name << endl;
+    }
+
+    LeagueTable descensoTable;
+    if (!descensoTeams.empty()) {
+        for (auto* t : descensoTeams) t->resetSeasonStats();
+        auto schedule = buildRoundRobinIndexSchedule(static_cast<int>(descensoTeams.size()), false);
+        cout << "\n--- Grupo de Descenso ---" << endl;
+        int round = 1;
+        for (const auto& roundMatches : schedule) {
+            cout << "\nFecha Descenso " << round << endl;
+            for (const auto& match : roundMatches) {
+                Team* home = descensoTeams[match.first];
+                Team* away = descensoTeams[match.second];
+                bool verbose = (home == career.myTeam || away == career.myTeam);
+                adjustCpuTactics(*home, *away, career.myTeam);
+                adjustCpuTactics(*away, *home, career.myTeam);
+                playMatch(*home, *away, verbose, true);
+            }
+            for (auto* team : descensoTeams) {
+                healInjuries(*team, false);
+                recoverFitness(*team, 7);
+                applyTrainingPlan(*team);
+            }
+            round++;
+        }
+        descensoTable.title = "Grupo Descenso";
+        for (auto* t : descensoTeams) descensoTable.addTeam(t);
+        descensoTable.sortTable();
+        descensoTable.displayTable();
+    }
+
+    vector<Team*> relegate;
+    if (!descensoTable.teams.empty()) {
+        int count = min(2, static_cast<int>(descensoTable.teams.size()));
+        for (int i = 0; i < count; ++i) {
+            relegate.push_back(descensoTable.teams[descensoTable.teams.size() - 1 - i]);
+        }
+    }
+
+    int idx = divisionIndex(career.activeDivision);
+    string higher = (idx > 0) ? kDivisions[idx - 1].id : "";
+    string lower = (idx >= 0 && idx + 1 < static_cast<int>(kDivisions.size())) ? kDivisions[idx + 1].id : "";
+
+    vector<Team*> promote;
+    if (!higher.empty() && champion) promote.push_back(champion);
+
+    vector<Team*> fromHigher = higher.empty() ? vector<Team*>() : bottomByValue(career.getDivisionTeams(higher), static_cast<int>(promote.size()));
+    vector<Team*> fromLower = lower.empty() ? vector<Team*>() : topByValue(career.getDivisionTeams(lower), static_cast<int>(relegate.size()));
+
+    for (auto* t : promote) {
+        if (!higher.empty()) {
+            t->division = higher;
+            t->budget += 50000;
+            t->morale = 60;
+        }
+    }
+    for (auto* t : relegate) {
+        if (!lower.empty()) {
+            t->division = lower;
+            t->budget = max(0LL, t->budget - 20000);
+            t->morale = 40;
+        }
+    }
+    for (auto* t : fromHigher) {
+        t->division = career.activeDivision;
+        t->morale = 45;
+    }
+    for (auto* t : fromLower) {
+        t->division = career.activeDivision;
+        t->morale = 55;
+    }
+
+    if (!higher.empty() && !promote.empty()) {
+        cout << "Ascenso: " << promote.front()->name << endl;
+    }
+    if (!lower.empty() && !relegate.empty()) {
+        cout << "Descensos: ";
+        for (size_t i = 0; i < relegate.size(); ++i) {
+            if (i) cout << ", ";
+            cout << relegate[i]->name;
+        }
+        cout << endl;
+    }
+
+    career.currentSeason++;
+    career.currentWeek = 1;
+    career.agePlayers();
+    if (career.myTeam) {
+        career.setActiveDivision(career.myTeam->division);
+    } else {
+        career.setActiveDivision(career.activeDivision);
+    }
+    career.resetSeason();
+    for (auto* team : career.activeTeams) {
+        addYouthPlayers(*team, 1);
+    }
+}
+
 void endSeason(Career& career) {
+    if (isSegundaFormat(career)) {
+        endSeasonSegundaDivision(career);
+        return;
+    }
     cout << "\nFin de temporada!" << endl;
     career.leagueTable.displayTable();
     if (!career.leagueTable.teams.empty()) {
@@ -981,6 +1265,13 @@ void simulateCareerWeek(Career& career) {
 
     cout << "\nSimulando semana " << career.currentWeek << "..." << endl;
     career.leagueTable.sortTable();
+    LeagueTable northTable;
+    LeagueTable southTable;
+    bool useGroups = isSegundaFormat(career);
+    if (useGroups) {
+        northTable = buildGroupTable(career, career.groupNorthIdx, "Grupo Norte");
+        southTable = buildGroupTable(career, career.groupSouthIdx, "Grupo Sur");
+    }
     const auto& matches = career.schedule[career.currentWeek - 1];
     vector<int> pointsBefore;
     pointsBefore.reserve(career.activeTeams.size());
@@ -991,7 +1282,19 @@ void simulateCareerWeek(Career& career) {
         bool verbose = (home == career.myTeam || away == career.myTeam);
         adjustCpuTactics(*home, *away, career.myTeam);
         adjustCpuTactics(*away, *home, career.myTeam);
-        bool key = isKeyMatch(career.leagueTable, home, away);
+        bool key = false;
+        if (useGroups) {
+            int group = groupForTeam(career, home);
+            if (group == groupForTeam(career, away) && group == 0) {
+                key = isKeyMatch(northTable, home, away);
+            } else if (group == groupForTeam(career, away) && group == 1) {
+                key = isKeyMatch(southTable, home, away);
+            } else {
+                key = isKeyMatch(career.leagueTable, home, away);
+            }
+        } else {
+            key = isKeyMatch(career.leagueTable, home, away);
+        }
         if (verbose && key) {
             cout << "[Aviso] Partido clave de la semana." << endl;
         }
