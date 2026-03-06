@@ -8,14 +8,9 @@
 #include <limits>
 #include <random>
 #include <sstream>
-#include <sys/stat.h>
-#include <direct.h>
 #include <windows.h>
 
 using namespace std;
-
-#define stat _stat
-#define mkdir _mkdir
 
 static std::mt19937 rng{std::random_device{}()};
 
@@ -44,17 +39,34 @@ string toLower(const string& s) {
     return out;
 }
 
+static wstring utf8ToWide(const string& input) {
+    if (input.empty()) return wstring();
+    int size = MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, nullptr, 0);
+    if (size <= 0) return wstring(input.begin(), input.end());
+    wstring output(static_cast<size_t>(size - 1), L'\0');
+    MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, &output[0], size);
+    return output;
+}
+
+static string wideToUtf8(const wstring& input) {
+    if (input.empty()) return string();
+    int size = WideCharToMultiByte(CP_UTF8, 0, input.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    if (size <= 0) return string(input.begin(), input.end());
+    string output(static_cast<size_t>(size - 1), '\0');
+    WideCharToMultiByte(CP_UTF8, 0, input.c_str(), -1, &output[0], size, nullptr, nullptr);
+    return output;
+}
+
 bool pathExists(const string& path) {
-    struct stat buffer;
-    return (stat(path.c_str(), &buffer) == 0);
+    wstring wide = utf8ToWide(path);
+    DWORD attrs = GetFileAttributesW(wide.c_str());
+    return attrs != INVALID_FILE_ATTRIBUTES;
 }
 
 bool isDirectory(const string& path) {
-    struct stat buffer;
-    if (stat(path.c_str(), &buffer) == 0) {
-        return (buffer.st_mode & S_IFDIR) != 0;
-    }
-    return false;
+    wstring wide = utf8ToWide(path);
+    DWORD attrs = GetFileAttributesW(wide.c_str());
+    return attrs != INVALID_FILE_ATTRIBUTES && (attrs & FILE_ATTRIBUTE_DIRECTORY);
 }
 
 string joinPath(const string& a, const string& b) {
@@ -82,20 +94,20 @@ string pathExtension(const string& path) {
 vector<string> listDirectories(const string& root) {
     vector<string> out;
     if (!isDirectory(root)) return out;
-    
-    WIN32_FIND_DATAA findData;
-    HANDLE hFind = FindFirstFileA((root + "\\*").c_str(), &findData);
+    wstring pattern = utf8ToWide(joinPath(root, "*"));
+    WIN32_FIND_DATAW findData;
+    HANDLE hFind = FindFirstFileW(pattern.c_str(), &findData);
     if (hFind == INVALID_HANDLE_VALUE) return out;
-    
+
     do {
         if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-            string name(findData.cFileName);
-            if (name != "." && name != "..") {
-                out.push_back(joinPath(root, name));
+            wstring name(findData.cFileName);
+            if (name != L"." && name != L"..") {
+                out.push_back(joinPath(root, wideToUtf8(name)));
             }
         }
-    } while (FindNextFileA(hFind, &findData));
-    
+    } while (FindNextFileW(hFind, &findData));
+
     FindClose(hFind);
     return out;
 }

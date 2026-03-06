@@ -166,5 +166,156 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - queda una base más limpia para seguir moviendo playoffs, ascensos y descensos a reglas declarativas
 - Validación realizada:
   - compilación verificada exitosamente con `build.bat`.
- 
-  - bloque de texto
+
+## Cambios recientes (2026-03-06) - Sanciones, centro de competicion, mercado y directiva
+- Implementado sistema de sanciones por jugador:
+  - las tarjetas amarillas y rojas ahora se asignan a futbolistas concretos en cada partido
+  - acumulacion de 5 amarillas = 1 fecha de suspension
+  - tarjeta roja = suspension automatica
+  - los suspendidos quedan fuera del XI mientras deban fechas
+- Persistidos en guardado/carga nuevos datos individuales:
+  - clausula de rescision
+  - acumulacion de amarillas
+  - tarjetas amarillas y rojas de temporada
+  - fechas de suspension pendientes
+- `viewTeam` y `displayStatistics` ahora muestran suspensiones, tarjetas individuales y clausulas.
+- Agregado `Centro de Competicion` al menu de carrera:
+  - posicion actual
+  - zona alta y zona baja de la tabla relevante
+  - proxima fecha
+  - confianza de la directiva
+- Agregada pantalla `Objetivos y Directiva`:
+  - objetivo de puesto final
+  - objetivo financiero
+  - objetivo de uso de juveniles sub-20
+  - nivel de confianza y semanas de advertencia
+- La directiva ahora genera objetivos automaticamente al iniciar cada temporada y actualiza su confianza semana a semana segun:
+  - posicion deportiva
+  - presupuesto
+  - uso de juveniles
+  - moral del equipo
+- Mercado de transferencias mejorado:
+  - compra de jugadores desde otros clubes
+  - negociacion de oferta con posible contraoferta del club vendedor
+  - negociacion de salario, duracion de contrato y honorarios de agente
+  - ejecucion de clausulas de rescision
+  - venta de jugadores con precio pedido y contraoferta del mercado
+- Ajustado el loop semanal de carrera:
+  - las sanciones se descuentan correctamente tras la fecha jugada
+  - ofertas entrantes permiten aceptar, contraofertar o rechazar
+  - la IA de fichajes actua de forma mas agresiva segun presupuesto y necesidades de plantel
+  - renovaciones de contrato ahora exigen salario, duracion y clausula
+- Validaciones realizadas:
+  - compilacion verificada exitosamente con `build.bat`
+  - arranque del ejecutable verificado con salida limpia al menu principal
+
+## Cambios recientes (2026-03-06) - Carrera avanzada, tacticas, finanzas y validadores
+- Implementada progresion de carrera del manager:
+  - nombre y reputacion del manager persistentes
+  - posibilidad de cambiar voluntariamente de club desde `Objetivos y Directiva`
+  - despido automatico si la confianza de la directiva cae a niveles criticos
+  - reasignacion inmediata a un nuevo club tras despido
+- Agregado historial de temporadas persistente:
+  - division, club, puesto final, campeon, ascensos, descensos y nota de temporada
+  - nueva pantalla `Historial de Temporadas`
+- Agregado feed de noticias persistente:
+  - resultados semanales
+  - fichajes, prestamos, precontratos y renovaciones
+  - eventos de club
+  - movimientos del manager
+  - nueva pantalla `Noticias`
+- Mercado expandido con nuevas operaciones:
+  - precontratos para jugadores con poco contrato restante
+  - prestamos entrantes
+  - prestamos salientes
+  - retorno automatico de jugadores cedidos al vencer el prestamo
+  - ejecucion de precontratos al comenzar la nueva temporada
+- Implementada gestion de alineacion y rotacion:
+  - XI preferido manual o automatico
+  - seleccion de capitan
+  - seleccion de lanzador de penales
+  - politica de rotacion (`Titulares`, `Balanceado`, `Rotacion`)
+  - el motor del XI ahora prioriza titulares preferidos y respeta rotacion, lesiones y suspensiones
+- Motor tactico ampliado:
+  - intensidad de presion
+  - linea defensiva
+  - tempo
+  - amplitud
+  - tipo de marcaje (`Zonal` / `Hombre`)
+  - la simulacion ahora usa estos parametros para rendimiento, desgaste, tarjetas y penales
+  - los desempates por penales ahora ponderan mejor capitan, lanzador y calidad del XI
+- Finanzas del club profundizadas:
+  - sponsor semanal
+  - ingresos por entradas segun localia, estadio y masa social
+  - deuda del club
+  - niveles de estadio, cantera y centro de entrenamiento
+  - costo semanal de infraestructura
+  - nueva pantalla `Club y Finanzas` para invertir en infraestructura
+  - la cantera y la recuperacion/entrenamiento ahora se benefician de la infraestructura
+- Transicion de temporada mejorada:
+  - premios economicos por posicion final
+  - registro automatico en historial
+  - ejecucion de precontratos al pasar de temporada
+  - avance de temporada centralizado en una sola rutina
+- Mejorado el soporte de rutas Unicode en Windows:
+  - `utils.cpp` ahora usa WinAPI wide (`GetFileAttributesW`, `FindFirstFileW`, `FindNextFileW`)
+  - se corrigio la deteccion de carpetas con acentos y `ñ`
+- Mejorado `build.bat`:
+  - ahora detiene la compilacion correctamente si un archivo falla
+  - agregado el nuevo modulo `validators.cpp`
+- Agregado modulo de validacion y tests:
+  - nuevo comando CLI `FootballManager.exe --validate`
+  - nueva opcion de menu principal `Validar sistema`
+  - valida conteo de divisiones, equipos unicos, planteles, fixtures, guardado/carga y orden basico de tabla
+- Validaciones realizadas:
+  - compilacion verificada exitosamente con `build.bat`
+  - suite `FootballManager.exe --validate` ejecutada con resultado sin fallas
+  - arranque del ejecutable y salida por menu principal verificados
+
+## Cambios recientes (2026-03-06) - Convocatoria, staff, copa, scouting y dinamicas de plantel
+- Implementada gestion mas completa de convocatoria y partido:
+  - banca preferida automatica o manual
+  - seleccion de lanzadores de tiros libres y corners
+  - visualizacion de banca en `Ver Equipo`
+  - cambios automaticos durante los partidos segun condicion, lesiones y rotacion
+  - registro de sustituciones en el resultado del partido
+- Mejorado el motor de simulacion:
+  - `playMatch` ahora devuelve tiros, posesion y cambios por equipo
+  - el capitan aporta segun liderazgo
+  - los especialistas a balon parado aportan segun `setPieceSkill`
+  - se registran titularidades de temporada para objetivos y dinamicas de vestuario
+  - mejorada la recuperacion de lesiones y condicion usando cuerpo medico y preparador fisico
+- Agregado cuerpo tecnico con impacto real:
+  - asistente tecnico, preparador fisico, jefe de scouting, jefe de juveniles y cuerpo medico visibles en `Club y Finanzas`
+  - nuevas inversiones para mejorar cada area del staff
+  - posibilidad de cambiar la region de captacion juvenil
+- Agregadas dinamicas de personalidad y relacion jugador-club:
+  - felicidad, quimica, liderazgo, profesionalismo y ambicion visibles en plantel y estadisticas
+  - jugadores pueden inquietarse por pocos minutos, bajo salario relativo o malos resultados
+  - aumento de ofertas y exigencia de renovacion cuando un jugador quiere salir
+- Sistema juvenil profundizado:
+  - desarrollo mensual de juveniles segun cantera, entrenador juvenil y profesionalismo
+  - ingresos de nuevos prospectos durante la temporada
+  - captacion influida por la region juvenil del club
+- Scouting ampliado:
+  - informes por region
+  - enfoque por posicion o necesidad detectada del plantel
+  - precision del informe ligada al jefe de scouting
+  - bandeja persistente de informes y opcion de fichar desde el informe
+- Agregado calendario multi-competencia simple:
+  - copa de temporada paralela a la liga
+  - rondas eliminatorias en semanas seleccionadas
+  - campeon de copa persistente
+  - visualizacion de estado de copa en `Centro de Competicion` y resumen semanal
+- Agregado analisis postpartido:
+  - resumen persistente del ultimo partido con marcador, tiros, posesion, cambios y lectura rapida
+  - visible en `Centro de Competicion`
+- Objetivos dinamicos reforzados:
+  - progreso mensual visible en `Objetivos y Directiva`, `Centro de Competicion` y dashboard semanal
+  - correccion del objetivo de mejora de posicion para que no genere metas imposibles
+- Herramientas de datos y validacion reforzadas:
+  - la suite de validacion ahora comprueba tambien persistencia de staff y datos avanzados de carrera
+- Validaciones realizadas:
+  - compilacion verificada exitosamente con `build.bat`
+  - suite `FootballManager.exe --validate` ejecutada con resultado sin fallas
+  - arranque del ejecutable y salida por menu principal verificados

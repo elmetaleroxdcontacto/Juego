@@ -62,11 +62,28 @@ Player makeRandomPlayer(const string& position, int skillMin, int skillMax, int 
     }
     p.value = static_cast<long long>(p.skill) * 10000;
     p.wage = static_cast<long long>(p.skill) * 150 + randInt(0, 800);
+    p.releaseClause = max(50000LL, p.value * (18 + randInt(0, 8)) / 10);
+    p.setPieceSkill = clampInt(p.skill + randInt(-8, 8), 25, 99);
+    p.leadership = clampInt(35 + randInt(0, 45), 1, 99);
+    p.professionalism = clampInt(40 + randInt(0, 45), 1, 99);
+    p.ambition = clampInt(35 + randInt(0, 50), 1, 99);
+    p.happiness = clampInt(55 + randInt(-10, 20), 1, 99);
+    p.chemistry = clampInt(45 + randInt(0, 35), 1, 99);
+    p.desiredStarts = (p.skill >= skillMax - 5) ? 3 : 1;
+    p.startsThisSeason = 0;
+    p.wantsToLeave = false;
+    p.onLoan = false;
+    p.parentClub.clear();
+    p.loanWeeksRemaining = 0;
     p.contractWeeks = randInt(52, 156);
     p.injured = false;
     p.injuryType = "";
     p.injuryWeeks = 0;
     p.injuryHistory = 0;
+    p.yellowAccumulation = 0;
+    p.seasonYellowCards = 0;
+    p.seasonRedCards = 0;
+    p.matchesSuspended = 0;
     p.goals = 0;
     p.assists = 0;
     p.matchesPlayed = 0;
@@ -93,7 +110,30 @@ Team::Team(string n)
       losses(0),
       yellowCards(0),
       redCards(0),
-      tiebreakerSeed(0) {}
+      tiebreakerSeed(0),
+      pressingIntensity(3),
+      defensiveLine(3),
+      tempo(3),
+      width(3),
+      markingStyle("Zonal"),
+      preferredBench(),
+      captain(""),
+      penaltyTaker(""),
+      freeKickTaker(""),
+      cornerTaker(""),
+      rotationPolicy("Balanceado"),
+      assistantCoach(55),
+      fitnessCoach(55),
+      scoutingChief(55),
+      youthCoach(55),
+      medicalTeam(55),
+      youthRegion("Metropolitana"),
+      debt(0),
+      sponsorWeekly(25000),
+      stadiumLevel(1),
+      youthFacilityLevel(1),
+      trainingFacilityLevel(1),
+      fanBase(12) {}
 
 void Team::addPlayer(const Player& p) {
     players.push_back(p);
@@ -235,6 +275,23 @@ static void parseFormation(const string& formation, int& defCount, int& midCount
     }
 }
 
+static bool isAvailableForSelection(const Player& player) {
+    return !player.injured && player.matchesSuspended <= 0;
+}
+
+static int selectionScore(const Team& team, int idx) {
+    const Player& player = team.players[idx];
+    int score = player.skill * 10 + player.fitness * 4 - player.matchesPlayed;
+    if (team.rotationPolicy == "Titulares") {
+        score = player.skill * 12 + player.fitness * 2 - player.matchesPlayed / 2;
+    } else if (team.rotationPolicy == "Rotacion") {
+        score = player.skill * 8 + player.fitness * 6 - player.matchesPlayed * 2;
+    }
+    if (!team.captain.empty() && player.name == team.captain) score += 10;
+    if (!team.penaltyTaker.empty() && player.name == team.penaltyTaker) score += 6;
+    return score;
+}
+
 vector<int> Team::getStartingXIIndices() const {
     vector<int> xi;
     if (players.empty()) return xi;
@@ -242,24 +299,43 @@ vector<int> Team::getStartingXIIndices() const {
     parseFormation(formation, defCount, midCount, fwdCount);
 
     vector<bool> used(players.size(), false);
+    auto tryPreferred = [&]() {
+        for (const auto& preferred : preferredXI) {
+            for (size_t i = 0; i < players.size(); ++i) {
+                if (used[i]) continue;
+                if (players[i].name != preferred) continue;
+                if (!isAvailableForSelection(players[i])) continue;
+                used[i] = true;
+                xi.push_back(static_cast<int>(i));
+                break;
+            }
+            if (xi.size() >= 11) return;
+        }
+    };
     auto pick = [&](const string& pos, int count) {
+        if (xi.size() >= 11 || count <= 0) return;
         vector<int> candidates;
         for (size_t i = 0; i < players.size(); ++i) {
             if (used[i]) continue;
-            if (players[i].injured) continue;
+            if (!isAvailableForSelection(players[i])) continue;
             string norm = normalizePosition(players[i].position);
             if (norm == pos) candidates.push_back(static_cast<int>(i));
         }
         sort(candidates.begin(), candidates.end(), [&](int a, int b) {
+            int aScore = selectionScore(*this, a);
+            int bScore = selectionScore(*this, b);
+            if (aScore != bScore) return aScore > bScore;
             return players[a].skill > players[b].skill;
         });
         for (int i = 0; i < count && i < static_cast<int>(candidates.size()); ++i) {
             int idx = candidates[i];
             used[idx] = true;
             xi.push_back(idx);
+            if (xi.size() >= 11) break;
         }
     };
 
+    tryPreferred();
     pick("ARQ", 1);
     pick("DEF", defCount);
     pick("MED", midCount);
@@ -268,9 +344,31 @@ vector<int> Team::getStartingXIIndices() const {
     if (xi.size() < 11) {
         vector<int> candidates;
         for (size_t i = 0; i < players.size(); ++i) {
-            if (!used[i] && !players[i].injured) candidates.push_back(static_cast<int>(i));
+            if (!used[i] && isAvailableForSelection(players[i])) {
+                candidates.push_back(static_cast<int>(i));
+            }
         }
         sort(candidates.begin(), candidates.end(), [&](int a, int b) {
+            int aScore = selectionScore(*this, a);
+            int bScore = selectionScore(*this, b);
+            if (aScore != bScore) return aScore > bScore;
+            return players[a].skill > players[b].skill;
+        });
+        for (int idx : candidates) {
+            used[idx] = true;
+            xi.push_back(idx);
+            if (xi.size() >= 11) break;
+        }
+    }
+    if (xi.size() < 11) {
+        vector<int> candidates;
+        for (size_t i = 0; i < players.size(); ++i) {
+            if (!used[i] && players[i].matchesSuspended <= 0) candidates.push_back(static_cast<int>(i));
+        }
+        sort(candidates.begin(), candidates.end(), [&](int a, int b) {
+            int aScore = selectionScore(*this, a);
+            int bScore = selectionScore(*this, b);
+            if (aScore != bScore) return aScore > bScore;
             return players[a].skill > players[b].skill;
         });
         for (int idx : candidates) {
@@ -285,6 +383,9 @@ vector<int> Team::getStartingXIIndices() const {
             if (!used[i]) candidates.push_back(static_cast<int>(i));
         }
         sort(candidates.begin(), candidates.end(), [&](int a, int b) {
+            int aScore = selectionScore(*this, a);
+            int bScore = selectionScore(*this, b);
+            if (aScore != bScore) return aScore > bScore;
             return players[a].skill > players[b].skill;
         });
         for (int idx : candidates) {
@@ -294,6 +395,52 @@ vector<int> Team::getStartingXIIndices() const {
         }
     }
     return xi;
+}
+
+vector<int> Team::getBenchIndices(int count) const {
+    vector<int> xi = getStartingXIIndices();
+    vector<int> bench;
+    if (count <= 0) return bench;
+    vector<bool> used(players.size(), false);
+    for (int idx : xi) {
+        if (idx >= 0 && idx < static_cast<int>(players.size())) used[idx] = true;
+    }
+
+    auto tryPreferred = [&]() {
+        for (const auto& preferred : preferredBench) {
+            for (size_t i = 0; i < players.size(); ++i) {
+                if (used[i]) continue;
+                if (players[i].name != preferred) continue;
+                if (!isAvailableForSelection(players[i])) continue;
+                used[i] = true;
+                bench.push_back(static_cast<int>(i));
+                break;
+            }
+            if (static_cast<int>(bench.size()) >= count) return;
+        }
+    };
+
+    tryPreferred();
+    if (static_cast<int>(bench.size()) < count) {
+        vector<int> candidates;
+        for (size_t i = 0; i < players.size(); ++i) {
+            if (used[i]) continue;
+            if (!isAvailableForSelection(players[i])) continue;
+            candidates.push_back(static_cast<int>(i));
+        }
+        sort(candidates.begin(), candidates.end(), [&](int a, int b) {
+            int aScore = selectionScore(*this, a);
+            int bScore = selectionScore(*this, b);
+            if (aScore != bScore) return aScore > bScore;
+            return players[a].skill > players[b].skill;
+        });
+        for (int idx : candidates) {
+            used[idx] = true;
+            bench.push_back(idx);
+            if (static_cast<int>(bench.size()) >= count) break;
+        }
+    }
+    return bench;
 }
 
 int Team::getTotalAttack() const {
@@ -406,7 +553,24 @@ const vector<DivisionInfo> kDivisions = {
     {"tercera division b", "LigaChilena/tercera division b", "Tercera Division B"}
 };
 
-Career::Career() : myTeam(nullptr), currentSeason(1), currentWeek(1), saveFile("career_save.txt"), initialized(false) {}
+Career::Career()
+    : myTeam(nullptr),
+      currentSeason(1),
+      currentWeek(1),
+      saveFile("career_save.txt"),
+      managerName("Manager"),
+      managerReputation(50),
+      boardConfidence(60),
+      boardExpectedFinish(0),
+      boardBudgetTarget(0),
+      boardYouthTarget(1),
+      boardWarningWeeks(0),
+      boardMonthlyTarget(0),
+      boardMonthlyProgress(0),
+      boardMonthlyDeadlineWeek(0),
+      cupActive(false),
+      cupRound(0),
+      initialized(false) {}
 
 bool Career::usesSegundaFormat() const {
     const CompetitionConfig& config = getCompetitionConfig(activeDivision);
@@ -577,6 +741,142 @@ static void decodeHeadToHead(const string& encoded, Team& team) {
     }
 }
 
+static string encodeStringList(const vector<string>& items) {
+    string out;
+    for (size_t i = 0; i < items.size(); ++i) {
+        if (i) out += ";";
+        out += items[i];
+    }
+    return out;
+}
+
+static vector<string> decodeStringList(const string& encoded) {
+    vector<string> items;
+    stringstream ss(encoded);
+    string token;
+    while (getline(ss, token, ';')) {
+        token = trim(token);
+        if (!token.empty()) items.push_back(token);
+    }
+    return items;
+}
+
+static string encodeHistory(const vector<SeasonHistoryEntry>& entries) {
+    string out;
+    for (size_t i = 0; i < entries.size(); ++i) {
+        if (i) out += "~";
+        const auto& e = entries[i];
+        out += to_string(e.season) + "^" + e.division + "^" + e.club + "^" + to_string(e.finish) + "^" +
+               e.champion + "^" + e.promoted + "^" + e.relegated + "^" + e.note;
+    }
+    return out;
+}
+
+static vector<SeasonHistoryEntry> decodeHistory(const string& encoded) {
+    vector<SeasonHistoryEntry> entries;
+    stringstream ss(encoded);
+    string token;
+    while (getline(ss, token, '~')) {
+        auto parts = splitByDelimiter(token, '^');
+        if (parts.size() < 8) continue;
+        SeasonHistoryEntry e;
+        e.season = stoi(parts[0]);
+        e.division = parts[1];
+        e.club = parts[2];
+        e.finish = stoi(parts[3]);
+        e.champion = parts[4];
+        e.promoted = parts[5];
+        e.relegated = parts[6];
+        e.note = parts[7];
+        entries.push_back(e);
+    }
+    return entries;
+}
+
+static string encodePendingTransfers(const vector<PendingTransfer>& entries) {
+    string out;
+    for (size_t i = 0; i < entries.size(); ++i) {
+        if (i) out += "~";
+        const auto& e = entries[i];
+        out += e.playerName + "^" + e.fromTeam + "^" + e.toTeam + "^" + to_string(e.effectiveSeason) + "^" +
+               to_string(e.loanWeeks) + "^" + to_string(e.fee) + "^" + to_string(e.wage) + "^" +
+               to_string(e.contractWeeks) + "^" + to_string(e.preContract ? 1 : 0) + "^" +
+               to_string(e.loan ? 1 : 0);
+    }
+    return out;
+}
+
+static vector<PendingTransfer> decodePendingTransfers(const string& encoded) {
+    vector<PendingTransfer> entries;
+    stringstream ss(encoded);
+    string token;
+    while (getline(ss, token, '~')) {
+        auto parts = splitByDelimiter(token, '^');
+        if (parts.size() < 8) continue;
+        PendingTransfer e;
+        e.playerName = parts[0];
+        e.fromTeam = parts[1];
+        e.toTeam = parts[2];
+        e.effectiveSeason = stoi(parts[3]);
+        e.loanWeeks = stoi(parts[4]);
+        e.fee = stoll(parts[5]);
+        if (parts.size() >= 10) {
+            e.wage = stoll(parts[6]);
+            e.contractWeeks = stoi(parts[7]);
+            e.preContract = (parts[8] == "1");
+            e.loan = (parts[9] == "1");
+        } else {
+            e.wage = 0;
+            e.contractWeeks = 104;
+            e.preContract = (parts[6] == "1");
+            e.loan = (parts[7] == "1");
+        }
+        entries.push_back(e);
+    }
+    return entries;
+}
+
+static LeagueTable buildBoardTable(const vector<Team*>& teams, const string& ruleId) {
+    LeagueTable table;
+    table.ruleId = ruleId;
+    for (auto* team : teams) {
+        if (team) table.addTeam(team);
+    }
+    table.sortTable();
+    return table;
+}
+
+static vector<Team*> boardRelevantTeams(const Career& career) {
+    vector<Team*> teams;
+    if (!career.myTeam) return teams;
+    if (career.usesGroupFormat()) {
+        const auto& idx = [&career]() -> const vector<int>& {
+            for (int i : career.groupNorthIdx) {
+                if (i >= 0 && i < static_cast<int>(career.activeTeams.size()) &&
+                    career.activeTeams[i] == career.myTeam) {
+                    return career.groupNorthIdx;
+                }
+            }
+            return career.groupSouthIdx;
+        }();
+        for (int i : idx) {
+            if (i >= 0 && i < static_cast<int>(career.activeTeams.size())) {
+                teams.push_back(career.activeTeams[i]);
+            }
+        }
+        if (!teams.empty()) return teams;
+    }
+    return career.activeTeams;
+}
+
+static int youthPlayersUsed(const Team& team) {
+    int count = 0;
+    for (const auto& player : team.players) {
+        if (player.age <= 20 && player.matchesPlayed > 0) count++;
+    }
+    return count;
+}
+
 void Career::resetSeason() {
     for (auto* team : activeTeams) {
         team->resetSeasonStats();
@@ -586,9 +886,24 @@ void Career::resetSeason() {
             p.injuryWeeks = 0;
             p.injuryType.clear();
             p.fitness = p.stamina;
+            p.yellowAccumulation = 0;
+            p.seasonYellowCards = 0;
+            p.seasonRedCards = 0;
+            p.matchesSuspended = 0;
+            p.goals = 0;
+            p.assists = 0;
+            p.matchesPlayed = 0;
+            p.startsThisSeason = 0;
+            p.wantsToLeave = false;
+            p.happiness = clampInt(p.happiness + 5, 1, 99);
         }
     }
     buildSchedule();
+    initializeBoardObjectives();
+    initializeSeasonCup();
+    initializeDynamicObjective();
+    lastMatchAnalysis.clear();
+    scoutInbox.clear();
 }
 
 void Career::agePlayers() {
@@ -605,6 +920,310 @@ void Career::agePlayers() {
     }
 }
 
+Team* Career::findTeamByName(const string& name) {
+    for (auto& team : allTeams) {
+        if (team.name == name) return &team;
+    }
+    return nullptr;
+}
+
+const Team* Career::findTeamByName(const string& name) const {
+    for (const auto& team : allTeams) {
+        if (team.name == name) return &team;
+    }
+    return nullptr;
+}
+
+void Career::addNews(const string& item) {
+    if (item.empty()) return;
+    string entry = "T" + to_string(currentSeason) + "-F" + to_string(currentWeek) + ": " + item;
+    newsFeed.push_back(entry);
+    if (newsFeed.size() > 40) {
+        newsFeed.erase(newsFeed.begin(), newsFeed.begin() + static_cast<long long>(newsFeed.size() - 40));
+    }
+}
+
+void Career::executePendingTransfers() {
+    for (size_t i = 0; i < pendingTransfers.size();) {
+        PendingTransfer& move = pendingTransfers[i];
+        if (move.effectiveSeason > currentSeason) {
+            ++i;
+            continue;
+        }
+        Team* from = findTeamByName(move.fromTeam);
+        Team* to = findTeamByName(move.toTeam);
+        if (!from || !to) {
+            pendingTransfers.erase(pendingTransfers.begin() + static_cast<long long>(i));
+            continue;
+        }
+        int playerIdx = -1;
+        for (size_t p = 0; p < from->players.size(); ++p) {
+            if (from->players[p].name == move.playerName) {
+                playerIdx = static_cast<int>(p);
+                break;
+            }
+        }
+        if (playerIdx < 0) {
+            pendingTransfers.erase(pendingTransfers.begin() + static_cast<long long>(i));
+            continue;
+        }
+        Player player = from->players[playerIdx];
+        if (move.preContract) {
+            player.onLoan = false;
+            player.parentClub.clear();
+            player.loanWeeksRemaining = 0;
+            if (move.wage > 0) player.wage = move.wage;
+            if (move.contractWeeks > 0) player.contractWeeks = move.contractWeeks;
+            player.releaseClause = max(player.value * 2, player.wage * 45);
+            from->players.erase(from->players.begin() + playerIdx);
+            to->addPlayer(player);
+            addNews(player.name + " se incorpora a " + to->name + " por precontrato.");
+        }
+        pendingTransfers.erase(pendingTransfers.begin() + static_cast<long long>(i));
+    }
+}
+
+void Career::initializeSeasonCup() {
+    cupRemainingTeams.clear();
+    cupChampion.clear();
+    cupRound = 0;
+    cupActive = activeTeams.size() >= 4;
+    if (!cupActive) return;
+    for (auto* team : activeTeams) {
+        if (team) cupRemainingTeams.push_back(team->name);
+    }
+}
+
+void Career::initializeDynamicObjective() {
+    if (!myTeam) return;
+    int rank = currentCompetitiveRank();
+    int field = max(1, currentCompetitiveFieldSize());
+    boardMonthlyProgress = 0;
+    boardMonthlyTarget = 0;
+    boardMonthlyDeadlineWeek = min(static_cast<int>(schedule.size()), currentWeek + 3);
+    if (boardMonthlyDeadlineWeek < currentWeek) boardMonthlyDeadlineWeek = currentWeek;
+
+    int objectiveType = randInt(1, 4);
+    if (objectiveType == 1) {
+        boardMonthlyTarget = 6;
+        boardMonthlyObjective = "Sumar al menos 6 puntos en 4 semanas";
+    } else if (objectiveType == 2) {
+        boardMonthlyTarget = 2;
+        boardMonthlyObjective = "Dar 2 titularidades a sub-20";
+    } else if (objectiveType == 3 && rank > 1) {
+        boardMonthlyTarget = max(1, rank - 1);
+        boardMonthlyProgress = (rank > 0) ? rank : field;
+        boardMonthlyObjective = "Mejorar la posicion liguera antes de 4 semanas";
+    } else {
+        boardMonthlyTarget = static_cast<int>(max(100000LL, myTeam->budget * 80 / 100));
+        boardMonthlyObjective = "Mantener presupuesto por sobre $" + to_string(boardMonthlyTarget);
+        boardMonthlyProgress = static_cast<int>(min<long long>(myTeam->budget, 2000000000LL));
+    }
+}
+
+void Career::updateDynamicObjectiveStatus() {
+    if (!myTeam || boardMonthlyObjective.empty()) return;
+    int youthStarts = 0;
+    for (const auto& player : myTeam->players) {
+        if (player.age <= 20) youthStarts += player.startsThisSeason;
+    }
+    if (boardMonthlyObjective.find("puntos") != string::npos) {
+        // progress updated externally from weekly points gain
+    } else if (boardMonthlyObjective.find("titularidades") != string::npos) {
+        boardMonthlyProgress = youthStarts;
+    } else if (boardMonthlyObjective.find("posicion") != string::npos) {
+        boardMonthlyProgress = currentCompetitiveRank();
+    } else if (boardMonthlyObjective.find("presupuesto") != string::npos) {
+        boardMonthlyProgress = static_cast<int>(min<long long>(myTeam->budget, 2000000000LL));
+    }
+
+    if (currentWeek < boardMonthlyDeadlineWeek) return;
+    bool success = false;
+    if (boardMonthlyObjective.find("puntos") != string::npos) {
+        success = boardMonthlyProgress >= boardMonthlyTarget;
+    } else if (boardMonthlyObjective.find("titularidades") != string::npos) {
+        success = boardMonthlyProgress >= boardMonthlyTarget;
+    } else if (boardMonthlyObjective.find("posicion") != string::npos) {
+        success = boardMonthlyProgress > 0 && boardMonthlyProgress <= boardMonthlyTarget;
+    } else if (boardMonthlyObjective.find("presupuesto") != string::npos) {
+        success = boardMonthlyProgress >= boardMonthlyTarget;
+    }
+    boardConfidence = clampInt(boardConfidence + (success ? 4 : -4), 0, 100);
+    addNews(string("Objetivo mensual ") + (success ? "cumplido: " : "fallado: ") + boardMonthlyObjective);
+    initializeDynamicObjective();
+}
+
+int Career::currentCompetitiveRank() const {
+    if (!myTeam) return -1;
+    vector<Team*> teams = boardRelevantTeams(*this);
+    LeagueTable table = buildBoardTable(teams, activeDivision);
+    for (size_t i = 0; i < table.teams.size(); ++i) {
+        if (table.teams[i] == myTeam) return static_cast<int>(i) + 1;
+    }
+    return -1;
+}
+
+int Career::currentCompetitiveFieldSize() const {
+    return static_cast<int>(boardRelevantTeams(*this).size());
+}
+
+void Career::initializeBoardObjectives() {
+    if (!myTeam) return;
+    vector<Team*> teams = boardRelevantTeams(*this);
+    if (teams.empty()) return;
+    vector<Team*> byValue = teams;
+    sort(byValue.begin(), byValue.end(), [](Team* a, Team* b) {
+        if (a->getSquadValue() != b->getSquadValue()) return a->getSquadValue() > b->getSquadValue();
+        return a->name < b->name;
+    });
+    int valueRank = static_cast<int>(byValue.size());
+    for (size_t i = 0; i < byValue.size(); ++i) {
+        if (byValue[i] == myTeam) {
+            valueRank = static_cast<int>(i) + 1;
+            break;
+        }
+    }
+
+    int fieldSize = static_cast<int>(teams.size());
+    boardExpectedFinish = clampInt(valueRank + 1, 1, fieldSize);
+    boardBudgetTarget = max(150000LL, myTeam->budget * 60 / 100);
+    boardYouthTarget = (fieldSize >= 14) ? 2 : 1;
+    boardConfidence = clampInt(55 + max(0, boardExpectedFinish - valueRank) * 4, 45, 75);
+    boardWarningWeeks = 0;
+}
+
+void Career::updateBoardConfidence() {
+    if (!myTeam || boardExpectedFinish <= 0) return;
+    int rank = currentCompetitiveRank();
+    int delta = 0;
+    if (rank > 0) {
+        if (rank <= boardExpectedFinish) delta += 3;
+        else delta -= min(5, rank - boardExpectedFinish);
+    }
+    if (myTeam->budget >= boardBudgetTarget) delta += 1;
+    else delta -= 2;
+
+    int youthUsed = youthPlayersUsed(*myTeam);
+    if (youthUsed >= boardYouthTarget) delta += 1;
+    else if (currentWeek > max(3, static_cast<int>(schedule.size()) / 4)) delta -= 1;
+
+    if (myTeam->morale >= 65) delta += 1;
+    else if (myTeam->morale <= 35) delta -= 1;
+
+    boardConfidence = clampInt(boardConfidence + delta, 0, 100);
+    if (boardConfidence < 35) boardWarningWeeks++;
+    else boardWarningWeeks = 0;
+}
+
+static string encodePlayerFields(const Player& p) {
+    stringstream ss;
+    ss << p.name << "|" << p.position << "|" << p.attack << "|" << p.defense << "|"
+       << p.stamina << "|" << p.fitness << "|" << p.skill << "|" << p.potential << "|" << p.age << "|" << p.value << "|"
+       << p.onLoan << "|" << p.parentClub << "|" << p.loanWeeksRemaining << "|"
+       << p.injured << "|" << p.injuryType << "|" << p.injuryWeeks << "|" << p.goals << "|" << p.assists << "|"
+       << p.matchesPlayed << "|" << p.lastTrainedSeason << "|" << p.lastTrainedWeek << "|"
+       << p.wage << "|" << p.releaseClause << "|" << p.contractWeeks << "|" << p.injuryHistory << "|"
+       << p.yellowAccumulation << "|" << p.seasonYellowCards << "|" << p.seasonRedCards << "|" << p.matchesSuspended
+       << "|" << p.role << "|" << p.setPieceSkill << "|" << p.leadership << "|" << p.professionalism
+       << "|" << p.ambition << "|" << p.happiness << "|" << p.chemistry << "|" << p.desiredStarts
+       << "|" << p.startsThisSeason << "|" << p.wantsToLeave;
+    return ss.str();
+}
+
+static Player decodePlayerFields(const vector<string>& pf) {
+    Player p;
+    size_t idx = 0;
+    bool hasLoanState = pf.size() >= 30;
+    if (idx < pf.size()) p.name = pf[idx++];
+    if (idx < pf.size()) p.position = pf[idx++];
+    if (idx < pf.size()) p.attack = stoi(pf[idx++]); else p.attack = 40;
+    if (idx < pf.size()) p.defense = stoi(pf[idx++]); else p.defense = 40;
+    if (idx < pf.size()) p.stamina = stoi(pf[idx++]); else p.stamina = 60;
+
+    bool hasFitness = (pf.size() >= 16);
+    if (hasFitness && idx < pf.size()) p.fitness = stoi(pf[idx++]);
+    else p.fitness = p.stamina;
+
+    if (idx < pf.size()) p.skill = stoi(pf[idx++]); else p.skill = (p.attack + p.defense) / 2;
+
+    size_t remaining = (idx <= pf.size()) ? (pf.size() - idx) : 0;
+    bool hasPotential = (remaining >= 11);
+    if (hasPotential && idx < pf.size()) p.potential = stoi(pf[idx++]);
+    else p.potential = clampInt(p.skill + randInt(0, 8), p.skill, 95);
+
+    if (idx < pf.size()) p.age = stoi(pf[idx++]); else p.age = 24;
+    if (idx < pf.size()) p.value = stoll(pf[idx++]); else p.value = static_cast<long long>(p.skill) * 10000;
+    if (hasLoanState && idx < pf.size()) {
+        string loanStr = toLower(pf[idx++]);
+        p.onLoan = (loanStr == "1" || loanStr == "true");
+    } else {
+        p.onLoan = false;
+    }
+    if (hasLoanState && idx < pf.size()) p.parentClub = pf[idx++];
+    else p.parentClub.clear();
+    if (hasLoanState && idx < pf.size()) p.loanWeeksRemaining = stoi(pf[idx++]);
+    else p.loanWeeksRemaining = 0;
+
+    string injuredStr = (idx < pf.size()) ? toLower(pf[idx++]) : "0";
+    p.injured = (injuredStr == "1" || injuredStr == "true");
+
+    if (hasPotential && idx < pf.size()) p.injuryType = pf[idx++];
+    else p.injuryType = p.injured ? "Leve" : "";
+    if (idx < pf.size()) p.injuryWeeks = stoi(pf[idx++]); else p.injuryWeeks = 0;
+    if (idx < pf.size()) p.goals = stoi(pf[idx++]); else p.goals = 0;
+    if (idx < pf.size()) p.assists = stoi(pf[idx++]); else p.assists = 0;
+    if (idx < pf.size()) p.matchesPlayed = stoi(pf[idx++]); else p.matchesPlayed = 0;
+    if (idx + 1 < pf.size()) {
+        p.lastTrainedSeason = stoi(pf[idx++]);
+        p.lastTrainedWeek = stoi(pf[idx++]);
+    } else {
+        p.lastTrainedSeason = -1;
+        p.lastTrainedWeek = -1;
+    }
+
+    if (idx < pf.size()) p.wage = stoll(pf[idx++]);
+    else p.wage = static_cast<long long>(p.skill) * 150 + randInt(0, 800);
+    if (idx < pf.size()) p.releaseClause = stoll(pf[idx++]);
+    else p.releaseClause = max(50000LL, p.value * 2);
+    if (idx < pf.size()) p.contractWeeks = stoi(pf[idx++]);
+    else p.contractWeeks = randInt(52, 156);
+    if (idx < pf.size()) p.injuryHistory = stoi(pf[idx++]);
+    else p.injuryHistory = 0;
+    if (idx < pf.size()) p.yellowAccumulation = stoi(pf[idx++]);
+    else p.yellowAccumulation = 0;
+    if (idx < pf.size()) p.seasonYellowCards = stoi(pf[idx++]);
+    else p.seasonYellowCards = 0;
+    if (idx < pf.size()) p.seasonRedCards = stoi(pf[idx++]);
+    else p.seasonRedCards = 0;
+    if (idx < pf.size()) p.matchesSuspended = stoi(pf[idx++]);
+    else p.matchesSuspended = 0;
+    if (idx < pf.size()) p.role = pf[idx++];
+    else p.role = defaultRoleForPosition(p.position);
+    if (idx < pf.size()) p.setPieceSkill = stoi(pf[idx++]);
+    else p.setPieceSkill = clampInt(p.skill + randInt(-6, 6), 25, 99);
+    if (idx < pf.size()) p.leadership = stoi(pf[idx++]);
+    else p.leadership = clampInt(35 + randInt(0, 45), 1, 99);
+    if (idx < pf.size()) p.professionalism = stoi(pf[idx++]);
+    else p.professionalism = clampInt(40 + randInt(0, 45), 1, 99);
+    if (idx < pf.size()) p.ambition = stoi(pf[idx++]);
+    else p.ambition = clampInt(35 + randInt(0, 50), 1, 99);
+    if (idx < pf.size()) p.happiness = stoi(pf[idx++]);
+    else p.happiness = clampInt(55 + randInt(-10, 20), 1, 99);
+    if (idx < pf.size()) p.chemistry = stoi(pf[idx++]);
+    else p.chemistry = clampInt(45 + randInt(0, 35), 1, 99);
+    if (idx < pf.size()) p.desiredStarts = stoi(pf[idx++]);
+    else p.desiredStarts = 1;
+    if (idx < pf.size()) p.startsThisSeason = stoi(pf[idx++]);
+    else p.startsThisSeason = 0;
+    if (idx < pf.size()) {
+        string wantsOut = toLower(pf[idx++]);
+        p.wantsToLeave = (wantsOut == "1" || wantsOut == "true");
+    } else {
+        p.wantsToLeave = false;
+    }
+    return p;
+}
+
 void Career::saveCareer() {
     ofstream file(saveFile);
     if (!file.is_open()) return;
@@ -612,10 +1231,22 @@ void Career::saveCareer() {
     file << "SEASON " << currentSeason << " WEEK " << currentWeek << "\n";
     file << "DIVISION " << activeDivision << "\n";
     file << "MYTEAM " << (myTeam ? myTeam->name : "") << "\n";
+    file << "MANAGER " << managerName << "|" << managerReputation << "\n";
+    file << "DYNOBJ " << boardMonthlyObjective << "|" << boardMonthlyTarget << "|" << boardMonthlyProgress
+         << "|" << boardMonthlyDeadlineWeek << "\n";
     file << "ACHIEVEMENTS " << achievements.size() << "\n";
     for (const auto& ach : achievements) {
         file << "ACH " << ach << "\n";
     }
+    file << "BOARD " << boardConfidence << "|" << boardExpectedFinish << "|" << boardBudgetTarget
+         << "|" << boardYouthTarget << "|" << boardWarningWeeks << "\n";
+    file << "NEWS " << encodeStringList(newsFeed) << "\n";
+    file << "SCOUT " << encodeStringList(scoutInbox) << "\n";
+    file << "HISTORY " << encodeHistory(history) << "\n";
+    file << "PENDING " << encodePendingTransfers(pendingTransfers) << "\n";
+    file << "CUP " << (cupActive ? 1 : 0) << "|" << cupRound << "|" << encodeStringList(cupRemainingTeams)
+         << "|" << cupChampion << "\n";
+    file << "LASTMATCH " << lastMatchAnalysis << "\n";
     file << "TEAMS " << allTeams.size() << "\n";
 
     for (const auto& team : allTeams) {
@@ -623,14 +1254,17 @@ void Career::saveCareer() {
              << "|" << team.budget << "|" << team.morale << "|" << team.points << "|" << team.goalsFor << "|" << team.goalsAgainst
              << "|" << team.wins << "|" << team.draws << "|" << team.losses << "|" << team.trainingFocus
              << "|" << team.awayGoals << "|" << team.redCards << "|" << team.yellowCards << "|" << team.tiebreakerSeed
-             << "|" << encodeHeadToHead(team.headToHead) << "\n";
+             << "|" << encodeHeadToHead(team.headToHead)
+             << "|" << team.pressingIntensity << "|" << team.defensiveLine << "|" << team.tempo << "|" << team.width
+             << "|" << team.markingStyle << "|" << encodeStringList(team.preferredXI) << "|" << encodeStringList(team.preferredBench)
+             << "|" << team.captain << "|" << team.penaltyTaker << "|" << team.freeKickTaker << "|" << team.cornerTaker
+             << "|" << team.rotationPolicy << "|" << team.assistantCoach << "|" << team.fitnessCoach << "|" << team.scoutingChief
+             << "|" << team.youthCoach << "|" << team.medicalTeam << "|" << team.youthRegion << "|" << team.debt
+             << "|" << team.sponsorWeekly << "|" << team.stadiumLevel << "|" << team.youthFacilityLevel
+             << "|" << team.trainingFacilityLevel << "|" << team.fanBase << "\n";
         file << "PLAYERS " << team.players.size() << "\n";
         for (const auto& p : team.players) {
-            file << "PLAYER " << p.name << "|" << p.position << "|" << p.attack << "|" << p.defense << "|"
-                 << p.stamina << "|" << p.fitness << "|" << p.skill << "|" << p.potential << "|" << p.age << "|" << p.value << "|"
-                 << p.injured << "|" << p.injuryType << "|" << p.injuryWeeks << "|" << p.goals << "|" << p.assists << "|"
-                 << p.matchesPlayed << "|" << p.lastTrainedSeason << "|" << p.lastTrainedWeek << "|"
-                 << p.wage << "|" << p.contractWeeks << "|" << p.injuryHistory << "|" << p.role << "\n";
+            file << "PLAYER " << encodePlayerFields(p) << "\n";
         }
         file << "ENDTEAM\n";
     }
@@ -661,6 +1295,26 @@ bool Career::loadCareer() {
 
         string teamsLine;
         if (!getline(file, teamsLine)) return false;
+        managerName = "Manager";
+        managerReputation = 50;
+        if (teamsLine.rfind("MANAGER ", 0) == 0) {
+            auto managerFields = splitByDelimiter(trim(teamsLine.substr(8)), '|');
+            if (!managerFields.empty()) managerName = managerFields[0];
+            if (managerFields.size() > 1) managerReputation = stoi(managerFields[1]);
+            if (!getline(file, teamsLine)) return false;
+        }
+        boardMonthlyObjective.clear();
+        boardMonthlyTarget = 0;
+        boardMonthlyProgress = 0;
+        boardMonthlyDeadlineWeek = 0;
+        if (teamsLine.rfind("DYNOBJ ", 0) == 0) {
+            auto objectiveFields = splitByDelimiter(trim(teamsLine.substr(7)), '|');
+            if (!objectiveFields.empty()) boardMonthlyObjective = objectiveFields[0];
+            if (objectiveFields.size() > 1) boardMonthlyTarget = stoi(objectiveFields[1]);
+            if (objectiveFields.size() > 2) boardMonthlyProgress = stoi(objectiveFields[2]);
+            if (objectiveFields.size() > 3) boardMonthlyDeadlineWeek = stoi(objectiveFields[3]);
+            if (!getline(file, teamsLine)) return false;
+        }
         achievements.clear();
         if (teamsLine.rfind("ACHIEVEMENTS ", 0) == 0) {
             int achCount = stoi(trim(teamsLine.substr(13)));
@@ -669,6 +1323,57 @@ bool Career::loadCareer() {
                 if (line.rfind("ACH ", 0) != 0) return false;
                 achievements.push_back(trim(line.substr(4)));
             }
+            if (!getline(file, teamsLine)) return false;
+        }
+        boardConfidence = 60;
+        boardExpectedFinish = 0;
+        boardBudgetTarget = 0;
+        boardYouthTarget = 1;
+        boardWarningWeeks = 0;
+        if (teamsLine.rfind("BOARD ", 0) == 0) {
+            auto boardFields = splitByDelimiter(trim(teamsLine.substr(6)), '|');
+            if (boardFields.size() > 0) boardConfidence = clampInt(stoi(boardFields[0]), 0, 100);
+            if (boardFields.size() > 1) boardExpectedFinish = stoi(boardFields[1]);
+            if (boardFields.size() > 2) boardBudgetTarget = stoll(boardFields[2]);
+            if (boardFields.size() > 3) boardYouthTarget = stoi(boardFields[3]);
+            if (boardFields.size() > 4) boardWarningWeeks = stoi(boardFields[4]);
+            if (!getline(file, teamsLine)) return false;
+        }
+        newsFeed.clear();
+        if (teamsLine.rfind("NEWS ", 0) == 0) {
+            newsFeed = decodeStringList(trim(teamsLine.substr(5)));
+            if (!getline(file, teamsLine)) return false;
+        }
+        scoutInbox.clear();
+        if (teamsLine.rfind("SCOUT ", 0) == 0) {
+            scoutInbox = decodeStringList(trim(teamsLine.substr(6)));
+            if (!getline(file, teamsLine)) return false;
+        }
+        history.clear();
+        if (teamsLine.rfind("HISTORY ", 0) == 0) {
+            history = decodeHistory(trim(teamsLine.substr(8)));
+            if (!getline(file, teamsLine)) return false;
+        }
+        pendingTransfers.clear();
+        if (teamsLine.rfind("PENDING ", 0) == 0) {
+            pendingTransfers = decodePendingTransfers(trim(teamsLine.substr(8)));
+            if (!getline(file, teamsLine)) return false;
+        }
+        cupActive = false;
+        cupRound = 0;
+        cupRemainingTeams.clear();
+        cupChampion.clear();
+        if (teamsLine.rfind("CUP ", 0) == 0) {
+            auto cupFields = splitByDelimiter(trim(teamsLine.substr(4)), '|');
+            if (!cupFields.empty()) cupActive = (cupFields[0] == "1");
+            if (cupFields.size() > 1) cupRound = stoi(cupFields[1]);
+            if (cupFields.size() > 2) cupRemainingTeams = decodeStringList(cupFields[2]);
+            if (cupFields.size() > 3) cupChampion = cupFields[3];
+            if (!getline(file, teamsLine)) return false;
+        }
+        lastMatchAnalysis.clear();
+        if (teamsLine.rfind("LASTMATCH ", 0) == 0) {
+            lastMatchAnalysis = trim(teamsLine.substr(10));
             if (!getline(file, teamsLine)) return false;
         }
         if (teamsLine.rfind("TEAMS ", 0) != 0) return false;
@@ -713,6 +1418,70 @@ bool Career::loadCareer() {
             else team.tiebreakerSeed = randInt(0, 1000000);
             if (fields.size() > extra + 4) decodeHeadToHead(fields[extra + 4], team);
             else team.headToHead.clear();
+            if (fields.size() > extra + 5) team.pressingIntensity = clampInt(stoi(fields[extra + 5]), 1, 5);
+            else team.pressingIntensity = 3;
+            if (fields.size() > extra + 6) team.defensiveLine = clampInt(stoi(fields[extra + 6]), 1, 5);
+            else team.defensiveLine = 3;
+            if (fields.size() > extra + 7) team.tempo = clampInt(stoi(fields[extra + 7]), 1, 5);
+            else team.tempo = 3;
+            if (fields.size() > extra + 8) team.width = clampInt(stoi(fields[extra + 8]), 1, 5);
+            else team.width = 3;
+            if (fields.size() > extra + 9) team.markingStyle = fields[extra + 9];
+            else team.markingStyle = "Zonal";
+            if (fields.size() > extra + 10) team.preferredXI = decodeStringList(fields[extra + 10]);
+            else team.preferredXI.clear();
+            if (fields.size() > extra + 11) team.preferredBench = decodeStringList(fields[extra + 11]);
+            else team.preferredBench.clear();
+            if (fields.size() > extra + 12) team.captain = fields[extra + 12];
+            else team.captain.clear();
+            if (fields.size() > extra + 13) team.penaltyTaker = fields[extra + 13];
+            else team.penaltyTaker.clear();
+            if (fields.size() > extra + 14) team.freeKickTaker = fields[extra + 14];
+            else team.freeKickTaker.clear();
+            if (fields.size() > extra + 15) team.cornerTaker = fields[extra + 15];
+            else team.cornerTaker.clear();
+            if (fields.size() > extra + 16) team.rotationPolicy = fields[extra + 16];
+            else team.rotationPolicy = "Balanceado";
+            if (fields.size() > extra + 17) team.assistantCoach = clampInt(stoi(fields[extra + 17]), 1, 99);
+            else team.assistantCoach = 55;
+            if (fields.size() > extra + 18) team.fitnessCoach = clampInt(stoi(fields[extra + 18]), 1, 99);
+            else team.fitnessCoach = 55;
+            if (fields.size() > extra + 19) team.scoutingChief = clampInt(stoi(fields[extra + 19]), 1, 99);
+            else team.scoutingChief = 55;
+            if (fields.size() > extra + 20) team.youthCoach = clampInt(stoi(fields[extra + 20]), 1, 99);
+            else team.youthCoach = 55;
+            if (fields.size() > extra + 21) team.medicalTeam = clampInt(stoi(fields[extra + 21]), 1, 99);
+            else team.medicalTeam = 55;
+            if (fields.size() > extra + 22) team.youthRegion = fields[extra + 22];
+            else team.youthRegion = "Metropolitana";
+            if (fields.size() > extra + 23) team.debt = stoll(fields[extra + 23]);
+            else team.debt = 0;
+            if (fields.size() > extra + 24) team.sponsorWeekly = stoll(fields[extra + 24]);
+            else team.sponsorWeekly = 25000;
+            if (fields.size() > extra + 25) team.stadiumLevel = stoi(fields[extra + 25]);
+            else team.stadiumLevel = 1;
+            if (fields.size() > extra + 26) team.youthFacilityLevel = stoi(fields[extra + 26]);
+            else team.youthFacilityLevel = 1;
+            if (fields.size() > extra + 27) team.trainingFacilityLevel = stoi(fields[extra + 27]);
+            else team.trainingFacilityLevel = 1;
+            if (fields.size() > extra + 28) team.fanBase = stoi(fields[extra + 28]);
+            else team.fanBase = 12;
+            if (fields.size() <= extra + 19) {
+                team.preferredBench.clear();
+                if (fields.size() > extra + 11) team.captain = fields[extra + 11];
+                if (fields.size() > extra + 12) team.penaltyTaker = fields[extra + 12];
+                if (fields.size() > extra + 13) team.rotationPolicy = fields[extra + 13];
+                if (fields.size() > extra + 14) team.debt = stoll(fields[extra + 14]);
+                if (fields.size() > extra + 15) team.sponsorWeekly = stoll(fields[extra + 15]);
+                if (fields.size() > extra + 16) team.stadiumLevel = stoi(fields[extra + 16]);
+                if (fields.size() > extra + 17) team.youthFacilityLevel = stoi(fields[extra + 17]);
+                if (fields.size() > extra + 18) team.trainingFacilityLevel = stoi(fields[extra + 18]);
+                if (fields.size() > extra + 19) team.fanBase = stoi(fields[extra + 19]);
+                team.freeKickTaker = team.penaltyTaker;
+                team.cornerTaker = team.penaltyTaker;
+                team.assistantCoach = team.fitnessCoach = team.scoutingChief = team.youthCoach = team.medicalTeam = 55;
+                team.youthRegion = "Metropolitana";
+            }
 
             if (!getline(file, line)) return false;
             if (line.rfind("PLAYERS ", 0) != 0) return false;
@@ -722,66 +1491,7 @@ bool Career::loadCareer() {
                 if (line.rfind("PLAYER ", 0) != 0) return false;
                 auto pf = splitByDelimiter(trim(line.substr(7)), '|');
                 if (pf.size() < 13) continue;
-                Player p;
-                size_t idx = 0;
-                p.name = pf[idx++];
-                p.position = pf[idx++];
-                p.attack = stoi(pf[idx++]);
-                p.defense = stoi(pf[idx++]);
-                p.stamina = stoi(pf[idx++]);
-
-                bool hasFitness = (pf.size() >= 16);
-                if (hasFitness) {
-                    p.fitness = stoi(pf[idx++]);
-                } else {
-                    p.fitness = p.stamina;
-                }
-
-                if (idx >= pf.size()) continue;
-                p.skill = stoi(pf[idx++]);
-
-                size_t remaining = (idx <= pf.size()) ? (pf.size() - idx) : 0;
-                bool hasPotential = (remaining >= 11);
-                if (hasPotential) {
-                    p.potential = stoi(pf[idx++]);
-                } else {
-                    p.potential = clampInt(p.skill + randInt(0, 8), p.skill, 95);
-                }
-
-                if (idx >= pf.size()) continue;
-                p.age = stoi(pf[idx++]);
-                if (idx >= pf.size()) continue;
-                p.value = stoll(pf[idx++]);
-                if (idx >= pf.size()) continue;
-                string injuredStr = toLower(pf[idx++]);
-                p.injured = (injuredStr == "1" || injuredStr == "true");
-
-                if (hasPotential && idx < pf.size()) {
-                    p.injuryType = pf[idx++];
-                } else {
-                    p.injuryType = p.injured ? "Leve" : "";
-                }
-                if (idx < pf.size()) p.injuryWeeks = stoi(pf[idx++]); else p.injuryWeeks = 0;
-                if (idx < pf.size()) p.goals = stoi(pf[idx++]); else p.goals = 0;
-                if (idx < pf.size()) p.assists = stoi(pf[idx++]); else p.assists = 0;
-                if (idx < pf.size()) p.matchesPlayed = stoi(pf[idx++]); else p.matchesPlayed = 0;
-                if (idx + 1 < pf.size()) {
-                    p.lastTrainedSeason = stoi(pf[idx++]);
-                    p.lastTrainedWeek = stoi(pf[idx++]);
-                } else {
-                    p.lastTrainedSeason = -1;
-                    p.lastTrainedWeek = -1;
-                }
-
-                if (idx < pf.size()) p.wage = stoll(pf[idx++]);
-                else p.wage = static_cast<long long>(p.skill) * 150 + randInt(0, 800);
-                if (idx < pf.size()) p.contractWeeks = stoi(pf[idx++]);
-                else p.contractWeeks = randInt(52, 156);
-                if (idx < pf.size()) p.injuryHistory = stoi(pf[idx++]);
-                else p.injuryHistory = 0;
-                if (idx < pf.size()) p.role = pf[idx++];
-                else p.role = defaultRoleForPosition(p.position);
-                team.addPlayer(p);
+                team.addPlayer(decodePlayerFields(pf));
             }
             if (!getline(file, line)) return false;
             if (trim(line) != "ENDTEAM") return false;
@@ -800,6 +1510,9 @@ bool Career::loadCareer() {
                 break;
             }
         }
+        if (boardExpectedFinish <= 0) initializeBoardObjectives();
+        if (boardMonthlyObjective.empty()) initializeDynamicObjective();
+        if (!cupActive && !activeTeams.empty()) initializeSeasonCup();
         return true;
     }
 
@@ -810,6 +1523,21 @@ bool Career::loadCareer() {
     if (!(file >> season >> week)) return false;
     currentSeason = season;
     currentWeek = week;
+    managerName = "Manager";
+    managerReputation = 50;
+    newsFeed.clear();
+    scoutInbox.clear();
+    history.clear();
+    pendingTransfers.clear();
+    boardMonthlyObjective.clear();
+    boardMonthlyTarget = 0;
+    boardMonthlyProgress = 0;
+    boardMonthlyDeadlineWeek = 0;
+    cupActive = false;
+    cupRound = 0;
+    cupRemainingTeams.clear();
+    cupChampion.clear();
+    lastMatchAnalysis.clear();
     string teamName;
     getline(file, teamName);
     getline(file, teamName);
@@ -843,6 +1571,9 @@ bool Career::loadCareer() {
                 p.potential = clampInt(p.skill + randInt(0, 6), p.skill, 95);
                 getline(ss, token, ','); p.age = stoi(token);
                 getline(ss, token, ','); p.value = stoll(token);
+                p.onLoan = false;
+                p.parentClub.clear();
+                p.loanWeeksRemaining = 0;
                 string injuredStr;
                 getline(ss, injuredStr, ',');
                 injuredStr = toLower(trim(injuredStr));
@@ -855,8 +1586,22 @@ bool Career::loadCareer() {
                 p.lastTrainedSeason = -1;
                 p.lastTrainedWeek = -1;
                 p.wage = static_cast<long long>(p.skill) * 150 + randInt(0, 800);
+                p.releaseClause = max(50000LL, p.value * 2);
+                p.setPieceSkill = clampInt(p.skill + randInt(-6, 6), 25, 99);
+                p.leadership = clampInt(35 + randInt(0, 45), 1, 99);
+                p.professionalism = clampInt(40 + randInt(0, 45), 1, 99);
+                p.ambition = clampInt(35 + randInt(0, 50), 1, 99);
+                p.happiness = clampInt(55 + randInt(-10, 20), 1, 99);
+                p.chemistry = clampInt(45 + randInt(0, 35), 1, 99);
+                p.desiredStarts = 1;
+                p.startsThisSeason = 0;
+                p.wantsToLeave = false;
                 p.contractWeeks = randInt(52, 156);
                 p.injuryHistory = 0;
+                p.yellowAccumulation = 0;
+                p.seasonYellowCards = 0;
+                p.seasonRedCards = 0;
+                p.matchesSuspended = 0;
                 p.role = defaultRoleForPosition(p.position);
                 myTeam->addPlayer(p);
             } catch (...) {
@@ -867,5 +1612,8 @@ bool Career::loadCareer() {
     if (myTeam) activeDivision = myTeam->division;
     else if (!divisions.empty()) activeDivision = divisions.front().id;
     if (!activeDivision.empty()) setActiveDivision(activeDivision);
+    initializeBoardObjectives();
+    initializeSeasonCup();
+    initializeDynamicObjective();
     return true;
 }

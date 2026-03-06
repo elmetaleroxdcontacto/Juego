@@ -6,6 +6,7 @@
 #include "simulation.h"
 #include "ui.h"
 #include "utils.h"
+#include "validators.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -13,18 +14,22 @@
 
 using namespace std;
 
-int main() {
+int main(int argc, char* argv[]) {
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
 #endif
+    if (argc > 1 && string(argv[1]) == "--validate") {
+        return runValidationSuite(true);
+    }
+
     Career career;
     career.initializeLeague();
 
     while (true) {
         displayMainMenu();
-        int mainChoice = readInt("Elige una opcion: ", 1, 4);
-        if (mainChoice == 4) {
+        int mainChoice = readInt("Elige una opcion: ", 1, 5);
+        if (mainChoice == 5) {
             cout << "Saliendo del juego." << endl;
             break;
         }
@@ -68,6 +73,12 @@ int main() {
                 }
                 int teamChoice = readInt("Elige un numero de equipo: ", 1, static_cast<int>(teams.size()));
                 career.myTeam = teams[teamChoice - 1];
+                string managerName = readLine("Nombre del manager (Enter para 'Manager'): ");
+                if (!managerName.empty()) career.managerName = managerName;
+                career.managerReputation = 50;
+                career.newsFeed.clear();
+                career.history.clear();
+                career.pendingTransfers.clear();
                 cout << "Has elegido: " << career.myTeam->name << endl;
                 career.currentSeason = 1;
                 career.currentWeek = 1;
@@ -82,29 +93,35 @@ int main() {
                 do {
                     cout << "\nTemporada " << career.currentSeason << ", Semana " << career.currentWeek << endl;
                     displayCareerMenu();
-                    careerChoice = readInt("Elige una opcion: ", 1, 14);
+                    careerChoice = readInt("Elige una opcion: ", 1, 20);
                     switch (careerChoice) {
                         case 1: viewTeam(*career.myTeam); break;
                         case 2: trainPlayer(*career.myTeam, career.currentSeason, career.currentWeek); break;
                         case 3: changeTactics(*career.myTeam); break;
                         case 4: simulateCareerWeek(career); break;
-                        case 5: displayLeagueTables(career); break;
-                        case 6: transferMarket(*career.myTeam); break;
-                        case 7: scoutPlayers(*career.myTeam); break;
-                        case 8: displayStatistics(*career.myTeam); break;
-                        case 9: displayAchievementsMenu(career); break;
-                        case 10: career.saveCareer(); break;
-                        case 11: retirePlayer(*career.myTeam); break;
-                        case 12: setTrainingPlan(*career.myTeam); break;
-                        case 13: cout << "Volviendo al menu principal." << endl; break;
-                        case 14: editTeam(*career.myTeam); break;
+                        case 5: displayCompetitionCenter(career); break;
+                        case 6: displayLeagueTables(career); break;
+                        case 7: transferMarket(career); break;
+                        case 8: scoutPlayers(career); break;
+                        case 9: displayStatistics(*career.myTeam); break;
+                        case 10: displayBoardStatus(career); break;
+                        case 11: displayNewsFeed(career); break;
+                        case 12: displaySeasonHistory(career); break;
+                        case 13: manageLineup(*career.myTeam); break;
+                        case 14: displayClubOperations(career); break;
+                        case 15: displayAchievementsMenu(career); break;
+                        case 16: career.saveCareer(); break;
+                        case 17: retirePlayer(*career.myTeam); break;
+                        case 18: setTrainingPlan(*career.myTeam); break;
+                        case 19: editTeam(*career.myTeam); break;
+                        case 20: cout << "Volviendo al menu principal." << endl; break;
                         default: break;
                     }
-                    if (careerChoice != 13) {
+                    if (careerChoice != 20) {
                         cout << "\nPresiona Enter para continuar...";
                         cin.ignore(numeric_limits<streamsize>::max(), '\n');
                     }
-                } while (careerChoice != 13);
+                } while (careerChoice != 20);
             }
         } else if (mainChoice == 2) {
             if (career.divisions.empty()) {
@@ -178,6 +195,9 @@ int main() {
             } while (gameChoice != 8);
         } else if (mainChoice == 3) {
             playCupMode(career);
+        } else if (mainChoice == 4) {
+            int result = runValidationSuite(true);
+            cout << (result == 0 ? "Validacion completada sin fallas." : "Validacion con fallas detectadas.") << endl;
         }
     }
 

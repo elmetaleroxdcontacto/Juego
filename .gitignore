@@ -2,6 +2,8 @@
 *.exe
 *.o
 *.obj
+career_save.txt
+validation_career_save.txt
 
 # IDE files
 .vscode/

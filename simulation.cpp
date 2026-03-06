@@ -59,6 +59,26 @@ static void applyRoleModifier(const Player& p, int& attack, int& defense) {
     defense = clampInt(defense, 1, 120);
 }
 
+static const Player* lineupPlayerByName(const Team& team, const vector<int>& xi, const string& playerName) {
+    if (playerName.empty()) return nullptr;
+    for (int idx : xi) {
+        if (idx >= 0 && idx < static_cast<int>(team.players.size()) && team.players[idx].name == playerName) {
+            return &team.players[idx];
+        }
+    }
+    return nullptr;
+}
+
+static vector<int> uniqueParticipants(const vector<int>& startXi, const vector<int>& finalXi) {
+    vector<int> participants = startXi;
+    for (int idx : finalXi) {
+        if (find(participants.begin(), participants.end(), idx) == participants.end()) {
+            participants.push_back(idx);
+        }
+    }
+    return participants;
+}
+
 static void applyMatchFatigue(Team& team, const vector<int>& xi, const string& tactics) {
     for (int idx : xi) {
         if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
@@ -71,24 +91,77 @@ static void applyMatchFatigue(Team& team, const vector<int>& xi, const string& t
         else if (tactics == "Offensive") drain += 1;
         else if (tactics == "Defensive") drain -= 1;
         else if (tactics == "Counter") drain -= 1;
+        drain += team.pressingIntensity - 3;
+        drain += team.tempo - 3;
+        if (team.rotationPolicy == "Rotacion") drain -= 1;
         p.fitness = clampInt(p.fitness - drain, 15, p.stamina);
     }
 }
 
-static int cardsForTactics(const string& tactics, int minVal, int maxVal) {
+static int cardsForTactics(const Team& team, int minVal, int maxVal) {
     int base = randInt(minVal, maxVal);
+    const string& tactics = team.tactics;
     if (tactics == "Pressing") base += 1;
     else if (tactics == "Offensive") base += 1;
     else if (tactics == "Defensive") base -= 1;
+    base += max(0, team.pressingIntensity - 3);
+    if (team.markingStyle == "Hombre") base += 1;
     return clampInt(base, 0, 6);
 }
 
-static int redChanceForTactics(const string& tactics) {
+static int redChanceForTactics(const Team& team) {
     int chance = 5;
+    const string& tactics = team.tactics;
     if (tactics == "Pressing") chance += 4;
     else if (tactics == "Offensive") chance += 2;
     else if (tactics == "Defensive") chance -= 1;
+    chance += max(0, team.pressingIntensity - 3);
+    if (team.markingStyle == "Hombre") chance += 1;
     return clampInt(chance, 1, 15);
+}
+
+static vector<int> cardCandidates(const Team& team, const vector<int>& xi) {
+    vector<int> candidates;
+    for (int idx : xi) {
+        if (idx >= 0 && idx < static_cast<int>(team.players.size())) candidates.push_back(idx);
+    }
+    if (!candidates.empty()) return candidates;
+    for (size_t i = 0; i < team.players.size(); ++i) {
+        candidates.push_back(static_cast<int>(i));
+    }
+    return candidates;
+}
+
+static void registerCards(Team& team, const vector<int>& xi, int yellowCards, int redCards, vector<string>* events) {
+    vector<int> candidates = cardCandidates(team, xi);
+    if (candidates.empty()) return;
+
+    for (int i = 0; i < yellowCards; ++i) {
+        int idx = candidates[randInt(0, static_cast<int>(candidates.size()) - 1)];
+        Player& player = team.players[idx];
+        player.seasonYellowCards++;
+        player.yellowAccumulation++;
+        if (events) {
+            events->push_back(to_string(randInt(1, 90)) + "' Amarilla: " + player.name);
+        }
+        if (player.yellowAccumulation >= 5) {
+            player.yellowAccumulation -= 5;
+            player.matchesSuspended++;
+            if (events) {
+                events->push_back(to_string(randInt(1, 90)) + "' Suspension por acumulacion: " + player.name);
+            }
+        }
+    }
+
+    for (int i = 0; i < redCards; ++i) {
+        int idx = candidates[randInt(0, static_cast<int>(candidates.size()) - 1)];
+        Player& player = team.players[idx];
+        player.seasonRedCards++;
+        player.matchesSuspended++;
+        if (events) {
+            events->push_back(to_string(randInt(1, 90)) + "' Roja: " + player.name);
+        }
+    }
 }
 
 TeamStrength computeStrength(Team& team) {
@@ -115,6 +188,97 @@ TeamStrength computeStrength(Team& team) {
     return ts;
 }
 
+static TeamStrength computeStrengthFromXI(const Team& team, const vector<int>& xi) {
+    TeamStrength ts;
+    ts.xi = xi;
+    ts.attack = 0;
+    ts.defense = 0;
+    ts.avgSkill = 0;
+    ts.avgStamina = 0;
+    if (ts.xi.empty()) return ts;
+    int skill = 0;
+    int stamina = 0;
+    for (int idx : ts.xi) {
+        int att = team.players[idx].attack;
+        int def = team.players[idx].defense;
+        applyRoleModifier(team.players[idx], att, def);
+        ts.attack += att;
+        ts.defense += def;
+        skill += team.players[idx].skill;
+        stamina += clampInt(team.players[idx].fitness, 0, 100);
+    }
+    ts.avgSkill = skill / static_cast<int>(ts.xi.size());
+    ts.avgStamina = stamina / static_cast<int>(ts.xi.size());
+    return ts;
+}
+
+static int lineupPerformanceScore(const Team& team, int idx, const string& targetPos) {
+    if (idx < 0 || idx >= static_cast<int>(team.players.size())) return -100000;
+    const Player& player = team.players[idx];
+    int score = player.skill * 3 + player.fitness * 2 + player.attack + player.defense;
+    if (normalizePosition(player.position) == targetPos) score += 18;
+    if (player.injured) score -= 60;
+    if (player.matchesSuspended > 0) score -= 1000;
+    return score;
+}
+
+static int performInMatchSubstitutions(Team& team, vector<int>& xi, vector<string>* events) {
+    if (xi.empty()) return 0;
+    vector<int> bench = team.getBenchIndices(7);
+    if (bench.empty()) return 0;
+
+    vector<bool> benchUsed(team.players.size(), false);
+    int substitutions = 0;
+    const int maxSubs = 3;
+    while (substitutions < maxSubs) {
+        int outSlot = -1;
+        int outNeed = 0;
+        for (size_t slot = 0; slot < xi.size(); ++slot) {
+            int idx = xi[slot];
+            if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
+            const Player& player = team.players[idx];
+            int need = 0;
+            if (player.injured) need += 100;
+            if (player.fitness < 58) need += (58 - player.fitness) * 2;
+            if (player.yellowAccumulation >= 4) need += 6;
+            if (team.rotationPolicy == "Rotacion" && player.fitness < 65) need += 4;
+            if (need > outNeed) {
+                outNeed = need;
+                outSlot = static_cast<int>(slot);
+            }
+        }
+        if (outSlot < 0 || outNeed <= 0) break;
+
+        int outIdx = xi[outSlot];
+        string targetPos = normalizePosition(team.players[outIdx].position);
+        int bestBench = -1;
+        int bestGain = -100000;
+        int currentScore = lineupPerformanceScore(team, outIdx, targetPos);
+        for (int idx : bench) {
+            if (idx < 0 || idx >= static_cast<int>(team.players.size()) || benchUsed[idx]) continue;
+            const Player& candidate = team.players[idx];
+            if (candidate.matchesSuspended > 0 || candidate.injured) continue;
+            int candidateScore = lineupPerformanceScore(team, idx, targetPos);
+            int gain = candidateScore - currentScore;
+            if (targetPos != normalizePosition(candidate.position)) gain -= 12;
+            if (gain > bestGain) {
+                bestGain = gain;
+                bestBench = idx;
+            }
+        }
+        if (bestBench < 0 || (bestGain < -6 && outNeed < 40)) break;
+
+        benchUsed[bestBench] = true;
+        substitutions++;
+        if (events) {
+            events->push_back(to_string(randInt(55, 88)) + "' Cambio: " + team.players[outIdx].name +
+                              " por " + team.players[bestBench].name);
+        }
+        xi[outSlot] = bestBench;
+    }
+    return substitutions;
+}
+
 bool hasInjuredInXI(const Team& team, const vector<int>& xi) {
     for (int idx : xi) {
         if (idx >= 0 && idx < static_cast<int>(team.players.size()) && team.players[idx].injured) {
@@ -124,7 +288,8 @@ bool hasInjuredInXI(const Team& team, const vector<int>& xi) {
     return false;
 }
 
-void applyTactics(const string& tactics, int& attack, int& defense) {
+void applyTactics(const Team& team, int& attack, int& defense) {
+    const string& tactics = team.tactics;
     if (tactics == "Defensive") {
         attack = attack * 90 / 100;
         defense = defense * 110 / 100;
@@ -137,6 +302,17 @@ void applyTactics(const string& tactics, int& attack, int& defense) {
     } else if (tactics == "Counter") {
         attack = attack * 107 / 100;
         defense = defense * 97 / 100;
+    }
+
+    attack += (team.tempo - 3) * 5;
+    defense += (team.defensiveLine - 3) * 5;
+    attack += (team.width - 3) * 3;
+    defense -= max(0, team.width - 3) * 2;
+    attack += max(0, team.pressingIntensity - 3) * 2;
+    defense += min(0, team.defensiveLine - 3) * 2;
+    if (team.markingStyle == "Hombre") {
+        defense += 4;
+        attack -= 2;
     }
 }
 
@@ -205,10 +381,14 @@ bool simulateInjury(Player& player, const string& tactics, bool verbose, vector<
 void healInjuries(Team& team, bool verbose) {
     for (auto& player : team.players) {
         if (player.injured) {
-            player.injuryWeeks--;
+            int progress = 1;
+            if (team.medicalTeam >= 70 && randInt(1, 100) <= 35) progress++;
+            if (team.medicalTeam >= 85 && randInt(1, 100) <= 20) progress++;
+            player.injuryWeeks -= progress;
             if (player.injuryWeeks <= 0) {
                 player.injured = false;
                 player.injuryType.clear();
+                player.injuryWeeks = 0;
                 if (verbose) {
                     cout << player.name << " se recupero de su lesion." << endl;
                 }
@@ -223,6 +403,8 @@ void recoverFitness(Team& team, int days) {
         int base = 4 + days / 2;
         if (player.injured) base = max(1, base / 2);
         if (player.age > 30) base -= (player.age - 30) / 6;
+        base += team.trainingFacilityLevel - 1;
+        base += max(0, (team.fitnessCoach - 55) / 15);
         if (base < 1) base = 1;
         if (player.fitness < player.stamina) {
             player.fitness = clampInt(player.fitness + base, 15, player.stamina);
@@ -239,6 +421,10 @@ static void applyDevelopment(Team& team, const vector<int>& xi, bool verbose) {
         if (p.age > 23) continue;
         if (p.skill >= p.potential) continue;
         int chance = clampInt(12 - (p.age - 17), 3, 12);
+        chance += max(0, team.youthCoach - 55) / 12;
+        chance += max(0, team.assistantCoach - 55) / 15;
+        chance += max(0, p.professionalism - 55) / 18;
+        chance = clampInt(chance, 3, 25);
         if (randInt(1, 100) <= chance) {
             p.skill = min(100, p.skill + 1);
             string pos = normalizePosition(p.position);
@@ -292,12 +478,63 @@ void assignGoalsAndAssists(Team& team, int goals, const vector<int>& xi, const s
     }
 }
 
+static bool playerNamedInXI(const Team& team, const vector<int>& xi, const string& playerName) {
+    return lineupPlayerByName(team, xi, playerName) != nullptr;
+}
+
+int teamPenaltyStrength(const Team& team) {
+    auto xi = team.getStartingXIIndices();
+    int total = 0;
+    for (int idx : xi) {
+        if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
+        const Player& player = team.players[idx];
+        total += player.skill;
+        total += player.setPieceSkill / 4;
+        total += player.professionalism / 10;
+        if (!team.penaltyTaker.empty() && player.name == team.penaltyTaker) total += 12 + player.setPieceSkill / 5;
+        if (!team.captain.empty() && player.name == team.captain) total += 4 + player.leadership / 6;
+    }
+    if (xi.empty()) return 50;
+    return total / static_cast<int>(xi.size());
+}
+
 MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool neutralVenue) {
     ensureMinimumSquad(home, 11);
     ensureMinimumSquad(away, 11);
 
     auto h = computeStrength(home);
     auto a = computeStrength(away);
+    vector<int> homeStartXI = h.xi;
+    vector<int> awayStartXI = a.xi;
+    for (int idx : homeStartXI) {
+        if (idx >= 0 && idx < static_cast<int>(home.players.size())) {
+            home.players[idx].startsThisSeason++;
+        }
+    }
+    for (int idx : awayStartXI) {
+        if (idx >= 0 && idx < static_cast<int>(away.players.size())) {
+            away.players[idx].startsThisSeason++;
+        }
+    }
+
+    vector<string> events;
+    vector<string>* eventsPtr = verbose ? &events : nullptr;
+    int homeSubs = performInMatchSubstitutions(home, h.xi, eventsPtr);
+    int awaySubs = performInMatchSubstitutions(away, a.xi, eventsPtr);
+    if (homeSubs > 0) {
+        TeamStrength adjusted = computeStrengthFromXI(home, h.xi);
+        h.attack = (h.attack * 3 + adjusted.attack) / 4;
+        h.defense = (h.defense * 3 + adjusted.defense) / 4;
+        h.avgSkill = (h.avgSkill * 3 + adjusted.avgSkill) / 4;
+        h.avgStamina = max(h.avgStamina, adjusted.avgStamina);
+    }
+    if (awaySubs > 0) {
+        TeamStrength adjusted = computeStrengthFromXI(away, a.xi);
+        a.attack = (a.attack * 3 + adjusted.attack) / 4;
+        a.defense = (a.defense * 3 + adjusted.defense) / 4;
+        a.avgSkill = (a.avgSkill * 3 + adjusted.avgSkill) / 4;
+        a.avgStamina = max(a.avgStamina, adjusted.avgStamina);
+    }
     WeatherEffect weather = rollWeather();
     bool homeInj = hasInjuredInXI(home, h.xi);
     bool awayInj = hasInjuredInXI(away, a.xi);
@@ -314,8 +551,8 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
     int awayAttack = a.attack;
     int awayDefense = a.defense;
 
-    applyTactics(home.tactics, homeAttack, homeDefense);
-    applyTactics(away.tactics, awayAttack, awayDefense);
+    applyTactics(home, homeAttack, homeDefense);
+    applyTactics(away, awayAttack, awayDefense);
 
     homeAttack += h.avgSkill;
     homeDefense += h.avgSkill;
@@ -342,6 +579,33 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
     homeDefense = homeDefense * max(30, homeStam) / 100;
     awayAttack = awayAttack * max(30, awayStam) / 100;
     awayDefense = awayDefense * max(30, awayStam) / 100;
+
+    if (playerNamedInXI(home, h.xi, home.captain)) {
+        const Player* captain = lineupPlayerByName(home, h.xi, home.captain);
+        if (captain) {
+            homeAttack += 2 + captain->leadership / 15;
+            homeDefense += 2 + captain->leadership / 15;
+        }
+    }
+    if (playerNamedInXI(away, a.xi, away.captain)) {
+        const Player* captain = lineupPlayerByName(away, a.xi, away.captain);
+        if (captain) {
+            awayAttack += 2 + captain->leadership / 15;
+            awayDefense += 2 + captain->leadership / 15;
+        }
+    }
+    if (const Player* taker = lineupPlayerByName(home, h.xi, home.freeKickTaker)) {
+        homeAttack += taker->setPieceSkill / 10;
+    }
+    if (const Player* taker = lineupPlayerByName(home, h.xi, home.cornerTaker)) {
+        homeAttack += taker->setPieceSkill / 12;
+    }
+    if (const Player* taker = lineupPlayerByName(away, a.xi, away.freeKickTaker)) {
+        awayAttack += taker->setPieceSkill / 10;
+    }
+    if (const Player* taker = lineupPlayerByName(away, a.xi, away.cornerTaker)) {
+        awayAttack += taker->setPieceSkill / 12;
+    }
 
     int homeGoals = samplePoisson(calcLambda(homeAttack, awayDefense));
     int awayGoals = samplePoisson(calcLambda(awayAttack, homeDefense));
@@ -381,10 +645,10 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
     away.goalsAgainst += homeGoals;
     away.awayGoals += awayGoals;
 
-    int yellowHome = cardsForTactics(home.tactics, 0, 3);
-    int yellowAway = cardsForTactics(away.tactics, 0, 3);
-    int redHome = (randInt(1, 100) <= redChanceForTactics(home.tactics)) ? 1 : 0;
-    int redAway = (randInt(1, 100) <= redChanceForTactics(away.tactics)) ? 1 : 0;
+    int yellowHome = cardsForTactics(home, 0, 3);
+    int yellowAway = cardsForTactics(away, 0, 3);
+    int redHome = (randInt(1, 100) <= redChanceForTactics(home)) ? 1 : 0;
+    int redAway = (randInt(1, 100) <= redChanceForTactics(away)) ? 1 : 0;
     home.yellowCards += yellowHome;
     away.yellowCards += yellowAway;
     home.redCards += redHome;
@@ -433,21 +697,35 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
     home.morale = clampInt(home.morale + deltaHome, 0, 100);
     away.morale = clampInt(away.morale + deltaAway, 0, 100);
 
-    for (int idx : h.xi) home.players[idx].matchesPlayed++;
-    for (int idx : a.xi) away.players[idx].matchesPlayed++;
-    vector<string> events;
-    vector<string>* eventsPtr = verbose ? &events : nullptr;
+    vector<int> homeParticipants = uniqueParticipants(homeStartXI, h.xi);
+    vector<int> awayParticipants = uniqueParticipants(awayStartXI, a.xi);
+    for (int idx : homeParticipants) {
+        if (idx >= 0 && idx < static_cast<int>(home.players.size())) home.players[idx].matchesPlayed++;
+    }
+    for (int idx : awayParticipants) {
+        if (idx >= 0 && idx < static_cast<int>(away.players.size())) away.players[idx].matchesPlayed++;
+    }
+    registerCards(home, homeParticipants, yellowHome, redHome, eventsPtr);
+    registerCards(away, awayParticipants, yellowAway, redAway, eventsPtr);
     assignGoalsAndAssists(home, homeGoals, h.xi, home.name, eventsPtr);
     assignGoalsAndAssists(away, awayGoals, a.xi, away.name, eventsPtr);
 
-    for (int idx : h.xi) simulateInjury(home.players[idx], home.tactics, verbose, eventsPtr);
-    for (int idx : a.xi) simulateInjury(away.players[idx], away.tactics, verbose, eventsPtr);
+    for (int idx : homeParticipants) {
+        if (idx >= 0 && idx < static_cast<int>(home.players.size())) {
+            simulateInjury(home.players[idx], home.tactics, verbose, eventsPtr);
+        }
+    }
+    for (int idx : awayParticipants) {
+        if (idx >= 0 && idx < static_cast<int>(away.players.size())) {
+            simulateInjury(away.players[idx], away.tactics, verbose, eventsPtr);
+        }
+    }
 
-    applyDevelopment(home, h.xi, verbose);
-    applyDevelopment(away, a.xi, verbose);
+    applyDevelopment(home, homeParticipants, verbose);
+    applyDevelopment(away, awayParticipants, verbose);
 
-    applyMatchFatigue(home, h.xi, home.tactics);
-    applyMatchFatigue(away, a.xi, away.tactics);
+    applyMatchFatigue(home, homeParticipants, home.tactics);
+    applyMatchFatigue(away, awayParticipants, away.tactics);
 
     if (verbose && !events.empty()) {
         cout << "\nEventos:" << endl;
@@ -456,5 +734,5 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
         }
     }
 
-    return {homeGoals, awayGoals};
+    return {homeGoals, awayGoals, homeShots, awayShots, homePoss, awayPoss, homeSubs, awaySubs};
 }

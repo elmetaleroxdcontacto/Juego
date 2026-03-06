@@ -2,8 +2,8 @@
 
 #include "models.h"
 
-void transferMarket(Team& team);
-void scoutPlayers(Team& team);
+void transferMarket(Career& career);
+void scoutPlayers(Career& career);
 void retirePlayer(Team& team);
 void checkAchievements(Career& career);
 void displayMainMenu();
@@ -15,7 +15,13 @@ void trainPlayer(Team& team, int season = -1, int week = -1);
 void changeTactics(Team& team);
 void editTeam(Team& team);
 void setTrainingPlan(Team& team);
+void manageLineup(Team& team);
 void displayStatistics(Team& team);
+void displayCompetitionCenter(Career& career);
+void displayBoardStatus(Career& career);
+void displayNewsFeed(const Career& career);
+void displaySeasonHistory(const Career& career);
+void displayClubOperations(Career& career);
 void displayAchievementsMenu(Career& career);
 void displayLeagueTables(Career& career);
 void endSeason(Career& career);
