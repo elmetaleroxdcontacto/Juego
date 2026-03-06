@@ -166,3 +166,5 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - queda una base más limpia para seguir moviendo playoffs, ascensos y descensos a reglas declarativas
 - Validación realizada:
   - compilación verificada exitosamente con `build.bat`.
+ 
+  - bloque de texto
