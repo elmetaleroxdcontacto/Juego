@@ -12,6 +12,35 @@
 
 using namespace std;
 
+static ManagerJobSelectionCallback g_managerJobSelectionCallback = nullptr;
+static UiMessageCallback g_uiMessageCallback = nullptr;
+static IncomingOfferDecisionCallback g_incomingOfferDecisionCallback = nullptr;
+static ContractRenewalDecisionCallback g_contractRenewalDecisionCallback = nullptr;
+
+void setManagerJobSelectionCallback(ManagerJobSelectionCallback callback) {
+    g_managerJobSelectionCallback = callback;
+}
+
+void setUiMessageCallback(UiMessageCallback callback) {
+    g_uiMessageCallback = callback;
+}
+
+void setIncomingOfferDecisionCallback(IncomingOfferDecisionCallback callback) {
+    g_incomingOfferDecisionCallback = callback;
+}
+
+void setContractRenewalDecisionCallback(ContractRenewalDecisionCallback callback) {
+    g_contractRenewalDecisionCallback = callback;
+}
+
+static void emitUiMessage(const string& message) {
+    if (g_uiMessageCallback) {
+        g_uiMessageCallback(message);
+    } else {
+        cout << message << endl;
+    }
+}
+
 static long long estimatedAgentFee(const Player& player, long long transferFee) {
     return max(10000LL, max(transferFee / 20, player.value / 15));
 }
@@ -1609,12 +1638,14 @@ static void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore)
         long long net = income - wages - debtPayment - infrastructure;
         team->budget = max(0LL, team->budget + net);
         if (career.myTeam == team) {
-            cout << "Finanzas semanales: +" << income
-                 << " (entradas " << ticketIncome << ", sponsor " << sponsor << ")"
-                 << " / -" << wages << " salarios"
-                 << " / -" << debtPayment << " deuda"
-                 << " / -" << infrastructure << " infraestructura"
-                 << " = " << net << endl;
+            ostringstream out;
+            out << "Finanzas semanales: +" << income
+                << " (entradas " << ticketIncome << ", sponsor " << sponsor << ")"
+                << " / -" << wages << " salarios"
+                << " / -" << debtPayment << " deuda"
+                << " / -" << infrastructure << " infraestructura"
+                << " = " << net;
+            emitUiMessage(out.str());
         }
     }
 }
@@ -1640,26 +1671,39 @@ static void weeklyDashboard(const Career& career) {
         if (p.matchesSuspended > 0) suspended++;
         if (p.contractWeeks > 0 && p.contractWeeks <= 4) expiring++;
     }
-    cout << "\n--- Resumen Semanal ---" << endl;
-    cout << "Posicion: " << rank << " | Pts: " << career.myTeam->points
-         << " | Moral: " << career.myTeam->morale
-         << " | Presupuesto: $" << career.myTeam->budget
-         << " | Directiva: " << career.boardConfidence << "/100" << endl;
-    cout << "Sponsor: $" << career.myTeam->sponsorWeekly << " | Deuda: $" << career.myTeam->debt
-         << " | Infraestructura E/C/T: "
-         << career.myTeam->stadiumLevel << "/" << career.myTeam->youthFacilityLevel << "/" << career.myTeam->trainingFacilityLevel << endl;
-    cout << "Lesionados: " << injured
-         << " | Suspendidos: " << suspended
-         << " | Contratos por vencer (<=4 sem): " << expiring << endl;
+    emitUiMessage("");
+    emitUiMessage("--- Resumen Semanal ---");
+    {
+        ostringstream out;
+        out << "Posicion: " << rank << " | Pts: " << career.myTeam->points
+            << " | Moral: " << career.myTeam->morale
+            << " | Presupuesto: $" << career.myTeam->budget
+            << " | Directiva: " << career.boardConfidence << "/100";
+        emitUiMessage(out.str());
+    }
+    {
+        ostringstream out;
+        out << "Sponsor: $" << career.myTeam->sponsorWeekly << " | Deuda: $" << career.myTeam->debt
+            << " | Infraestructura E/C/T: "
+            << career.myTeam->stadiumLevel << "/" << career.myTeam->youthFacilityLevel << "/" << career.myTeam->trainingFacilityLevel;
+        emitUiMessage(out.str());
+    }
+    {
+        ostringstream out;
+        out << "Lesionados: " << injured
+            << " | Suspendidos: " << suspended
+            << " | Contratos por vencer (<=4 sem): " << expiring;
+        emitUiMessage(out.str());
+    }
     if (!career.boardMonthlyObjective.empty()) {
-        cout << "Objetivo mensual: " << career.boardMonthlyObjective
-             << " | " << career.boardMonthlyProgress << "/" << career.boardMonthlyTarget << endl;
+        emitUiMessage("Objetivo mensual: " + career.boardMonthlyObjective +
+                      " | " + to_string(career.boardMonthlyProgress) + "/" + to_string(career.boardMonthlyTarget));
     }
     if (!career.cupChampion.empty()) {
-        cout << "Copa: campeon " << career.cupChampion << endl;
+        emitUiMessage("Copa: campeon " + career.cupChampion);
     } else if (career.cupActive) {
-        cout << "Copa: ronda " << career.cupRound + 1
-             << " | vivos " << career.cupRemainingTeams.size() << endl;
+        emitUiMessage("Copa: ronda " + to_string(career.cupRound + 1) +
+                      " | vivos " + to_string(career.cupRemainingTeams.size()));
     }
 }
 
@@ -1671,11 +1715,11 @@ static void applyClubEvent(Career& career) {
         long long bonus = 50000 + randInt(0, 30000);
         career.myTeam->budget += bonus;
         career.addNews("Nuevo patrocinio para " + career.myTeam->name + " por $" + to_string(bonus) + ".");
-        cout << "[Evento] Patrocinio sorpresa: +" << bonus << endl;
+        emitUiMessage("[Evento] Patrocinio sorpresa: +" + to_string(bonus));
     } else if (event == 2) {
         career.myTeam->morale = clampInt(career.myTeam->morale - 5, 0, 100);
         career.addNews("La hinchada presiona a " + career.myTeam->name + " tras los ultimos resultados.");
-        cout << "[Evento] Protesta de hinchas: moral -5." << endl;
+        emitUiMessage("[Evento] Protesta de hinchas: moral -5.");
     } else if (event == 3) {
         if (!career.myTeam->players.empty()) {
             int idx = randInt(0, static_cast<int>(career.myTeam->players.size()) - 1);
@@ -1685,7 +1729,8 @@ static void applyClubEvent(Career& career) {
             p.injuryWeeks = randInt(1, 2);
             p.injuryHistory++;
             career.addNews(p.name + " sufre una lesion leve en entrenamiento.");
-            cout << "[Evento] Accidente en entrenamiento: " << p.name << " fuera " << p.injuryWeeks << " semanas." << endl;
+            emitUiMessage("[Evento] Accidente en entrenamiento: " + p.name +
+                          " fuera " + to_string(p.injuryWeeks) + " semanas.");
         }
     } else {
         int maxSquad = getCompetitionConfig(career.myTeam->division).maxSquadSize;
@@ -1697,7 +1742,8 @@ static void applyClubEvent(Career& career) {
         youth.potential = clampInt(youth.skill + randInt(8 + youthBoost, 15 + youthBoost), youth.skill, 99);
         career.myTeam->addPlayer(youth);
         career.addNews("La cantera promociona a " + youth.name + " en " + career.myTeam->name + ".");
-        cout << "[Evento] Cantera: se unio " << youth.name << " (pot " << youth.potential << ")." << endl;
+        emitUiMessage("[Evento] Cantera: se unio " + youth.name +
+                      " (pot " + to_string(youth.potential) + ").");
     }
 }
 
@@ -1994,29 +2040,42 @@ static void processIncomingOffers(Career& career) {
     Player& p = career.myTeam->players[idx];
     long long maxOffer = max(p.value, p.value * (105 + randInt(0, 40)) / 100);
     long long offer = max(p.value * 9 / 10, maxOffer * 85 / 100);
-    cout << "\nOferta recibida por " << p.name << ": $" << offer
-         << " (tope estimado del mercado: $" << maxOffer << ")" << endl;
-    cout << "1. Aceptar" << endl;
-    cout << "2. Contraofertar" << endl;
-    cout << "3. Rechazar" << endl;
-    int choice = readInt("Respuesta: ", 1, 3);
+    emitUiMessage("");
+    emitUiMessage("Oferta recibida por " + p.name + ": $" + to_string(offer) +
+                  " (tope estimado del mercado: $" + to_string(maxOffer) + ")");
+    int choice = 3;
+    long long counter = 0;
+    if (g_incomingOfferDecisionCallback) {
+        IncomingOfferDecision decision = g_incomingOfferDecisionCallback(career, p, offer, maxOffer);
+        if (decision.action >= 1 && decision.action <= 3) {
+            choice = decision.action;
+            counter = decision.counterOffer;
+        }
+    } else {
+        cout << "1. Aceptar" << endl;
+        cout << "2. Contraofertar" << endl;
+        cout << "3. Rechazar" << endl;
+        choice = readInt("Respuesta: ", 1, 3);
+        if (choice == 2) {
+            counter = readLongLong("Tu contraoferta: ", 0, 1000000000000LL);
+        }
+    }
     if (choice == 1) {
         career.myTeam->budget += offer;
-        cout << "Transferencia aceptada. " << p.name << " vendido." << endl;
+        emitUiMessage("Transferencia aceptada. " + p.name + " vendido.");
         career.addNews(p.name + " es vendido por $" + to_string(offer) + ".");
         career.myTeam->players.erase(career.myTeam->players.begin() + idx);
     } else if (choice == 2) {
-        long long counter = readLongLong("Tu contraoferta: ", 0, 1000000000000LL);
         if (counter <= maxOffer) {
             career.myTeam->budget += counter;
-            cout << "Contraoferta aceptada. " << p.name << " vendido por $" << counter << endl;
+            emitUiMessage("Contraoferta aceptada. " + p.name + " vendido por $" + to_string(counter));
             career.addNews(p.name + " es vendido tras contraoferta por $" + to_string(counter) + ".");
             career.myTeam->players.erase(career.myTeam->players.begin() + idx);
         } else {
-            cout << "La contraoferta fue rechazada." << endl;
+            emitUiMessage("La contraoferta fue rechazada.");
         }
     } else {
-        cout << "Oferta rechazada." << endl;
+        emitUiMessage("Oferta rechazada.");
     }
 }
 
@@ -2067,17 +2126,24 @@ static void updateContracts(Career& career) {
                 if (p.wantsToLeave) demandedWage = demandedWage * 120 / 100;
                 int demandedWeeks = randInt(52, 156);
                 long long demandedClause = max(p.value * 2, demandedWage * 40);
-                cout << "\nContrato expirado: " << p.name << endl;
-                cout << "Demanda renovar por " << demandedWeeks << " semanas"
-                     << " | Salario $" << demandedWage
-                     << " | Clausula $" << demandedClause << endl;
+                emitUiMessage("");
+                emitUiMessage("Contrato expirado: " + p.name);
+                emitUiMessage("Demanda renovar por " + to_string(demandedWeeks) +
+                              " semanas | Salario $" + to_string(demandedWage) +
+                              " | Clausula $" + to_string(demandedClause));
                 if (p.wantsToLeave) {
-                    cout << p.name << " esta inquieto por su rol en el club y exige mejores condiciones." << endl;
+                    emitUiMessage(p.name + " esta inquieto por su rol en el club y exige mejores condiciones.");
                 }
-                int choice = readInt("Renovar? (1. Si, 2. No): ", 1, 2);
-                if (choice == 1) {
+                bool renew = false;
+                if (g_contractRenewalDecisionCallback) {
+                    renew = g_contractRenewalDecisionCallback(career, *team, p, demandedWage, demandedWeeks, demandedClause);
+                } else {
+                    int choice = readInt("Renovar? (1. Si, 2. No): ", 1, 2);
+                    renew = (choice == 1);
+                }
+                if (renew) {
                     if (team->budget < demandedWage * 6) {
-                        cout << "No hay margen salarial suficiente. " << p.name << " deja el club." << endl;
+                        emitUiMessage("No hay margen salarial suficiente. " + p.name + " deja el club.");
                         career.addNews(p.name + " deja el club tras no acordar renovacion.");
                         team->players.erase(team->players.begin() + i);
                     } else {
@@ -2086,12 +2152,12 @@ static void updateContracts(Career& career) {
                         p.releaseClause = demandedClause;
                         p.wantsToLeave = false;
                         p.happiness = clampInt(p.happiness + 6, 1, 99);
-                        cout << "Renovado. Nuevo salario $" << p.wage << endl;
+                        emitUiMessage("Renovado. Nuevo salario $" + to_string(p.wage));
                         career.addNews(p.name + " renueva contrato en " + team->name + ".");
                         ++i;
                     }
                 } else {
-                    cout << p.name << " deja el club." << endl;
+                    emitUiMessage(p.name + " deja el club.");
                     career.addNews(p.name + " deja el club al finalizar su contrato.");
                     team->players.erase(team->players.begin() + i);
                 }
@@ -2152,7 +2218,8 @@ static void updateManagerReputation(Career& career) {
 static void handleManagerStatus(Career& career) {
     if (!career.myTeam) return;
     if (career.boardConfidence >= 20 && career.boardWarningWeeks < 6) return;
-    cout << "\n[Directiva] " << career.myTeam->name << " decide despedirte." << endl;
+    emitUiMessage("");
+    emitUiMessage("[Directiva] " + career.myTeam->name + " decide despedirte.");
     career.addNews(career.managerName + " fue despedido de " + career.myTeam->name + ".");
     career.managerReputation = clampInt(career.managerReputation - 8, 10, 100);
     vector<Team*> jobs = buildJobMarket(career, true);
@@ -2161,11 +2228,19 @@ static void handleManagerStatus(Career& career) {
             if (&team != career.myTeam) jobs.push_back(&team);
         }
     }
-    cout << "Debes elegir nuevo club:" << endl;
+    emitUiMessage("Debes elegir nuevo club:");
     for (size_t i = 0; i < jobs.size(); ++i) {
-        cout << i + 1 << ". " << jobs[i]->name << " (" << divisionDisplay(jobs[i]->division) << ")" << endl;
+        emitUiMessage(to_string(i + 1) + ". " + jobs[i]->name + " (" + divisionDisplay(jobs[i]->division) + ")");
     }
-    int choice = readInt("Club: ", 1, static_cast<int>(jobs.size()));
+    int choice = 1;
+    if (g_managerJobSelectionCallback) {
+        int selected = g_managerJobSelectionCallback(career, jobs);
+        if (selected >= 0 && selected < static_cast<int>(jobs.size())) {
+            choice = selected + 1;
+        }
+    } else {
+        choice = readInt("Club: ", 1, static_cast<int>(jobs.size()));
+    }
     takeManagerJob(career, jobs[choice - 1], "Llega tras un despido reciente.");
 }
 
@@ -3241,7 +3316,7 @@ void endSeason(Career& career) {
 
 void simulateCareerWeek(Career& career) {
     if (career.activeTeams.empty() || career.schedule.empty()) {
-        cout << "No hay calendario disponible." << endl;
+        emitUiMessage("No hay calendario disponible.");
         return;
     }
     if (career.currentWeek > static_cast<int>(career.schedule.size())) {
@@ -3249,7 +3324,8 @@ void simulateCareerWeek(Career& career) {
         return;
     }
 
-    cout << "\nSimulando semana " << career.currentWeek << "..." << endl;
+    emitUiMessage("");
+    emitUiMessage("Simulando semana " + to_string(career.currentWeek) + "...");
     career.leagueTable.sortTable();
     LeagueTable northTable;
     LeagueTable southTable;
@@ -3291,7 +3367,7 @@ void simulateCareerWeek(Career& career) {
             key = isKeyMatch(career.leagueTable, home, away);
         }
         if (verbose && key) {
-            cout << "[Aviso] Partido clave de la semana." << endl;
+            emitUiMessage("[Aviso] Partido clave de la semana.");
         }
         MatchResult result = playMatch(*home, *away, verbose, key);
         storeMatchAnalysis(career, *home, *away, result, false);

@@ -152,6 +152,7 @@ struct LeagueTable {
     void clear();
     void addTeam(Team* team);
     void sortTable();
+    std::vector<std::string> formatLines() const;
     void displayTable();
 };
 
@@ -223,7 +224,7 @@ struct Career {
     int currentCompetitiveFieldSize() const;
     void initializeBoardObjectives();
     void updateBoardConfidence();
-    void saveCareer();
+    bool saveCareer();
     bool loadCareer();
 };
 

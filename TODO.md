@@ -319,3 +319,44 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - compilacion verificada exitosamente con `build.bat`
   - suite `FootballManager.exe --validate` ejecutada con resultado sin fallas
   - arranque del ejecutable y salida por menu principal verificados
+
+## Cambios recientes (2026-03-06) - Interfaz grafica
+- Agregado nuevo modulo `gui.cpp` / `gui.h` con una interfaz grafica nativa Win32 para Windows.
+- La GUI permite:
+  - iniciar una carrera nueva eligiendo division, equipo y manager
+  - cargar y guardar carrera
+  - simular semanas desde la ventana principal
+  - ver resumen del club, noticias, tabla y plantel
+  - ejecutar la validacion del sistema desde un boton
+- `main.cpp` ahora abre la GUI por defecto; la interfaz de consola sigue disponible con `FootballManager.exe --cli`.
+- Ajustado `ui.cpp` para soportar seleccion automatica de nuevo club al ser despedido cuando el juego corre en modo GUI.
+- Corregido `Career::initializeLeague` para limpiar `myTeam` y evitar punteros colgantes al recargar datos.
+- `build.bat` actualizado para compilar `gui.cpp` y enlazar `comctl32` y `gdi32`.
+- Validaciones realizadas:
+  - compilacion verificada exitosamente
+  - `FootballManager.exe --validate` ejecutado con resultado sin fallas
+
+## Cambios recientes (2026-03-06) - Desacople de terminal
+- Agregada nueva capa `app_services.cpp` / `app_services.h` para que la GUI consuma operaciones del juego sin depender de la terminal:
+  - iniciar carrera
+  - cargar carrera
+  - guardar carrera
+  - simular semana
+  - ejecutar validaciones
+- `Career::saveCareer()` ya no imprime directamente en consola; ahora devuelve estado y cada interfaz decide como mostrar el resultado.
+- `LeagueTable` ahora puede renderizar su contenido como lineas de texto mediante `formatLines()`, reduciendo el acoplamiento del modelo con `cout`.
+- `validators.cpp` ahora genera un `ValidationSuiteSummary` reutilizable; la salida a consola queda solo como una capa de presentacion.
+- `ui.cpp` incorpora callbacks para desacoplar decisiones interactivas del flujo semanal:
+  - mensajes de UI
+  - seleccion de nuevo club tras despido
+  - decision sobre ofertas entrantes
+  - decision sobre renovaciones de contrato
+- La GUI ya no depende de `readInt` dentro de la simulacion semanal para:
+  - renovaciones de contrato
+  - ofertas de transferencia entrantes
+  - eleccion de club tras despido
+- `simulateCareerWeek` y varios helpers del resumen semanal/eventos ahora pueden emitir mensajes por callback en lugar de escribir siempre a terminal.
+- `build.bat` y `README.md` actualizados para incluir `app_services.cpp`.
+- Validaciones realizadas:
+  - compilacion verificada exitosamente
+  - `FootballManager.exe --validate` ejecutado con resultado sin fallas

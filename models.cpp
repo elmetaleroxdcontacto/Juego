@@ -525,15 +525,18 @@ void LeagueTable::sortTable() {
     });
 }
 
-void LeagueTable::displayTable() {
-    cout << "\n--- Tabla " << (title.empty() ? "Liga" : title) << " ---" << endl;
-    cout << "Pos | Equipo                 | Pts | PJ | G  | E  | P  | GF | GA | DG" << endl;
-    cout << "----+------------------------+-----+----+----+----+----+----+----+----" << endl;
+vector<string> LeagueTable::formatLines() const {
+    vector<string> lines;
+    lines.push_back("");
+    lines.push_back("--- Tabla " + (title.empty() ? string("Liga") : title) + " ---");
+    lines.push_back("Pos | Equipo                 | Pts | PJ | G  | E  | P  | GF | GA | DG");
+    lines.push_back("----+------------------------+-----+----+----+----+----+----+----+----");
     for (size_t i = 0; i < teams.size(); ++i) {
         Team* team = teams[i];
         int gd = team->goalsFor - team->goalsAgainst;
         int pj = team->wins + team->draws + team->losses;
-        cout << setw(3) << i + 1 << " | " << setw(22) << left << team->name.substr(0, 22)
+        ostringstream line;
+        line << setw(3) << i + 1 << " | " << setw(22) << left << team->name.substr(0, 22)
              << " | " << setw(3) << team->points
              << " | " << setw(2) << pj
              << " | " << setw(2) << team->wins
@@ -541,7 +544,15 @@ void LeagueTable::displayTable() {
              << " | " << setw(2) << team->losses
              << " | " << setw(2) << team->goalsFor
              << " | " << setw(2) << team->goalsAgainst
-             << " | " << setw(2) << gd << endl;
+             << " | " << setw(2) << gd;
+        lines.push_back(line.str());
+    }
+    return lines;
+}
+
+void LeagueTable::displayTable() {
+    for (const auto& line : formatLines()) {
+        cout << line << endl;
     }
 }
 
@@ -607,6 +618,7 @@ void Career::buildRegionalGroups() {
 
 void Career::initializeLeague(bool forceReload) {
     if (initialized && !forceReload) return;
+    myTeam = nullptr;
     allTeams.clear();
     activeTeams.clear();
     schedule.clear();
@@ -1224,9 +1236,9 @@ static Player decodePlayerFields(const vector<string>& pf) {
     return p;
 }
 
-void Career::saveCareer() {
+bool Career::saveCareer() {
     ofstream file(saveFile);
-    if (!file.is_open()) return;
+    if (!file.is_open()) return false;
 
     file << "SEASON " << currentSeason << " WEEK " << currentWeek << "\n";
     file << "DIVISION " << activeDivision << "\n";
@@ -1268,7 +1280,7 @@ void Career::saveCareer() {
         }
         file << "ENDTEAM\n";
     }
-    cout << "Carrera guardada exitosamente." << endl;
+    return true;
 }
 
 bool Career::loadCareer() {

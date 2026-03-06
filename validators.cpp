@@ -192,7 +192,7 @@ static ValidationResult validateTableSorting() {
     return {"Desempates", true, "Orden de tabla base validado."};
 }
 
-int runValidationSuite(bool verbose) {
+ValidationSuiteSummary buildValidationSuiteSummary() {
     vector<ValidationResult> results;
     Career career;
     career.initializeLeague(true);
@@ -205,17 +205,25 @@ int runValidationSuite(bool verbose) {
     results.push_back(validateTableSorting());
 
     int failures = 0;
-    if (verbose) {
-        cout << "\n=== Suite de Validacion ===" << endl;
-    }
+    ValidationSuiteSummary summary;
+    summary.lines.push_back("");
+    summary.lines.push_back("=== Suite de Validacion ===");
     for (const auto& result : results) {
         if (!result.ok) failures++;
-        if (verbose) {
-            cout << (result.ok ? "[OK] " : "[FAIL] ") << result.name << ": " << result.detail << endl;
+        summary.lines.push_back(string(result.ok ? "[OK] " : "[FAIL] ") + result.name + ": " + result.detail);
+    }
+    summary.ok = (failures == 0);
+    summary.lines.push_back("");
+    summary.lines.push_back("Resultado: " + (summary.ok ? string("sin fallas") : to_string(failures) + " falla(s)"));
+    return summary;
+}
+
+int runValidationSuite(bool verbose) {
+    ValidationSuiteSummary summary = buildValidationSuiteSummary();
+    if (verbose) {
+        for (const auto& line : summary.lines) {
+            cout << line << endl;
         }
     }
-    if (verbose) {
-        cout << "\nResultado: " << (failures == 0 ? "sin fallas" : to_string(failures) + " falla(s)") << endl;
-    }
-    return failures == 0 ? 0 : 1;
+    return summary.ok ? 0 : 1;
 }

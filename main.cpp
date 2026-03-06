@@ -4,6 +4,7 @@
 #include "io.h"
 #include "models.h"
 #include "simulation.h"
+#include "gui.h"
 #include "ui.h"
 #include "utils.h"
 #include "validators.h"
@@ -14,15 +15,7 @@
 
 using namespace std;
 
-int main(int argc, char* argv[]) {
-#ifdef _WIN32
-    SetConsoleOutputCP(CP_UTF8);
-    SetConsoleCP(CP_UTF8);
-#endif
-    if (argc > 1 && string(argv[1]) == "--validate") {
-        return runValidationSuite(true);
-    }
-
+static int runConsoleApp() {
     Career career;
     career.initializeLeague();
 
@@ -110,7 +103,9 @@ int main(int argc, char* argv[]) {
                         case 13: manageLineup(*career.myTeam); break;
                         case 14: displayClubOperations(career); break;
                         case 15: displayAchievementsMenu(career); break;
-                        case 16: career.saveCareer(); break;
+                        case 16:
+                            cout << (career.saveCareer() ? "Carrera guardada exitosamente." : "No se pudo guardar la carrera.") << endl;
+                            break;
                         case 17: retirePlayer(*career.myTeam); break;
                         case 18: setTrainingPlan(*career.myTeam); break;
                         case 19: editTeam(*career.myTeam); break;
@@ -202,4 +197,24 @@ int main(int argc, char* argv[]) {
     }
 
     return 0;
+}
+
+int main(int argc, char* argv[]) {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
+    if (argc > 1 && string(argv[1]) == "--validate") {
+        return runValidationSuite(true);
+    }
+
+    if (argc > 1 && string(argv[1]) == "--cli") {
+        return runConsoleApp();
+    }
+
+#ifdef _WIN32
+    HWND consoleWindow = GetConsoleWindow();
+    if (consoleWindow) ShowWindow(consoleWindow, SW_HIDE);
+#endif
+    return runGuiApp();
 }
