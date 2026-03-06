@@ -14,4 +14,4 @@ bool simulateInjury(Player& player, const std::string& tactics, bool verbose, st
 void healInjuries(Team& team, bool verbose);
 void recoverFitness(Team& team, int days);
 void assignGoalsAndAssists(Team& team, int goals, const std::vector<int>& xi, const std::string& teamName, std::vector<std::string>* events);
-MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch = false);
+MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch = false, bool neutralVenue = false);

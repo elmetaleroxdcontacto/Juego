@@ -30,6 +30,11 @@ struct Player {
     std::string role;
 };
 
+struct HeadToHeadRecord {
+    std::string opponent;
+    int points;
+};
+
 void applyPositionStats(Player& p);
 std::string defaultRoleForPosition(const std::string& position);
 Player makeRandomPlayer(const std::string& position, int skillMin, int skillMax, int ageMin, int ageMax);
@@ -54,11 +59,14 @@ public:
     int yellowCards;
     int redCards;
     int tiebreakerSeed;
+    std::vector<HeadToHeadRecord> headToHead;
     std::vector<std::string> achievements;
 
     Team(std::string n = "");
 
     void addPlayer(const Player& p);
+    void addHeadToHeadPoints(const std::string& opponent, int points);
+    int headToHeadPointsAgainst(const std::string& opponent) const;
 
     std::vector<int> getStartingXIIndices() const;
     int getTotalAttack() const;
@@ -108,7 +116,10 @@ struct Career {
     Career();
 
     bool usesSegundaFormat() const;
+    bool usesTerceraBFormat() const;
+    bool usesGroupFormat() const;
     void buildSegundaGroups();
+    void buildRegionalGroups();
     void initializeLeague(bool forceReload = false);
     std::vector<Team*> getDivisionTeams(const std::string& id);
     void buildSchedule();

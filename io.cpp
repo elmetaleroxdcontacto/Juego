@@ -1,5 +1,6 @@
 ﻿#include "io.h"
 
+#include "competition.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -76,9 +77,7 @@ void assignMissingPositions(Team& team) {
 }
 
 static int maxSquadForDivision(const string& division) {
-    if (division == "tercera division a") return 30;
-    if (division == "tercera division b") return 30;
-    return 0;
+    return getCompetitionConfig(division).maxSquadSize;
 }
 
 void trimSquadForDivision(Team& team) {
@@ -439,11 +438,8 @@ vector<Team*> loadDivisionFromFolder(const string& folder, const string& divisio
 
         ensureMinimumSquad(team, 18);
 
-        int divisor = 5;
-        if (divisionId == "primera division") divisor = 3;
-        else if (divisionId == "primera b") divisor = 4;
-        else if (divisionId == "segunda division") divisor = 5;
-        else divisor = 6;
+        int divisor = getCompetitionConfig(divisionId).budgetDivisor;
+        if (divisor <= 0) divisor = 6;
         long long budget = team.getSquadValue() / divisor;
         team.budget = max(200000LL, budget);
 

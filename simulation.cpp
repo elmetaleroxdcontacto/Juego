@@ -292,7 +292,7 @@ void assignGoalsAndAssists(Team& team, int goals, const vector<int>& xi, const s
     }
 }
 
-MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch) {
+MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool neutralVenue) {
     ensureMinimumSquad(home, 11);
     ensureMinimumSquad(away, 11);
 
@@ -329,8 +329,8 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch) {
     awayAttack = static_cast<int>(round(awayAttack * awayMoraleFactor));
     awayDefense = static_cast<int>(round(awayDefense * awayMoraleFactor));
 
-    const double homeAttackBonus = 1.05;
-    const double homeDefenseBonus = 1.03;
+    const double homeAttackBonus = neutralVenue ? 1.00 : 1.05;
+    const double homeDefenseBonus = neutralVenue ? 1.00 : 1.03;
     homeAttack = static_cast<int>(round(homeAttack * homeAttackBonus * weather.attackMul));
     homeDefense = static_cast<int>(round(homeDefense * homeDefenseBonus * weather.defenseMul));
     awayAttack = static_cast<int>(round(awayAttack * weather.attackMul));
@@ -362,6 +362,7 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch) {
         cout << home.name << " vs " << away.name << endl;
         cout << "Tacticas: " << home.tactics << " vs " << away.tactics << endl;
         if (keyMatch) cout << "[PARTIDO CLAVE]" << endl;
+        if (neutralVenue) cout << "Sede: Cancha neutral" << endl;
         cout << "Clima: " << weather.name << endl;
         cout << "Condicion promedio: " << homeStam << " vs " << awayStam << endl;
         if (homeStam < 60 || awayStam < 60) {
@@ -393,17 +394,23 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch) {
         home.points += 3;
         home.wins++;
         away.losses++;
+        home.addHeadToHeadPoints(away.name, 3);
+        away.addHeadToHeadPoints(home.name, 0);
         if (verbose) cout << "Ganaste!" << endl;
     } else if (homeGoals < awayGoals) {
         away.points += 3;
         away.wins++;
         home.losses++;
+        home.addHeadToHeadPoints(away.name, 0);
+        away.addHeadToHeadPoints(home.name, 3);
         if (verbose) cout << "Perdiste." << endl;
     } else {
         home.points += 1;
         away.points += 1;
         home.draws++;
         away.draws++;
+        home.addHeadToHeadPoints(away.name, 1);
+        away.addHeadToHeadPoints(home.name, 1);
         if (verbose) cout << "Empate." << endl;
     }
 

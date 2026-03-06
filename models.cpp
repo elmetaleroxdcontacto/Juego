@@ -1,5 +1,6 @@
 ﻿#include "models.h"
 
+#include "competition.h"
 #include "io.h"
 #include "utils.h"
 
@@ -98,6 +99,23 @@ void Team::addPlayer(const Player& p) {
     players.push_back(p);
 }
 
+void Team::addHeadToHeadPoints(const string& opponent, int pointsToAdd) {
+    for (auto& record : headToHead) {
+        if (record.opponent == opponent) {
+            record.points += pointsToAdd;
+            return;
+        }
+    }
+    headToHead.push_back({opponent, pointsToAdd});
+}
+
+int Team::headToHeadPointsAgainst(const string& opponent) const {
+    for (const auto& record : headToHead) {
+        if (record.opponent == opponent) return record.points;
+    }
+    return 0;
+}
+
 void Team::resetSeasonStats() {
     points = 0;
     goalsFor = 0;
@@ -109,6 +127,82 @@ void Team::resetSeasonStats() {
     yellowCards = 0;
     redCards = 0;
     tiebreakerSeed = randInt(0, 1000000);
+    headToHead.clear();
+}
+
+static int goalDifference(const Team* team) {
+    return team->goalsFor - team->goalsAgainst;
+}
+
+static bool compareTerceraABase(const Team* a, const Team* b) {
+    if (a->points != b->points) return a->points > b->points;
+    int aGD = goalDifference(a);
+    int bGD = goalDifference(b);
+    if (aGD != bGD) return aGD > bGD;
+    if (a->goalsFor != b->goalsFor) return a->goalsFor > b->goalsFor;
+    if (a->wins != b->wins) return a->wins > b->wins;
+    if (a->awayGoals != b->awayGoals) return a->awayGoals > b->awayGoals;
+    return a->name < b->name;
+}
+
+static bool equalTerceraABase(const Team* a, const Team* b) {
+    return a->points == b->points &&
+           goalDifference(a) == goalDifference(b) &&
+           a->goalsFor == b->goalsFor &&
+           a->wins == b->wins &&
+           a->awayGoals == b->awayGoals;
+}
+
+static bool compareTerceraBBase(const Team* a, const Team* b) {
+    if (a->points != b->points) return a->points > b->points;
+    int aGD = goalDifference(a);
+    int bGD = goalDifference(b);
+    if (aGD != bGD) return aGD > bGD;
+    if (a->wins != b->wins) return a->wins > b->wins;
+    if (a->goalsFor != b->goalsFor) return a->goalsFor > b->goalsFor;
+    if (a->awayGoals != b->awayGoals) return a->awayGoals > b->awayGoals;
+    return a->name < b->name;
+}
+
+static bool equalTerceraBBase(const Team* a, const Team* b) {
+    return a->points == b->points &&
+           goalDifference(a) == goalDifference(b) &&
+           a->wins == b->wins &&
+           a->goalsFor == b->goalsFor &&
+           a->awayGoals == b->awayGoals;
+}
+
+static int headToHeadPointsWithinTie(const Team* team, const vector<Team*>& tiedTeams) {
+    int total = 0;
+    for (auto* other : tiedTeams) {
+        if (other != team) total += team->headToHeadPointsAgainst(other->name);
+    }
+    return total;
+}
+
+static void applyHeadToHeadOrder(vector<Team*>& teams, bool terceraA) {
+    auto equalBase = terceraA ? equalTerceraABase : equalTerceraBBase;
+    size_t start = 0;
+    while (start < teams.size()) {
+        size_t end = start + 1;
+        while (end < teams.size() && equalBase(teams[start], teams[end])) {
+            end++;
+        }
+        if (end - start > 1) {
+            vector<Team*> tiedTeams(teams.begin() + static_cast<long long>(start),
+                                    teams.begin() + static_cast<long long>(end));
+            stable_sort(teams.begin() + static_cast<long long>(start),
+                        teams.begin() + static_cast<long long>(end),
+                        [&](Team* a, Team* b) {
+                            int aH2H = headToHeadPointsWithinTie(a, tiedTeams);
+                            int bH2H = headToHeadPointsWithinTie(b, tiedTeams);
+                            if (aH2H != bH2H) return aH2H > bH2H;
+                            if (a->tiebreakerSeed != b->tiebreakerSeed) return a->tiebreakerSeed < b->tiebreakerSeed;
+                            return a->name < b->name;
+                        });
+        }
+        start = end;
+    }
 }
 
 static void parseFormation(const string& formation, int& defCount, int& midCount, int& fwdCount) {
@@ -247,11 +341,12 @@ void LeagueTable::addTeam(Team* team) {
 }
 
 void LeagueTable::sortTable() {
-    if (ruleId == "primera division" || ruleId == "primera b") {
+    const CompetitionConfig& config = getCompetitionConfig(ruleId);
+    if (config.tableProfile == CompetitionTableProfile::PrimeraLike) {
         sort(teams.begin(), teams.end(), [](Team* a, Team* b) {
             if (a->points != b->points) return a->points > b->points;
-            int aGD = a->goalsFor - a->goalsAgainst;
-            int bGD = b->goalsFor - b->goalsAgainst;
+            int aGD = goalDifference(a);
+            int bGD = goalDifference(b);
             if (aGD != bGD) return aGD > bGD;
             if (a->wins != b->wins) return a->wins > b->wins;
             if (a->goalsFor != b->goalsFor) return a->goalsFor > b->goalsFor;
@@ -263,10 +358,20 @@ void LeagueTable::sortTable() {
         });
         return;
     }
+    if (config.tableProfile == CompetitionTableProfile::TerceraA) {
+        sort(teams.begin(), teams.end(), compareTerceraABase);
+        applyHeadToHeadOrder(teams, true);
+        return;
+    }
+    if (config.tableProfile == CompetitionTableProfile::TerceraB) {
+        sort(teams.begin(), teams.end(), compareTerceraBBase);
+        applyHeadToHeadOrder(teams, false);
+        return;
+    }
     sort(teams.begin(), teams.end(), [](Team* a, Team* b) {
         if (a->points != b->points) return a->points > b->points;
-        int aGD = a->goalsFor - a->goalsAgainst;
-        int bGD = b->goalsFor - b->goalsAgainst;
+        int aGD = goalDifference(a);
+        int bGD = goalDifference(b);
         if (aGD != bGD) return aGD > bGD;
         if (a->goalsFor != b->goalsFor) return a->goalsFor > b->goalsFor;
         return a->name < b->name;
@@ -304,15 +409,34 @@ const vector<DivisionInfo> kDivisions = {
 Career::Career() : myTeam(nullptr), currentSeason(1), currentWeek(1), saveFile("career_save.txt"), initialized(false) {}
 
 bool Career::usesSegundaFormat() const {
-    return activeDivision == "segunda division" && activeTeams.size() == 14;
+    const CompetitionConfig& config = getCompetitionConfig(activeDivision);
+    return config.seasonHandler == CompetitionSeasonHandler::SegundaGroups &&
+           (config.expectedTeamCount <= 0 || static_cast<int>(activeTeams.size()) == config.expectedTeamCount);
+}
+
+bool Career::usesTerceraBFormat() const {
+    const CompetitionConfig& config = getCompetitionConfig(activeDivision);
+    return config.seasonHandler == CompetitionSeasonHandler::TerceraB &&
+           (config.expectedTeamCount <= 0 || static_cast<int>(activeTeams.size()) == config.expectedTeamCount);
+}
+
+bool Career::usesGroupFormat() const {
+    return competitionUsesGroupStage(activeDivision, static_cast<int>(activeTeams.size()));
 }
 
 void Career::buildSegundaGroups() {
+    buildRegionalGroups();
+}
+
+void Career::buildRegionalGroups() {
     groupNorthIdx.clear();
     groupSouthIdx.clear();
-    if (!usesSegundaFormat()) return;
+    if (!usesGroupFormat()) return;
+    const CompetitionConfig& config = getCompetitionConfig(activeDivision);
+    int split = config.groups.groupSize;
+    if (split <= 0) return;
     for (int i = 0; i < static_cast<int>(activeTeams.size()); ++i) {
-        if (i < 7) groupNorthIdx.push_back(i);
+        if (i < split) groupNorthIdx.push_back(i);
         else groupSouthIdx.push_back(i);
     }
 }
@@ -386,10 +510,11 @@ void Career::buildSchedule() {
     int n = static_cast<int>(activeTeams.size());
     if (n < 2) return;
 
-    if (usesSegundaFormat()) {
-        if (groupNorthIdx.empty() || groupSouthIdx.empty()) buildSegundaGroups();
-        auto north = buildRoundRobinSchedule(groupNorthIdx, true);
-        auto south = buildRoundRobinSchedule(groupSouthIdx, true);
+    if (usesGroupFormat()) {
+        const CompetitionConfig& config = getCompetitionConfig(activeDivision);
+        if (groupNorthIdx.empty() || groupSouthIdx.empty()) buildRegionalGroups();
+        auto north = buildRoundRobinSchedule(groupNorthIdx, config.groups.doubleRoundRobin);
+        auto south = buildRoundRobinSchedule(groupSouthIdx, config.groups.doubleRoundRobin);
         int rounds = static_cast<int>(max(north.size(), south.size()));
         for (int r = 0; r < rounds; ++r) {
             vector<pair<int, int>> matches;
@@ -420,8 +545,36 @@ void Career::setActiveDivision(const string& id) {
     leagueTable.sortTable();
     groupNorthIdx.clear();
     groupSouthIdx.clear();
-    buildSegundaGroups();
+    buildRegionalGroups();
     buildSchedule();
+}
+
+static string encodeHeadToHead(const vector<HeadToHeadRecord>& records) {
+    string out;
+    for (size_t i = 0; i < records.size(); ++i) {
+        if (i) out += ";";
+        out += records[i].opponent + "=" + to_string(records[i].points);
+    }
+    return out;
+}
+
+static void decodeHeadToHead(const string& encoded, Team& team) {
+    team.headToHead.clear();
+    stringstream ss(encoded);
+    string token;
+    while (getline(ss, token, ';')) {
+        token = trim(token);
+        if (token.empty()) continue;
+        size_t eq = token.find('=');
+        if (eq == string::npos) continue;
+        string opponent = trim(token.substr(0, eq));
+        string pointsStr = trim(token.substr(eq + 1));
+        if (opponent.empty() || pointsStr.empty()) continue;
+        try {
+            team.headToHead.push_back({opponent, stoi(pointsStr)});
+        } catch (...) {
+        }
+    }
 }
 
 void Career::resetSeason() {
@@ -469,7 +622,8 @@ void Career::saveCareer() {
         file << "TEAM " << team.name << "|" << team.division << "|" << team.tactics << "|" << team.formation
              << "|" << team.budget << "|" << team.morale << "|" << team.points << "|" << team.goalsFor << "|" << team.goalsAgainst
              << "|" << team.wins << "|" << team.draws << "|" << team.losses << "|" << team.trainingFocus
-             << "|" << team.awayGoals << "|" << team.redCards << "|" << team.yellowCards << "|" << team.tiebreakerSeed << "\n";
+             << "|" << team.awayGoals << "|" << team.redCards << "|" << team.yellowCards << "|" << team.tiebreakerSeed
+             << "|" << encodeHeadToHead(team.headToHead) << "\n";
         file << "PLAYERS " << team.players.size() << "\n";
         for (const auto& p : team.players) {
             file << "PLAYER " << p.name << "|" << p.position << "|" << p.attack << "|" << p.defense << "|"
@@ -557,6 +711,8 @@ bool Career::loadCareer() {
             else team.yellowCards = 0;
             if (fields.size() > extra + 3) team.tiebreakerSeed = stoi(fields[extra + 3]);
             else team.tiebreakerSeed = randInt(0, 1000000);
+            if (fields.size() > extra + 4) decodeHeadToHead(fields[extra + 4], team);
+            else team.headToHead.clear();
 
             if (!getline(file, line)) return false;
             if (line.rfind("PLAYERS ", 0) != 0) return false;

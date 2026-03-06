@@ -106,3 +106,63 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Liguilla de Primera B (2°-8°) ida/vuelta con reglas de localía; final con prórroga + penales.
 - Descenso en Primera B: último lugar con definición si hay empate en puntos.
 - Ascensos/descensos actualizados: Primera División recibe campeón + liguilla de Primera B; Primera B asciende campeón + liguilla y desciende 1 a Segunda.
+
+## Cambios recientes (2026-03-06)
+- Ajustada la implementación de Primera B 2026 para usar desempates por título y descenso en cancha neutral, sin ventaja de localía.
+- `playMatch` ahora soporta partidos en sede neutral; se usa en finales y definiciones de desempate.
+- Corregida la evaluación de llaves ida/vuelta de la liguilla de ascenso para decidir por puntaje de serie y luego diferencia de gol.
+- Final de la liguilla de Primera B ajustada para aplicar prórroga y luego penales solo si persiste la igualdad tras puntaje de serie y diferencia de gol.
+- Empates múltiples por el 1° lugar o por el último lugar ahora se reducen a dos equipos usando el orden oficial de clasificación antes del partido definitorio.
+- Validado el fixture de Primera B: 16 equipos, 30 fechas, 8 partidos por fecha y segunda rueda espejada invirtiendo localía.
+- Compilación verificada exitosamente con `build.bat` tras los cambios.
+
+## Cambios recientes (2026-03-06) - Tercera Division A/B
+- Implementado formato 2026 de Tercera División A con 16 equipos, todos contra todos ida y vuelta y calendario automático de 30 fechas.
+- Agregados desempates específicos para Tercera A: puntos, diferencia de gol, goles a favor, partidos ganados, goles de visita y enfrentamientos directos.
+- Se incorporó registro persistente de enfrentamientos directos por equipo y su guardado/carga en la carrera.
+- Implementado playoff de ascenso de Tercera A para 2°-5°: semifinales ida y vuelta (2° vs 5°, 3° vs 4°) y final a partido único.
+- Implementado cierre de temporada específico de Tercera A con ascenso directo del 1°, ascenso adicional por playoff y cruces de promoción/descenso frente a Tercera B.
+- Implementado formato 2026 de Tercera División B con 28 equipos divididos en Zona Norte y Zona Sur, cada una con tabla independiente y fixture automático por grupo.
+- Agregado soporte general de divisiones con grupos en la UI y en el calendario para reutilizar la lógica entre Segunda División y Tercera B.
+- Implementados ascensos directos de Tercera B para los campeones de Zona Norte y Zona Sur.
+- Implementada final entre campeones de grupo para definir al campeón de Tercera B.
+- Implementados cruces 2°/3° entre zonas y llaves de promoción entre Tercera B y Tercera A.
+- Actualizados `teams.txt` de Tercera A y Tercera B a una estructura 2026 de 16 y 28 equipos respectivamente.
+- Creadas carpetas placeholder para clubes nuevos que no existían en el repositorio, permitiendo que el cargador genere planteles automáticos y no descarte equipos.
+- Validaciones realizadas:
+  - Tercera A queda con 16 equipos y 30 fechas.
+  - Tercera B queda con 28 equipos y 2 grupos de 14.
+  - Compilación verificada exitosamente con `build.bat`.
+- Nota de implementación:
+  - En Tercera B la fase zonal quedó a una rueda por grupo y los cruces 2°/3° se usaron como filtro para la promoción A/B siguiendo la especificación dada en la solicitud.
+
+## Cambios recientes (2026-03-06) - Motor de competiciones
+- Creado un nuevo módulo de configuración de competiciones en `competition.h` y `competition.cpp`.
+- Centralizadas en `CompetitionConfig` las reglas base por división:
+  - perfil de tabla
+  - handler de fin de temporada
+  - formato de grupos
+  - ingresos semanales
+  - factor salarial
+  - divisor de presupuesto
+  - tamaño máximo de plantel
+  - cantidad esperada de equipos
+- `models.cpp` ahora usa esta configuración para:
+  - decidir el perfil de desempates de tabla
+  - determinar si una división usa grupos
+  - construir grupos regionales
+  - generar calendarios según formato configurado
+- `io.cpp` ahora usa la configuración para:
+  - limitar tamaño máximo de plantel por división
+  - calcular presupuesto inicial según divisor configurado
+- `ui.cpp` ahora usa la configuración para:
+  - nombres de grupos (por ejemplo, Zona Norte / Zona Sur)
+  - ingresos base por división
+  - factor salarial semanal
+  - despacho del cierre de temporada según handler de competición
+- `build.bat` fue actualizado para compilar el nuevo módulo `competition.cpp`.
+- Resultado:
+  - el juego depende menos de `if (division == ...)` repartidos por múltiples archivos
+  - queda una base más limpia para seguir moviendo playoffs, ascensos y descensos a reglas declarativas
+- Validación realizada:
+  - compilación verificada exitosamente con `build.bat`.
