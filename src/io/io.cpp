@@ -431,9 +431,9 @@ void ensureMinimumSquad(Team& team, int minPlayers) {
     }
 }
 
-vector<Team*> loadDivisionFromFolder(const string& folder, const string& divisionId, deque<Team>& allTeams) {
-    vector<Team*> out;
-    if (!isDirectory(folder)) return out;
+DivisionLoadResult loadDivisionFromFolder(const string& folder, const string& divisionId, deque<Team>& allTeams) {
+    DivisionLoadResult result;
+    if (!isDirectory(folder)) return result;
 
     vector<pair<string, string>> teamEntries;
     if (!loadTeamsList(folder, teamEntries)) {
@@ -453,13 +453,15 @@ vector<Team*> loadDivisionFromFolder(const string& folder, const string& divisio
         string teamFolder = entry.second;
         string dir = joinPath(folder, teamFolder);
         if (!isDirectory(dir)) {
-            cout << "[AVISO] Carpeta de equipo no encontrada: " << teamFolder << " (" << divisionDisplay(divisionId) << ")" << endl;
+            result.warnings.push_back("Carpeta de equipo no encontrada: " + teamFolder +
+                                      " (" + divisionDisplay(divisionId) + ")");
             continue;
         }
         string teamId = normalizeTeamId(teamName);
         if (teamId.empty()) teamId = normalizeTeamId(teamFolder);
         if (!teamId.empty() && usedIds.find(teamId) != usedIds.end()) {
-            cout << "[AVISO] Equipo duplicado ignorado: " << teamName << " (" << divisionDisplay(divisionId) << ")" << endl;
+            result.warnings.push_back("Equipo duplicado ignorado: " + teamName +
+                                      " (" + divisionDisplay(divisionId) + ")");
             continue;
         }
         if (!teamId.empty()) usedIds.insert(teamId);
@@ -521,7 +523,7 @@ vector<Team*> loadDivisionFromFolder(const string& folder, const string& divisio
         ensureTeamIdentity(team);
 
         allTeams.push_back(std::move(team));
-        out.push_back(&allTeams.back());
+        result.teams.push_back(&allTeams.back());
     }
-    return out;
+    return result;
 }

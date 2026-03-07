@@ -8,7 +8,13 @@
 #include <limits>
 #include <random>
 #include <sstream>
+
+#ifdef _WIN32
 #include <windows.h>
+#else
+#include <dirent.h>
+#include <sys/stat.h>
+#endif
 
 using namespace std;
 
@@ -38,6 +44,8 @@ string toLower(const string& s) {
     transform(out.begin(), out.end(), out.begin(), [](unsigned char c) { return static_cast<char>(tolower(c)); });
     return out;
 }
+
+#ifdef _WIN32
 
 static wstring utf8ToWide(const string& input) {
     if (input.empty()) return wstring();
@@ -69,28 +77,6 @@ bool isDirectory(const string& path) {
     return attrs != INVALID_FILE_ATTRIBUTES && (attrs & FILE_ATTRIBUTE_DIRECTORY);
 }
 
-string joinPath(const string& a, const string& b) {
-    if (a.empty()) return b;
-    string result = a;
-    if (!result.empty() && result.back() != '/' && result.back() != '\\') {
-        result += "\\";
-    }
-    result += b;
-    return result;
-}
-
-string pathFilename(const string& path) {
-    size_t pos = path.find_last_of("/\\");
-    if (pos == string::npos) return path;
-    return path.substr(pos + 1);
-}
-
-string pathExtension(const string& path) {
-    size_t pos = path.find_last_of('.');
-    if (pos == string::npos || pos == 0) return "";
-    return path.substr(pos);
-}
-
 vector<string> listDirectories(const string& root) {
     vector<string> out;
     if (!isDirectory(root)) return out;
@@ -110,6 +96,63 @@ vector<string> listDirectories(const string& root) {
 
     FindClose(hFind);
     return out;
+}
+
+#else
+
+bool pathExists(const string& path) {
+    struct stat info {};
+    return stat(path.c_str(), &info) == 0;
+}
+
+bool isDirectory(const string& path) {
+    struct stat info {};
+    return stat(path.c_str(), &info) == 0 && (info.st_mode & S_IFDIR);
+}
+
+vector<string> listDirectories(const string& root) {
+    vector<string> out;
+    if (!isDirectory(root)) return out;
+    DIR* dir = opendir(root.c_str());
+    if (!dir) return out;
+
+    while (dirent* entry = readdir(dir)) {
+        string name = entry->d_name;
+        if (name == "." || name == "..") continue;
+        string candidate = joinPath(root, name);
+        if (isDirectory(candidate)) out.push_back(candidate);
+    }
+
+    closedir(dir);
+    return out;
+}
+
+#endif
+
+string joinPath(const string& a, const string& b) {
+    if (a.empty()) return b;
+    string result = a;
+    if (!result.empty() && result.back() != '/' && result.back() != '\\') {
+#ifdef _WIN32
+        result += "\\";
+#else
+        result += "/";
+#endif
+    }
+    result += b;
+    return result;
+}
+
+string pathFilename(const string& path) {
+    size_t pos = path.find_last_of("/\\");
+    if (pos == string::npos) return path;
+    return path.substr(pos + 1);
+}
+
+string pathExtension(const string& path) {
+    size_t pos = path.find_last_of('.');
+    if (pos == string::npos || pos == 0) return "";
+    return path.substr(pos);
 }
 
 vector<string> splitCsvLine(const string& line) {

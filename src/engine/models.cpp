@@ -1,8 +1,8 @@
 ﻿#include "models.h"
 
-#include "competition.h"
-#include "io.h"
-#include "utils.h"
+#include "competition/competition.h"
+#include "io/io.h"
+#include "utils/utils.h"
 
 #include <algorithm>
 #include <fstream>
@@ -890,11 +890,13 @@ void Career::initializeLeague(bool forceReload) {
     groupSouthIdx.clear();
     divisions.clear();
     activeDivision.clear();
+    loadWarnings.clear();
 
     for (const auto& div : kDivisions) {
         if (!isDirectory(div.folder)) continue;
-        auto teams = loadDivisionFromFolder(div.folder, div.id, allTeams);
-        if (!teams.empty()) {
+        DivisionLoadResult divisionLoad = loadDivisionFromFolder(div.folder, div.id, allTeams);
+        loadWarnings.insert(loadWarnings.end(), divisionLoad.warnings.begin(), divisionLoad.warnings.end());
+        if (!divisionLoad.teams.empty()) {
             divisions.push_back(div);
         }
     }

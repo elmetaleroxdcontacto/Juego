@@ -6,33 +6,70 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-file(GLOB FM_ROOT_SOURCES CONFIGURE_DEPENDS "*.cpp")
-file(GLOB_RECURSE FM_SRC_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
-set(FM_COMMON_SOURCES ${FM_ROOT_SOURCES} ${FM_SRC_SOURCES})
+set(FM_CAREER_SOURCES
+    src/career/app_services.cpp
+    src/career/career_support.cpp
+)
 
-if(NOT WIN32)
-    list(FILTER FM_COMMON_SOURCES EXCLUDE REGEX ".*/gui\\.cpp$")
-endif()
+set(FM_COMPETITION_SOURCES
+    src/competition/competition.cpp
+)
 
+set(FM_ENGINE_SOURCES
+    src/engine/models.cpp
+)
+
+set(FM_IO_SOURCES
+    src/io/io.cpp
+)
+
+set(FM_SIMULATION_SOURCES
+    src/simulation/match_events.cpp
+    src/simulation/match_tactics.cpp
+    src/simulation/simulation.cpp
+)
+
+set(FM_TRANSFER_SOURCES
+    src/transfers/negotiation_system.cpp
+)
+
+set(FM_UI_SOURCES
+    src/main.cpp
+    src/ui/ui.cpp
+    src/utils/utils.cpp
+    src/validators/validators.cpp
+)
+
+set(FM_GUI_SOURCES)
 if(WIN32)
-    add_executable(FootballManager WIN32
-        ${FM_COMMON_SOURCES}
-    )
-    target_link_libraries(FootballManager PRIVATE comctl32 gdi32)
-else()
-    add_executable(FootballManager
-        ${FM_COMMON_SOURCES}
-    )
+    list(APPEND FM_GUI_SOURCES src/gui/gui.cpp)
 endif()
+
+add_executable(FootballManager
+    ${FM_CAREER_SOURCES}
+    ${FM_COMPETITION_SOURCES}
+    ${FM_ENGINE_SOURCES}
+    ${FM_IO_SOURCES}
+    ${FM_SIMULATION_SOURCES}
+    ${FM_TRANSFER_SOURCES}
+    ${FM_UI_SOURCES}
+    ${FM_GUI_SOURCES}
+)
 
 target_include_directories(FootballManager PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
+
+if(WIN32)
+    target_link_libraries(FootballManager PRIVATE comctl32 gdi32)
+endif()
 
 if(MSVC)
     target_compile_options(FootballManager PRIVATE /W4)
 else()
     target_compile_options(FootballManager PRIVATE -Wall -Wextra -Wpedantic)
 endif()
+
+set_target_properties(FootballManager PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)

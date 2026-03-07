@@ -207,6 +207,7 @@ struct Career {
     std::vector<DivisionInfo> divisions;
     std::string activeDivision;
     std::string saveFile;
+    std::vector<std::string> loadWarnings;
     std::vector<std::string> achievements;
     std::string managerName;
     int managerReputation;
@@ -271,6 +272,10 @@ struct MatchResult {
     int homeCorners;
     int awayCorners;
     std::string weather;
+    std::vector<std::string> warnings;
+    std::vector<std::string> reportLines;
+    std::vector<std::string> events;
+    std::string verdict;
 };
 
 struct TeamStrength {

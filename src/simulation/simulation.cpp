@@ -673,10 +673,7 @@ bool simulateInjury(Player& player, const string& tactics, bool verbose, vector<
             player.injuryWeeks = randInt(7, 12);
         }
         if (player.age >= 34 && randInt(1, 100) <= 25) player.injuryWeeks++;
-        if (verbose) {
-            cout << player.name << " se lesiono (" << player.injuryType << ") y estara fuera por "
-                 << player.injuryWeeks << " semanas." << endl;
-        }
+        (void)verbose;
         if (events) {
             int minute = randInt(1, 90);
             events->push_back(to_string(minute) + "' Lesion: " + player.name +
@@ -724,7 +721,7 @@ void recoverFitness(Team& team, int days) {
     }
 }
 
-static void applyDevelopment(Team& team, const vector<int>& xi, bool verbose) {
+static void applyDevelopment(Team& team, const vector<int>& xi, vector<string>* events) {
     for (int idx : xi) {
         if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
         Player& p = team.players[idx];
@@ -748,8 +745,8 @@ static void applyDevelopment(Team& team, const vector<int>& xi, bool verbose) {
             } else {
                 p.attack = min(100, p.attack + 1);
             }
-            if (verbose) {
-                cout << "[Progreso] " << p.name << " mejoro su habilidad a " << p.skill << "." << endl;
+            if (events) {
+                events->push_back("[Progreso] " + p.name + " mejora su habilidad a " + to_string(p.skill) + ".");
             }
             p.currentForm = clampInt(p.currentForm + 1, 1, 99);
         }
@@ -818,7 +815,7 @@ int teamPenaltyStrength(const Team& team) {
     return total / static_cast<int>(xi.size());
 }
 
-MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool neutralVenue) {
+MatchResult simulateMatch(Team& home, Team& away, bool keyMatch, bool neutralVenue) {
     ensureMinimumSquad(home, 11);
     ensureMinimumSquad(away, 11);
     ensureTeamIdentity(home);
@@ -839,8 +836,10 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
         }
     }
 
+    vector<string> warnings;
+    vector<string> reportLines;
     vector<string> events;
-    vector<string>* eventsPtr = verbose ? &events : nullptr;
+    vector<string>* eventsPtr = &events;
     int homeSubs = performInMatchSubstitutions(home, h.xi, eventsPtr);
     int awaySubs = performInMatchSubstitutions(away, a.xi, eventsPtr);
     if (homeSubs > 0) {
@@ -860,12 +859,13 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
     WeatherEffect weather = rollWeather();
     bool homeInj = hasInjuredInXI(home, h.xi);
     bool awayInj = hasInjuredInXI(away, a.xi);
-    if (verbose && (homeInj || awayInj)) {
-        cout << "[AVISO] Equipos sin suficientes jugadores sanos: ";
-        if (homeInj) cout << home.name;
-        if (homeInj && awayInj) cout << " y ";
-        if (awayInj) cout << away.name;
-        cout << ". Se usan lesionados en el XI." << endl;
+    if (homeInj || awayInj) {
+        string warning = "Equipos sin suficientes jugadores sanos: ";
+        if (homeInj) warning += home.name;
+        if (homeInj && awayInj) warning += " y ";
+        if (awayInj) warning += away.name;
+        warning += ". Se usan lesionados en el XI.";
+        warnings.push_back(warning);
     }
 
     int homeAttack = h.attack;
@@ -886,25 +886,23 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
     homeDefense += homeRecovery / 2 + homeCrowd / 2;
     awayAttack += awayRecovery + awayDirect + awayCrowd;
     awayDefense += awayRecovery / 2 + awayCrowd / 2;
-    if (eventsPtr) {
-        if (areRivalClubs(home, away)) {
-            match_internal::pushTacticalEvent(eventsPtr, randInt(4, 18), "Se juega con clima de clasico entre " + home.name + " y " + away.name);
-        }
-        if (homeRecovery >= 8) {
-            match_internal::pushTacticalEvent(eventsPtr, randInt(8, 24), home.name + " muerde alto y roba cerca del area rival");
-        }
-        if (awayRecovery >= 8) {
-            match_internal::pushTacticalEvent(eventsPtr, randInt(8, 24), away.name + " activa la presion y corta la salida");
-        }
-        if (homeDirect >= 7) {
-            match_internal::pushTacticalEvent(eventsPtr, randInt(16, 34), home.name + " amenaza con balones largos a la espalda de la linea alta");
-        }
-        if (awayDirect >= 7) {
-            match_internal::pushTacticalEvent(eventsPtr, randInt(16, 34), away.name + " castiga la espalda de la defensa adelantada");
-        }
-        if (homeCrowd >= 6) {
-            match_internal::pushTacticalEvent(eventsPtr, randInt(2, 12), "La localia empuja a " + home.name + " desde el inicio");
-        }
+    if (areRivalClubs(home, away)) {
+        match_internal::pushTacticalEvent(eventsPtr, randInt(4, 18), "Se juega con clima de clasico entre " + home.name + " y " + away.name);
+    }
+    if (homeRecovery >= 8) {
+        match_internal::pushTacticalEvent(eventsPtr, randInt(8, 24), home.name + " muerde alto y roba cerca del area rival");
+    }
+    if (awayRecovery >= 8) {
+        match_internal::pushTacticalEvent(eventsPtr, randInt(8, 24), away.name + " activa la presion y corta la salida");
+    }
+    if (homeDirect >= 7) {
+        match_internal::pushTacticalEvent(eventsPtr, randInt(16, 34), home.name + " amenaza con balones largos a la espalda de la linea alta");
+    }
+    if (awayDirect >= 7) {
+        match_internal::pushTacticalEvent(eventsPtr, randInt(16, 34), away.name + " castiga la espalda de la defensa adelantada");
+    }
+    if (homeCrowd >= 6) {
+        match_internal::pushTacticalEvent(eventsPtr, randInt(2, 12), "La localia empuja a " + home.name + " desde el inicio");
     }
 
     homeAttack += h.avgSkill;
@@ -1001,28 +999,28 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
         }
     }
 
-    if (verbose) {
-        cout << "\n--- Partido ---" << endl;
-        cout << home.name << " vs " << away.name << endl;
-        cout << "Tacticas: " << home.tactics << " (" << home.formation << ") vs "
-             << away.tactics << " (" << away.formation << ")" << endl;
-        cout << "Instrucciones: " << home.matchInstruction << " vs " << away.matchInstruction << endl;
-        if (keyMatch) cout << "[PARTIDO CLAVE]" << endl;
-        if (neutralVenue) cout << "Sede: Cancha neutral" << endl;
-        cout << "Clima: " << weather.name << endl;
-        cout << "Condicion promedio: " << homeStam << " vs " << awayStam << endl;
-        cout << "Contexto: prestigio " << teamPrestigeScore(home) << "-" << teamPrestigeScore(away)
-             << " | apoyo local " << homeCrowd << "-" << awayCrowd
-             << " | recuperaciones " << homeRecovery << "-" << awayRecovery << endl;
-        if (homeStam < 60 || awayStam < 60) {
-            cout << "[AVISO] Condicion baja puede afectar el rendimiento." << endl;
-        }
-        cout << "Resultado Final: " << home.name << " " << homeGoals << " - " << awayGoals << " " << away.name << endl;
-        cout << "Estadisticas: Tiros " << homeShots << "-" << awayShots
-             << ", Tiros al arco " << homeShotsOn << "-" << awayShotsOn
-             << ", Posesion " << homePoss << "%-" << awayPoss << "%"
-             << ", Corners " << homeCorners << "-" << awayCorners << endl;
+    reportLines.push_back("--- Partido ---");
+    reportLines.push_back(home.name + " vs " + away.name);
+    reportLines.push_back("Tacticas: " + home.tactics + " (" + home.formation + ") vs " +
+                          away.tactics + " (" + away.formation + ")");
+    reportLines.push_back("Instrucciones: " + home.matchInstruction + " vs " + away.matchInstruction);
+    if (keyMatch) reportLines.push_back("[PARTIDO CLAVE]");
+    if (neutralVenue) reportLines.push_back("Sede: Cancha neutral");
+    reportLines.push_back("Clima: " + weather.name);
+    reportLines.push_back("Condicion promedio: " + to_string(homeStam) + " vs " + to_string(awayStam));
+    reportLines.push_back("Contexto: prestigio " + to_string(teamPrestigeScore(home)) + "-" +
+                          to_string(teamPrestigeScore(away)) +
+                          " | apoyo local " + to_string(homeCrowd) + "-" + to_string(awayCrowd) +
+                          " | recuperaciones " + to_string(homeRecovery) + "-" + to_string(awayRecovery));
+    if (homeStam < 60 || awayStam < 60) {
+        warnings.push_back("Condicion baja puede afectar el rendimiento.");
     }
+    reportLines.push_back("Resultado Final: " + home.name + " " + to_string(homeGoals) + " - " +
+                          to_string(awayGoals) + " " + away.name);
+    reportLines.push_back("Estadisticas: Tiros " + to_string(homeShots) + "-" + to_string(awayShots) +
+                          ", Tiros al arco " + to_string(homeShotsOn) + "-" + to_string(awayShotsOn) +
+                          ", Posesion " + to_string(homePoss) + "%-" + to_string(awayPoss) + "%" +
+                          ", Corners " + to_string(homeCorners) + "-" + to_string(awayCorners));
 
     home.goalsFor += homeGoals;
     home.goalsAgainst += awayGoals;
@@ -1043,20 +1041,21 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
     home.redCards += redHome;
     away.redCards += redAway;
 
+    string verdict;
     if (homeGoals > awayGoals) {
         home.points += 3;
         home.wins++;
         away.losses++;
         home.addHeadToHeadPoints(away.name, 3);
         away.addHeadToHeadPoints(home.name, 0);
-        if (verbose) cout << "Ganaste!" << endl;
+        verdict = "Ganaste!";
     } else if (homeGoals < awayGoals) {
         away.points += 3;
         away.wins++;
         home.losses++;
         home.addHeadToHeadPoints(away.name, 0);
         away.addHeadToHeadPoints(home.name, 3);
-        if (verbose) cout << "Perdiste." << endl;
+        verdict = "Perdiste.";
     } else {
         home.points += 1;
         away.points += 1;
@@ -1064,8 +1063,9 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
         away.draws++;
         home.addHeadToHeadPoints(away.name, 1);
         away.addHeadToHeadPoints(home.name, 1);
-        if (verbose) cout << "Empate." << endl;
+        verdict = "Empate.";
     }
+    reportLines.push_back(verdict);
 
     int deltaHome = 0;
     int deltaAway = 0;
@@ -1101,32 +1101,45 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
 
     for (int idx : homeParticipants) {
         if (idx >= 0 && idx < static_cast<int>(home.players.size())) {
-            simulateInjury(home.players[idx], home.tactics, verbose, eventsPtr);
+            simulateInjury(home.players[idx], home.tactics, false, eventsPtr);
         }
     }
     for (int idx : awayParticipants) {
         if (idx >= 0 && idx < static_cast<int>(away.players.size())) {
-            simulateInjury(away.players[idx], away.tactics, verbose, eventsPtr);
+            simulateInjury(away.players[idx], away.tactics, false, eventsPtr);
         }
     }
     match_internal::applyIntensityInjuryRisk(home, homeParticipants, eventsPtr);
     match_internal::applyIntensityInjuryRisk(away, awayParticipants, eventsPtr);
 
-    applyDevelopment(home, homeParticipants, verbose);
-    applyDevelopment(away, awayParticipants, verbose);
+    applyDevelopment(home, homeParticipants, eventsPtr);
+    applyDevelopment(away, awayParticipants, eventsPtr);
     updateMatchForm(home, homeParticipants, homeGoals, awayGoals, keyMatch);
     updateMatchForm(away, awayParticipants, awayGoals, homeGoals, keyMatch);
 
     match_internal::applyMatchFatigue(home, homeParticipants, home.tactics);
     match_internal::applyMatchFatigue(away, awayParticipants, away.tactics);
 
-    if (verbose && !events.empty()) {
+    return {homeGoals, awayGoals, homeShots, awayShots, homePoss, awayPoss, homeSubs, awaySubs,
+            homeCorners, awayCorners, weather.name, warnings, reportLines, events, verdict};
+}
+
+MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool neutralVenue) {
+    MatchResult result = simulateMatch(home, away, keyMatch, neutralVenue);
+    if (!verbose) return result;
+
+    cout << endl;
+    for (const auto& warning : result.warnings) {
+        cout << "[AVISO] " << warning << endl;
+    }
+    for (const auto& line : result.reportLines) {
+        cout << line << endl;
+    }
+    if (!result.events.empty()) {
         cout << "\nEventos:" << endl;
-        for (const auto& e : events) {
-            cout << "- " << e << endl;
+        for (const auto& event : result.events) {
+            cout << "- " << event << endl;
         }
     }
-
-    return {homeGoals, awayGoals, homeShots, awayShots, homePoss, awayPoss, homeSubs, awaySubs,
-            homeCorners, awayCorners, weather.name};
+    return result;
 }

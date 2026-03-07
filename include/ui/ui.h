@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "models.h"
+#include "engine/models.h"
 
 struct IncomingOfferDecision {
     int action = 3;

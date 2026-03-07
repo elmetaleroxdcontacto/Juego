@@ -1,116 +1,121 @@
-﻿# ⚽ Football Manager Simulation (C++)
+# ⚽ C++ Football Manager Simulator
 
-![Version](https://img.shields.io/badge/version-0.1.0--alpha-blue)
-![Language](https://img.shields.io/badge/language-C++-brightgreen)
-![Status](https://img.shields.io/badge/status-active%20development-orange)
-![Contributions](https://img.shields.io/badge/contributions-welcome-success)
+A football management simulation game developed in **C++**, inspired by games like **Football Manager**.
 
-A **Football Manager style simulation game** built in **C++**.
-
-The goal of this project is to create a deep football management experience including leagues, teams, tactics, transfers, and match simulations.
-
-This project is **open source** and collaborators are welcome.
+The project focuses on **simulation systems, football logic, management gameplay, and long-term career progression**. It currently centers on the **Chilean league structure for the 2026 season** and is being actively refactored into a more scalable open source codebase.
 
 ---
 
 # 📌 Project Status
 
-🚧 **Alpha Development**
+🚧 **Active Development**
 
-The core systems of the game are currently under development.
-Many systems are experimental and will evolve as the project grows.
+The game is playable and already contains a substantial management simulation core, while the architecture is being reorganized into a cleaner `src/` + `include/` layout.
 
----
+Current focus areas include:
 
-# 🎮 Current Features
-
-Implemented or in progress:
-
-* League system
-* Team structure
-* Player database
-* Basic match simulation
-* Season progression
-* Basic statistics
+- Match simulation refactor
+- Tactical systems and AI structure
+- Transfer market architecture
+- Career mode progression
+- Save/data organization
+- Repository cleanup and contributor readiness
 
 ---
 
-# 🚀 Planned Features
+# 🎮 Features
 
-Future development goals:
+## Current Systems
 
-* Transfer market
-* Tactical system
-* Player development and aging
-* Financial system
-* Staff and scouting
-* Training system
-* Save / Load system
-* UI improvements
-* Multiple leagues
-* Modding support
+- Career mode
+- Chilean league system with multiple divisions
+- Promotions and relegations
+- League tables and seasonal progression
+- Match simulation with tactical and contextual modifiers
+- Team management
+- Player attributes, morale, chemistry and development data
+- Injuries, suspensions and fitness recovery
+- Transfer market, pre-contracts and negotiations
+- Scouting, shortlist and scouting reports
+- Club finances and upgrade systems
+- Board confidence and objectives
+- Save / Load system
+- Match analysis and weekly reporting
+- Windows GUI plus console fallback
+- Validation suite for data and save integrity
 
 ---
 
-# 🗺 Development Roadmap
+# 🏆 Leagues Implemented
 
-### Phase 1 – Core Systems
+The project currently focuses on the **Chilean football league system**.
 
-* Player structure
-* Team management
-* League system
-* Match simulation engine
+Supported divisions:
 
-### Phase 2 – Gameplay Systems
+- Primera División
+- Primera B
+- Segunda División Profesional
+- Tercera División A
+- Tercera División B
 
-* Transfers
-* Tactics
-* Player attributes and progression
-* Match statistics
+Each league is prepared with:
 
-### Phase 3 – Advanced Systems
+- Promotion and relegation rules
+- Standings and season handling
+- Division-specific competition behavior
+- Squad and data loading from external files under `data/LigaChilena/`
 
-* Finances
-* Staff and scouting
-* Training system
-* Dynamic seasons
+---
 
-### Phase 4 – Expansion
+# 🧠 Planned Improvements
 
-* Multiple leagues
-* Mod support
-* UI improvements
+The next major improvements planned for the project are:
+
+- Further match engine modularization
+- Stronger tactical cause/effect
+- More advanced transfer negotiation flow
+- Better rival AI adaptation
+- Deeper player progression and youth generation
+- Cleaner service layer separation from UI
+- More externalized data formats and mod support
+- Expanded validation and test coverage
 
 ---
 
 # 🛠 Technologies
 
-Current stack:
+The project is currently built with:
 
-* **C++**
-* **Git / GitHub**
+- **C++17**
+- Standard Library
+- Windows GUI APIs for the native desktop client
+- CMake
+- Batch build tooling for Windows convenience
+- Git / GitHub
 
-Possible future integrations:
+It also includes:
 
-* GUI system
-* Database support
-* External modding tools
+- Console interface fallback
+- External text/CSV/JSON-style data files for teams and players
+- A validation mode for structural consistency checks
 
 ---
 
 # 📂 Project Structure
 
-Current structure:
+Current repository structure:
 
-```
+```text
 FootballManagerGame/
+├── data/
+│   └── LigaChilena/
+├── docs/
+│   ├── ARCHITECTURE.md
+│   └── ROADMAP.md
 ├── include/
 │   ├── career/
-│   ├── simulation/
-│   └── transfers/
-├── src/
-│   ├── career/
 │   ├── competition/
+│   ├── engine/
 │   ├── gui/
 │   ├── io/
 │   ├── simulation/
@@ -118,114 +123,131 @@ FootballManagerGame/
 │   ├── ui/
 │   ├── utils/
 │   └── validators/
-├── data/
-│   └── LigaChilena/
 ├── saves/
+├── src/
+│   ├── career/
+│   ├── competition/
+│   ├── engine/
+│   ├── gui/
+│   ├── io/
+│   ├── simulation/
+│   ├── transfers/
+│   ├── ui/
+│   ├── utils/
+│   └── validators/
 ├── tests/
 ├── build.bat
 ├── CMakeLists.txt
-└── *.cpp / *.h
+└── README.md
 ```
 
-Note:
-The project is currently in a staged migration. Some legacy root `.cpp` / `.h` files remain active while shared logic is being moved into `src/` and `include/`.
+Compatibility bridge headers are still present in `include/` while the migration away from legacy include paths is completed.
 
 ---
 
-# ▶ How to Run
+# 🚀 How to Build
 
-1. Clone the repository
+## Clone the repository
 
-```
+```bash
 git clone https://github.com/elmetaleroxdcontacto/Juego.git
+cd Juego
 ```
 
-2. Open the project with your preferred C++ IDE
+## Recommended: Build with CMake
 
-Examples:
+```bash
+cmake -S . -B build-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+cmake --build build-cmake
+```
 
-* Visual Studio
-* Code::Blocks
-* CLion
+The executable is generated under:
 
-3. Compile the project
+```text
+build-cmake/bin/
+```
 
-Windows batch build:
+## Windows Convenience Build
+
+If you prefer the existing batch workflow:
 
 ```powershell
 build.bat
 ```
 
-Build only, without opening the game:
+Build without launching the game:
 
 ```powershell
 $env:FM_SKIP_RUN='1'
 cmd /c build.bat
 ```
 
-If CMake is installed:
-
-```powershell
-cmake -S . -B build-cmake
-cmake --build build-cmake
-```
-
-4. Run the executable
+`build.bat` will try CMake first and fall back to direct `g++` compilation if CMake is not usable in the current environment.
 
 ---
 
-# 🤝 Contributing
+# 🎯 Project Goals
+
+The main goal is to build a **deep football management simulator in C++** with:
+
+- Realistic football systems
+- Long-term career gameplay
+- Scalable architecture
+- Contributor-friendly project structure
+- Clear separation between simulation logic and UI
+
+The project is also intended to be a solid open source base for experimenting with:
+
+- Match engines
+- Tactical systems
+- Sports simulation architecture
+- Data-driven league/gameplay systems
+
+---
+
+## 🤝 Contributing
 
 Contributions are welcome!
 
 We are looking for contributors interested in:
 
-* C++ development
-* Gameplay systems
-* Data creation (teams, players, leagues)
-* UI / UX
-* Testing and balancing
+- C++ development
+- Gameplay systems
+- Data creation (teams, players, leagues)
+- UI / UX
+- Testing and balancing
 
-### How to contribute
+### How to Contribute
 
 1. Fork the repository
-2. Create a branch
+2. Create a new branch
 3. Make your changes
 4. Submit a Pull Request
 
----
-
-# 📋 Help Wanted
+## 📋 Help Wanted
 
 Some areas currently needing work:
 
-* Improve match simulation
-* Transfer system
-* Player attributes system
-* Statistics system
-* Code refactoring
+- Improve match simulation
+- Transfer system improvements
+- Player attributes system
+- Statistics and analytics system
+- Code refactoring and optimization
 
-Check the **Issues section** for available tasks.
+Check the **Issues** section for available tasks.
 
----
+## ⭐ Support the Project
 
-# ⭐ Support the Project
+If you like the project you can help by:
 
-If you like the project:
+- ⭐ Starring the repository
+- Sharing feedback
+- Reporting bugs
+- Contributing to development
 
-* ⭐ Star the repository
-* Share feedback
-* Contribute to development
-
----
-
-# 📬 Contact
+## 📬 Contact
 
 If you want to collaborate, open an **Issue** or contact through GitHub.
 
 Repository:
 https://github.com/elmetaleroxdcontacto/Juego
-
----
-
-⚽ *Building a football management simulation from scratch.*

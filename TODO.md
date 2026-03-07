@@ -657,3 +657,40 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Dividir `app_services.cpp` por dominios como carrera, finanzas, reportes y mercado.
 - Avanzar hacia datos mas moddeables para ligas, equipos y plantillas.
 - Consolidar la reorganizacion fisica de archivos para que la mayor parte del codigo viva ya en `src/` e `include/`.
+
+## Cambios recientes (2026-03-07) - Repo, build y presentacion open source
+- Reorganizado el repositorio para que el codigo compilable principal viva en `src/` e `include/`.
+- Movidos los modulos raiz a carpetas por dominio:
+  - `src/engine`, `src/career`, `src/simulation`, `src/transfers`, `src/competition`, `src/io`, `src/ui`, `src/gui`, `src/utils`, `src/validators`
+  - `include/engine`, `include/career`, `include/simulation`, `include/transfers`, `include/competition`, `include/io`, `include/ui`, `include/gui`, `include/utils`, `include/validators`
+- Agregados headers puente en `include/` para mantener compatibilidad temporal con includes legacy mientras termina la migracion.
+- `io.cpp` ahora devuelve advertencias estructuradas al cargar divisiones, en vez de imprimir avisos directamente desde la logica de carga.
+- `Career` ahora conserva `loadWarnings` para que consola, GUI o servicios decidan como presentar esas advertencias.
+- `MatchResult` ahora guarda:
+  - advertencias
+  - lineas de reporte
+  - eventos del partido
+  - veredicto final
+- `simulation.cpp` ahora expone una base mas limpia para separar simulacion y presentacion:
+  - `simulateMatch(...)` devuelve datos del partido sin necesidad de imprimir
+  - `playMatch(...)` queda como wrapper compatible para flujo legacy con salida visible
+- `utils.cpp` deja preparada una capa de paths/directorios con implementacion Windows y POSIX, reduciendo acoplamiento innecesario a `windows.h`.
+- `build.bat` ahora:
+  - intenta usar CMake primero
+  - cae a compilacion directa con `g++` si CMake no es usable en el entorno
+  - compila solo desde `src/`
+- `CMakeLists.txt` fue rehecho para reflejar la nueva estructura modular del proyecto.
+- `.gitignore` fue ampliado para ignorar:
+  - builds
+  - artefactos de CMake
+  - ejecutables y objetos
+  - saves versionables accidentales
+- Eliminado el save legacy `career_save.txt` desde la raiz del repositorio.
+- Agregada documentacion nueva en `docs/`:
+  - `ARCHITECTURE.md`
+  - `ROADMAP.md`
+- `README.md` reescrito por completo en ingles, alineado con el estado real del proyecto y pensado para GitHub/open source.
+- Verificaciones:
+  - `build.bat` ejecutado con `FM_SKIP_RUN=1` y compilacion correcta por fallback directo
+  - `FootballManager.exe --validate` ejecutado con resultado sin fallas
+  - CMake configurado como camino principal, pero en este entorno concreto falla por un problema externo del toolchain MinGW (`ar.exe` no puede renombrar archivos durante la prueba minima del compilador)

@@ -15,9 +15,16 @@
 
 using namespace std;
 
+static void showLoadWarnings(const Career& career) {
+    for (const auto& warning : career.loadWarnings) {
+        cout << "[AVISO] " << warning << endl;
+    }
+}
+
 static int runConsoleApp() {
     Career career;
     career.initializeLeague();
+    showLoadWarnings(career);
 
     while (true) {
         displayMainMenu();
@@ -38,6 +45,7 @@ static int runConsoleApp() {
             bool careerStarted = false;
             if (careerStartChoice == 1) {
                 career.initializeLeague();
+                showLoadWarnings(career);
                 if (career.loadCareer()) {
                     cout << "Carrera cargada exitosamente." << endl;
                     cout << "Temporada " << career.currentSeason << ", Semana " << career.currentWeek << endl;
@@ -47,6 +55,7 @@ static int runConsoleApp() {
                 }
             } else if (careerStartChoice == 2) {
                 career.initializeLeague(true);
+                showLoadWarnings(career);
                 if (career.divisions.empty()) {
                     cout << "No se encontraron divisiones disponibles." << endl;
                     continue;

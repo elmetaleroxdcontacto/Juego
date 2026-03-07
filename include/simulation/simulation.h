@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "models.h"
+#include "engine/models.h"
 
 #include <string>
 #include <vector>
@@ -15,4 +15,5 @@ void healInjuries(Team& team, bool verbose);
 void recoverFitness(Team& team, int days);
 void assignGoalsAndAssists(Team& team, int goals, const std::vector<int>& xi, const std::string& teamName, std::vector<std::string>* events);
 int teamPenaltyStrength(const Team& team);
+MatchResult simulateMatch(Team& home, Team& away, bool keyMatch = false, bool neutralVenue = false);
 MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch = false, bool neutralVenue = false);

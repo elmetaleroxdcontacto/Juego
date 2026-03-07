@@ -328,6 +328,7 @@ ServiceResult startCareerService(Career& career,
     career.resetSeason();
     result.ok = true;
     result.messages.push_back("Nueva carrera iniciada con " + career.myTeam->name + ".");
+    result.messages.insert(result.messages.end(), career.loadWarnings.begin(), career.loadWarnings.end());
     return result;
 }
 
@@ -338,6 +339,7 @@ ServiceResult loadCareerService(Career& career) {
     result.messages.push_back(result.ok
                                   ? "Carrera cargada: " + (career.myTeam ? career.myTeam->name : string("Sin club")) + "."
                                   : "No se encontro una carrera guardada.");
+    result.messages.insert(result.messages.end(), career.loadWarnings.begin(), career.loadWarnings.end());
     return result;
 }
 
