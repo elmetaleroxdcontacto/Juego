@@ -34,16 +34,53 @@ enum ControlId {
     IDC_SUMMARY_EDIT,
     IDC_NEWS_LIST,
     IDC_TABLE_LIST,
-    IDC_SQUAD_LIST
+    IDC_SQUAD_LIST,
+    IDC_TRANSFER_LIST,
+    IDC_VIEW_OVERVIEW_BUTTON,
+    IDC_VIEW_COMPETITION_BUTTON,
+    IDC_VIEW_BOARD_BUTTON,
+    IDC_VIEW_CLUB_BUTTON,
+    IDC_VIEW_SCOUTING_BUTTON,
+    IDC_NEGOTIATION_COMBO,
+    IDC_PROMISE_COMBO,
+    IDC_SCOUT_BUTTON,
+    IDC_SHORTLIST_BUTTON,
+    IDC_FOLLOW_SHORTLIST_BUTTON,
+    IDC_BUY_BUTTON,
+    IDC_PRECONTRACT_BUTTON,
+    IDC_RENEW_BUTTON,
+    IDC_SELL_BUTTON,
+    IDC_PLAN_BUTTON,
+    IDC_INSTRUCTION_BUTTON,
+    IDC_YOUTH_UPGRADE_BUTTON,
+    IDC_TRAINING_UPGRADE_BUTTON,
+    IDC_SCOUTING_UPGRADE_BUTTON,
+    IDC_STADIUM_UPGRADE_BUTTON
+};
+
+enum class SummaryMode {
+    Overview,
+    Competition,
+    Board,
+    Club,
+    Scouting
 };
 
 struct AppState {
     HINSTANCE instance = nullptr;
     HWND window = nullptr;
     HFONT font = nullptr;
+    HFONT titleFont = nullptr;
+    HFONT sectionFont = nullptr;
+    HFONT monoFont = nullptr;
+    HBRUSH backgroundBrush = nullptr;
+    HBRUSH panelBrush = nullptr;
+    HBRUSH headerBrush = nullptr;
+    HBRUSH inputBrush = nullptr;
 
     Career career;
     bool suppressComboEvents = false;
+    SummaryMode summaryMode = SummaryMode::Overview;
 
     HWND divisionCombo = nullptr;
     HWND teamCombo = nullptr;
@@ -55,6 +92,7 @@ struct AppState {
     HWND validateButton = nullptr;
     HWND infoLabel = nullptr;
     HWND statusLabel = nullptr;
+    HWND summaryLabel = nullptr;
     HWND summaryEdit = nullptr;
     HWND newsLabel = nullptr;
     HWND newsList = nullptr;
@@ -62,7 +100,108 @@ struct AppState {
     HWND tableList = nullptr;
     HWND squadLabel = nullptr;
     HWND squadList = nullptr;
+    HWND transferLabel = nullptr;
+    HWND transferList = nullptr;
+    HWND overviewButton = nullptr;
+    HWND competitionButton = nullptr;
+    HWND boardButton = nullptr;
+    HWND clubButton = nullptr;
+    HWND scoutingButton = nullptr;
+    HWND negotiationCombo = nullptr;
+    HWND promiseCombo = nullptr;
+    HWND scoutActionButton = nullptr;
+    HWND shortlistButton = nullptr;
+    HWND followShortlistButton = nullptr;
+    HWND buyButton = nullptr;
+    HWND preContractButton = nullptr;
+    HWND renewButton = nullptr;
+    HWND sellButton = nullptr;
+    HWND planButton = nullptr;
+    HWND instructionButton = nullptr;
+    HWND youthUpgradeButton = nullptr;
+    HWND trainingUpgradeButton = nullptr;
+    HWND scoutingUpgradeButton = nullptr;
+    HWND stadiumUpgradeButton = nullptr;
 };
+
+constexpr COLORREF kThemeBg = RGB(8, 17, 24);
+constexpr COLORREF kThemeHeader = RGB(12, 33, 28);
+constexpr COLORREF kThemePanel = RGB(18, 29, 40);
+constexpr COLORREF kThemePanelAlt = RGB(13, 23, 32);
+constexpr COLORREF kThemeInput = RGB(12, 20, 29);
+constexpr COLORREF kThemeAccent = RGB(210, 176, 84);
+constexpr COLORREF kThemeAccentGreen = RGB(42, 137, 96);
+constexpr COLORREF kThemeText = RGB(236, 239, 232);
+constexpr COLORREF kThemeMuted = RGB(145, 164, 167);
+constexpr COLORREF kThemeDanger = RGB(191, 87, 87);
+constexpr COLORREF kThemeSelection = RGB(68, 92, 108);
+
+RECT childRectOnParent(HWND child, HWND parent) {
+    RECT rect{};
+    if (!child || !parent) return rect;
+    GetWindowRect(child, &rect);
+    MapWindowPoints(nullptr, parent, reinterpret_cast<LPPOINT>(&rect), 2);
+    return rect;
+}
+
+RECT expandedRect(RECT rect, int dx, int dy) {
+    rect.left -= dx;
+    rect.top -= dy;
+    rect.right += dx;
+    rect.bottom += dy;
+    return rect;
+}
+
+void drawRoundedPanel(HDC hdc, const RECT& rect, COLORREF fill, COLORREF border, int radius = 16) {
+    HBRUSH brush = CreateSolidBrush(fill);
+    HPEN pen = CreatePen(PS_SOLID, 1, border);
+    HGDIOBJ oldBrush = SelectObject(hdc, brush);
+    HGDIOBJ oldPen = SelectObject(hdc, pen);
+    RoundRect(hdc, rect.left, rect.top, rect.right, rect.bottom, radius, radius);
+    SelectObject(hdc, oldBrush);
+    SelectObject(hdc, oldPen);
+    DeleteObject(brush);
+    DeleteObject(pen);
+}
+
+void drawPitchOverlay(HDC hdc, const RECT& rect) {
+    HPEN pen = CreatePen(PS_SOLID, 1, RGB(42, 88, 68));
+    HGDIOBJ oldPen = SelectObject(hdc, pen);
+    HGDIOBJ oldBrush = SelectObject(hdc, GetStockObject(HOLLOW_BRUSH));
+    Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+    int midX = (rect.left + rect.right) / 2;
+    MoveToEx(hdc, midX, rect.top, nullptr);
+    LineTo(hdc, midX, rect.bottom);
+    int radius = std::min((rect.right - rect.left) / 8, (rect.bottom - rect.top) / 4);
+    Ellipse(hdc, midX - radius, (rect.top + rect.bottom) / 2 - radius, midX + radius, (rect.top + rect.bottom) / 2 + radius);
+    SelectObject(hdc, oldBrush);
+    SelectObject(hdc, oldPen);
+    DeleteObject(pen);
+}
+
+bool isSummaryButtonId(int id) {
+    return id == IDC_VIEW_OVERVIEW_BUTTON || id == IDC_VIEW_COMPETITION_BUTTON || id == IDC_VIEW_BOARD_BUTTON ||
+           id == IDC_VIEW_CLUB_BUTTON || id == IDC_VIEW_SCOUTING_BUTTON;
+}
+
+bool isUpgradeButtonId(int id) {
+    return id == IDC_YOUTH_UPGRADE_BUTTON || id == IDC_TRAINING_UPGRADE_BUTTON ||
+           id == IDC_SCOUTING_UPGRADE_BUTTON || id == IDC_STADIUM_UPGRADE_BUTTON;
+}
+
+bool isPrimaryButtonId(int id) {
+    return id == IDC_NEW_CAREER_BUTTON || id == IDC_SIMULATE_BUTTON || id == IDC_BUY_BUTTON ||
+           id == IDC_RENEW_BUTTON || id == IDC_SCOUT_BUTTON;
+}
+
+bool isActiveSummaryButton(const AppState& state, int id) {
+    if (id == IDC_VIEW_OVERVIEW_BUTTON) return state.summaryMode == SummaryMode::Overview;
+    if (id == IDC_VIEW_COMPETITION_BUTTON) return state.summaryMode == SummaryMode::Competition;
+    if (id == IDC_VIEW_BOARD_BUTTON) return state.summaryMode == SummaryMode::Board;
+    if (id == IDC_VIEW_CLUB_BUTTON) return state.summaryMode == SummaryMode::Club;
+    if (id == IDC_VIEW_SCOUTING_BUTTON) return state.summaryMode == SummaryMode::Scouting;
+    return false;
+}
 
 std::wstring utf8ToWide(const std::string& text) {
     if (text.empty()) return std::wstring();
@@ -156,6 +295,47 @@ std::string comboText(HWND combo) {
     return wideToUtf8(buffer);
 }
 
+int selectedListViewRow(HWND list) {
+    return ListView_GetNextItem(list, -1, LVNI_SELECTED);
+}
+
+std::string listViewText(HWND list, int row, int subItem) {
+    if (row < 0) return std::string();
+    wchar_t buffer[512]{};
+    LVITEMW item{};
+    item.iSubItem = subItem;
+    item.pszText = buffer;
+    item.cchTextMax = static_cast<int>(sizeof(buffer) / sizeof(buffer[0]));
+    SendMessageW(list, LVM_GETITEMTEXTW, static_cast<WPARAM>(row), reinterpret_cast<LPARAM>(&item));
+    return wideToUtf8(buffer);
+}
+
+std::string summaryTitleFor(SummaryMode mode) {
+    switch (mode) {
+        case SummaryMode::Overview: return "Resumen";
+        case SummaryMode::Competition: return "Competicion";
+        case SummaryMode::Board: return "Directiva";
+        case SummaryMode::Club: return "Club y Finanzas";
+        case SummaryMode::Scouting: return "Scouting";
+    }
+    return "Resumen";
+}
+
+NegotiationProfile selectedNegotiationProfile(const AppState& state) {
+    int index = comboIndex(state.negotiationCombo);
+    if (index <= 0) return NegotiationProfile::Safe;
+    if (index == 2) return NegotiationProfile::Aggressive;
+    return NegotiationProfile::Balanced;
+}
+
+NegotiationPromise selectedNegotiationPromise(const AppState& state) {
+    int index = comboIndex(state.promiseCombo);
+    if (index == 1) return NegotiationPromise::Starter;
+    if (index == 2) return NegotiationPromise::Rotation;
+    if (index == 3) return NegotiationPromise::Prospect;
+    return NegotiationPromise::None;
+}
+
 std::string formatMoney(long long value) {
     bool negative = value < 0;
     unsigned long long absValue = static_cast<unsigned long long>(negative ? -value : value);
@@ -166,6 +346,18 @@ std::string formatMoney(long long value) {
         out += digits[i];
     }
     return std::string(negative ? "-$" : "$") + out;
+}
+
+std::string shortInstructionLabel(const std::string& value) {
+    if (value == "Laterales altos") return "Instr LA";
+    if (value == "Bloque bajo") return "Instr BB";
+    if (value == "Balon parado") return "Instr BP";
+    if (value == "Presion final") return "Instr PF";
+    if (value == "Por bandas") return "Instr PB";
+    if (value == "Juego directo") return "Instr JD";
+    if (value == "Contra-presion") return "Instr CP";
+    if (value == "Pausar juego") return "Instr PJ";
+    return "Instr EQ";
 }
 
 std::string boardStatusLabel(int confidence) {
@@ -279,6 +471,7 @@ LeagueTable relevantTable(const Career& career) {
 
 void setStatus(AppState& state, const std::string& text) {
     setWindowTextUtf8(state.statusLabel, text);
+    if (state.window) InvalidateRect(state.statusLabel, nullptr, TRUE);
 }
 
 void clearListView(HWND list) {
@@ -322,9 +515,32 @@ void refreshHeader(AppState& state) {
     bool hasCareer = state.career.myTeam != nullptr;
     EnableWindow(state.saveButton, hasCareer);
     EnableWindow(state.simulateButton, hasCareer);
+    EnableWindow(state.overviewButton, hasCareer);
+    EnableWindow(state.competitionButton, hasCareer);
+    EnableWindow(state.boardButton, hasCareer);
+    EnableWindow(state.clubButton, hasCareer);
+    EnableWindow(state.scoutingButton, hasCareer);
+    EnableWindow(state.negotiationCombo, hasCareer);
+    EnableWindow(state.promiseCombo, hasCareer);
+    EnableWindow(state.scoutActionButton, hasCareer);
+    EnableWindow(state.shortlistButton, hasCareer);
+    EnableWindow(state.followShortlistButton, hasCareer);
+    EnableWindow(state.buyButton, hasCareer);
+    EnableWindow(state.preContractButton, hasCareer);
+    EnableWindow(state.renewButton, hasCareer);
+    EnableWindow(state.sellButton, hasCareer);
+    EnableWindow(state.planButton, hasCareer);
+    EnableWindow(state.instructionButton, hasCareer);
+    EnableWindow(state.youthUpgradeButton, hasCareer);
+    EnableWindow(state.trainingUpgradeButton, hasCareer);
+    EnableWindow(state.scoutingUpgradeButton, hasCareer);
+    EnableWindow(state.stadiumUpgradeButton, hasCareer);
+    setWindowTextUtf8(state.instructionButton,
+                      hasCareer ? shortInstructionLabel(state.career.myTeam->matchInstruction) : "Instruccion");
 
     if (!hasCareer) {
         setWindowTextUtf8(state.infoLabel, "Selecciona division, equipo y manager para crear una carrera o cargar un guardado.");
+        setWindowTextUtf8(state.summaryLabel, "Resumen");
         return;
     }
 
@@ -338,11 +554,32 @@ void refreshHeader(AppState& state) {
         << " | Presupuesto " << formatMoney(team.budget)
         << " | Directiva " << boardStatusLabel(state.career.boardConfidence);
     setWindowTextUtf8(state.infoLabel, out.str());
+    setWindowTextUtf8(state.summaryLabel, summaryTitleFor(state.summaryMode));
+    if (state.window) InvalidateRect(state.window, nullptr, FALSE);
 }
 
 void refreshSummary(AppState& state) {
     if (!state.career.myTeam) {
+        setWindowTextUtf8(state.summaryLabel, "Resumen");
         setWindowTextUtf8(state.summaryEdit, "Crea una nueva carrera o carga una partida guardada para empezar.");
+        return;
+    }
+
+    setWindowTextUtf8(state.summaryLabel, summaryTitleFor(state.summaryMode));
+    if (state.summaryMode == SummaryMode::Competition) {
+        setWindowTextUtf8(state.summaryEdit, buildCompetitionSummaryService(state.career));
+        return;
+    }
+    if (state.summaryMode == SummaryMode::Board) {
+        setWindowTextUtf8(state.summaryEdit, buildBoardSummaryService(state.career));
+        return;
+    }
+    if (state.summaryMode == SummaryMode::Club) {
+        setWindowTextUtf8(state.summaryEdit, buildClubSummaryService(state.career));
+        return;
+    }
+    if (state.summaryMode == SummaryMode::Scouting) {
+        setWindowTextUtf8(state.summaryEdit, buildScoutingSummaryService(state.career));
         return;
     }
 
@@ -352,10 +589,31 @@ void refreshSummary(AppState& state) {
     int injured = 0;
     int suspended = 0;
     int totalFitness = 0;
+    int expiringContracts = 0;
+    int wantsToLeave = 0;
+    int incomingLoans = 0;
+    int outgoingLoans = 0;
+    int promisesAtRisk = 0;
+    int leaders = 0;
     for (const auto& player : team.players) {
         if (player.injured) injured++;
         if (player.matchesSuspended > 0) suspended++;
         totalFitness += player.fitness;
+        if (player.contractWeeks <= 12) expiringContracts++;
+        if (player.wantsToLeave) wantsToLeave++;
+        if (player.onLoan && !player.parentClub.empty()) incomingLoans++;
+        if (player.leadership >= 72 || playerHasTrait(player, "Lider")) leaders++;
+        if ((player.promisedRole == "Titular" && player.startsThisSeason + 2 < std::max(2, state.career.currentWeek * 2 / 3)) ||
+            (player.promisedRole == "Rotacion" && player.startsThisSeason + 1 < std::max(1, state.career.currentWeek / 3)) ||
+            (player.promisedRole == "Proyecto" && player.age <= 22 && player.startsThisSeason < std::max(1, state.career.currentWeek / 4))) {
+            promisesAtRisk++;
+        }
+    }
+    for (const auto& club : state.career.allTeams) {
+        if (&club == state.career.myTeam) continue;
+        for (const auto& player : club.players) {
+            if (player.onLoan && player.parentClub == team.name) outgoingLoans++;
+        }
     }
     int avgFitness = team.players.empty() ? 0 : totalFitness / static_cast<int>(team.players.size());
 
@@ -373,7 +631,8 @@ void refreshSummary(AppState& state) {
     out << "Tactica: " << team.tactics
         << " | Formacion: " << team.formation
         << " | Entrenamiento: " << team.trainingFocus
-        << " | Rotacion: " << team.rotationPolicy << "\r\n";
+        << " | Rotacion: " << team.rotationPolicy
+        << " | Instruccion: " << team.matchInstruction << "\r\n";
     out << "Presion " << team.pressingIntensity
         << " | Linea " << team.defensiveLine
         << " | Tempo " << team.tempo
@@ -384,6 +643,12 @@ void refreshSummary(AppState& state) {
         << " | Valor " << formatMoney(team.getSquadValue())
         << " | Condicion media " << avgFitness << "\r\n";
     out << "Bajas: " << injured << " lesionados | " << suspended << " suspendidos\r\n";
+    out << "Mercado: " << state.career.pendingTransfers.size() << " pendientes"
+        << " | " << expiringContracts << " contratos cortos"
+        << " | " << wantsToLeave << " quieren salir"
+        << " | Prestamos " << incomingLoans << "/" << outgoingLoans << "\r\n";
+    out << "Vestuario: lideres " << leaders
+        << " | promesas en riesgo " << promisesAtRisk << "\r\n";
     out << "Sponsor semanal: " << formatMoney(team.sponsorWeekly)
         << " | Deuda: " << formatMoney(team.debt) << "\r\n";
     if (!state.career.boardMonthlyObjective.empty()) {
@@ -452,7 +717,7 @@ void refreshNews(AppState& state) {
     }
 }
 
-std::string playerRole(const Team& team, int index, const std::vector<int>& xi, const std::vector<int>& bench) {
+std::string playerRole(const Team&, int index, const std::vector<int>& xi, const std::vector<int>& bench) {
     if (std::find(xi.begin(), xi.end(), index) != xi.end()) return "XI";
     if (std::find(bench.begin(), bench.end(), index) != bench.end()) return "Banco";
     return "Plantel";
@@ -472,6 +737,129 @@ std::string playerStatus(const Player& player) {
         out << flags[i];
     }
     return out.str();
+}
+
+std::string transferTypeFor(const PendingTransfer& move) {
+    if (move.preContract) return "Precontrato";
+    if (move.loan) return "Prestamo";
+    return "Pendiente";
+}
+
+struct TransferPreviewItem {
+    std::string type;
+    std::string player;
+    std::string club;
+    std::string detail;
+    std::string amount;
+};
+
+std::vector<TransferPreviewItem> buildTransferPreview(const Career& career) {
+    std::vector<TransferPreviewItem> rows;
+    if (!career.myTeam) return rows;
+
+    const Team& team = *career.myTeam;
+    rows.reserve(32);
+
+    for (const auto& move : career.pendingTransfers) {
+        std::ostringstream detail;
+        detail << transferTypeFor(move) << " para T" << move.effectiveSeason;
+        if (move.contractWeeks > 0) detail << " | contrato " << move.contractWeeks << " sem";
+        if (!move.promisedRole.empty()) detail << " | promesa " << move.promisedRole;
+        rows.push_back({
+            transferTypeFor(move),
+            move.playerName,
+            move.fromTeam + " -> " + move.toTeam,
+            detail.str(),
+            move.fee > 0 ? formatMoney(move.fee) : formatMoney(move.wage)
+        });
+    }
+
+    for (const auto& player : team.players) {
+        if (player.contractWeeks <= 12) {
+            rows.push_back({
+                "Contrato",
+                player.name,
+                team.name,
+                "Vence en " + std::to_string(player.contractWeeks) + " sem",
+                formatMoney(player.wage)
+            });
+        }
+        if (player.wantsToLeave) {
+            rows.push_back({
+                "Salida",
+                player.name,
+                team.name,
+                "Pidio salir del club",
+                formatMoney(player.value)
+            });
+        }
+        if (player.onLoan && !player.parentClub.empty()) {
+            rows.push_back({
+                "Prestamo",
+                player.name,
+                player.parentClub + " -> " + team.name,
+                std::to_string(std::max(0, player.loanWeeksRemaining)) + " sem restantes",
+                formatMoney(player.wage)
+            });
+        }
+    }
+
+    for (const auto& club : career.allTeams) {
+        if (&club == career.myTeam) continue;
+        for (const auto& player : club.players) {
+            if (player.onLoan && player.parentClub == team.name) {
+                rows.push_back({
+                    "Cedido",
+                    player.name,
+                    team.name + " -> " + club.name,
+                    std::to_string(std::max(0, player.loanWeeksRemaining)) + " sem restantes",
+                    formatMoney(player.value)
+                });
+            }
+        }
+    }
+
+    std::vector<std::pair<const Team*, int>> marketPool;
+    for (const auto& club : career.allTeams) {
+        if (&club == career.myTeam) continue;
+        if (club.players.size() <= 18) continue;
+        for (size_t i = 0; i < club.players.size(); ++i) {
+            const Player& player = club.players[i];
+            if (player.onLoan) continue;
+            if (player.age > 35) continue;
+            marketPool.push_back({&club, static_cast<int>(i)});
+        }
+    }
+    std::sort(marketPool.begin(), marketPool.end(), [](const auto& left, const auto& right) {
+        const Player& a = left.first->players[static_cast<size_t>(left.second)];
+        const Player& b = right.first->players[static_cast<size_t>(right.second)];
+        if (a.skill != b.skill) return a.skill > b.skill;
+        if (a.value != b.value) return a.value < b.value;
+        return a.name < b.name;
+    });
+    if (marketPool.size() > 10) marketPool.resize(10);
+
+    for (const auto& entry : marketPool) {
+        const Team* seller = entry.first;
+        const Player& player = seller->players[static_cast<size_t>(entry.second)];
+        long long ask = std::max(player.value, player.releaseClause * 65 / 100);
+        std::ostringstream detail;
+        detail << normalizePosition(player.position)
+               << " | Hab " << player.skill
+               << " | Pie " << player.preferredFoot
+               << " | Forma " << playerFormLabel(player)
+               << " | Contrato " << player.contractWeeks << " sem"
+               << " | " << joinStringValues(player.traits, ", ");
+        rows.push_back({
+            "Mercado",
+            player.name,
+            seller->name,
+            detail.str(),
+            formatMoney(ask)
+        });
+    }
+
+    return rows;
 }
 
 int positionRank(const Player& player) {
@@ -517,9 +905,67 @@ void refreshSquad(AppState& state) {
                            std::to_string(player.potential),
                            std::to_string(player.age),
                            std::to_string(player.fitness),
-                           std::to_string(player.goals),
-                           std::to_string(player.assists),
+                           player.developmentPlan,
+                           player.promisedRole,
                            playerStatus(player)
+                       });
+    }
+}
+
+void refreshTransfers(AppState& state) {
+    clearListView(state.transferList);
+    if (!state.career.myTeam) {
+        setWindowTextUtf8(state.transferLabel, "Centro de transferencias");
+        return;
+    }
+
+    const Team& team = *state.career.myTeam;
+    int expiringContracts = 0;
+    int wantsToLeave = 0;
+    int incomingLoans = 0;
+    int outgoingLoans = 0;
+
+    for (const auto& player : team.players) {
+        if (player.contractWeeks <= 12) expiringContracts++;
+        if (player.wantsToLeave) wantsToLeave++;
+        if (player.onLoan && !player.parentClub.empty()) incomingLoans++;
+    }
+    for (const auto& club : state.career.allTeams) {
+        if (&club == state.career.myTeam) continue;
+        for (const auto& player : club.players) {
+            if (player.onLoan && player.parentClub == team.name) outgoingLoans++;
+        }
+    }
+
+    std::ostringstream label;
+    label << "Centro de transferencias"
+          << " | Pendientes " << state.career.pendingTransfers.size()
+          << " | Contratos cortos " << expiringContracts
+          << " | Salidas " << wantsToLeave
+          << " | Prestamos " << incomingLoans << "/" << outgoingLoans;
+    setWindowTextUtf8(state.transferLabel, label.str());
+
+    std::vector<TransferPreviewItem> rows = buildTransferPreview(state.career);
+    if (rows.empty()) {
+        addListViewRow(state.transferList,
+                       {
+                           "Info",
+                           "-",
+                           team.name,
+                           "No hay movimientos ni objetivos destacados en este momento.",
+                           "-"
+                       });
+        return;
+    }
+
+    for (const auto& row : rows) {
+        addListViewRow(state.transferList,
+                       {
+                           row.type,
+                           row.player,
+                           row.club,
+                           row.detail,
+                           row.amount
                        });
     }
 }
@@ -565,6 +1011,7 @@ void refreshAll(AppState& state) {
     refreshNews(state);
     refreshTable(state);
     refreshSquad(state);
+    refreshTransfers(state);
 }
 
 void configureViews(AppState& state) {
@@ -591,14 +1038,33 @@ void configureViews(AppState& state) {
                                  {L"Pot", 55},
                                  {L"Edad", 55},
                                  {L"Cond", 55},
-                                 {L"G", 45},
-                                 {L"A", 45},
+                                 {L"Plan", 110},
+                                 {L"Prom", 90},
                                  {L"Estado", 200}
+                             });
+    configureListViewColumns(state.transferList,
+                             {
+                                 {L"Tipo", 110},
+                                 {L"Jugador", 220},
+                                 {L"Club", 260},
+                                 {L"Detalle", 430},
+                                 {L"Monto", 120}
                              });
 
     DWORD styles = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES;
     ListView_SetExtendedListViewStyle(state.tableList, styles);
     ListView_SetExtendedListViewStyle(state.squadList, styles);
+    ListView_SetExtendedListViewStyle(state.transferList, styles);
+    ListView_SetBkColor(state.tableList, kThemeInput);
+    ListView_SetBkColor(state.squadList, kThemeInput);
+    ListView_SetBkColor(state.transferList, kThemeInput);
+    ListView_SetTextBkColor(state.tableList, kThemeInput);
+    ListView_SetTextBkColor(state.squadList, kThemeInput);
+    ListView_SetTextBkColor(state.transferList, kThemeInput);
+    ListView_SetTextColor(state.tableList, kThemeText);
+    ListView_SetTextColor(state.squadList, kThemeText);
+    ListView_SetTextColor(state.transferList, kThemeText);
+    SendMessageW(state.newsList, LB_SETITEMHEIGHT, 0, 22);
 }
 
 void layoutWindow(AppState& state) {
@@ -607,6 +1073,8 @@ void layoutWindow(AppState& state) {
 
     const int padding = 12;
     const int rowHeight = 26;
+    const int smallButtonWidth = 74;
+    const int buttonGap = 6;
 
     MoveWindow(state.divisionCombo, 78, 12, 190, rowHeight, TRUE);
     MoveWindow(state.teamCombo, 332, 12, 240, rowHeight, TRUE);
@@ -618,33 +1086,83 @@ void layoutWindow(AppState& state) {
     MoveWindow(state.simulateButton, 356, 46, 150, rowHeight, TRUE);
     MoveWindow(state.validateButton, 514, 46, 120, rowHeight, TRUE);
 
-    MoveWindow(state.infoLabel, padding, 80, std::max(240, static_cast<int>(client.right) - padding * 2), 22, TRUE);
+    int actionY = 80;
+    int x = padding;
+    MoveWindow(state.overviewButton, x, actionY, smallButtonWidth, rowHeight, TRUE); x += smallButtonWidth + buttonGap;
+    MoveWindow(state.competitionButton, x, actionY, smallButtonWidth, rowHeight, TRUE); x += smallButtonWidth + buttonGap;
+    MoveWindow(state.boardButton, x, actionY, smallButtonWidth, rowHeight, TRUE); x += smallButtonWidth + buttonGap;
+    MoveWindow(state.clubButton, x, actionY, smallButtonWidth, rowHeight, TRUE); x += smallButtonWidth + buttonGap;
+    MoveWindow(state.scoutingButton, x, actionY, smallButtonWidth, rowHeight, TRUE); x += smallButtonWidth + buttonGap;
+    MoveWindow(state.negotiationCombo, x, actionY, 108, 180, TRUE); x += 108 + buttonGap;
+    MoveWindow(state.promiseCombo, x, actionY, 108, 180, TRUE);
 
-    int contentTop = 110;
+    int actionY2 = actionY + rowHeight + 8;
+    x = padding;
+    MoveWindow(state.scoutActionButton, x, actionY2, smallButtonWidth, rowHeight, TRUE); x += smallButtonWidth + buttonGap;
+    MoveWindow(state.shortlistButton, x, actionY2, smallButtonWidth, rowHeight, TRUE); x += smallButtonWidth + buttonGap;
+    MoveWindow(state.followShortlistButton, x, actionY2, smallButtonWidth, rowHeight, TRUE); x += smallButtonWidth + buttonGap;
+    MoveWindow(state.buyButton, x, actionY2, smallButtonWidth, rowHeight, TRUE); x += smallButtonWidth + buttonGap;
+    MoveWindow(state.preContractButton, x, actionY2, smallButtonWidth, rowHeight, TRUE); x += smallButtonWidth + buttonGap;
+    MoveWindow(state.renewButton, x, actionY2, smallButtonWidth, rowHeight, TRUE); x += smallButtonWidth + buttonGap;
+    MoveWindow(state.sellButton, x, actionY2, smallButtonWidth, rowHeight, TRUE);
+
+    int actionY3 = actionY2 + rowHeight + 8;
+    x = padding;
+    MoveWindow(state.planButton, x, actionY3, smallButtonWidth, rowHeight, TRUE); x += smallButtonWidth + buttonGap;
+    MoveWindow(state.instructionButton, x, actionY3, 120, rowHeight, TRUE); x += 120 + buttonGap;
+    MoveWindow(state.youthUpgradeButton, x, actionY3, smallButtonWidth, rowHeight, TRUE); x += smallButtonWidth + buttonGap;
+    MoveWindow(state.trainingUpgradeButton, x, actionY3, smallButtonWidth + 8, rowHeight, TRUE); x += smallButtonWidth + 8 + buttonGap;
+    MoveWindow(state.scoutingUpgradeButton, x, actionY3, smallButtonWidth, rowHeight, TRUE); x += smallButtonWidth + buttonGap;
+    MoveWindow(state.stadiumUpgradeButton, x, actionY3, smallButtonWidth + 6, rowHeight, TRUE);
+
+    MoveWindow(state.infoLabel, padding, 178, std::max(240, static_cast<int>(client.right) - padding * 2), 22, TRUE);
+
+    int contentTop = 208;
     int contentBottom = client.bottom - 36;
-    int contentHeight = std::max(220, contentBottom - contentTop);
+    int contentHeight = std::max(360, contentBottom - contentTop);
     int halfWidth = std::max(280, (static_cast<int>(client.right) - padding * 3) / 2);
-    int topHeight = std::max(180, contentHeight * 48 / 100);
-    int bottomTop = contentTop + topHeight + 30;
-    int bottomHeight = std::max(150, contentBottom - bottomTop);
+    int topHeight = std::max(170, contentHeight * 33 / 100);
+    int middleHeight = std::max(150, contentHeight * 24 / 100);
+    int middleTop = contentTop + topHeight + 30;
+    int transferTop = middleTop + middleHeight + 30;
+    int transferHeight = std::max(140, contentBottom - transferTop - 18);
 
+    MoveWindow(state.summaryLabel, padding, contentTop, halfWidth, 18, TRUE);
     MoveWindow(state.summaryEdit, padding, contentTop + 18, halfWidth, topHeight, TRUE);
     MoveWindow(state.newsLabel, padding * 2 + halfWidth, contentTop, halfWidth, 18, TRUE);
     MoveWindow(state.newsList, padding * 2 + halfWidth, contentTop + 18, halfWidth, topHeight, TRUE);
 
-    MoveWindow(state.tableLabel, padding, bottomTop, halfWidth, 18, TRUE);
-    MoveWindow(state.tableList, padding, bottomTop + 18, halfWidth, bottomHeight, TRUE);
+    MoveWindow(state.tableLabel, padding, middleTop, halfWidth, 18, TRUE);
+    MoveWindow(state.tableList, padding, middleTop + 18, halfWidth, middleHeight, TRUE);
 
-    MoveWindow(state.squadLabel, padding * 2 + halfWidth, bottomTop, halfWidth, 18, TRUE);
-    MoveWindow(state.squadList, padding * 2 + halfWidth, bottomTop + 18, halfWidth, bottomHeight, TRUE);
+    MoveWindow(state.squadLabel, padding * 2 + halfWidth, middleTop, halfWidth, 18, TRUE);
+    MoveWindow(state.squadList, padding * 2 + halfWidth, middleTop + 18, halfWidth, middleHeight, TRUE);
+
+    MoveWindow(state.transferLabel, padding, transferTop, std::max(240, static_cast<int>(client.right) - padding * 2), 18, TRUE);
+    MoveWindow(state.transferList, padding, transferTop + 18, std::max(240, static_cast<int>(client.right) - padding * 2), transferHeight, TRUE);
 
     MoveWindow(state.statusLabel, padding, client.bottom - 24, std::max(240, static_cast<int>(client.right) - padding * 2), 18, TRUE);
 }
 
 void initializeInterface(AppState& state) {
-    state.font = CreateFontW(-16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+    state.font = CreateFontW(-17, 0, 0, 0, FW_SEMIBOLD, FALSE, FALSE, FALSE,
                              DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-                             CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Segoe UI");
+                             CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Bahnschrift");
+    state.titleFont = CreateFontW(-34, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+                                  DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+                                  CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Bahnschrift SemiBold");
+    state.sectionFont = CreateFontW(-19, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+                                    DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+                                    CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Bahnschrift SemiBold");
+    state.monoFont = CreateFontW(-16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+                                 DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+                                 CLEARTYPE_QUALITY, FIXED_PITCH | FF_MODERN, L"Consolas");
+    state.backgroundBrush = CreateSolidBrush(kThemeBg);
+    state.panelBrush = CreateSolidBrush(kThemePanel);
+    state.headerBrush = CreateSolidBrush(kThemeHeader);
+    state.inputBrush = CreateSolidBrush(kThemeInput);
+
+    const DWORD buttonStyle = WS_CHILD | WS_VISIBLE | BS_OWNERDRAW;
 
     createControl(state, 0, L"STATIC", L"Division", WS_CHILD | WS_VISIBLE, 12, 16, 60, 20, state.window, 0);
     createControl(state, 0, L"STATIC", L"Equipo", WS_CHILD | WS_VISIBLE, 280, 16, 50, 20, state.window, 0);
@@ -654,13 +1172,44 @@ void initializeInterface(AppState& state) {
     state.teamCombo = createControl(state, 0, L"COMBOBOX", L"", WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL, 332, 12, 240, 300, state.window, IDC_TEAM_COMBO);
     state.managerEdit = createControl(state, WS_EX_CLIENTEDGE, L"EDIT", L"Manager", WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL, 656, 12, 210, 24, state.window, IDC_MANAGER_EDIT);
 
-    state.newCareerButton = createControl(state, 0, L"BUTTON", L"Nueva carrera", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 12, 46, 120, 26, state.window, IDC_NEW_CAREER_BUTTON);
-    state.loadButton = createControl(state, 0, L"BUTTON", L"Cargar", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 140, 46, 100, 26, state.window, IDC_LOAD_BUTTON);
-    state.saveButton = createControl(state, 0, L"BUTTON", L"Guardar", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 248, 46, 100, 26, state.window, IDC_SAVE_BUTTON);
-    state.simulateButton = createControl(state, 0, L"BUTTON", L"Simular semana", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 356, 46, 150, 26, state.window, IDC_SIMULATE_BUTTON);
-    state.validateButton = createControl(state, 0, L"BUTTON", L"Validar", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 514, 46, 120, 26, state.window, IDC_VALIDATE_BUTTON);
+    state.newCareerButton = createControl(state, 0, L"BUTTON", L"Nueva carrera", buttonStyle, 12, 46, 120, 26, state.window, IDC_NEW_CAREER_BUTTON);
+    state.loadButton = createControl(state, 0, L"BUTTON", L"Cargar", buttonStyle, 140, 46, 100, 26, state.window, IDC_LOAD_BUTTON);
+    state.saveButton = createControl(state, 0, L"BUTTON", L"Guardar", buttonStyle, 248, 46, 100, 26, state.window, IDC_SAVE_BUTTON);
+    state.simulateButton = createControl(state, 0, L"BUTTON", L"Simular semana", buttonStyle, 356, 46, 150, 26, state.window, IDC_SIMULATE_BUTTON);
+    state.validateButton = createControl(state, 0, L"BUTTON", L"Validar", buttonStyle, 514, 46, 120, 26, state.window, IDC_VALIDATE_BUTTON);
+    state.overviewButton = createControl(state, 0, L"BUTTON", L"Resumen", buttonStyle, 12, 80, 88, 26, state.window, IDC_VIEW_OVERVIEW_BUTTON);
+    state.competitionButton = createControl(state, 0, L"BUTTON", L"Compet.", buttonStyle, 104, 80, 88, 26, state.window, IDC_VIEW_COMPETITION_BUTTON);
+    state.boardButton = createControl(state, 0, L"BUTTON", L"Directiva", buttonStyle, 196, 80, 88, 26, state.window, IDC_VIEW_BOARD_BUTTON);
+    state.clubButton = createControl(state, 0, L"BUTTON", L"Club", buttonStyle, 288, 80, 88, 26, state.window, IDC_VIEW_CLUB_BUTTON);
+    state.scoutingButton = createControl(state, 0, L"BUTTON", L"Scouting", buttonStyle, 380, 80, 88, 26, state.window, IDC_VIEW_SCOUTING_BUTTON);
+    state.negotiationCombo = createControl(state, 0, L"COMBOBOX", L"", WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL, 472, 80, 110, 180, state.window, IDC_NEGOTIATION_COMBO);
+    state.promiseCombo = createControl(state, 0, L"COMBOBOX", L"", WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL, 588, 80, 110, 180, state.window, IDC_PROMISE_COMBO);
+    state.scoutActionButton = createControl(state, 0, L"BUTTON", L"Otear", buttonStyle, 12, 114, 88, 26, state.window, IDC_SCOUT_BUTTON);
+    state.shortlistButton = createControl(state, 0, L"BUTTON", L"Seguir", buttonStyle, 104, 114, 88, 26, state.window, IDC_SHORTLIST_BUTTON);
+    state.followShortlistButton = createControl(state, 0, L"BUTTON", L"Actualizar", buttonStyle, 196, 114, 88, 26, state.window, IDC_FOLLOW_SHORTLIST_BUTTON);
+    state.buyButton = createControl(state, 0, L"BUTTON", L"Fichar", buttonStyle, 288, 114, 88, 26, state.window, IDC_BUY_BUTTON);
+    state.preContractButton = createControl(state, 0, L"BUTTON", L"Precontr.", buttonStyle, 380, 114, 88, 26, state.window, IDC_PRECONTRACT_BUTTON);
+    state.renewButton = createControl(state, 0, L"BUTTON", L"Renovar", buttonStyle, 472, 114, 88, 26, state.window, IDC_RENEW_BUTTON);
+    state.sellButton = createControl(state, 0, L"BUTTON", L"Vender", buttonStyle, 564, 114, 88, 26, state.window, IDC_SELL_BUTTON);
+    state.planButton = createControl(state, 0, L"BUTTON", L"Plan+", buttonStyle, 12, 148, 88, 26, state.window, IDC_PLAN_BUTTON);
+    state.instructionButton = createControl(state, 0, L"BUTTON", L"Instruccion", buttonStyle, 104, 148, 110, 26, state.window, IDC_INSTRUCTION_BUTTON);
+    state.youthUpgradeButton = createControl(state, 0, L"BUTTON", L"Cantera+", buttonStyle, 220, 148, 88, 26, state.window, IDC_YOUTH_UPGRADE_BUTTON);
+    state.trainingUpgradeButton = createControl(state, 0, L"BUTTON", L"Entreno+", buttonStyle, 312, 148, 94, 26, state.window, IDC_TRAINING_UPGRADE_BUTTON);
+    state.scoutingUpgradeButton = createControl(state, 0, L"BUTTON", L"Scout+", buttonStyle, 410, 148, 88, 26, state.window, IDC_SCOUTING_UPGRADE_BUTTON);
+    state.stadiumUpgradeButton = createControl(state, 0, L"BUTTON", L"Estadio+", buttonStyle, 502, 148, 94, 26, state.window, IDC_STADIUM_UPGRADE_BUTTON);
 
-    state.infoLabel = createControl(state, 0, L"STATIC", L"", WS_CHILD | WS_VISIBLE, 12, 80, 900, 22, state.window, 0);
+    addComboItem(state.negotiationCombo, "Segura");
+    addComboItem(state.negotiationCombo, "Balanceada");
+    addComboItem(state.negotiationCombo, "Agresiva");
+    SendMessageW(state.negotiationCombo, CB_SETCURSEL, 1, 0);
+    addComboItem(state.promiseCombo, "Sin promesa");
+    addComboItem(state.promiseCombo, "Titular");
+    addComboItem(state.promiseCombo, "Rotacion");
+    addComboItem(state.promiseCombo, "Proyecto");
+    SendMessageW(state.promiseCombo, CB_SETCURSEL, 0, 0);
+
+    state.infoLabel = createControl(state, 0, L"STATIC", L"", WS_CHILD | WS_VISIBLE, 12, 178, 900, 22, state.window, 0);
+    state.summaryLabel = createControl(state, 0, L"STATIC", L"Resumen", WS_CHILD | WS_VISIBLE, 12, 142, 300, 18, state.window, 0);
     state.summaryEdit = createControl(state, WS_EX_CLIENTEDGE, L"EDIT", L"", WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL, 12, 128, 300, 200, state.window, IDC_SUMMARY_EDIT);
     state.newsLabel = createControl(state, 0, L"STATIC", L"Noticias", WS_CHILD | WS_VISIBLE, 330, 110, 200, 18, state.window, 0);
     state.newsList = createControl(state, WS_EX_CLIENTEDGE, L"LISTBOX", L"", WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_NOINTEGRALHEIGHT, 330, 128, 300, 200, state.window, IDC_NEWS_LIST);
@@ -668,7 +1217,21 @@ void initializeInterface(AppState& state) {
     state.tableList = createControl(state, WS_EX_CLIENTEDGE, WC_LISTVIEWW, L"", WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_SHOWSELALWAYS, 12, 368, 300, 200, state.window, IDC_TABLE_LIST);
     state.squadLabel = createControl(state, 0, L"STATIC", L"Plantel", WS_CHILD | WS_VISIBLE, 330, 350, 200, 18, state.window, 0);
     state.squadList = createControl(state, WS_EX_CLIENTEDGE, WC_LISTVIEWW, L"", WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_SHOWSELALWAYS, 330, 368, 300, 200, state.window, IDC_SQUAD_LIST);
+    state.transferLabel = createControl(state, 0, L"STATIC", L"Centro de transferencias", WS_CHILD | WS_VISIBLE, 12, 590, 300, 18, state.window, 0);
+    state.transferList = createControl(state, WS_EX_CLIENTEDGE, WC_LISTVIEWW, L"", WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_SHOWSELALWAYS, 12, 608, 620, 120, state.window, IDC_TRANSFER_LIST);
     state.statusLabel = createControl(state, 0, L"STATIC", L"Listo.", WS_CHILD | WS_VISIBLE, 12, 740, 900, 18, state.window, 0);
+
+    if (state.sectionFont) {
+        SendMessageW(state.summaryLabel, WM_SETFONT, reinterpret_cast<WPARAM>(state.sectionFont), TRUE);
+        SendMessageW(state.newsLabel, WM_SETFONT, reinterpret_cast<WPARAM>(state.sectionFont), TRUE);
+        SendMessageW(state.tableLabel, WM_SETFONT, reinterpret_cast<WPARAM>(state.sectionFont), TRUE);
+        SendMessageW(state.squadLabel, WM_SETFONT, reinterpret_cast<WPARAM>(state.sectionFont), TRUE);
+        SendMessageW(state.transferLabel, WM_SETFONT, reinterpret_cast<WPARAM>(state.sectionFont), TRUE);
+    }
+    if (state.monoFont) {
+        SendMessageW(state.summaryEdit, WM_SETFONT, reinterpret_cast<WPARAM>(state.monoFont), TRUE);
+        SendMessageW(state.newsList, WM_SETFONT, reinterpret_cast<WPARAM>(state.monoFont), TRUE);
+    }
 
     configureViews(state);
     layoutWindow(state);
@@ -696,6 +1259,7 @@ void startNewCareer(AppState& state) {
         MessageBoxW(state.window, utf8ToWide(message).c_str(), L"Football Manager", MB_OK | MB_ICONWARNING);
     }
 
+    state.summaryMode = SummaryMode::Overview;
     syncCombosFromCareer(state);
     refreshAll(state);
     setStatus(state, result.messages.empty() ? "Nueva carrera iniciada." : result.messages.back());
@@ -713,6 +1277,7 @@ void loadCareer(AppState& state) {
         return;
     }
 
+    state.summaryMode = SummaryMode::Overview;
     syncCombosFromCareer(state);
     refreshAll(state);
     setStatus(state, result.messages.empty() ? "Carrera cargada." : result.messages.back());
@@ -754,6 +1319,365 @@ void validateSystem(AppState& state) {
     }
 }
 
+void setSummaryMode(AppState& state, SummaryMode mode) {
+    state.summaryMode = mode;
+    refreshSummary(state);
+    refreshHeader(state);
+}
+
+void showServiceMessages(AppState& state, const ServiceResult& result, const std::string& title) {
+    if (result.messages.empty()) return;
+    std::ostringstream out;
+    for (size_t i = 0; i < result.messages.size(); ++i) {
+        if (i) out << "\n";
+        out << result.messages[i];
+    }
+    MessageBoxW(state.window,
+                utf8ToWide(out.str()).c_str(),
+                utf8ToWide(title).c_str(),
+                MB_OK | (result.ok ? MB_ICONINFORMATION : MB_ICONWARNING));
+}
+
+void finalizeAction(AppState& state,
+                    const ServiceResult& result,
+                    SummaryMode successMode,
+                    const std::string& title,
+                    bool forceDialog = false) {
+    if (result.ok) {
+        state.summaryMode = successMode;
+        syncCombosFromCareer(state);
+        refreshAll(state);
+    }
+    if (!result.messages.empty()) {
+        setStatus(state, result.messages.back());
+    }
+    if (!result.ok || forceDialog || result.messages.size() > 2) {
+        showServiceMessages(state, result, title);
+    }
+}
+
+void runScoutingAction(AppState& state) {
+    ServiceResult result = scoutPlayersService(state.career, "Todas", "");
+    finalizeAction(state, result, SummaryMode::Scouting, "Scouting", true);
+}
+
+void runBuyAction(AppState& state) {
+    int row = selectedListViewRow(state.transferList);
+    if (row < 0) {
+        MessageBoxW(state.window, L"Selecciona un objetivo del centro de transferencias.", L"Mercado", MB_OK | MB_ICONINFORMATION);
+        return;
+    }
+    std::string type = listViewText(state.transferList, row, 0);
+    if (type != "Mercado") {
+        MessageBoxW(state.window, L"Solo puedes fichar filas marcadas como Mercado.", L"Mercado", MB_OK | MB_ICONINFORMATION);
+        return;
+    }
+    ServiceResult result = buyTransferTargetService(state.career,
+                                                    listViewText(state.transferList, row, 2),
+                                                    listViewText(state.transferList, row, 1),
+                                                    selectedNegotiationProfile(state),
+                                                    selectedNegotiationPromise(state));
+    finalizeAction(state, result, SummaryMode::Overview, "Fichaje");
+}
+
+void runPreContractAction(AppState& state) {
+    int row = selectedListViewRow(state.transferList);
+    if (row < 0) {
+        MessageBoxW(state.window, L"Selecciona un objetivo del centro de transferencias.", L"Precontrato", MB_OK | MB_ICONINFORMATION);
+        return;
+    }
+    std::string type = listViewText(state.transferList, row, 0);
+    if (type != "Mercado") {
+        MessageBoxW(state.window, L"El precontrato se intenta sobre un objetivo de mercado.", L"Precontrato", MB_OK | MB_ICONINFORMATION);
+        return;
+    }
+    ServiceResult result = signPreContractService(state.career,
+                                                  listViewText(state.transferList, row, 2),
+                                                  listViewText(state.transferList, row, 1),
+                                                  selectedNegotiationProfile(state),
+                                                  selectedNegotiationPromise(state));
+    finalizeAction(state, result, SummaryMode::Overview, "Precontrato");
+}
+
+void runRenewAction(AppState& state) {
+    int row = selectedListViewRow(state.squadList);
+    if (row < 0) {
+        MessageBoxW(state.window, L"Selecciona un jugador del plantel.", L"Renovar", MB_OK | MB_ICONINFORMATION);
+        return;
+    }
+    ServiceResult result = renewPlayerContractService(state.career,
+                                                      listViewText(state.squadList, row, 3),
+                                                      selectedNegotiationProfile(state),
+                                                      selectedNegotiationPromise(state));
+    finalizeAction(state, result, SummaryMode::Overview, "Renovacion");
+}
+
+void runSellAction(AppState& state) {
+    int row = selectedListViewRow(state.squadList);
+    if (row < 0) {
+        MessageBoxW(state.window, L"Selecciona un jugador del plantel.", L"Venta", MB_OK | MB_ICONINFORMATION);
+        return;
+    }
+    ServiceResult result = sellPlayerService(state.career, listViewText(state.squadList, row, 3));
+    finalizeAction(state, result, SummaryMode::Overview, "Venta");
+}
+
+void runUpgradeAction(AppState& state, ClubUpgrade upgrade, SummaryMode mode, const std::string& title) {
+    ServiceResult result = upgradeClubService(state.career, upgrade);
+    finalizeAction(state, result, mode, title);
+}
+
+void runPlanAction(AppState& state) {
+    int row = selectedListViewRow(state.squadList);
+    if (row < 0) {
+        MessageBoxW(state.window, L"Selecciona un jugador del plantel.", L"Plan individual", MB_OK | MB_ICONINFORMATION);
+        return;
+    }
+    ServiceResult result = cyclePlayerDevelopmentPlanService(state.career, listViewText(state.squadList, row, 3));
+    finalizeAction(state, result, SummaryMode::Club, "Plan individual");
+}
+
+void runInstructionAction(AppState& state) {
+    ServiceResult result = cycleMatchInstructionService(state.career);
+    finalizeAction(state, result, SummaryMode::Overview, "Instruccion");
+}
+
+void runShortlistAction(AppState& state) {
+    int row = selectedListViewRow(state.transferList);
+    if (row < 0) {
+        MessageBoxW(state.window, L"Selecciona un objetivo del centro de transferencias.", L"Shortlist", MB_OK | MB_ICONINFORMATION);
+        return;
+    }
+    std::string type = listViewText(state.transferList, row, 0);
+    if (type != "Mercado") {
+        MessageBoxW(state.window, L"Solo puedes seguir objetivos de mercado.", L"Shortlist", MB_OK | MB_ICONINFORMATION);
+        return;
+    }
+    ServiceResult result = shortlistPlayerService(state.career,
+                                                  listViewText(state.transferList, row, 2),
+                                                  listViewText(state.transferList, row, 1));
+    finalizeAction(state, result, SummaryMode::Scouting, "Shortlist");
+}
+
+void runFollowShortlistAction(AppState& state) {
+    ServiceResult result = followShortlistService(state.career);
+    finalizeAction(state, result, SummaryMode::Scouting, "Seguimiento", true);
+}
+
+void showSelectedSquadDetails(AppState& state) {
+    int row = selectedListViewRow(state.squadList);
+    if (row < 0 || !state.career.myTeam) return;
+    std::string playerName = listViewText(state.squadList, row, 3);
+    for (const auto& player : state.career.myTeam->players) {
+        if (player.name != playerName) continue;
+        std::ostringstream out;
+        out << player.name
+            << " | Hab " << player.skill
+            << " | Pot " << player.potential
+            << " | Contrato " << player.contractWeeks
+            << " | Salario " << formatMoney(player.wage)
+            << " | Clausula " << formatMoney(player.releaseClause)
+            << " | Pie " << player.preferredFoot
+            << " | Sec " << (player.secondaryPositions.empty() ? std::string("-") : joinStringValues(player.secondaryPositions, "/"))
+            << " | Forma " << playerFormLabel(player) << " (" << player.currentForm << ")"
+            << " | Fiabilidad " << playerReliabilityLabel(player)
+            << " | Partidos grandes " << player.bigMatches
+            << " | Plan " << player.developmentPlan
+            << " | Promesa " << player.promisedRole
+            << " | Fel " << player.happiness
+            << " | Quim " << player.chemistry
+            << " | Rasgos " << joinStringValues(player.traits, ", ");
+        setStatus(state, out.str());
+        return;
+    }
+}
+
+void showSelectedTransferDetails(AppState& state) {
+    int row = selectedListViewRow(state.transferList);
+    if (row < 0) return;
+    std::string type = listViewText(state.transferList, row, 0);
+    std::string playerName = listViewText(state.transferList, row, 1);
+    std::string clubName = listViewText(state.transferList, row, 2);
+    std::string detail = listViewText(state.transferList, row, 3);
+    std::string amount = listViewText(state.transferList, row, 4);
+    if (type == "Mercado") {
+        const Team* seller = state.career.findTeamByName(clubName);
+        if (seller) {
+            for (const auto& player : seller->players) {
+                if (player.name != playerName) continue;
+                setStatus(state,
+                          type + " | " + player.name + " | " + seller->name +
+                          " | " + detail + " | " + amount +
+                          " | Rasgos " + joinStringValues(player.traits, ", "));
+                return;
+            }
+        }
+    }
+    setStatus(state, type + " | " + playerName + " | " + clubName + " | " + detail + " | " + amount);
+}
+
+void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
+    if (!drawItem) return;
+    HDC hdc = drawItem->hDC;
+    RECT rect = drawItem->rcItem;
+    int id = static_cast<int>(drawItem->CtlID);
+    bool pressed = (drawItem->itemState & ODS_SELECTED) != 0;
+    bool disabled = (drawItem->itemState & ODS_DISABLED) != 0;
+    bool active = isActiveSummaryButton(state, id);
+
+    COLORREF fill = kThemePanelAlt;
+    COLORREF border = RGB(44, 62, 76);
+    COLORREF text = kThemeText;
+    if (isPrimaryButtonId(id)) {
+        fill = RGB(19, 63, 49);
+        border = kThemeAccentGreen;
+    } else if (isUpgradeButtonId(id)) {
+        fill = RGB(54, 45, 20);
+        border = kThemeAccent;
+    } else if (id == IDC_VALIDATE_BUTTON) {
+        fill = RGB(39, 48, 72);
+        border = RGB(94, 122, 184);
+    } else if (id == IDC_SAVE_BUTTON || id == IDC_LOAD_BUTTON) {
+        fill = RGB(28, 43, 56);
+    }
+    if (active) {
+        fill = RGB(72, 56, 18);
+        border = kThemeAccent;
+        text = RGB(255, 245, 214);
+    }
+    if (pressed) {
+        fill = RGB(std::max(0, static_cast<int>(GetRValue(fill)) - 18),
+                   std::max(0, static_cast<int>(GetGValue(fill)) - 18),
+                   std::max(0, static_cast<int>(GetBValue(fill)) - 18));
+    }
+    if (disabled) {
+        fill = RGB(30, 35, 40);
+        border = RGB(52, 58, 64);
+        text = RGB(102, 112, 118);
+    }
+
+    drawRoundedPanel(hdc, rect, fill, border, 12);
+
+    RECT accentRect = rect;
+    accentRect.bottom = accentRect.top + 4;
+    HBRUSH accentBrush = CreateSolidBrush(active ? kThemeAccent : (isPrimaryButtonId(id) ? kThemeAccentGreen : border));
+    FillRect(hdc, &accentRect, accentBrush);
+    DeleteObject(accentBrush);
+
+    wchar_t textBuffer[128]{};
+    GetWindowTextW(drawItem->hwndItem, textBuffer, static_cast<int>(sizeof(textBuffer) / sizeof(textBuffer[0])));
+    RECT textRect = rect;
+    if (pressed) OffsetRect(&textRect, 0, 1);
+    SetBkMode(hdc, TRANSPARENT);
+    SetTextColor(hdc, text);
+    HFONT font = state.font ? state.font : static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT));
+    HGDIOBJ oldFont = SelectObject(hdc, font);
+    DrawTextW(hdc, textBuffer, -1, &textRect, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+    SelectObject(hdc, oldFont);
+
+    if ((drawItem->itemState & ODS_FOCUS) != 0) {
+        RECT focusRect = rect;
+        InflateRect(&focusRect, -6, -6);
+        DrawFocusRect(hdc, &focusRect);
+    }
+}
+
+LRESULT handleListCustomDraw(AppState& state, LPNMHDR header) {
+    if (!header || header->code != NM_CUSTOMDRAW) return CDRF_DODEFAULT;
+    if (header->idFrom != IDC_TABLE_LIST && header->idFrom != IDC_SQUAD_LIST && header->idFrom != IDC_TRANSFER_LIST) {
+        return CDRF_DODEFAULT;
+    }
+    auto* draw = reinterpret_cast<NMLVCUSTOMDRAW*>(header);
+    if (draw->nmcd.dwDrawStage == CDDS_PREPAINT) {
+        return CDRF_NOTIFYITEMDRAW;
+    }
+    if (draw->nmcd.dwDrawStage != CDDS_ITEMPREPAINT) {
+        return CDRF_DODEFAULT;
+    }
+
+    int row = static_cast<int>(draw->nmcd.dwItemSpec);
+    COLORREF bg = (row % 2 == 0) ? kThemeInput : RGB(15, 25, 35);
+    COLORREF text = kThemeText;
+
+    if (header->idFrom == IDC_TABLE_LIST) {
+        std::string teamName = listViewText(state.tableList, row, 1);
+        if (teamName.find('*') != std::string::npos) {
+            bg = RGB(24, 67, 50);
+        } else if (row == 0) {
+            bg = RGB(62, 49, 18);
+            text = RGB(255, 239, 192);
+        }
+    } else if (header->idFrom == IDC_SQUAD_LIST) {
+        std::string role = listViewText(state.squadList, row, 1);
+        std::string status = listViewText(state.squadList, row, 10);
+        if (role == "XI") {
+            bg = RGB(21, 64, 48);
+        } else if (status.find("Les") != std::string::npos || status.find("Salida") != std::string::npos) {
+            bg = RGB(72, 31, 33);
+        } else if (role == "Banco") {
+            bg = RGB(23, 42, 60);
+        }
+    } else if (header->idFrom == IDC_TRANSFER_LIST) {
+        std::string type = listViewText(state.transferList, row, 0);
+        if (type == "Mercado") bg = RGB(19, 61, 47);
+        else if (type == "Contrato" || type == "Precontrato") bg = RGB(64, 48, 19);
+        else if (type == "Salida") bg = RGB(74, 32, 35);
+        else if (type == "Prestamo" || type == "Cedido") bg = RGB(25, 43, 63);
+    }
+
+    if ((draw->nmcd.uItemState & CDIS_SELECTED) != 0) {
+        bg = kThemeSelection;
+        text = RGB(255, 255, 255);
+    }
+
+    draw->clrText = text;
+    draw->clrTextBk = bg;
+    return CDRF_NEWFONT;
+}
+
+void paintWindowChrome(AppState& state, HDC hdc) {
+    RECT client{};
+    GetClientRect(state.window, &client);
+    FillRect(hdc, &client, state.backgroundBrush ? state.backgroundBrush : static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
+
+    RECT headerRect{0, 0, client.right, 196};
+    FillRect(hdc, &headerRect, state.headerBrush ? state.headerBrush : state.backgroundBrush);
+
+    RECT actionCard{8, 8, client.right - 8, 192};
+    drawRoundedPanel(hdc, actionCard, RGB(12, 24, 32), RGB(32, 58, 54), 18);
+
+    RECT titleRect{std::max(900, static_cast<int>(client.right) - 470), 14, client.right - 24, 66};
+    RECT subtitleRect{titleRect.left, 70, titleRect.right, 96};
+    RECT pitchRect{titleRect.left - 130, 18, titleRect.left - 12, 96};
+    drawPitchOverlay(hdc, pitchRect);
+
+    SetBkMode(hdc, TRANSPARENT);
+    SetTextColor(hdc, kThemeAccent);
+    HGDIOBJ oldFont = SelectObject(hdc, state.titleFont ? state.titleFont : state.font);
+    DrawTextW(hdc, L"CAREER COMMAND", -1, &titleRect, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
+    SelectObject(hdc, state.sectionFont ? state.sectionFont : state.font);
+    SetTextColor(hdc, kThemeMuted);
+    DrawTextW(hdc, L"Football Manager // native game hub", -1, &subtitleRect, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
+    SelectObject(hdc, oldFont);
+
+    RECT infoCard = expandedRect(childRectOnParent(state.infoLabel, state.window), 8, 8);
+    drawRoundedPanel(hdc, infoCard, RGB(13, 26, 35), RGB(41, 74, 88), 14);
+
+    RECT summaryCard = expandedRect(childRectOnParent(state.summaryEdit, state.window), 8, 24);
+    RECT newsCard = expandedRect(childRectOnParent(state.newsList, state.window), 8, 24);
+    RECT tableCard = expandedRect(childRectOnParent(state.tableList, state.window), 8, 24);
+    RECT squadCard = expandedRect(childRectOnParent(state.squadList, state.window), 8, 24);
+    RECT transferCard = expandedRect(childRectOnParent(state.transferList, state.window), 8, 24);
+    drawRoundedPanel(hdc, summaryCard, kThemePanel, RGB(44, 69, 84), 16);
+    drawRoundedPanel(hdc, newsCard, kThemePanel, RGB(44, 69, 84), 16);
+    drawRoundedPanel(hdc, tableCard, kThemePanel, RGB(44, 69, 84), 16);
+    drawRoundedPanel(hdc, squadCard, kThemePanel, RGB(44, 69, 84), 16);
+    drawRoundedPanel(hdc, transferCard, kThemePanel, RGB(44, 69, 84), 16);
+
+    RECT statusCard = expandedRect(childRectOnParent(state.statusLabel, state.window), 8, 8);
+    drawRoundedPanel(hdc, statusCard, RGB(12, 25, 34), RGB(46, 82, 98), 12);
+}
+
 LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     AppState* state = reinterpret_cast<AppState*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
 
@@ -768,9 +1692,72 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
         case WM_CREATE:
             if (state) initializeInterface(*state);
             return 0;
+        case WM_ERASEBKGND:
+            return 1;
         case WM_SIZE:
             if (state) layoutWindow(*state);
             return 0;
+        case WM_NOTIFY:
+            if (!state) break;
+            if (reinterpret_cast<LPNMHDR>(lParam)->code == NM_CUSTOMDRAW) {
+                return handleListCustomDraw(*state, reinterpret_cast<LPNMHDR>(lParam));
+            }
+            if (reinterpret_cast<LPNMHDR>(lParam)->idFrom == IDC_SQUAD_LIST &&
+                reinterpret_cast<LPNMHDR>(lParam)->code != LVN_COLUMNCLICK) {
+                showSelectedSquadDetails(*state);
+                return 0;
+            }
+            if (reinterpret_cast<LPNMHDR>(lParam)->idFrom == IDC_TRANSFER_LIST &&
+                reinterpret_cast<LPNMHDR>(lParam)->code != LVN_COLUMNCLICK) {
+                showSelectedTransferDetails(*state);
+                return 0;
+            }
+            break;
+        case WM_DRAWITEM:
+            if (state && wParam != 0) {
+                drawThemedButton(*state, reinterpret_cast<const DRAWITEMSTRUCT*>(lParam));
+                return TRUE;
+            }
+            break;
+        case WM_CTLCOLOREDIT:
+        case WM_CTLCOLORLISTBOX:
+        case WM_CTLCOLORSTATIC:
+            if (state) {
+                HDC hdc = reinterpret_cast<HDC>(wParam);
+                HWND control = reinterpret_cast<HWND>(lParam);
+                SetBkMode(hdc, TRANSPARENT);
+                if (message == WM_CTLCOLOREDIT || control == state->managerEdit || control == state->summaryEdit) {
+                    SetBkMode(hdc, OPAQUE);
+                    SetBkColor(hdc, kThemeInput);
+                    SetTextColor(hdc, kThemeText);
+                    return reinterpret_cast<LRESULT>(state->inputBrush ? state->inputBrush : state->panelBrush);
+                }
+                if (control == state->divisionCombo || control == state->teamCombo ||
+                    control == state->negotiationCombo || control == state->promiseCombo) {
+                    SetBkMode(hdc, OPAQUE);
+                    SetBkColor(hdc, kThemeInput);
+                    SetTextColor(hdc, kThemeText);
+                    return reinterpret_cast<LRESULT>(state->inputBrush ? state->inputBrush : state->panelBrush);
+                }
+                if (message == WM_CTLCOLORLISTBOX || control == state->newsList) {
+                    SetBkMode(hdc, OPAQUE);
+                    SetBkColor(hdc, kThemeInput);
+                    SetTextColor(hdc, kThemeText);
+                    return reinterpret_cast<LRESULT>(state->inputBrush ? state->inputBrush : state->panelBrush);
+                }
+                if (control == state->summaryLabel || control == state->newsLabel || control == state->tableLabel ||
+                    control == state->squadLabel || control == state->transferLabel) {
+                    SetTextColor(hdc, kThemeAccent);
+                } else if (control == state->statusLabel) {
+                    SetTextColor(hdc, RGB(188, 228, 216));
+                } else if (control == state->infoLabel) {
+                    SetTextColor(hdc, kThemeText);
+                } else {
+                    SetTextColor(hdc, kThemeMuted);
+                }
+                return reinterpret_cast<LRESULT>(GetStockObject(NULL_BRUSH));
+            }
+            break;
         case WM_COMMAND:
             if (!state) break;
             switch (LOWORD(wParam)) {
@@ -794,14 +1781,91 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 case IDC_VALIDATE_BUTTON:
                     validateSystem(*state);
                     return 0;
+                case IDC_VIEW_OVERVIEW_BUTTON:
+                    setSummaryMode(*state, SummaryMode::Overview);
+                    return 0;
+                case IDC_VIEW_COMPETITION_BUTTON:
+                    setSummaryMode(*state, SummaryMode::Competition);
+                    return 0;
+                case IDC_VIEW_BOARD_BUTTON:
+                    setSummaryMode(*state, SummaryMode::Board);
+                    return 0;
+                case IDC_VIEW_CLUB_BUTTON:
+                    setSummaryMode(*state, SummaryMode::Club);
+                    return 0;
+                case IDC_VIEW_SCOUTING_BUTTON:
+                    setSummaryMode(*state, SummaryMode::Scouting);
+                    return 0;
+                case IDC_SCOUT_BUTTON:
+                    runScoutingAction(*state);
+                    return 0;
+                case IDC_SHORTLIST_BUTTON:
+                    runShortlistAction(*state);
+                    return 0;
+                case IDC_FOLLOW_SHORTLIST_BUTTON:
+                    runFollowShortlistAction(*state);
+                    return 0;
+                case IDC_BUY_BUTTON:
+                    runBuyAction(*state);
+                    return 0;
+                case IDC_PRECONTRACT_BUTTON:
+                    runPreContractAction(*state);
+                    return 0;
+                case IDC_RENEW_BUTTON:
+                    runRenewAction(*state);
+                    return 0;
+                case IDC_SELL_BUTTON:
+                    runSellAction(*state);
+                    return 0;
+                case IDC_PLAN_BUTTON:
+                    runPlanAction(*state);
+                    return 0;
+                case IDC_INSTRUCTION_BUTTON:
+                    runInstructionAction(*state);
+                    return 0;
+                case IDC_YOUTH_UPGRADE_BUTTON:
+                    runUpgradeAction(*state, ClubUpgrade::Youth, SummaryMode::Club, "Cantera");
+                    return 0;
+                case IDC_TRAINING_UPGRADE_BUTTON:
+                    runUpgradeAction(*state, ClubUpgrade::Training, SummaryMode::Club, "Entrenamiento");
+                    return 0;
+                case IDC_SCOUTING_UPGRADE_BUTTON:
+                    runUpgradeAction(*state, ClubUpgrade::Scouting, SummaryMode::Club, "Scouting");
+                    return 0;
+                case IDC_STADIUM_UPGRADE_BUTTON:
+                    runUpgradeAction(*state, ClubUpgrade::Stadium, SummaryMode::Club, "Estadio");
+                    return 0;
                 default:
                     break;
             }
             break;
+        case WM_PAINT:
+            if (state) {
+                PAINTSTRUCT paint{};
+                HDC hdc = BeginPaint(hwnd, &paint);
+                paintWindowChrome(*state, hdc);
+                EndPaint(hwnd, &paint);
+                return 0;
+            }
+            break;
         case WM_DESTROY:
-            if (state && state->font) {
-                DeleteObject(state->font);
+            if (state) {
+                if (state->font) DeleteObject(state->font);
+                if (state->titleFont) DeleteObject(state->titleFont);
+                if (state->sectionFont) DeleteObject(state->sectionFont);
+                if (state->monoFont) DeleteObject(state->monoFont);
+                if (state->backgroundBrush) DeleteObject(state->backgroundBrush);
+                if (state->panelBrush) DeleteObject(state->panelBrush);
+                if (state->headerBrush) DeleteObject(state->headerBrush);
+                if (state->inputBrush) DeleteObject(state->inputBrush);
                 state->font = nullptr;
+                state->titleFont = nullptr;
+                state->sectionFont = nullptr;
+                state->monoFont = nullptr;
+                state->backgroundBrush = nullptr;
+                state->panelBrush = nullptr;
+                state->headerBrush = nullptr;
+                state->inputBrush = nullptr;
             }
             PostQuitMessage(0);
             return 0;
@@ -829,7 +1893,7 @@ int runGuiApp() {
     windowClass.hInstance = state.instance;
     windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
     windowClass.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
-    windowClass.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
+    windowClass.hbrBackground = nullptr;
     windowClass.lpszClassName = L"FootballManagerGuiWindow";
     RegisterClassExW(&windowClass);
 
@@ -839,8 +1903,8 @@ int runGuiApp() {
                                   WS_OVERLAPPEDWINDOW | WS_VISIBLE,
                                   CW_USEDEFAULT,
                                   CW_USEDEFAULT,
-                                  1320,
-                                  860,
+                                  1460,
+                                  940,
                                   nullptr,
                                   nullptr,
                                   state.instance,

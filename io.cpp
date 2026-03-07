@@ -209,7 +209,7 @@ bool loadTeamFromCsv(const string& filename, Team& team) {
         p.matchesPlayed = 0;
         p.lastTrainedSeason = -1;
         p.lastTrainedWeek = -1;
-        p.role = defaultRoleForPosition(p.position);
+        ensurePlayerProfile(p, true);
         team.addPlayer(p);
         seen.insert(key);
     }
@@ -323,7 +323,7 @@ bool loadTeamFromPlayersTxt(const string& filename, Team& team) {
         p.matchesPlayed = 0;
         p.lastTrainedSeason = -1;
         p.lastTrainedWeek = -1;
-        p.role = defaultRoleForPosition(p.position);
+        ensurePlayerProfile(p, true);
         team.addPlayer(p);
         seen.insert(key);
     }
@@ -397,7 +397,7 @@ bool loadTeamFromLegacyTxt(const string& filename, Team& team) {
             p.seasonYellowCards = 0;
             p.seasonRedCards = 0;
             p.matchesSuspended = 0;
-            p.role = defaultRoleForPosition(p.position);
+            ensurePlayerProfile(p, true);
             team.addPlayer(p);
         }
     }

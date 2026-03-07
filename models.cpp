@@ -12,6 +12,8 @@
 
 using namespace std;
 
+static constexpr int kCareerSaveVersion = 4;
+
 void applyPositionStats(Player& p) {
     string norm = normalizePosition(p.position);
     if (norm == "ARQ") {
@@ -36,6 +38,155 @@ string defaultRoleForPosition(const string& position) {
     if (norm == "MED") return "BoxToBox";
     if (norm == "DEL") return "Poacher";
     return "Default";
+}
+
+string defaultDevelopmentPlanForPosition(const string& position) {
+    string norm = normalizePosition(position);
+    if (norm == "ARQ") return "Reflejos";
+    if (norm == "DEF") return "Defensa";
+    if (norm == "MED") return "Creatividad";
+    if (norm == "DEL") return "Finalizacion";
+    return "Equilibrado";
+}
+
+static string randomPreferredFoot() {
+    int roll = randInt(1, 100);
+    if (roll <= 68) return "Derecho";
+    if (roll <= 92) return "Izquierdo";
+    return "Ambos";
+}
+
+static void addUniquePosition(vector<string>& positions, const string& value) {
+    string normalized = normalizePosition(value);
+    if (normalized == "N/A") return;
+    if (find(positions.begin(), positions.end(), normalized) == positions.end()) {
+        positions.push_back(normalized);
+    }
+}
+
+static vector<string> inferSecondaryPositions(const Player& p) {
+    vector<string> positions;
+    string primary = normalizePosition(p.position);
+    if (primary == "ARQ") return positions;
+
+    if (primary == "DEF") {
+        if (p.versatility >= 48 || p.attack >= p.defense - 6 || p.stamina >= 68) addUniquePosition(positions, "MED");
+    } else if (primary == "MED") {
+        if (p.defense >= p.attack - 4 || p.tacticalDiscipline >= 64) addUniquePosition(positions, "DEF");
+        if (p.attack >= p.defense - 2 || p.bigMatches >= 62) addUniquePosition(positions, "DEL");
+    } else if (primary == "DEL") {
+        if (p.versatility >= 42 || p.stamina >= 66) addUniquePosition(positions, "MED");
+    }
+
+    if (p.versatility >= 76) {
+        if (primary != "DEF") addUniquePosition(positions, "DEF");
+        if (primary != "MED") addUniquePosition(positions, "MED");
+        if (primary != "DEL") addUniquePosition(positions, "DEL");
+    }
+    return positions;
+}
+
+void ensurePlayerProfile(Player& p, bool regenerateTraits) {
+    string normalizedPos = normalizePosition(p.position);
+    if (normalizedPos == "N/A") normalizedPos = "MED";
+    p.position = normalizedPos;
+    if (p.preferredFoot.empty()) p.preferredFoot = randomPreferredFoot();
+    if (p.consistency <= 0) {
+        int base = 38 + p.professionalism / 3 + p.happiness / 8 + randInt(-6, 8);
+        p.consistency = clampInt(base, 1, 99);
+    }
+    if (p.bigMatches <= 0) {
+        int base = 34 + p.ambition / 3 + p.leadership / 6 + randInt(-8, 9);
+        p.bigMatches = clampInt(base, 1, 99);
+    }
+    if (p.currentForm <= 0) {
+        int base = 44 + p.skill / 5 + randInt(-10, 10);
+        p.currentForm = clampInt(base, 1, 99);
+    }
+    if (p.tacticalDiscipline <= 0) {
+        int base = 36 + p.professionalism / 2 + p.chemistry / 6 + randInt(-8, 8);
+        p.tacticalDiscipline = clampInt(base, 1, 99);
+    }
+    if (p.versatility <= 0) {
+        int base = 30 + p.stamina / 4 + p.professionalism / 5 + randInt(-8, 12);
+        p.versatility = clampInt(base, 1, 99);
+    }
+    if (p.secondaryPositions.empty()) p.secondaryPositions = inferSecondaryPositions(p);
+    if (p.role.empty()) p.role = defaultRoleForPosition(p.position);
+    if (p.developmentPlan.empty()) p.developmentPlan = defaultDevelopmentPlanForPosition(p.position);
+    if (p.promisedRole.empty()) p.promisedRole = "Sin promesa";
+    if (regenerateTraits || p.traits.empty()) p.traits = generatePlayerTraits(p, p.age <= 19);
+    if (p.traits.empty()) p.traits = generatePlayerTraits(p, p.age <= 19);
+}
+
+int positionFitScore(const Player& p, const string& desiredPosition) {
+    string desired = normalizePosition(desiredPosition);
+    string primary = normalizePosition(p.position);
+    if (desired == "N/A" || desired.empty()) return 60;
+    if (primary == desired) return 100 + p.versatility / 8;
+    if (find(p.secondaryPositions.begin(), p.secondaryPositions.end(), desired) != p.secondaryPositions.end()) {
+        return 78 + p.versatility / 4;
+    }
+    if (primary == "MED" && (desired == "DEF" || desired == "DEL")) return 45 + p.versatility / 5;
+    if (primary == "DEF" && desired == "MED") return 42 + p.versatility / 6;
+    if (primary == "DEL" && desired == "MED") return 40 + p.versatility / 6;
+    if (primary == "ARQ" || desired == "ARQ") return 6;
+    return 18 + p.versatility / 8;
+}
+
+string playerReliabilityLabel(const Player& p) {
+    int score = (p.consistency * 2 + p.professionalism) / 3;
+    if (score >= 78) return "Muy fiable";
+    if (score >= 62) return "Solido";
+    if (score >= 48) return "Variable";
+    return "Irregular";
+}
+
+string playerFormLabel(const Player& p) {
+    if (p.currentForm >= 76) return "En racha";
+    if (p.currentForm >= 60) return "Bien";
+    if (p.currentForm >= 45) return "Normal";
+    return "Baja";
+}
+
+bool playerHasTrait(const Player& p, const string& trait) {
+    return find(p.traits.begin(), p.traits.end(), trait) != p.traits.end();
+}
+
+string joinStringValues(const vector<string>& values, const string& separator) {
+    string out;
+    for (size_t i = 0; i < values.size(); ++i) {
+        if (i) out += separator;
+        out += values[i];
+    }
+    return out;
+}
+
+vector<string> generatePlayerTraits(const Player& p, bool youth) {
+    vector<string> traits;
+    auto addTrait = [&](const string& trait) {
+        if (find(traits.begin(), traits.end(), trait) == traits.end()) {
+            traits.push_back(trait);
+        }
+    };
+
+    string pos = normalizePosition(p.position);
+    if (p.leadership >= 72 || p.professionalism >= 80) addTrait("Lider");
+    if (p.professionalism >= 76 && p.ambition >= 62 && traits.size() < 3) addTrait("Competidor");
+    if ((p.injuryHistory >= 2 || p.stamina <= 60 || p.age >= 31) && traits.size() < 3) addTrait("Fragil");
+    if ((p.ambition >= 75 && p.professionalism <= 48) && traits.size() < 3) addTrait("Caliente");
+    if (p.bigMatches >= 74 && traits.size() < 3) addTrait("Cita grande");
+    if (p.consistency <= 45 && traits.size() < 3) addTrait("Irregular");
+    if (p.versatility >= 76 && traits.size() < 3) addTrait("Versatil");
+    if (p.preferredFoot == "Ambos" && traits.size() < 3) addTrait("Dos perfiles");
+    if (pos == "MED" && p.attack >= p.defense && traits.size() < 3) addTrait("Pase riesgoso");
+    if ((pos == "MED" || pos == "DEF") && p.stamina >= 72 && traits.size() < 3) addTrait("Llega al area");
+    if ((pos == "DEF" || pos == "DEL") && p.stamina >= 74 && p.professionalism >= 55 && traits.size() < 3) addTrait("Presiona");
+    if ((pos == "ARQ" || pos == "DEF") && p.defense >= p.attack + 8 && traits.size() < 3) addTrait("Muralla");
+    if (youth && p.potential - p.skill >= 12 && traits.size() < 3) addTrait("Proyecto");
+    if (traits.empty()) addTrait("Equilibrado");
+    if (traits.size() > 3) traits.resize(3);
+    return traits;
 }
 
 Player makeRandomPlayer(const string& position, int skillMin, int skillMax, int ageMin, int ageMax) {
@@ -90,6 +241,7 @@ Player makeRandomPlayer(const string& position, int skillMin, int skillMax, int 
     p.lastTrainedSeason = -1;
     p.lastTrainedWeek = -1;
     p.role = defaultRoleForPosition(position);
+    ensurePlayerProfile(p, true);
     return p;
 }
 
@@ -133,7 +285,8 @@ Team::Team(string n)
       stadiumLevel(1),
       youthFacilityLevel(1),
       trainingFacilityLevel(1),
-      fanBase(12) {}
+      fanBase(12),
+      matchInstruction("Equilibrado") {}
 
 void Team::addPlayer(const Player& p) {
     players.push_back(p);
@@ -281,12 +434,16 @@ static bool isAvailableForSelection(const Player& player) {
 
 static int selectionScore(const Team& team, int idx) {
     const Player& player = team.players[idx];
-    int score = player.skill * 10 + player.fitness * 4 - player.matchesPlayed;
+    int score = player.skill * 10 + player.fitness * 4 + player.currentForm * 3 + player.consistency * 2 +
+                player.tacticalDiscipline - player.matchesPlayed;
     if (team.rotationPolicy == "Titulares") {
-        score = player.skill * 12 + player.fitness * 2 - player.matchesPlayed / 2;
+        score = player.skill * 12 + player.fitness * 2 + player.currentForm * 4 + player.consistency * 2 -
+                player.matchesPlayed / 2;
     } else if (team.rotationPolicy == "Rotacion") {
-        score = player.skill * 8 + player.fitness * 6 - player.matchesPlayed * 2;
+        score = player.skill * 8 + player.fitness * 6 + player.currentForm * 2 + player.versatility -
+                player.matchesPlayed * 2;
     }
+    if (player.wantsToLeave) score -= 12;
     if (!team.captain.empty() && player.name == team.captain) score += 10;
     if (!team.penaltyTaker.empty() && player.name == team.penaltyTaker) score += 6;
     return score;
@@ -318,12 +475,11 @@ vector<int> Team::getStartingXIIndices() const {
         for (size_t i = 0; i < players.size(); ++i) {
             if (used[i]) continue;
             if (!isAvailableForSelection(players[i])) continue;
-            string norm = normalizePosition(players[i].position);
-            if (norm == pos) candidates.push_back(static_cast<int>(i));
+            if (positionFitScore(players[i], pos) >= 40) candidates.push_back(static_cast<int>(i));
         }
         sort(candidates.begin(), candidates.end(), [&](int a, int b) {
-            int aScore = selectionScore(*this, a);
-            int bScore = selectionScore(*this, b);
+            int aScore = selectionScore(*this, a) + positionFitScore(players[a], pos) * 6;
+            int bScore = selectionScore(*this, b) + positionFitScore(players[b], pos) * 6;
             if (aScore != bScore) return aScore > bScore;
             return players[a].skill > players[b].skill;
         });
@@ -813,7 +969,7 @@ static string encodePendingTransfers(const vector<PendingTransfer>& entries) {
         out += e.playerName + "^" + e.fromTeam + "^" + e.toTeam + "^" + to_string(e.effectiveSeason) + "^" +
                to_string(e.loanWeeks) + "^" + to_string(e.fee) + "^" + to_string(e.wage) + "^" +
                to_string(e.contractWeeks) + "^" + to_string(e.preContract ? 1 : 0) + "^" +
-               to_string(e.loan ? 1 : 0);
+               to_string(e.loan ? 1 : 0) + "^" + e.promisedRole;
     }
     return out;
 }
@@ -837,11 +993,13 @@ static vector<PendingTransfer> decodePendingTransfers(const string& encoded) {
             e.contractWeeks = stoi(parts[7]);
             e.preContract = (parts[8] == "1");
             e.loan = (parts[9] == "1");
+            e.promisedRole = (parts.size() > 10) ? parts[10] : "Sin promesa";
         } else {
             e.wage = 0;
             e.contractWeeks = 104;
             e.preContract = (parts[6] == "1");
             e.loan = (parts[7] == "1");
+            e.promisedRole = "Sin promesa";
         }
         entries.push_back(e);
     }
@@ -890,10 +1048,10 @@ static int youthPlayersUsed(const Team& team) {
 }
 
 void Career::resetSeason() {
-    for (auto* team : activeTeams) {
-        team->resetSeasonStats();
-        team->morale = 50;
-        for (auto& p : team->players) {
+    for (auto& team : allTeams) {
+        team.resetSeasonStats();
+        team.morale = 50;
+        for (auto& p : team.players) {
             p.injured = false;
             p.injuryWeeks = 0;
             p.injuryType.clear();
@@ -908,6 +1066,8 @@ void Career::resetSeason() {
             p.startsThisSeason = 0;
             p.wantsToLeave = false;
             p.happiness = clampInt(p.happiness + 5, 1, 99);
+            p.currentForm = clampInt(44 + p.professionalism / 4 + randInt(-8, 8), 20, 88);
+            ensurePlayerProfile(p, false);
         }
     }
     buildSchedule();
@@ -928,6 +1088,8 @@ void Career::agePlayers() {
             }
             if (player.fitness > player.stamina) player.fitness = player.stamina;
             if (player.potential < player.skill) player.potential = player.skill;
+            player.currentForm = clampInt((player.currentForm + 50) / 2 + randInt(-4, 4), 15, 90);
+            ensurePlayerProfile(player, false);
         }
     }
 }
@@ -987,6 +1149,12 @@ void Career::executePendingTransfers() {
             if (move.wage > 0) player.wage = move.wage;
             if (move.contractWeeks > 0) player.contractWeeks = move.contractWeeks;
             player.releaseClause = max(player.value * 2, player.wage * 45);
+            if (!move.promisedRole.empty()) {
+                player.promisedRole = move.promisedRole;
+                if (move.promisedRole == "Titular") player.desiredStarts = max(player.desiredStarts, 4);
+                else if (move.promisedRole == "Rotacion") player.desiredStarts = max(player.desiredStarts, 2);
+                else if (move.promisedRole == "Proyecto") player.desiredStarts = max(player.desiredStarts, 2);
+            }
             from->players.erase(from->players.begin() + playerIdx);
             to->addPlayer(player);
             addNews(player.name + " se incorpora a " + to->name + " por precontrato.");
@@ -1138,7 +1306,11 @@ static string encodePlayerFields(const Player& p) {
        << p.yellowAccumulation << "|" << p.seasonYellowCards << "|" << p.seasonRedCards << "|" << p.matchesSuspended
        << "|" << p.role << "|" << p.setPieceSkill << "|" << p.leadership << "|" << p.professionalism
        << "|" << p.ambition << "|" << p.happiness << "|" << p.chemistry << "|" << p.desiredStarts
-       << "|" << p.startsThisSeason << "|" << p.wantsToLeave;
+       << "|" << p.startsThisSeason << "|" << p.wantsToLeave
+       << "|" << p.developmentPlan << "|" << p.promisedRole << "|" << encodeStringList(p.traits)
+       << "|" << p.preferredFoot << "|" << encodeStringList(p.secondaryPositions)
+       << "|" << p.consistency << "|" << p.bigMatches << "|" << p.currentForm
+       << "|" << p.tacticalDiscipline << "|" << p.versatility;
     return ss.str();
 }
 
@@ -1233,6 +1405,24 @@ static Player decodePlayerFields(const vector<string>& pf) {
     } else {
         p.wantsToLeave = false;
     }
+    if (idx < pf.size()) p.developmentPlan = pf[idx++];
+    else p.developmentPlan = defaultDevelopmentPlanForPosition(p.position);
+    if (idx < pf.size()) p.promisedRole = pf[idx++];
+    else p.promisedRole = "Sin promesa";
+    if (idx < pf.size()) p.traits = decodeStringList(pf[idx++]);
+    if (idx < pf.size()) p.preferredFoot = pf[idx++];
+    if (idx < pf.size()) p.secondaryPositions = decodeStringList(pf[idx++]);
+    if (idx < pf.size()) p.consistency = stoi(pf[idx++]);
+    else p.consistency = 0;
+    if (idx < pf.size()) p.bigMatches = stoi(pf[idx++]);
+    else p.bigMatches = 0;
+    if (idx < pf.size()) p.currentForm = stoi(pf[idx++]);
+    else p.currentForm = 0;
+    if (idx < pf.size()) p.tacticalDiscipline = stoi(pf[idx++]);
+    else p.tacticalDiscipline = 0;
+    if (idx < pf.size()) p.versatility = stoi(pf[idx++]);
+    else p.versatility = 0;
+    ensurePlayerProfile(p, p.traits.empty());
     return p;
 }
 
@@ -1240,6 +1430,7 @@ bool Career::saveCareer() {
     ofstream file(saveFile);
     if (!file.is_open()) return false;
 
+    file << "VERSION " << kCareerSaveVersion << "\n";
     file << "SEASON " << currentSeason << " WEEK " << currentWeek << "\n";
     file << "DIVISION " << activeDivision << "\n";
     file << "MYTEAM " << (myTeam ? myTeam->name : "") << "\n";
@@ -1254,6 +1445,7 @@ bool Career::saveCareer() {
          << "|" << boardYouthTarget << "|" << boardWarningWeeks << "\n";
     file << "NEWS " << encodeStringList(newsFeed) << "\n";
     file << "SCOUT " << encodeStringList(scoutInbox) << "\n";
+    file << "SHORTLIST " << encodeStringList(scoutingShortlist) << "\n";
     file << "HISTORY " << encodeHistory(history) << "\n";
     file << "PENDING " << encodePendingTransfers(pendingTransfers) << "\n";
     file << "CUP " << (cupActive ? 1 : 0) << "|" << cupRound << "|" << encodeStringList(cupRemainingTeams)
@@ -1273,7 +1465,7 @@ bool Career::saveCareer() {
              << "|" << team.rotationPolicy << "|" << team.assistantCoach << "|" << team.fitnessCoach << "|" << team.scoutingChief
              << "|" << team.youthCoach << "|" << team.medicalTeam << "|" << team.youthRegion << "|" << team.debt
              << "|" << team.sponsorWeekly << "|" << team.stadiumLevel << "|" << team.youthFacilityLevel
-             << "|" << team.trainingFacilityLevel << "|" << team.fanBase << "\n";
+             << "|" << team.trainingFacilityLevel << "|" << team.fanBase << "|" << team.matchInstruction << "\n";
         file << "PLAYERS " << team.players.size() << "\n";
         for (const auto& p : team.players) {
             file << "PLAYER " << encodePlayerFields(p) << "\n";
@@ -1290,6 +1482,14 @@ bool Career::loadCareer() {
     string line;
     if (!getline(file, line)) return false;
     line = trim(line);
+
+    int saveVersion = 1;
+    if (line.rfind("VERSION ", 0) == 0) {
+        saveVersion = stoi(trim(line.substr(8)));
+        if (saveVersion > kCareerSaveVersion) return false;
+        if (!getline(file, line)) return false;
+        line = trim(line);
+    }
 
     if (line.rfind("SEASON ", 0) == 0) {
         string token;
@@ -1359,6 +1559,11 @@ bool Career::loadCareer() {
         scoutInbox.clear();
         if (teamsLine.rfind("SCOUT ", 0) == 0) {
             scoutInbox = decodeStringList(trim(teamsLine.substr(6)));
+            if (!getline(file, teamsLine)) return false;
+        }
+        scoutingShortlist.clear();
+        if (teamsLine.rfind("SHORTLIST ", 0) == 0) {
+            scoutingShortlist = decodeStringList(trim(teamsLine.substr(10)));
             if (!getline(file, teamsLine)) return false;
         }
         history.clear();
@@ -1478,6 +1683,8 @@ bool Career::loadCareer() {
             else team.trainingFacilityLevel = 1;
             if (fields.size() > extra + 28) team.fanBase = stoi(fields[extra + 28]);
             else team.fanBase = 12;
+            if (fields.size() > extra + 29) team.matchInstruction = fields[extra + 29];
+            else team.matchInstruction = "Equilibrado";
             if (fields.size() <= extra + 19) {
                 team.preferredBench.clear();
                 if (fields.size() > extra + 11) team.captain = fields[extra + 11];
@@ -1493,6 +1700,7 @@ bool Career::loadCareer() {
                 team.cornerTaker = team.penaltyTaker;
                 team.assistantCoach = team.fitnessCoach = team.scoutingChief = team.youthCoach = team.medicalTeam = 55;
                 team.youthRegion = "Metropolitana";
+                team.matchInstruction = "Equilibrado";
             }
 
             if (!getline(file, line)) return false;
@@ -1539,6 +1747,7 @@ bool Career::loadCareer() {
     managerReputation = 50;
     newsFeed.clear();
     scoutInbox.clear();
+    scoutingShortlist.clear();
     history.clear();
     pendingTransfers.clear();
     boardMonthlyObjective.clear();
@@ -1614,7 +1823,7 @@ bool Career::loadCareer() {
                 p.seasonYellowCards = 0;
                 p.seasonRedCards = 0;
                 p.matchesSuspended = 0;
-                p.role = defaultRoleForPosition(p.position);
+                ensurePlayerProfile(p, true);
                 myTeam->addPlayer(p);
             } catch (...) {
             }

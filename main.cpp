@@ -70,6 +70,8 @@ static int runConsoleApp() {
                 if (!managerName.empty()) career.managerName = managerName;
                 career.managerReputation = 50;
                 career.newsFeed.clear();
+                career.scoutInbox.clear();
+                career.scoutingShortlist.clear();
                 career.history.clear();
                 career.pendingTransfers.clear();
                 cout << "Has elegido: " << career.myTeam->name << endl;

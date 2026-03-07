@@ -320,14 +320,60 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - suite `FootballManager.exe --validate` ejecutada con resultado sin fallas
   - arranque del ejecutable y salida por menu principal verificados
 
+## Cambios recientes (2026-03-07) - Estabilidad de compilacion y ejecucion
+- Corregido `build.bat` para que la compilacion sea lineal y deterministica, sin pausas ni subrutinas que dejaban un `FootballManager.exe` inestable.
+- El ejecutable final vuelve a generarse correctamente en `FootballManager.exe` y ya no dispara el error de aplicacion por lectura invalida de memoria al correr validaciones.
+- Se retiraron trazas temporales de depuracion usadas para aislar el fallo durante la investigacion.
+- Validaciones realizadas:
+  - compilacion verificada exitosamente con el nuevo `build.bat`
+  - `FootballManager.exe --validate` ejecutado con resultado sin fallas
+
+## Cambios recientes (2026-03-07) - GUI jugable y versionado de saves
+- La GUI gano una barra de vistas y acciones rapidas en la ventana principal.
+- Nuevas vistas dentro del panel izquierdo:
+  - resumen
+  - competicion
+  - directiva
+  - club y finanzas
+  - scouting
+- Nuevas acciones jugables desde GUI, sin pasar por la consola:
+  - otear jugadores automaticamente segun necesidad del plantel
+  - fichar un objetivo seleccionado del centro de transferencias
+  - firmar precontratos sobre objetivos elegibles
+  - renovar contratos desde el plantel
+  - vender jugadores desde el plantel
+  - mejorar cantera, entrenamiento, scouting y estadio
+- `app_services.cpp` / `app_services.h` ampliados para soportar desde GUI:
+  - resumenes de competicion, directiva, club y scouting
+  - scouting automatico reutilizable
+  - mejoras de club reutilizables
+  - fichaje directo, precontrato, renovacion y venta por servicio
+- `models.cpp` ahora guarda version del save con cabecera `VERSION 2` y `loadCareer()` acepta retrocompatibilidad con saves sin version.
+- `validators.cpp` ahora verifica tambien que el archivo de carrera guardado incluya version de save.
+- Validaciones realizadas:
+  - compilacion verificada exitosamente con `build.bat`
+  - `FootballManager.exe --validate` ejecutado con resultado sin fallas
+
 ## Cambios recientes (2026-03-06) - Interfaz grafica
 - Agregado nuevo modulo `gui.cpp` / `gui.h` con una interfaz grafica nativa Win32 para Windows.
 - La GUI permite:
   - iniciar una carrera nueva eligiendo division, equipo y manager
   - cargar y guardar carrera
   - simular semanas desde la ventana principal
-  - ver resumen del club, noticias, tabla y plantel
+  - ver resumen del club, noticias, tabla, plantel y centro de transferencias
   - ejecutar la validacion del sistema desde un boton
+- Agregado un nuevo bloque "Centro de transferencias" en la GUI principal.
+- El centro de transferencias muestra:
+  - precontratos y movimientos pendientes
+  - jugadores con contratos cortos
+  - jugadores que quieren salir
+  - prestamos entrantes y salientes
+  - objetivos destacados del mercado
+- El resumen principal de la GUI ahora tambien incluye alertas resumidas del mercado:
+  - cantidad de pendientes
+  - contratos por vencer
+  - jugadores que quieren salir
+  - conteo de prestamos
 - `main.cpp` ahora abre la GUI por defecto; la interfaz de consola sigue disponible con `FootballManager.exe --cli`.
 - Ajustado `ui.cpp` para soportar seleccion automatica de nuevo club al ser despedido cuando el juego corre en modo GUI.
 - Corregido `Career::initializeLeague` para limpiar `myTeam` y evitar punteros colgantes al recargar datos.
@@ -359,4 +405,130 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - `build.bat` y `README.md` actualizados para incluir `app_services.cpp`.
 - Validaciones realizadas:
   - compilacion verificada exitosamente
+  - `FootballManager.exe --validate` ejecutado con resultado sin fallas
+
+## Cambios recientes (2026-03-07) - Revision tecnica completa
+- Revisados todos los archivos fuente principales del proyecto para detectar errores de compilacion, validacion o inconsistencias evidentes.
+- Ejecutada una pasada global de chequeo sobre:
+  - compilacion completa con `build.bat`
+  - validacion interna con `FootballManager.exe --validate`
+  - revision estatica de todas las fuentes `.cpp` con `g++ -std=c++17 -Wall -Wextra -Wpedantic -fsyntax-only`
+- Corregido un warning menor en `gui.cpp` por un parametro sin uso dentro de `playerRole(...)`.
+- Resultado final de la revision:
+  - sin errores de compilacion
+  - sin fallas en la suite de validacion
+  - sin warnings en la pasada estatica aplicada a las fuentes principales
+
+## Cambios recientes (2026-03-07) - Nuevas mecanicas deportivas, de vestuario y negociacion
+- Agregadas nuevas mecanicas persistentes de jugador en `models.h` / `models.cpp`:
+  - rasgos individuales (`traits`)
+  - plan de desarrollo (`developmentPlan`)
+  - promesa contractual (`promisedRole`)
+- Agregada nueva instruccion de partido por equipo en `Team.matchInstruction`.
+- El guardado de carrera sube a `VERSION 3` y mantiene retrocompatibilidad de carga para saves anteriores sin estos campos.
+- Los jugadores generados aleatoriamente y juveniles ahora nacen con rasgos y plan individual por defecto.
+- La simulacion en `simulation.cpp` ahora usa estas mecanicas:
+  - rasgos que alteran ataque/defensa
+  - rasgos que afectan fatiga, tarjetas e impacto de lesion
+  - instrucciones de partido que cambian el comportamiento tactico del equipo
+  - ajuste de corners y juego a balon parado segun instruccion
+- La progresion semanal y mensual en `ui.cpp` ahora considera:
+  - planes de desarrollo individuales
+  - promesas de rol incumplidas
+  - lideres de vestuario y jugadores conflictivos
+  - noticias adicionales de prensa, aficion y tension interna
+- La negociacion en `app_services.cpp` / `app_services.h` se amplió con promesas:
+  - sin promesa
+  - titular
+  - rotacion
+  - proyecto
+- Las promesas ya afectan salario, duracion de contrato, felicidad y expectativa de minutos.
+- La GUI en `gui.cpp` ahora expone estas mecanicas:
+  - nuevo combo de promesa para fichajes, precontratos y renovaciones
+  - boton `Plan+` para ciclar el plan individual del jugador seleccionado
+  - boton de instruccion de partido para ciclar la instruccion activa del equipo
+  - detalle ampliado en seleccion de jugador y de objetivo de mercado con plan, promesa y rasgos
+  - vista de plantel con columnas de plan y promesa
+  - resumen principal con instruccion activa, lideres/promesas en riesgo y estado ampliado del vestuario
+- Los resumenes de `Club`, `Directiva` y `Scouting` ahora muestran:
+  - clima de vestuario
+  - lideres del plantel
+  - promesas en riesgo
+  - proyectos juveniles
+  - rasgos y perfil de personalidad en informes de scouting y shortlist
+- Ajustado tambien el flujo de consola para:
+  - mostrar plan/promesa/rasgos al ver el plantel
+  - permitir cambiar la instruccion de partido desde tacticas
+- `validators.cpp` ahora verifica tambien la persistencia de:
+  - instruccion de partido
+  - plan de desarrollo
+  - promesa contractual
+  - rasgos del jugador
+- Validaciones realizadas:
+  - compilacion verificada exitosamente con `build.bat`
+  - `FootballManager.exe --validate` ejecutado con resultado sin fallas
+  - revision estatica de las fuentes principales sin warnings
+
+## Cambios recientes (2026-03-07) - Profundidad estilo Football Manager
+- Ampliado el perfil persistente de jugador en `models.h` / `models.cpp` con nuevos atributos de contexto futbolistico:
+  - pie habil (`preferredFoot`)
+  - posiciones secundarias (`secondaryPositions`)
+  - consistencia
+  - rendimiento en partidos grandes
+  - forma actual
+  - disciplina tactica
+  - versatilidad
+- El guardado de carrera sube a `VERSION 4` y mantiene carga retrocompatible para saves anteriores sin estos campos.
+- Se agrego `ensurePlayerProfile(...)` para normalizar y completar automaticamente jugadores cargados desde:
+  - `players.csv`
+  - `players.txt`
+  - formatos legacy
+  - generacion aleatoria
+  - alta manual desde la UI
+- Mejorada la seleccion automatica del XI y de la banca:
+  - ahora pondera forma, consistencia, disciplina tactica y situacion contractual
+  - las posiciones secundarias ya cuentan al evaluar si un jugador puede cubrir un rol
+- Profundizado el motor de partidos en `simulation.cpp`:
+  - la forma, consistencia, disciplina tactica y pie habil ya modifican el rendimiento real
+  - los partidos clave ahora favorecen o castigan a futbolistas segun su atributo de `bigMatches`
+  - se agregaron/modularon mas roles efectivos en simulacion:
+    - `SweeperKeeper`
+    - `BallPlaying`
+    - `Organizador`
+    - `Interior`
+    - `Objetivo`
+  - las instrucciones colectivas tienen mas peso sobre ataque, defensa, fatiga, tarjetas y riesgo competitivo
+- Nuevas instrucciones de partido disponibles desde consola y GUI:
+  - `Por bandas`
+  - `Juego directo`
+  - `Contra-presion`
+  - `Pausar juego`
+- Ampliado el entrenamiento semanal en `ui.cpp`:
+  - nuevo foco `Preparacion partido`
+  - nuevo foco `Recuperacion`
+  - el entrenamiento tactico ahora mejora disciplina tactica
+  - la preparacion de partido mejora forma/chemistry
+  - la recuperacion acelera vuelta fisica y reduce tiempos de lesion leves
+- Mejorado el scouting en consola y servicios:
+  - los informes ahora muestran pie habil, posiciones secundarias, forma, fiabilidad y rendimiento en partidos grandes
+  - el foco de posicion ya acepta jugadores capaces de cubrir la demarcacion por versatilidad, no solo por posicion primaria
+  - la shortlist actualizada hereda este nivel de detalle
+- Mejoradas las negociaciones y sueldos:
+  - la demanda salarial ahora considera forma actual, consistencia y peso competitivo del jugador
+- Mejorado el analisis post-partido:
+  - se agrego una estimacion simple de xG
+  - se añade una recomendacion automatica de ajuste tactico para la semana siguiente
+- Implementada actividad de mundo en segundo plano:
+  - las otras divisiones del proyecto ahora juegan fechas en background mientras avanzas tu carrera
+  - se generan titulares de resultados externos en `newsFeed`
+  - CPU de otras divisiones tambien renueva contratos y mueve planteles fuera de tu categoria activa
+- Ajustada la progresion semanal global:
+  - recuperacion, entrenamiento y evolucion contractual ya no quedan limitados solo a la division activa
+- Mejorada la GUI en `gui.cpp`:
+  - nuevos detalles de jugador con pie habil, posiciones secundarias, forma y fiabilidad
+  - resumen de mercado mas informativo
+  - etiquetas cortas para las nuevas instrucciones de partido
+- `validators.cpp` actualizado para comprobar persistencia de los nuevos atributos avanzados del jugador.
+- Validaciones realizadas:
+  - compilacion verificada exitosamente con `build.bat`
   - `FootballManager.exe --validate` ejecutado con resultado sin fallas

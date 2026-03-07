@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <iostream>
 #include <unordered_map>
+#include <unordered_set>
 
 using namespace std;
 
@@ -46,7 +47,10 @@ static long long estimatedAgentFee(const Player& player, long long transferFee) 
 }
 
 static long long wageDemandFor(const Player& player) {
-    return max(player.wage, static_cast<long long>(player.skill) * 170 + player.potential * 25);
+    long long performancePremium = static_cast<long long>(player.currentForm) * 60 +
+                                   static_cast<long long>(player.bigMatches) * 40 +
+                                   static_cast<long long>(player.consistency) * 30;
+    return max(player.wage, static_cast<long long>(player.skill) * 170 + player.potential * 25 + performancePremium);
 }
 
 static int playerIndexByName(const Team& team, const string& name) {
@@ -74,7 +78,7 @@ static vector<pair<Team*, int>> buildTransferPool(Career& career, const string& 
         for (size_t i = 0; i < club.players.size(); ++i) {
             const Player& player = club.players[i];
             if (player.onLoan) continue;
-            if (!filterPos.empty() && normalizePosition(player.position) != filterPos) continue;
+            if (!filterPos.empty() && positionFitScore(player, filterPos) < 70) continue;
             if (player.age > 35) continue;
             pool.push_back({&club, static_cast<int>(i)});
         }
@@ -147,6 +151,8 @@ static void buyFromClub(Career& career) {
         long long ask = max(player.value, player.releaseClause * 65 / 100);
         cout << i + 1 << ". " << player.name << " (" << player.position << ", " << seller->name << ")"
              << " Hab " << player.skill << " | Valor $" << player.value
+             << " | Pie " << player.preferredFoot
+             << " | Forma " << playerFormLabel(player)
              << " | Pedido $" << ask << " | Clausula $" << player.releaseClause << endl;
     }
     int choice = readInt("Elige jugador (0 para cancelar): ", 0, static_cast<int>(pool.size()));
@@ -411,7 +417,8 @@ static void signPreContract(Career& career) {
         return;
     }
     career.myTeam->budget -= signingBonus;
-    career.pendingTransfers.push_back({player.name, from->name, career.myTeam->name, career.currentSeason + 1, 0, 0, newWage, contractWeeks, true, false});
+    career.pendingTransfers.push_back({player.name, from->name, career.myTeam->name, career.currentSeason + 1, 0, 0,
+                                       newWage, contractWeeks, true, false, "Sin promesa"});
     career.addNews(player.name + " firma un precontrato con " + career.myTeam->name + ".");
     cout << "Precontrato firmado para la temporada siguiente." << endl;
 }
@@ -511,7 +518,7 @@ void scoutPlayers(Career& career) {
         for (size_t i = 0; i < club.players.size(); ++i) {
             const Player& player = club.players[i];
             if (player.onLoan) continue;
-            if (!focusPos.empty() && normalizePosition(player.position) != focusPos) continue;
+            if (!focusPos.empty() && positionFitScore(player, focusPos) < 70) continue;
             reports.push_back({&club, static_cast<int>(i)});
         }
     }
@@ -522,8 +529,8 @@ void scoutPlayers(Career& career) {
     sort(reports.begin(), reports.end(), [&](const pair<Team*, int>& a, const pair<Team*, int>& b) {
         const Player& pa = a.first->players[a.second];
         const Player& pb = b.first->players[b.second];
-        int aFit = (normalizePosition(pa.position) == focusPos ? 10 : 0) + pa.potential + pa.professionalism / 2;
-        int bFit = (normalizePosition(pb.position) == focusPos ? 10 : 0) + pb.potential + pb.professionalism / 2;
+        int aFit = positionFitScore(pa, focusPos) + pa.potential + pa.professionalism / 2 + pa.currentForm / 2;
+        int bFit = positionFitScore(pb, focusPos) + pb.potential + pb.professionalism / 2 + pb.currentForm / 2;
         if (aFit != bFit) return aFit > bFit;
         return pa.skill > pb.skill;
     });
@@ -538,15 +545,25 @@ void scoutPlayers(Career& career) {
         int estSkillHi = clampInt(player.skill + error, 1, 99);
         int estPotLo = clampInt(player.potential - error, player.skill, 99);
         int estPotHi = clampInt(player.potential + error, player.skill, 99);
-        string fit = normalizePosition(player.position) == focusPos ? "ajuste alto" : "ajuste medio";
+        int fitScore = positionFitScore(player, focusPos);
+        string fit = fitScore >= 90 ? "ajuste alto" : (fitScore >= 75 ? "ajuste medio" : "ajuste parcial");
         cout << i + 1 << ". " << player.name << " (" << player.position << ", " << club->name << ", " << club->youthRegion << ")"
              << " Hab " << estSkillLo << "-" << estSkillHi
              << " | Pot " << estPotLo << "-" << estPotHi
              << " | " << fit
+             << " | Pie " << player.preferredFoot
+             << " | Sec " << (player.secondaryPositions.empty() ? string("-") : joinStringValues(player.secondaryPositions, "/"))
+             << " | Forma " << playerFormLabel(player)
+             << " | Fiabilidad " << playerReliabilityLabel(player)
+             << " | Partidos grandes " << player.bigMatches
              << " | Valor $" << player.value << endl;
         career.scoutInbox.push_back(player.name + " | " + club->name + " | " + club->youthRegion + " | Hab " +
                                     to_string(estSkillLo) + "-" + to_string(estSkillHi) + " | Pot " +
-                                    to_string(estPotLo) + "-" + to_string(estPotHi));
+                                    to_string(estPotLo) + "-" + to_string(estPotHi) +
+                                    " | Pie " + player.preferredFoot +
+                                    " | Sec " + (player.secondaryPositions.empty() ? string("-") : joinStringValues(player.secondaryPositions, "/")) +
+                                    " | Forma " + playerFormLabel(player) +
+                                    " | Perfil " + playerReliabilityLabel(player));
     }
     if (career.scoutInbox.size() > 30) {
         career.scoutInbox.erase(career.scoutInbox.begin(),
@@ -647,7 +664,8 @@ void displayCareerMenu() {
 void viewTeam(Team& team) {
     cout << "\nEquipo: " << team.name << endl;
     cout << "Tacticas: " << team.tactics << ", Formacion: " << team.formation
-         << ", Plan: " << team.trainingFocus << ", Presupuesto: $" << team.budget << endl;
+         << ", Plan: " << team.trainingFocus << ", Instruccion: " << team.matchInstruction
+         << ", Presupuesto: $" << team.budget << endl;
     cout << "Presion " << team.pressingIntensity << " | Linea " << team.defensiveLine
          << " | Tempo " << team.tempo << " | Amplitud " << team.width
          << " | Marcaje " << team.markingStyle << " | Rotacion " << team.rotationPolicy << endl;
@@ -732,9 +750,17 @@ void viewTeam(Team& team) {
                  << ", Rol " << p.role << ", Edad " << p.age << ", Valor $" << p.value
                  << ", Salario $" << p.wage << ", Clausula $" << p.releaseClause
                  << ", Contrato " << p.contractWeeks << " sem"
+                 << ", Pie " << p.preferredFoot
+                 << ", Sec " << (p.secondaryPositions.empty() ? string("-") : joinStringValues(p.secondaryPositions, "/"))
+                 << ", Forma " << playerFormLabel(p) << " (" << p.currentForm << ")"
+                 << ", Fiabilidad " << playerReliabilityLabel(p)
+                 << ", Partidos grandes " << p.bigMatches
                  << ", TA " << p.seasonYellowCards << ", TR " << p.seasonRedCards
                  << ", Fel " << p.happiness << ", Quim " << p.chemistry
                  << ", Lider " << p.leadership << ", Profesionalismo " << p.professionalism
+                 << ", Disciplina tactica " << p.tacticalDiscipline
+                 << ", Plan " << p.developmentPlan << ", Promesa " << p.promisedRole
+                 << ", Rasgos " << joinStringValues(p.traits, ", ")
                  << (p.wantsToLeave ? ", Quiere salir" : "")
                  << (p.onLoan ? ", Prestamo desde " + p.parentClub + " (" + to_string(p.loanWeeksRemaining) + " sem)" : "")
                  << endl;
@@ -783,7 +809,7 @@ void addPlayer(Team& team) {
     p.matchesPlayed = 0;
     p.lastTrainedSeason = -1;
     p.lastTrainedWeek = -1;
-    p.role = defaultRoleForPosition(p.position);
+    ensurePlayerProfile(p, true);
     team.addPlayer(p);
     cout << "Jugador agregado!" << endl;
 }
@@ -889,6 +915,26 @@ void changeTactics(Team& team) {
     cout << "2. Hombre" << endl;
     int marking = readInt("Tipo de marcaje: ", 1, 2);
     team.markingStyle = (marking == 2) ? "Hombre" : "Zonal";
+    cout << "Instruccion de partido actual: " << team.matchInstruction << endl;
+    cout << "1. Equilibrado" << endl;
+    cout << "2. Laterales altos" << endl;
+    cout << "3. Bloque bajo" << endl;
+    cout << "4. Balon parado" << endl;
+    cout << "5. Presion final" << endl;
+    cout << "6. Por bandas" << endl;
+    cout << "7. Juego directo" << endl;
+    cout << "8. Contra-presion" << endl;
+    cout << "9. Pausar juego" << endl;
+    int instruction = readInt("Nueva instruccion: ", 1, 9);
+    if (instruction == 2) team.matchInstruction = "Laterales altos";
+    else if (instruction == 3) team.matchInstruction = "Bloque bajo";
+    else if (instruction == 4) team.matchInstruction = "Balon parado";
+    else if (instruction == 5) team.matchInstruction = "Presion final";
+    else if (instruction == 6) team.matchInstruction = "Por bandas";
+    else if (instruction == 7) team.matchInstruction = "Juego directo";
+    else if (instruction == 8) team.matchInstruction = "Contra-presion";
+    else if (instruction == 9) team.matchInstruction = "Pausar juego";
+    else team.matchInstruction = "Equilibrado";
     cout << "Tacticas cambiadas a " << team.tactics << endl;
 }
 
@@ -1031,12 +1077,16 @@ void setTrainingPlan(Team& team) {
     cout << "2. Fisico" << endl;
     cout << "3. Tecnico" << endl;
     cout << "4. Tactico" << endl;
-    int choice = readInt("Elige plan: ", 1, 4);
+    cout << "5. Preparacion partido" << endl;
+    cout << "6. Recuperacion" << endl;
+    int choice = readInt("Elige plan: ", 1, 6);
     switch (choice) {
         case 1: team.trainingFocus = "Balanceado"; break;
         case 2: team.trainingFocus = "Fisico"; break;
         case 3: team.trainingFocus = "Tecnico"; break;
         case 4: team.trainingFocus = "Tactico"; break;
+        case 5: team.trainingFocus = "Preparacion partido"; break;
+        case 6: team.trainingFocus = "Recuperacion"; break;
         default: break;
     }
     cout << "Plan actualizado a " << team.trainingFocus << endl;
@@ -1077,11 +1127,57 @@ static void applyTrainingPlan(Team& team) {
         for (auto& p : team.players) {
             if (p.injured) continue;
             p.fitness = clampInt(p.fitness + 1 + facilityBonus + fitnessBonus, 15, p.stamina);
+            p.tacticalDiscipline = clampInt(p.tacticalDiscipline + 1, 1, 99);
+        }
+    } else if (focus == "Preparacion partido") {
+        team.morale = clampInt(team.morale + 1 + assistantBonus, 0, 100);
+        for (auto& p : team.players) {
+            if (p.injured) continue;
+            p.fitness = clampInt(p.fitness + 1 + facilityBonus, 15, p.stamina);
+            p.currentForm = clampInt(p.currentForm + 1 + assistantBonus / 2, 1, 99);
+            p.chemistry = clampInt(p.chemistry + 1, 1, 99);
+        }
+    } else if (focus == "Recuperacion") {
+        for (auto& p : team.players) {
+            if (p.injured) {
+                p.injuryWeeks = max(0, p.injuryWeeks - 1);
+                if (p.injuryWeeks == 0) {
+                    p.injured = false;
+                    p.injuryType.clear();
+                }
+            }
+            p.fitness = clampInt(p.fitness + 3 + facilityBonus + fitnessBonus, 15, p.stamina);
+            if (p.fitness >= p.stamina - 2) {
+                p.currentForm = clampInt(p.currentForm + 1, 1, 99);
+            }
         }
     } else {
         for (auto& p : team.players) {
             if (p.injured) continue;
             p.fitness = clampInt(p.fitness + 1 + facilityBonus + fitnessBonus, 15, p.stamina);
+        }
+    }
+
+    int planChance = clampInt(10 + facilityBonus * 2 + assistantBonus, 6, 28);
+    for (auto& p : team.players) {
+        if (p.injured) continue;
+        if (p.developmentPlan == "Fisico") {
+            p.fitness = clampInt(p.fitness + 1, 15, p.stamina);
+            if (randInt(1, 100) <= planChance) p.stamina = min(100, p.stamina + 1);
+        } else if (p.developmentPlan == "Defensa" || p.developmentPlan == "Reflejos") {
+            if (randInt(1, 100) <= planChance) p.defense = min(100, p.defense + 1);
+        } else if (p.developmentPlan == "Creatividad") {
+            if (randInt(1, 100) <= planChance) {
+                p.attack = min(100, p.attack + 1);
+                p.setPieceSkill = min(99, p.setPieceSkill + 1);
+            }
+        } else if (p.developmentPlan == "Finalizacion") {
+            if (randInt(1, 100) <= planChance) p.attack = min(100, p.attack + 1);
+        } else if (p.developmentPlan == "Liderazgo") {
+            if (randInt(1, 100) <= max(8, planChance - 2)) {
+                p.leadership = min(99, p.leadership + 1);
+                if (randInt(1, 100) <= 40) p.professionalism = min(99, p.professionalism + 1);
+            }
         }
     }
 }
@@ -1626,23 +1722,31 @@ static void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore)
     for (size_t i = 0; i < career.activeTeams.size(); ++i) {
         Team* team = career.activeTeams[i];
         int pointsDelta = team->points - pointsBefore[i];
+        if (pointsDelta >= 3) team->fanBase = clampInt(team->fanBase + 1, 10, 99);
+        else if (pointsDelta == 0 && team->fanBase > 12 && randInt(1, 100) <= 30) team->fanBase--;
         long long ticketIncome = static_cast<long long>(homeGames[team]) * (team->fanBase * 2500LL + team->stadiumLevel * 7000LL);
-        long long sponsor = team->sponsorWeekly;
+        long long seasonTickets = (career.currentWeek % 4 == 1) ? team->fanBase * 900LL : 0LL;
+        long long sponsor = team->sponsorWeekly + max(0, pointsDelta) * 800LL;
         long long performanceBonus = pointsDelta * 4000LL;
         long long solidarity = randInt(0, 3000);
-        long long income = divisionBaseIncome(team->division) + sponsor + ticketIncome + performanceBonus + solidarity;
+        long long income = divisionBaseIncome(team->division) + sponsor + ticketIncome + seasonTickets + performanceBonus + solidarity;
         long long wages = weeklyWage(*team);
         long long debtPayment = min(team->debt, max(0LL, income / 8));
         team->debt -= debtPayment;
+        long long debtInterest = max(0LL, team->debt / 250);
         long long infrastructure = (team->trainingFacilityLevel + team->youthFacilityLevel + team->stadiumLevel - 3) * 1500LL;
-        long long net = income - wages - debtPayment - infrastructure;
+        long long net = income - wages - debtPayment - debtInterest - infrastructure;
         team->budget = max(0LL, team->budget + net);
+        if (career.currentWeek % 8 == 0 && pointsDelta >= 3) {
+            team->sponsorWeekly += max(500LL, team->fanBase * 30LL);
+        }
         if (career.myTeam == team) {
             ostringstream out;
             out << "Finanzas semanales: +" << income
-                << " (entradas " << ticketIncome << ", sponsor " << sponsor << ")"
+                << " (entradas " << ticketIncome << ", abonos " << seasonTickets << ", sponsor " << sponsor << ")"
                 << " / -" << wages << " salarios"
                 << " / -" << debtPayment << " deuda"
+                << " / -" << debtInterest << " interes"
                 << " / -" << infrastructure << " infraestructura"
                 << " = " << net;
             emitUiMessage(out.str());
@@ -1692,7 +1796,8 @@ static void weeklyDashboard(const Career& career) {
         ostringstream out;
         out << "Lesionados: " << injured
             << " | Suspendidos: " << suspended
-            << " | Contratos por vencer (<=4 sem): " << expiring;
+            << " | Contratos por vencer (<=4 sem): " << expiring
+            << " | Shortlist: " << career.scoutingShortlist.size();
         emitUiMessage(out.str());
     }
     if (!career.boardMonthlyObjective.empty()) {
@@ -1798,9 +1903,16 @@ static void addYouthPlayers(Team& team, int count) {
         string pos = positions[randInt(0, static_cast<int>(positions.size()) - 1)];
         int youthBoost = max(0, team.youthFacilityLevel - 1) + max(0, team.youthCoach - 55) / 12;
         Player youth = makeRandomPlayer(pos, minSkill + youthBoost, maxSkill + youthBoost, 16, 18);
-        youth.potential = clampInt(youth.skill + randInt(10 + youthBoost, 18 + youthBoost), youth.skill, 99);
+        bool eliteProspect = randInt(1, 100) <= clampInt(6 + team.youthFacilityLevel * 3 + max(0, team.youthCoach - 60) / 5, 4, 28);
+        int potFloor = eliteProspect ? 14 + youthBoost : 10 + youthBoost;
+        int potTop = eliteProspect ? 24 + youthBoost : 18 + youthBoost;
+        youth.potential = clampInt(youth.skill + randInt(potFloor, potTop), youth.skill, 99);
         youth.chemistry = clampInt(youth.chemistry + max(0, team.youthCoach - 55) / 10, 1, 99);
         youth.professionalism = clampInt(youth.professionalism + max(0, team.youthCoach - 55) / 12, 1, 99);
+        if (eliteProspect) {
+            youth.value = max(youth.value, static_cast<long long>(youth.potential) * 12000LL);
+            youth.role = (pos == "DEL") ? "Poacher" : (pos == "MED" ? "BoxToBox" : defaultRoleForPosition(pos));
+        }
         team.addPlayer(youth);
     }
 }
@@ -1854,19 +1966,39 @@ static void storeMatchAnalysis(Career& career,
     int oppPoss = myHome ? result.awayPossession : result.homePossession;
     int mySubs = myHome ? result.homeSubstitutions : result.awaySubstitutions;
     int oppSubs = myHome ? result.awaySubstitutions : result.homeSubstitutions;
+    int myCorners = myHome ? result.homeCorners : result.awayCorners;
+    int oppCorners = myHome ? result.awayCorners : result.homeCorners;
+    double myXg = max(0.2, myShots * 0.11 + myCorners * 0.05 + max(0, myPoss - 50) * 0.015);
+    double oppXg = max(0.2, oppShots * 0.11 + oppCorners * 0.05 + max(0, oppPoss - 50) * 0.015);
     string opponent = myHome ? away.name : home.name;
     string verdict = (myGoals > oppGoals) ? "Partido controlado" : (myGoals < oppGoals ? "Derrota con ajustes pendientes" : "Empate cerrado");
+    string recommendation = "Mantener base y ajustar rotacion segun forma individual";
 
     if (myShots < oppShots && myPoss < 50) verdict += ", falto presencia ofensiva";
     else if (myShots > oppShots && myGoals <= oppGoals) verdict += ", falto eficacia";
     else if (myPoss >= 55 && myGoals >= oppGoals) verdict += ", buen control del ritmo";
+    if (myCorners > oppCorners + 2) verdict += ", se cargo el area rival";
+    if (myPoss < 45 && myGoals > oppGoals) verdict += ", transiciones muy efectivas";
+    if (myShots + 2 < oppShots && myPoss < 48) {
+        recommendation = "Subir un punto la altura de linea o el tempo para recuperar iniciativa";
+    } else if (myGoals < oppGoals && myShots >= oppShots) {
+        recommendation = "Trabajar finalizacion y pelota parada en la semana";
+    } else if (myCorners + 2 < oppCorners) {
+        recommendation = "Explorar 'Por bandas' o laterales mas altos para cargar el area";
+    } else if (myPoss >= 55 && myGoals == 0) {
+        recommendation = "Mantener posesion pero acelerar ultimo tercio con juego mas directo";
+    }
 
     career.lastMatchAnalysis =
         string(cupMatch ? "Copa" : "Liga") + ": " + career.myTeam->name + " " + to_string(myGoals) + "-" +
         to_string(oppGoals) + " " + opponent + " | Tiros " + to_string(myShots) + "-" + to_string(oppShots) +
         " | Posesion " + to_string(myPoss) + "-" + to_string(oppPoss) +
+        " | Corners " + to_string(myCorners) + "-" + to_string(oppCorners) +
+        " | xG " + to_string(static_cast<int>(myXg * 10 + 0.5)) + "/" + to_string(static_cast<int>(oppXg * 10 + 0.5)) +
         " | Cambios " + to_string(mySubs) + "-" + to_string(oppSubs) +
-        " | " + verdict;
+        " | Clima " + result.weather +
+        " | " + verdict +
+        " | Recomendacion: " + recommendation;
 }
 
 static void simulateSeasonCupRound(Career& career) {
@@ -1933,11 +2065,31 @@ static void updateSquadDynamics(Career& career, int pointsDelta) {
         captainLeadership = career.myTeam->players[captainIdx].leadership;
     }
 
+    auto expectedStartsForPromise = [&](const Player& player) {
+        if (player.promisedRole == "Titular") return max(2, career.currentWeek * 2 / 3);
+        if (player.promisedRole == "Rotacion") return max(1, career.currentWeek / 3);
+        if (player.promisedRole == "Proyecto") return (player.age <= 22) ? max(1, career.currentWeek / 4) : max(0, career.currentWeek / 6);
+        return max(0, career.currentWeek / 2 + player.desiredStarts - 1);
+    };
+
     for (auto& player : career.myTeam->players) {
         bool wasUnhappy = player.wantsToLeave;
-        int expectedStarts = max(0, career.currentWeek / 2 + player.desiredStarts - 1);
-        if (player.startsThisSeason < expectedStarts) player.happiness = clampInt(player.happiness - 2, 1, 99);
-        else player.happiness = clampInt(player.happiness + 1, 1, 99);
+        int expectedStarts = expectedStartsForPromise(player);
+        int unmetStarts = max(0, expectedStarts - player.startsThisSeason);
+        if (unmetStarts > 0) {
+            player.happiness = clampInt(player.happiness - min(4, 1 + unmetStarts), 1, 99);
+            if (player.skill >= career.myTeam->getAverageSkill() && unmetStarts >= 2) {
+                player.chemistry = clampInt(player.chemistry - 1, 1, 99);
+            }
+            if (player.promisedRole != "Sin promesa" && unmetStarts >= 2) {
+                player.happiness = clampInt(player.happiness - 2, 1, 99);
+            }
+        } else {
+            player.happiness = clampInt(player.happiness + 1, 1, 99);
+            if (player.promisedRole != "Sin promesa") {
+                player.happiness = clampInt(player.happiness + 1, 1, 99);
+            }
+        }
 
         if (pointsDelta == 3) {
             player.happiness = clampInt(player.happiness + 1, 1, 99);
@@ -1949,8 +2101,22 @@ static void updateSquadDynamics(Career& career, int pointsDelta) {
         if (player.wage < wageDemandFor(player) * 80 / 100) player.happiness = clampInt(player.happiness - 1, 1, 99);
         if (captainLeadership >= 75) player.chemistry = clampInt(player.chemistry + 1, 1, 99);
         if (career.myTeam->morale >= 65) player.happiness = clampInt(player.happiness + 1, 1, 99);
+        if (playerHasTrait(player, "Lider") && career.myTeam->morale >= 55) {
+            player.chemistry = clampInt(player.chemistry + 1, 1, 99);
+        }
+        if (playerHasTrait(player, "Caliente") && pointsDelta == 0) {
+            player.happiness = clampInt(player.happiness - 1, 1, 99);
+        }
+        if (player.leadership >= 75 && player.happiness >= 60) {
+            player.chemistry = clampInt(player.chemistry + 1, 1, 99);
+        }
+        if (player.professionalism >= 75 && player.startsThisSeason >= expectedStarts) {
+            player.happiness = clampInt(player.happiness + 1, 1, 99);
+        }
 
-        player.wantsToLeave = player.happiness <= 32 && (player.ambition >= 60 || player.professionalism <= 45);
+        int unrestThreshold = (player.skill >= career.myTeam->getAverageSkill() + 3) ? 38 : 32;
+        player.wantsToLeave = player.happiness <= unrestThreshold &&
+                              (player.ambition >= 60 || player.professionalism <= 45 || unmetStarts >= 3 || player.promisedRole != "Sin promesa");
         if (!wasUnhappy && player.wantsToLeave) {
             career.addNews(player.name + " queda disconforme con su situacion en " + career.myTeam->name + ".");
         }
@@ -1961,12 +2127,21 @@ static void runMonthlyDevelopment(Career& career) {
     if (career.currentWeek <= 0 || career.currentWeek % 4 != 0) return;
     for (auto* team : career.activeTeams) {
         int improved = 0;
+        int eliteImproved = 0;
         for (auto& player : team->players) {
             if (player.age > 21 || player.skill >= player.potential) continue;
             int chance = 6 + max(0, team->youthCoach - 55) / 10 + max(0, team->trainingFacilityLevel - 1) * 2;
             chance += max(0, player.professionalism - 55) / 15;
+            if (player.developmentPlan == "Finalizacion" || player.developmentPlan == "Creatividad" ||
+                player.developmentPlan == "Defensa" || player.developmentPlan == "Reflejos") {
+                chance += 2;
+            }
+            if (player.promisedRole == "Proyecto") chance += 2;
+            if (playerHasTrait(player, "Proyecto") || playerHasTrait(player, "Competidor")) chance += 2;
             if (randInt(1, 100) <= clampInt(chance, 4, 28)) {
-                player.skill = min(100, player.skill + 1);
+                int gain = 1;
+                if (player.age <= 19 && player.potential - player.skill >= 10 && randInt(1, 100) <= 28) gain++;
+                player.skill = min(100, player.skill + gain);
                 string pos = normalizePosition(player.position);
                 if (pos == "ARQ" || pos == "DEF") player.defense = min(100, player.defense + 1);
                 else if (pos == "MED") {
@@ -1975,7 +2150,17 @@ static void runMonthlyDevelopment(Career& career) {
                 } else {
                     player.attack = min(100, player.attack + 1);
                 }
+                if (player.developmentPlan == "Liderazgo") {
+                    player.leadership = min(99, player.leadership + 1);
+                    player.professionalism = min(99, player.professionalism + 1);
+                } else if (player.developmentPlan == "Creatividad") {
+                    player.setPieceSkill = min(99, player.setPieceSkill + 1);
+                } else if (player.developmentPlan == "Fisico") {
+                    player.stamina = min(100, player.stamina + 1);
+                    player.fitness = min(player.stamina, player.fitness + 1);
+                }
                 improved++;
+                if (gain > 1) eliteImproved++;
             }
         }
         int maxSquad = getCompetitionConfig(team->division).maxSquadSize;
@@ -1988,6 +2173,9 @@ static void runMonthlyDevelopment(Career& career) {
         }
         if (team == career.myTeam && improved > 0) {
             career.addNews("Informe juvenil: " + to_string(improved) + " jugador(es) joven(es) mejoran este mes.");
+            if (eliteImproved > 0) {
+                career.addNews("Informe de cantera: " + to_string(eliteImproved) + " prospecto(s) muestran una aceleracion especial.");
+            }
         }
     }
 }
@@ -2014,6 +2202,92 @@ static string weakestSquadPosition(const Team& team) {
         }
     }
     return bestPos;
+}
+
+static void updateShortlistAlerts(Career& career) {
+    if (!career.myTeam || career.scoutingShortlist.empty()) return;
+    if (career.currentWeek % 4 != 0) return;
+
+    vector<string> active;
+    for (const auto& item : career.scoutingShortlist) {
+        auto parts = splitByDelimiter(item, '|');
+        if (parts.size() < 2) continue;
+        Team* seller = career.findTeamByName(parts[0]);
+        if (!seller) continue;
+        int idx = playerIndexByName(*seller, parts[1]);
+        if (idx < 0) continue;
+        const Player& player = seller->players[static_cast<size_t>(idx)];
+        active.push_back(item);
+        if (player.contractWeeks <= 12) {
+            career.addNews("Alerta de shortlist: " + player.name + " entra en ventana de precontrato con " + seller->name + ".");
+        } else if (player.value <= player.releaseClause * 60 / 100) {
+            career.addNews("Alerta de shortlist: " + player.name + " mantiene un costo accesible en " + seller->name + ".");
+        }
+    }
+    career.scoutingShortlist = active;
+}
+
+static void generateWeeklyNarratives(Career& career, int myTeamPointsDelta) {
+    if (!career.myTeam) return;
+    int rank = career.currentCompetitiveRank();
+    int field = max(1, career.currentCompetitiveFieldSize());
+    if (rank > 0 && rank <= max(2, field / 4)) {
+        career.addNews("La prensa destaca a " + career.myTeam->name + " por su presencia en la zona alta.");
+    } else if (rank >= max(2, field - field / 4)) {
+        career.addNews("La prensa pone a " + career.myTeam->name + " en la pelea por evitar el fondo.");
+    }
+
+    if (myTeamPointsDelta == 3 && career.myTeam->morale >= 65) {
+        career.addNews("El vestuario de " + career.myTeam->name + " atraviesa un momento de confianza.");
+    } else if (myTeamPointsDelta == 0 && career.boardConfidence <= 30) {
+        career.addNews("Crece la tension institucional alrededor de " + career.myTeam->name + ".");
+    }
+
+    int promiseAlerts = 0;
+    int leaders = 0;
+    for (const auto& player : career.myTeam->players) {
+        if (player.promisedRole == "Titular" && player.startsThisSeason + 2 < max(2, career.currentWeek * 2 / 3)) promiseAlerts++;
+        if (player.promisedRole == "Rotacion" && player.startsThisSeason + 1 < max(1, career.currentWeek / 3)) promiseAlerts++;
+        if ((player.leadership >= 72 || playerHasTrait(player, "Lider")) && player.happiness >= 55) leaders++;
+    }
+    if (promiseAlerts > 0) {
+        career.addNews("Se acumulan " + to_string(promiseAlerts) + " promesa(s) de rol bajo presion en el plantel.");
+    }
+    if (career.myTeam->fanBase >= 65 && myTeamPointsDelta == 3) {
+        career.addNews("La aficion responde con entusiasmo y empuja la recaudacion del club.");
+    } else if (career.myTeam->fanBase >= 45 && myTeamPointsDelta == 0) {
+        career.addNews("La prensa cuestiona la falta de resultados recientes de " + career.myTeam->name + ".");
+    }
+    if (leaders >= 3 && career.myTeam->morale >= 60) {
+        career.addNews("Los lideres del vestuario sostienen un ambiente competitivo en " + career.myTeam->name + ".");
+    }
+
+    for (const auto& player : career.myTeam->players) {
+        if (player.contractWeeks > 0 && player.contractWeeks <= 4) {
+            career.addNews("Contrato al limite: " + player.name + " entra en sus ultimas " + to_string(player.contractWeeks) + " semana(s).");
+            break;
+        }
+    }
+}
+
+static void applyDepartureShock(Team& team, const Player& player) {
+    bool keyPlayer = player.skill >= team.getAverageSkill();
+    if (!keyPlayer) return;
+    team.morale = clampInt(team.morale - 3, 0, 100);
+    for (auto& mate : team.players) {
+        if (mate.name == player.name) continue;
+        mate.chemistry = clampInt(mate.chemistry - 1, 1, 99);
+        if (player.leadership >= 70) mate.happiness = clampInt(mate.happiness - 1, 1, 99);
+    }
+}
+
+static void detachNamedResponsibilities(Team& team, const string& playerName) {
+    team.preferredXI.erase(remove(team.preferredXI.begin(), team.preferredXI.end(), playerName), team.preferredXI.end());
+    team.preferredBench.erase(remove(team.preferredBench.begin(), team.preferredBench.end(), playerName), team.preferredBench.end());
+    if (team.captain == playerName) team.captain.clear();
+    if (team.penaltyTaker == playerName) team.penaltyTaker.clear();
+    if (team.freeKickTaker == playerName) team.freeKickTaker.clear();
+    if (team.cornerTaker == playerName) team.cornerTaker.clear();
 }
 
 static void processIncomingOffers(Career& career) {
@@ -2064,12 +2338,16 @@ static void processIncomingOffers(Career& career) {
         career.myTeam->budget += offer;
         emitUiMessage("Transferencia aceptada. " + p.name + " vendido.");
         career.addNews(p.name + " es vendido por $" + to_string(offer) + ".");
+        detachNamedResponsibilities(*career.myTeam, p.name);
+        applyDepartureShock(*career.myTeam, p);
         career.myTeam->players.erase(career.myTeam->players.begin() + idx);
     } else if (choice == 2) {
         if (counter <= maxOffer) {
             career.myTeam->budget += counter;
             emitUiMessage("Contraoferta aceptada. " + p.name + " vendido por $" + to_string(counter));
             career.addNews(p.name + " es vendido tras contraoferta por $" + to_string(counter) + ".");
+            detachNamedResponsibilities(*career.myTeam, p.name);
+            applyDepartureShock(*career.myTeam, p);
             career.myTeam->players.erase(career.myTeam->players.begin() + idx);
         } else {
             emitUiMessage("La contraoferta fue rechazada.");
@@ -2080,7 +2358,8 @@ static void processIncomingOffers(Career& career) {
 }
 
 static void processCpuTransfers(Career& career) {
-    for (auto* team : career.activeTeams) {
+    for (auto& teamRef : career.allTeams) {
+        Team* team = &teamRef;
         if (career.myTeam == team) continue;
         if (randInt(1, 100) > 14) continue;
 
@@ -2094,26 +2373,62 @@ static void processCpuTransfers(Career& career) {
                 }
             }
             long long saleValue = team->players[sellIdx].value;
+            detachNamedResponsibilities(*team, team->players[sellIdx].name);
             team->players.erase(team->players.begin() + sellIdx);
             team->budget += saleValue;
         }
 
         if (team->players.size() >= 24 || team->budget < 150000) continue;
-        int minSkill, maxSkill;
-        getDivisionSkillRange(team->division, minSkill, maxSkill);
         string pos = weakestSquadPosition(*team);
-        Player newP = makeRandomPlayer(pos, minSkill, maxSkill, 18, 29);
-        long long fee = max(newP.value, newP.releaseClause * 55 / 100);
-        if (team->budget >= fee) {
+        Team* seller = nullptr;
+        int sellerIdx = -1;
+        int bestScore = -100000;
+        for (auto& club : career.allTeams) {
+            if (&club == team || &club == career.myTeam) continue;
+            if (club.players.size() <= 18) continue;
+            for (size_t i = 0; i < club.players.size(); ++i) {
+                const Player& target = club.players[i];
+                if (target.onLoan) continue;
+                if (normalizePosition(target.position) != pos) continue;
+                long long fee = max(target.value, target.releaseClause * 55 / 100);
+                if (fee > team->budget * 65 / 100) continue;
+                int score = target.skill * 3 + target.potential - target.age * 2;
+                if (target.contractWeeks <= 20) score += 6;
+                if (score > bestScore) {
+                    bestScore = score;
+                    seller = &club;
+                    sellerIdx = static_cast<int>(i);
+                }
+            }
+        }
+
+        if (seller && sellerIdx >= 0) {
+            Player newP = seller->players[static_cast<size_t>(sellerIdx)];
+            long long fee = max(newP.value, newP.releaseClause * 55 / 100);
             team->budget -= fee;
+            seller->budget += fee;
             newP.releaseClause = max(newP.value * 2, fee * 2);
+            newP.wantsToLeave = false;
             team->addPlayer(newP);
+            detachNamedResponsibilities(*seller, newP.name);
+            seller->players.erase(seller->players.begin() + sellerIdx);
+        } else {
+            int minSkill, maxSkill;
+            getDivisionSkillRange(team->division, minSkill, maxSkill);
+            Player newP = makeRandomPlayer(pos, minSkill, maxSkill, 18, 29);
+            long long fee = max(newP.value, newP.releaseClause * 55 / 100);
+            if (team->budget >= fee) {
+                team->budget -= fee;
+                newP.releaseClause = max(newP.value * 2, fee * 2);
+                team->addPlayer(newP);
+            }
         }
     }
 }
 
 static void updateContracts(Career& career) {
-    for (auto* team : career.activeTeams) {
+    for (auto& teamRef : career.allTeams) {
+        Team* team = &teamRef;
         for (size_t i = 0; i < team->players.size();) {
             Player& p = team->players[i];
             if (p.contractWeeks > 0) p.contractWeeks--;
@@ -2124,8 +2439,9 @@ static void updateContracts(Career& career) {
             if (team == career.myTeam) {
                 long long demandedWage = max(p.wage, wageDemandFor(p));
                 if (p.wantsToLeave) demandedWage = demandedWage * 120 / 100;
-                int demandedWeeks = randInt(52, 156);
-                long long demandedClause = max(p.value * 2, demandedWage * 40);
+                if (p.skill >= team->getAverageSkill()) demandedWage = demandedWage * 110 / 100;
+                int demandedWeeks = randInt(78, 182);
+                long long demandedClause = max(p.value * 2, demandedWage * (p.skill >= team->getAverageSkill() ? 48 : 40));
                 emitUiMessage("");
                 emitUiMessage("Contrato expirado: " + p.name);
                 emitUiMessage("Demanda renovar por " + to_string(demandedWeeks) +
@@ -2145,6 +2461,8 @@ static void updateContracts(Career& career) {
                     if (team->budget < demandedWage * 6) {
                         emitUiMessage("No hay margen salarial suficiente. " + p.name + " deja el club.");
                         career.addNews(p.name + " deja el club tras no acordar renovacion.");
+                        detachNamedResponsibilities(*team, p.name);
+                        applyDepartureShock(*team, p);
                         team->players.erase(team->players.begin() + i);
                     } else {
                         p.contractWeeks = demandedWeeks;
@@ -2159,6 +2477,8 @@ static void updateContracts(Career& career) {
                 } else {
                     emitUiMessage(p.name + " deja el club.");
                     career.addNews(p.name + " deja el club al finalizar su contrato.");
+                    detachNamedResponsibilities(*team, p.name);
+                    applyDepartureShock(*team, p);
                     team->players.erase(team->players.begin() + i);
                 }
             } else {
@@ -2168,6 +2488,7 @@ static void updateContracts(Career& career) {
                     p.releaseClause = max(p.value * 2, p.wage * 45);
                     ++i;
                 } else {
+                    detachNamedResponsibilities(*team, p.name);
                     team->players.erase(team->players.begin() + i);
                 }
             }
@@ -2381,6 +2702,44 @@ static vector<vector<pair<int, int>>> buildRoundRobinIndexSchedule(int teamCount
         }
     }
     return out;
+}
+
+static void simulateBackgroundDivisionWeek(Career& career, const string& divisionId) {
+    if (divisionId.empty() || divisionId == career.activeDivision) return;
+    vector<Team*> teams = career.getDivisionTeams(divisionId);
+    if (teams.size() < 2) return;
+    sort(teams.begin(), teams.end(), [](Team* a, Team* b) {
+        if (a->tiebreakerSeed != b->tiebreakerSeed) return a->tiebreakerSeed < b->tiebreakerSeed;
+        return a->name < b->name;
+    });
+    auto schedule = buildRoundRobinIndexSchedule(static_cast<int>(teams.size()), true);
+    int round = career.currentWeek - 1;
+    if (round < 0 || round >= static_cast<int>(schedule.size())) return;
+
+    int headlineMargin = -1;
+    string headline;
+    for (const auto& match : schedule[static_cast<size_t>(round)]) {
+        Team* home = teams[static_cast<size_t>(match.first)];
+        Team* away = teams[static_cast<size_t>(match.second)];
+        MatchResult result = playMatch(*home, *away, false, false);
+        int margin = abs(result.homeGoals - result.awayGoals);
+        if (margin > headlineMargin) {
+            headlineMargin = margin;
+            headline = home->name + " " + to_string(result.homeGoals) + "-" + to_string(result.awayGoals) + " " + away->name;
+        }
+    }
+
+    LeagueTable table;
+    table.title = divisionDisplay(divisionId);
+    table.ruleId = divisionId;
+    for (Team* team : teams) table.addTeam(team);
+    table.sortTable();
+    if (!headline.empty() && (career.currentWeek % 4 == 0 || headlineMargin >= 3)) {
+        Team* leader = table.teams.empty() ? nullptr : table.teams.front();
+        string news = "[Mundo] " + divisionDisplay(divisionId) + ": " + headline;
+        if (leader) news += " | Lider " + leader->name + " (" + to_string(leader->points) + " pts)";
+        career.addNews(news);
+    }
 }
 
 static void awardLegPoints(int goalsA, int goalsB, int& pointsA, int& pointsB) {
@@ -3372,6 +3731,9 @@ void simulateCareerWeek(Career& career) {
         MatchResult result = playMatch(*home, *away, verbose, key);
         storeMatchAnalysis(career, *home, *away, result, false);
     }
+    for (const auto& division : career.divisions) {
+        simulateBackgroundDivisionWeek(career, division.id);
+    }
     bool cupWeek = career.cupActive &&
                    (career.currentWeek == 1 || career.currentWeek % 4 == 0 ||
                     career.currentWeek == static_cast<int>(career.schedule.size()));
@@ -3388,10 +3750,10 @@ void simulateCareerWeek(Career& career) {
             }
         }
     }
-    for (auto* team : career.activeTeams) {
-        healInjuries(*team, false);
-        recoverFitness(*team, 7);
-        applyTrainingPlan(*team);
+    for (auto& team : career.allTeams) {
+        healInjuries(team, false);
+        recoverFitness(team, 7);
+        applyTrainingPlan(team);
     }
     updateContracts(career);
     processIncomingOffers(career);
@@ -3412,6 +3774,7 @@ void simulateCareerWeek(Career& career) {
         updateSquadDynamics(career, myTeamPointsDelta);
     }
     runMonthlyDevelopment(career);
+    updateShortlistAlerts(career);
     career.updateDynamicObjectiveStatus();
     career.updateBoardConfidence();
     updateManagerReputation(career);
@@ -3424,6 +3787,7 @@ void simulateCareerWeek(Career& career) {
         if (career.boardWarningWeeks >= 4) {
             career.addNews("La directiva aumenta la presion sobre " + career.myTeam->name + ".");
         }
+        generateWeeklyNarratives(career, myTeamPointsDelta);
     }
     handleManagerStatus(career);
     career.currentWeek++;

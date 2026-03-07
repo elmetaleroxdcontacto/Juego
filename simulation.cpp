@@ -4,6 +4,7 @@
 #include "utils.h"
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <iostream>
 
@@ -30,33 +31,196 @@ static int effectiveStamina(int avgStamina, double mul) {
     return clampInt(val, 20, 100);
 }
 
+static string compactToken(string value) {
+    value = toLower(trim(value));
+    value.erase(remove_if(value.begin(), value.end(), [](unsigned char ch) {
+                    return std::isspace(ch) || ch == '-' || ch == '_';
+                }),
+                value.end());
+    return value;
+}
+
 static void applyRoleModifier(const Player& p, int& attack, int& defense) {
-    string role = toLower(trim(p.role));
+    string role = compactToken(p.role);
     if (role == "stopper") {
-        defense += 4;
+        defense += 5;
+        attack -= 1;
+    } else if (role == "sweeperkeeper") {
+        attack += 2;
+        defense += 3;
+    } else if (role == "ballplaying") {
+        attack += 2;
+        defense += 3;
     } else if (role == "carrilero") {
-        attack += 3;
-        defense -= 2;
+        attack += 4;
+        defense -= 1;
     } else if (role == "enganche") {
         attack += 5;
         defense -= 3;
     } else if (role == "boxtobox") {
         attack += 2;
         defense += 2;
+    } else if (role == "organizador") {
+        attack += 4;
+        defense += 1;
     } else if (role == "pivote") {
         defense += 5;
-        attack -= 3;
+        attack -= 2;
+    } else if (role == "interior") {
+        attack += 4;
+        defense += 1;
     } else if (role == "poacher") {
         attack += 5;
+        defense -= 1;
     } else if (role == "falso9") {
         attack += 3;
         defense += 2;
     } else if (role == "pressing") {
         attack += 2;
         defense += 1;
+    } else if (role == "objetivo") {
+        attack += 4;
+        defense += 1;
     }
     attack = clampInt(attack, 1, 120);
     defense = clampInt(defense, 1, 120);
+}
+
+static void applyTraitModifier(const Player& p, int& attack, int& defense) {
+    if (playerHasTrait(p, "Lider")) defense += 1;
+    if (playerHasTrait(p, "Competidor")) {
+        attack += 1;
+        defense += 1;
+    }
+    if (playerHasTrait(p, "Pase riesgoso")) {
+        attack += 3;
+        defense -= 1;
+    }
+    if (playerHasTrait(p, "Llega al area")) attack += 2;
+    if (playerHasTrait(p, "Presiona")) {
+        attack += 1;
+        defense += 2;
+    }
+    if (playerHasTrait(p, "Muralla")) defense += 3;
+    if (playerHasTrait(p, "Cita grande")) {
+        attack += 1;
+        defense += 1;
+    }
+    if (playerHasTrait(p, "Versatil")) defense += 1;
+    if (playerHasTrait(p, "Caliente")) {
+        attack += 1;
+        defense -= 1;
+    }
+    attack = clampInt(attack, 1, 125);
+    defense = clampInt(defense, 1, 125);
+}
+
+static void applyPlayerStateModifier(const Player& p, const Team& team, int& attack, int& defense) {
+    attack = attack * clampInt(92 + p.currentForm / 4 + p.consistency / 8, 72, 128) / 100;
+    defense = defense * clampInt(92 + p.currentForm / 5 + p.tacticalDiscipline / 5, 74, 130) / 100;
+    if (p.preferredFoot == "Ambos") {
+        if (normalizePosition(p.position) == "MED" || normalizePosition(p.position) == "DEL") attack += 2;
+        else defense += 1;
+    } else if (p.preferredFoot == "Izquierdo" && team.width >= 4) {
+        attack += 1;
+    }
+    if (p.currentForm <= 35) {
+        attack -= 2;
+        defense -= 2;
+    } else if (p.currentForm >= 78) {
+        attack += 2;
+        defense += 1;
+    }
+    if (p.tacticalDiscipline >= 75 && (team.tactics == "Defensive" || team.matchInstruction == "Bloque bajo")) {
+        defense += 2;
+    }
+    attack = clampInt(attack, 1, 130);
+    defense = clampInt(defense, 1, 130);
+}
+
+static void applyMatchInstruction(const Team& team, int& attack, int& defense) {
+    if (team.matchInstruction == "Laterales altos") {
+        attack += 6;
+        defense -= 3;
+    } else if (team.matchInstruction == "Bloque bajo") {
+        attack -= 4;
+        defense += 8;
+    } else if (team.matchInstruction == "Balon parado") {
+        attack += 4;
+        defense += 2;
+    } else if (team.matchInstruction == "Presion final") {
+        attack += 8;
+        defense -= 2;
+    } else if (team.matchInstruction == "Por bandas") {
+        attack += 6;
+        defense -= 1;
+    } else if (team.matchInstruction == "Juego directo") {
+        attack += 5;
+        defense += 1;
+    } else if (team.matchInstruction == "Contra-presion") {
+        attack += 4;
+        defense += 4;
+    } else if (team.matchInstruction == "Pausar juego") {
+        attack -= 3;
+        defense += 6;
+    }
+}
+
+static void applyFormationBias(const Team& team, const vector<int>& xi, int& attack, int& defense) {
+    int defenders = 0;
+    int midfielders = 0;
+    int forwards = 0;
+    for (int idx : xi) {
+        if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
+        string pos = normalizePosition(team.players[idx].position);
+        if (pos == "DEF") defenders++;
+        else if (pos == "MED") midfielders++;
+        else if (pos == "DEL") forwards++;
+    }
+    if (defenders >= 5) defense += 8;
+    if (midfielders >= 4) {
+        attack += 4;
+        defense += 3;
+    }
+    if (forwards >= 3) {
+        attack += 8;
+        defense -= 4;
+    }
+    if (forwards <= 1) attack -= 5;
+    if (team.formation.find("4-3-3") != string::npos || team.formation.find("3-4-3") != string::npos) attack += 3;
+    if (team.formation.find("5-") == 0 || team.formation.find("4-5-1") != string::npos) defense += 4;
+}
+
+static void applyStyleMatchup(const Team& home,
+                              const Team& away,
+                              int& homeAttack,
+                              int& homeDefense,
+                              int& awayAttack,
+                              int& awayDefense) {
+    if (home.tactics == "Pressing" && away.tactics == "Counter") {
+        awayAttack += 7;
+        homeDefense -= 4;
+    }
+    if (away.tactics == "Pressing" && home.tactics == "Counter") {
+        homeAttack += 7;
+        awayDefense -= 4;
+    }
+    if (home.tactics == "Offensive" && away.tactics == "Defensive") {
+        awayDefense += 6;
+        homeAttack -= 2;
+    }
+    if (away.tactics == "Offensive" && home.tactics == "Defensive") {
+        homeDefense += 6;
+        awayAttack -= 2;
+    }
+    if (home.markingStyle == "Hombre" && away.width >= 4) {
+        awayAttack += 4;
+        homeDefense -= 2;
+    }
+    if (away.markingStyle == "Hombre" && home.width >= 4) {
+        homeAttack += 4;
+        awayDefense -= 2;
+    }
 }
 
 static const Player* lineupPlayerByName(const Team& team, const vector<int>& xi, const string& playerName) {
@@ -87,12 +251,19 @@ static void applyMatchFatigue(Team& team, const vector<int>& xi, const string& t
         if (p.stamina < 60) drain += 2;
         if (p.age > 30) drain += (p.age - 30) / 3;
         if (p.injured) drain += 2;
+        if (playerHasTrait(p, "Presiona")) drain += 1;
+        if (playerHasTrait(p, "Llega al area")) drain += 1;
         if (tactics == "Pressing") drain += 3;
         else if (tactics == "Offensive") drain += 1;
         else if (tactics == "Defensive") drain -= 1;
         else if (tactics == "Counter") drain -= 1;
+        if (team.matchInstruction == "Presion final") drain += 2;
+        else if (team.matchInstruction == "Contra-presion") drain += 2;
+        else if (team.matchInstruction == "Juego directo") drain -= 1;
+        else if (team.matchInstruction == "Pausar juego") drain -= 2;
         drain += team.pressingIntensity - 3;
         drain += team.tempo - 3;
+        drain -= max(0, p.tacticalDiscipline - 70) / 12;
         if (team.rotationPolicy == "Rotacion") drain -= 1;
         p.fitness = clampInt(p.fitness - drain, 15, p.stamina);
     }
@@ -104,6 +275,8 @@ static int cardsForTactics(const Team& team, int minVal, int maxVal) {
     if (tactics == "Pressing") base += 1;
     else if (tactics == "Offensive") base += 1;
     else if (tactics == "Defensive") base -= 1;
+    if (team.matchInstruction == "Presion final") base += 1;
+    else if (team.matchInstruction == "Contra-presion") base += 1;
     base += max(0, team.pressingIntensity - 3);
     if (team.markingStyle == "Hombre") base += 1;
     return clampInt(base, 0, 6);
@@ -115,6 +288,8 @@ static int redChanceForTactics(const Team& team) {
     if (tactics == "Pressing") chance += 4;
     else if (tactics == "Offensive") chance += 2;
     else if (tactics == "Defensive") chance -= 1;
+    if (team.matchInstruction == "Presion final") chance += 2;
+    else if (team.matchInstruction == "Contra-presion") chance += 1;
     chance += max(0, team.pressingIntensity - 3);
     if (team.markingStyle == "Hombre") chance += 1;
     return clampInt(chance, 1, 15);
@@ -123,7 +298,12 @@ static int redChanceForTactics(const Team& team) {
 static vector<int> cardCandidates(const Team& team, const vector<int>& xi) {
     vector<int> candidates;
     for (int idx : xi) {
-        if (idx >= 0 && idx < static_cast<int>(team.players.size())) candidates.push_back(idx);
+        if (idx >= 0 && idx < static_cast<int>(team.players.size())) {
+            candidates.push_back(idx);
+            if (playerHasTrait(team.players[idx], "Caliente") || playerHasTrait(team.players[idx], "Presiona")) {
+                candidates.push_back(idx);
+            }
+        }
     }
     if (!candidates.empty()) return candidates;
     for (size_t i = 0; i < team.players.size(); ++i) {
@@ -174,17 +354,32 @@ TeamStrength computeStrength(Team& team) {
     if (ts.xi.empty()) return ts;
     int skill = 0;
     int stamina = 0;
+    int chemistry = 0;
+    int professionalism = 0;
+    int form = 0;
+    int discipline = 0;
     for (int idx : ts.xi) {
         int att = team.players[idx].attack;
         int def = team.players[idx].defense;
         applyRoleModifier(team.players[idx], att, def);
+        applyTraitModifier(team.players[idx], att, def);
+        applyPlayerStateModifier(team.players[idx], team, att, def);
         ts.attack += att;
         ts.defense += def;
         skill += team.players[idx].skill;
         stamina += clampInt(team.players[idx].fitness, 0, 100);
+        chemistry += team.players[idx].chemistry;
+        professionalism += team.players[idx].professionalism;
+        form += team.players[idx].currentForm;
+        discipline += team.players[idx].tacticalDiscipline;
     }
+    applyFormationBias(team, ts.xi, ts.attack, ts.defense);
     ts.avgSkill = skill / static_cast<int>(ts.xi.size());
     ts.avgStamina = stamina / static_cast<int>(ts.xi.size());
+    ts.attack += chemistry / static_cast<int>(ts.xi.size()) / 4;
+    ts.defense += professionalism / static_cast<int>(ts.xi.size()) / 5;
+    ts.attack += form / static_cast<int>(ts.xi.size()) / 5;
+    ts.defense += discipline / static_cast<int>(ts.xi.size()) / 5;
     return ts;
 }
 
@@ -198,25 +393,41 @@ static TeamStrength computeStrengthFromXI(const Team& team, const vector<int>& x
     if (ts.xi.empty()) return ts;
     int skill = 0;
     int stamina = 0;
+    int chemistry = 0;
+    int professionalism = 0;
+    int form = 0;
+    int discipline = 0;
     for (int idx : ts.xi) {
         int att = team.players[idx].attack;
         int def = team.players[idx].defense;
         applyRoleModifier(team.players[idx], att, def);
+        applyTraitModifier(team.players[idx], att, def);
+        applyPlayerStateModifier(team.players[idx], team, att, def);
         ts.attack += att;
         ts.defense += def;
         skill += team.players[idx].skill;
         stamina += clampInt(team.players[idx].fitness, 0, 100);
+        chemistry += team.players[idx].chemistry;
+        professionalism += team.players[idx].professionalism;
+        form += team.players[idx].currentForm;
+        discipline += team.players[idx].tacticalDiscipline;
     }
+    applyFormationBias(team, ts.xi, ts.attack, ts.defense);
     ts.avgSkill = skill / static_cast<int>(ts.xi.size());
     ts.avgStamina = stamina / static_cast<int>(ts.xi.size());
+    ts.attack += chemistry / static_cast<int>(ts.xi.size()) / 4;
+    ts.defense += professionalism / static_cast<int>(ts.xi.size()) / 5;
+    ts.attack += form / static_cast<int>(ts.xi.size()) / 5;
+    ts.defense += discipline / static_cast<int>(ts.xi.size()) / 5;
     return ts;
 }
 
 static int lineupPerformanceScore(const Team& team, int idx, const string& targetPos) {
     if (idx < 0 || idx >= static_cast<int>(team.players.size())) return -100000;
     const Player& player = team.players[idx];
-    int score = player.skill * 3 + player.fitness * 2 + player.attack + player.defense;
-    if (normalizePosition(player.position) == targetPos) score += 18;
+    int score = player.skill * 3 + player.fitness * 2 + player.attack + player.defense +
+                player.currentForm * 2 + player.consistency + player.tacticalDiscipline;
+    score += positionFitScore(player, targetPos) * 4;
     if (player.injured) score -= 60;
     if (player.matchesSuspended > 0) score -= 1000;
     return score;
@@ -260,7 +471,6 @@ static int performInMatchSubstitutions(Team& team, vector<int>& xi, vector<strin
             if (candidate.matchesSuspended > 0 || candidate.injured) continue;
             int candidateScore = lineupPerformanceScore(team, idx, targetPos);
             int gain = candidateScore - currentScore;
-            if (targetPos != normalizePosition(candidate.position)) gain -= 12;
             if (gain > bestGain) {
                 bestGain = gain;
                 bestBench = idx;
@@ -304,16 +514,27 @@ void applyTactics(const Team& team, int& attack, int& defense) {
         defense = defense * 97 / 100;
     }
 
-    attack += (team.tempo - 3) * 5;
-    defense += (team.defensiveLine - 3) * 5;
-    attack += (team.width - 3) * 3;
+    attack += (team.tempo - 3) * 6;
+    defense -= max(0, team.tempo - 3) * 2;
+    defense += (team.defensiveLine - 3) * 4;
+    attack += (team.width - 3) * 4;
+    if (team.width <= 2) defense += 2;
     defense -= max(0, team.width - 3) * 2;
-    attack += max(0, team.pressingIntensity - 3) * 2;
+    attack += max(0, team.pressingIntensity - 3) * 3;
     defense += min(0, team.defensiveLine - 3) * 2;
+    if (team.pressingIntensity >= 4 && team.defensiveLine >= 4) {
+        attack += 3;
+        defense -= 2;
+    }
+    if (team.defensiveLine <= 2 && team.tactics == "Counter") {
+        defense += 3;
+        attack += 1;
+    }
     if (team.markingStyle == "Hombre") {
         defense += 4;
         attack -= 2;
     }
+    applyMatchInstruction(team, attack, defense);
 }
 
 double calcLambda(int attack, int defense) {
@@ -343,10 +564,13 @@ bool simulateInjury(Player& player, const string& tactics, bool verbose, vector<
     if (player.stamina < 60) risk += 2;
     if (player.age >= 32) risk += (player.age - 31) / 3;
     risk += player.injuryHistory / 3;
+    risk -= max(0, player.tacticalDiscipline - 70) / 12;
     if (tactics == "Pressing") risk += 3;
     else if (tactics == "Offensive") risk += 2;
     else if (tactics == "Counter") risk += 1;
     else if (tactics == "Defensive") risk -= 1;
+    if (playerHasTrait(player, "Fragil")) risk += 4;
+    if (playerHasTrait(player, "Competidor")) risk += 1;
     risk = clampInt(risk, 2, 15);
     if (randInt(1, 100) <= risk) {
         player.injured = true;
@@ -424,6 +648,8 @@ static void applyDevelopment(Team& team, const vector<int>& xi, bool verbose) {
         chance += max(0, team.youthCoach - 55) / 12;
         chance += max(0, team.assistantCoach - 55) / 15;
         chance += max(0, p.professionalism - 55) / 18;
+        chance += max(0, p.currentForm - 55) / 18;
+        chance += max(0, p.consistency - 60) / 20;
         chance = clampInt(chance, 3, 25);
         if (randInt(1, 100) <= chance) {
             p.skill = min(100, p.skill + 1);
@@ -439,7 +665,46 @@ static void applyDevelopment(Team& team, const vector<int>& xi, bool verbose) {
             if (verbose) {
                 cout << "[Progreso] " << p.name << " mejoro su habilidad a " << p.skill << "." << endl;
             }
+            p.currentForm = clampInt(p.currentForm + 1, 1, 99);
         }
+    }
+}
+
+static int keyMatchModifier(const Team& team, const vector<int>& xi) {
+    if (xi.empty()) return 0;
+    int total = 0;
+    for (int idx : xi) {
+        if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
+        const Player& player = team.players[idx];
+        total += player.bigMatches;
+        if (playerHasTrait(player, "Cita grande")) total += 8;
+        if (!team.captain.empty() && player.name == team.captain) total += player.leadership / 6;
+    }
+    int avg = total / static_cast<int>(xi.size());
+    return clampInt((avg - 55) / 4, -8, 10);
+}
+
+static void updateMatchForm(Team& team,
+                            const vector<int>& participants,
+                            int goalsFor,
+                            int goalsAgainst,
+                            bool keyMatch) {
+    int baseDelta = 0;
+    if (goalsFor > goalsAgainst) baseDelta = 3;
+    else if (goalsFor < goalsAgainst) baseDelta = -3;
+    if (keyMatch) baseDelta += (baseDelta >= 0) ? 1 : -1;
+    for (int idx : participants) {
+        if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
+        Player& player = team.players[idx];
+        int delta = baseDelta;
+        string pos = normalizePosition(player.position);
+        if (pos == "DEL" && goalsFor >= 2) delta += 1;
+        if ((pos == "DEF" || pos == "ARQ") && goalsAgainst == 0) delta += 1;
+        if (player.fitness < 50) delta -= 1;
+        if (player.injured) delta -= 2;
+        if (keyMatch && playerHasTrait(player, "Cita grande")) delta += 1;
+        if (keyMatch && player.bigMatches <= 40) delta -= 1;
+        player.currentForm = clampInt(player.currentForm + delta, 1, 99);
     }
 }
 
@@ -448,7 +713,13 @@ void assignGoalsAndAssists(Team& team, int goals, const vector<int>& xi, const s
     vector<int> attackers;
     for (int idx : xi) {
         string pos = normalizePosition(team.players[idx].position);
-        if (pos == "DEL" || pos == "MED") attackers.push_back(idx);
+        if (pos == "DEL" || pos == "MED") {
+            attackers.push_back(idx);
+            if (playerHasTrait(team.players[idx], "Llega al area") ||
+                playerHasTrait(team.players[idx], "Competidor")) {
+                attackers.push_back(idx);
+            }
+        }
     }
     if (attackers.empty()) attackers = xi;
 
@@ -465,6 +736,10 @@ void assignGoalsAndAssists(Team& team, int goals, const vector<int>& xi, const s
                 guard++;
             }
             if (assistIdx != scorerIdx) {
+                if (playerHasTrait(team.players[assistIdx], "Pase riesgoso") && xi.size() > 2 && randInt(1, 100) <= 35) {
+                    int retry = xi[randInt(0, static_cast<int>(xi.size()) - 1)];
+                    if (retry != scorerIdx) assistIdx = retry;
+                }
                 team.players[assistIdx].assists++;
                 assistName = team.players[assistIdx].name;
             }
@@ -538,7 +813,7 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
     WeatherEffect weather = rollWeather();
     bool homeInj = hasInjuredInXI(home, h.xi);
     bool awayInj = hasInjuredInXI(away, a.xi);
-    if (homeInj || awayInj) {
+    if (verbose && (homeInj || awayInj)) {
         cout << "[AVISO] Equipos sin suficientes jugadores sanos: ";
         if (homeInj) cout << home.name;
         if (homeInj && awayInj) cout << " y ";
@@ -553,6 +828,7 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
 
     applyTactics(home, homeAttack, homeDefense);
     applyTactics(away, awayAttack, awayDefense);
+    applyStyleMatchup(home, away, homeAttack, homeDefense, awayAttack, awayDefense);
 
     homeAttack += h.avgSkill;
     homeDefense += h.avgSkill;
@@ -565,6 +841,14 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
     homeDefense = static_cast<int>(round(homeDefense * homeMoraleFactor));
     awayAttack = static_cast<int>(round(awayAttack * awayMoraleFactor));
     awayDefense = static_cast<int>(round(awayDefense * awayMoraleFactor));
+    if (keyMatch) {
+        int homeKey = keyMatchModifier(home, h.xi);
+        int awayKey = keyMatchModifier(away, a.xi);
+        homeAttack += homeKey;
+        homeDefense += homeKey / 2;
+        awayAttack += awayKey;
+        awayDefense += awayKey / 2;
+    }
 
     const double homeAttackBonus = neutralVenue ? 1.00 : 1.05;
     const double homeDefenseBonus = neutralVenue ? 1.00 : 1.03;
@@ -606,6 +890,8 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
     if (const Player* taker = lineupPlayerByName(away, a.xi, away.cornerTaker)) {
         awayAttack += taker->setPieceSkill / 12;
     }
+    if (home.matchInstruction == "Balon parado") homeAttack += 6;
+    if (away.matchInstruction == "Balon parado") awayAttack += 6;
 
     int homeGoals = samplePoisson(calcLambda(homeAttack, awayDefense));
     int awayGoals = samplePoisson(calcLambda(awayAttack, homeDefense));
@@ -618,13 +904,17 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
     int awayShotsOn = clampInt(awayGoals + randInt(0, max(0, awayShots - awayGoals)), awayGoals, awayShots);
     int homeCorners = clampInt(homeShots / 3 + randInt(0, 2), 0, 12);
     int awayCorners = clampInt(awayShots / 3 + randInt(0, 2), 0, 12);
+    if (home.matchInstruction == "Laterales altos") homeCorners = clampInt(homeCorners + 2, 0, 14);
+    if (away.matchInstruction == "Laterales altos") awayCorners = clampInt(awayCorners + 2, 0, 14);
     int homePoss = clampInt(static_cast<int>(round(50 + ((static_cast<double>(homeAttack) / max(1, homeAttack + awayAttack)) - 0.5) * 30 + randInt(-3, 3))), 35, 65);
     int awayPoss = 100 - homePoss;
 
     if (verbose) {
         cout << "\n--- Partido ---" << endl;
         cout << home.name << " vs " << away.name << endl;
-        cout << "Tacticas: " << home.tactics << " vs " << away.tactics << endl;
+        cout << "Tacticas: " << home.tactics << " (" << home.formation << ") vs "
+             << away.tactics << " (" << away.formation << ")" << endl;
+        cout << "Instrucciones: " << home.matchInstruction << " vs " << away.matchInstruction << endl;
         if (keyMatch) cout << "[PARTIDO CLAVE]" << endl;
         if (neutralVenue) cout << "Sede: Cancha neutral" << endl;
         cout << "Clima: " << weather.name << endl;
@@ -723,6 +1013,8 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
 
     applyDevelopment(home, homeParticipants, verbose);
     applyDevelopment(away, awayParticipants, verbose);
+    updateMatchForm(home, homeParticipants, homeGoals, awayGoals, keyMatch);
+    updateMatchForm(away, awayParticipants, awayGoals, homeGoals, keyMatch);
 
     applyMatchFatigue(home, homeParticipants, home.tactics);
     applyMatchFatigue(away, awayParticipants, away.tactics);
@@ -734,5 +1026,6 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
         }
     }
 
-    return {homeGoals, awayGoals, homeShots, awayShots, homePoss, awayPoss, homeSubs, awaySubs};
+    return {homeGoals, awayGoals, homeShots, awayShots, homePoss, awayPoss, homeSubs, awaySubs,
+            homeCorners, awayCorners, weather.name};
 }

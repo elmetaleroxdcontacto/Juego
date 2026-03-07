@@ -8,6 +8,8 @@
 struct Player {
     std::string name;
     std::string position;
+    std::string preferredFoot;
+    std::vector<std::string> secondaryPositions;
     int attack;
     int defense;
     int stamina;
@@ -22,6 +24,11 @@ struct Player {
     int leadership;
     int professionalism;
     int ambition;
+    int consistency;
+    int bigMatches;
+    int currentForm;
+    int tacticalDiscipline;
+    int versatility;
     int happiness;
     int chemistry;
     int desiredStarts;
@@ -45,6 +52,9 @@ struct Player {
     int lastTrainedSeason;
     int lastTrainedWeek;
     std::string role;
+    std::string developmentPlan;
+    std::string promisedRole;
+    std::vector<std::string> traits;
 };
 
 struct HeadToHeadRecord {
@@ -74,10 +84,19 @@ struct PendingTransfer {
     int contractWeeks;
     bool preContract;
     bool loan;
+    std::string promisedRole;
 };
 
 void applyPositionStats(Player& p);
 std::string defaultRoleForPosition(const std::string& position);
+std::string defaultDevelopmentPlanForPosition(const std::string& position);
+void ensurePlayerProfile(Player& p, bool regenerateTraits = false);
+std::vector<std::string> generatePlayerTraits(const Player& p, bool youth = false);
+bool playerHasTrait(const Player& p, const std::string& trait);
+int positionFitScore(const Player& p, const std::string& desiredPosition);
+std::string playerReliabilityLabel(const Player& p);
+std::string playerFormLabel(const Player& p);
+std::string joinStringValues(const std::vector<std::string>& values, const std::string& separator);
 Player makeRandomPlayer(const std::string& position, int skillMin, int skillMax, int ageMin, int ageMax);
 
 class Team {
@@ -124,6 +143,7 @@ public:
     int youthFacilityLevel;
     int trainingFacilityLevel;
     int fanBase;
+    std::string matchInstruction;
     std::vector<HeadToHeadRecord> headToHead;
     std::vector<std::string> achievements;
 
@@ -191,6 +211,7 @@ struct Career {
     int boardMonthlyDeadlineWeek;
     std::vector<std::string> newsFeed;
     std::vector<std::string> scoutInbox;
+    std::vector<std::string> scoutingShortlist;
     std::vector<SeasonHistoryEntry> history;
     std::vector<PendingTransfer> pendingTransfers;
     bool cupActive;
@@ -237,6 +258,9 @@ struct MatchResult {
     int awayPossession;
     int homeSubstitutions;
     int awaySubstitutions;
+    int homeCorners;
+    int awayCorners;
+    std::string weather;
 };
 
 struct TeamStrength {

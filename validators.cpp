@@ -5,6 +5,7 @@
 #include "utils.h"
 
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <set>
@@ -132,6 +133,7 @@ static ValidationResult validateSaveLoad() {
     career.myTeam->youthCoach = 76;
     career.myTeam->medicalTeam = 77;
     career.myTeam->youthRegion = "Sur";
+    career.myTeam->matchInstruction = "Balon parado";
     career.boardMonthlyObjective = "Objetivo de prueba";
     career.boardMonthlyTarget = 5;
     career.boardMonthlyProgress = 2;
@@ -139,12 +141,29 @@ static ValidationResult validateSaveLoad() {
     career.lastMatchAnalysis = "Analisis de prueba";
     if (!career.myTeam->players.empty()) {
         career.myTeam->preferredXI = {career.myTeam->players.front().name};
+        career.myTeam->players.front().developmentPlan = "Liderazgo";
+        career.myTeam->players.front().promisedRole = "Titular";
+        career.myTeam->players.front().traits = {"Lider", "Competidor"};
+        career.myTeam->players.front().preferredFoot = "Ambos";
+        career.myTeam->players.front().secondaryPositions = {"MED", "DEL"};
+        career.myTeam->players.front().consistency = 82;
+        career.myTeam->players.front().bigMatches = 79;
+        career.myTeam->players.front().currentForm = 74;
+        career.myTeam->players.front().tacticalDiscipline = 77;
+        career.myTeam->players.front().versatility = 71;
         if (career.myTeam->players.size() > 1) {
             career.myTeam->preferredBench = {career.myTeam->players[1].name};
         }
     }
     career.addNews("Prueba de guardado.");
+    career.scoutingShortlist.push_back("Club Prueba|Jugador Prueba");
     career.saveCareer();
+
+    ifstream rawSave(career.saveFile);
+    string firstLine;
+    if (!rawSave.is_open() || !getline(rawSave, firstLine) || firstLine.rfind("VERSION ", 0) != 0) {
+        return {"Guardado/carga", false, "El archivo guardado no incluye version de save."};
+    }
 
     Career loaded;
     loaded.saveFile = "validation_career_save.txt";
@@ -160,12 +179,32 @@ static ValidationResult validateSaveLoad() {
     }
     if (loaded.myTeam->assistantCoach != career.myTeam->assistantCoach ||
         loaded.myTeam->medicalTeam != career.myTeam->medicalTeam ||
-        loaded.myTeam->youthRegion != career.myTeam->youthRegion) {
+        loaded.myTeam->youthRegion != career.myTeam->youthRegion ||
+        loaded.myTeam->matchInstruction != career.myTeam->matchInstruction) {
         return {"Guardado/carga", false, "No se preservaron correctamente los datos de staff."};
+    }
+    if (!loaded.myTeam->players.empty() && !career.myTeam->players.empty()) {
+        const Player& loadedPlayer = loaded.myTeam->players.front();
+        const Player& savedPlayer = career.myTeam->players.front();
+        if (loadedPlayer.developmentPlan != savedPlayer.developmentPlan ||
+            loadedPlayer.promisedRole != savedPlayer.promisedRole ||
+            loadedPlayer.traits != savedPlayer.traits ||
+            loadedPlayer.preferredFoot != savedPlayer.preferredFoot ||
+            loadedPlayer.secondaryPositions != savedPlayer.secondaryPositions ||
+            loadedPlayer.consistency != savedPlayer.consistency ||
+            loadedPlayer.bigMatches != savedPlayer.bigMatches ||
+            loadedPlayer.currentForm != savedPlayer.currentForm ||
+            loadedPlayer.tacticalDiscipline != savedPlayer.tacticalDiscipline ||
+            loadedPlayer.versatility != savedPlayer.versatility) {
+            return {"Guardado/carga", false, "No se preservaron correctamente los datos avanzados del jugador."};
+        }
     }
     if (loaded.boardMonthlyObjective != career.boardMonthlyObjective ||
         loaded.lastMatchAnalysis != career.lastMatchAnalysis) {
         return {"Guardado/carga", false, "No se preservaron correctamente datos avanzados de carrera."};
+    }
+    if (loaded.scoutingShortlist != career.scoutingShortlist) {
+        return {"Guardado/carga", false, "No se preservo correctamente la shortlist de scouting."};
     }
     return {"Guardado/carga", true, "Guardado y carga basicos verificados."};
 }
