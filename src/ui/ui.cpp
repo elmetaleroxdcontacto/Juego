@@ -1,9 +1,13 @@
 ﻿#include "ui.h"
 
+#include "ai/team_ai.h"
+#include "career/player_development.h"
+#include "career/team_management.h"
 #include "career/career_support.h"
 #include "competition.h"
 #include "simulation.h"
 #include "transfers/negotiation_system.h"
+#include "transfers/transfer_market.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -1084,96 +1088,6 @@ void setTrainingPlan(Team& team) {
     cout << "Plan actualizado a " << team.trainingFocus << endl;
 }
 
-static void applyTrainingPlan(Team& team) {
-    string focus = team.trainingFocus.empty() ? "Balanceado" : team.trainingFocus;
-    int facilityBonus = max(0, team.trainingFacilityLevel - 1);
-    int assistantBonus = max(0, team.assistantCoach - 55) / 15;
-    int fitnessBonus = max(0, team.fitnessCoach - 55) / 15;
-    if (focus == "Fisico") {
-        for (auto& p : team.players) {
-            if (p.injured) continue;
-            p.fitness = clampInt(p.fitness + 2 + facilityBonus + fitnessBonus, 15, p.stamina);
-            if (randInt(1, 100) <= 12 + facilityBonus * 2 + fitnessBonus * 2) {
-                p.stamina = min(100, p.stamina + 1);
-                if (p.fitness > p.stamina) p.fitness = p.stamina;
-            }
-        }
-    } else if (focus == "Tecnico") {
-        for (auto& p : team.players) {
-            if (p.injured) continue;
-            if (p.skill >= p.potential) continue;
-            if (randInt(1, 100) <= 18 + facilityBonus * 2 + assistantBonus * 2) {
-                p.skill = min(100, p.skill + 1);
-                string pos = normalizePosition(p.position);
-                if (pos == "ARQ" || pos == "DEF") p.defense = min(100, p.defense + 1);
-                else if (pos == "MED") {
-                    p.attack = min(100, p.attack + 1);
-                    p.defense = min(100, p.defense + 1);
-                } else {
-                    p.attack = min(100, p.attack + 1);
-                }
-            }
-        }
-    } else if (focus == "Tactico") {
-        team.morale = clampInt(team.morale + 2 + assistantBonus, 0, 100);
-        for (auto& p : team.players) {
-            if (p.injured) continue;
-            p.fitness = clampInt(p.fitness + 1 + facilityBonus + fitnessBonus, 15, p.stamina);
-            p.tacticalDiscipline = clampInt(p.tacticalDiscipline + 1, 1, 99);
-        }
-    } else if (focus == "Preparacion partido") {
-        team.morale = clampInt(team.morale + 1 + assistantBonus, 0, 100);
-        for (auto& p : team.players) {
-            if (p.injured) continue;
-            p.fitness = clampInt(p.fitness + 1 + facilityBonus, 15, p.stamina);
-            p.currentForm = clampInt(p.currentForm + 1 + assistantBonus / 2, 1, 99);
-            p.chemistry = clampInt(p.chemistry + 1, 1, 99);
-        }
-    } else if (focus == "Recuperacion") {
-        for (auto& p : team.players) {
-            if (p.injured) {
-                p.injuryWeeks = max(0, p.injuryWeeks - 1);
-                if (p.injuryWeeks == 0) {
-                    p.injured = false;
-                    p.injuryType.clear();
-                }
-            }
-            p.fitness = clampInt(p.fitness + 3 + facilityBonus + fitnessBonus, 15, p.stamina);
-            if (p.fitness >= p.stamina - 2) {
-                p.currentForm = clampInt(p.currentForm + 1, 1, 99);
-            }
-        }
-    } else {
-        for (auto& p : team.players) {
-            if (p.injured) continue;
-            p.fitness = clampInt(p.fitness + 1 + facilityBonus + fitnessBonus, 15, p.stamina);
-        }
-    }
-
-    int planChance = clampInt(10 + facilityBonus * 2 + assistantBonus, 6, 28);
-    for (auto& p : team.players) {
-        if (p.injured) continue;
-        if (p.developmentPlan == "Fisico") {
-            p.fitness = clampInt(p.fitness + 1, 15, p.stamina);
-            if (randInt(1, 100) <= planChance) p.stamina = min(100, p.stamina + 1);
-        } else if (p.developmentPlan == "Defensa" || p.developmentPlan == "Reflejos") {
-            if (randInt(1, 100) <= planChance) p.defense = min(100, p.defense + 1);
-        } else if (p.developmentPlan == "Creatividad") {
-            if (randInt(1, 100) <= planChance) {
-                p.attack = min(100, p.attack + 1);
-                p.setPieceSkill = min(99, p.setPieceSkill + 1);
-            }
-        } else if (p.developmentPlan == "Finalizacion") {
-            if (randInt(1, 100) <= planChance) p.attack = min(100, p.attack + 1);
-        } else if (p.developmentPlan == "Liderazgo") {
-            if (randInt(1, 100) <= max(8, planChance - 2)) {
-                p.leadership = min(99, p.leadership + 1);
-                if (randInt(1, 100) <= 40) p.professionalism = min(99, p.professionalism + 1);
-            }
-        }
-    }
-}
-
 void editTeam(Team& team) {
     while (true) {
         cout << "\n=== Editor Rapido de Equipo ===" << endl;
@@ -1835,71 +1749,6 @@ static void applyClubEvent(Career& career) {
     }
 }
 
-static void adjustCpuTactics(Team& team, const Team& opponent, const Team* myTeam) {
-    if (&team == myTeam) return;
-    int diff = team.getAverageSkill() - opponent.getAverageSkill();
-    if (team.morale >= 70) {
-        team.tactics = "Pressing";
-    } else if (diff >= 6) {
-        team.tactics = "Offensive";
-    } else if (diff <= -6) {
-        team.tactics = "Defensive";
-    } else if (team.morale <= 35) {
-        team.tactics = "Defensive";
-    } else {
-        team.tactics = "Balanced";
-    }
-
-    if (diff >= 6) {
-        team.pressingIntensity = 4;
-        team.defensiveLine = 4;
-        team.tempo = 4;
-        team.width = 4;
-        team.markingStyle = "Zonal";
-    } else if (diff <= -6) {
-        team.pressingIntensity = 2;
-        team.defensiveLine = 2;
-        team.tempo = 2;
-        team.width = 3;
-        team.markingStyle = "Hombre";
-    } else {
-        team.pressingIntensity = 3;
-        team.defensiveLine = 3;
-        team.tempo = 3;
-        team.width = 3;
-        team.markingStyle = (team.morale < 40) ? "Hombre" : "Zonal";
-    }
-}
-
-static void addYouthPlayers(Team& team, int count) {
-    int minSkill, maxSkill;
-    getDivisionSkillRange(team.division, minSkill, maxSkill);
-    for (int i = 0; i < count; ++i) {
-        int maxSquad = getCompetitionConfig(team.division).maxSquadSize;
-        if (maxSquad > 0 && static_cast<int>(team.players.size()) >= maxSquad) return;
-        vector<string> positions;
-        if (team.youthRegion == "Norte") positions = {"DEL", "MED", "MED", "DEF"};
-        else if (team.youthRegion == "Sur") positions = {"DEF", "MED", "ARQ", "DEL"};
-        else if (team.youthRegion == "Patagonia") positions = {"ARQ", "DEF", "DEF", "MED"};
-        else if (team.youthRegion == "Centro") positions = {"MED", "MED", "DEL", "DEF"};
-        else positions = {"ARQ", "DEF", "MED", "DEL"};
-        string pos = positions[randInt(0, static_cast<int>(positions.size()) - 1)];
-        int youthBoost = max(0, team.youthFacilityLevel - 1) + max(0, team.youthCoach - 55) / 12;
-        Player youth = makeRandomPlayer(pos, minSkill + youthBoost, maxSkill + youthBoost, 16, 18);
-        bool eliteProspect = randInt(1, 100) <= clampInt(6 + team.youthFacilityLevel * 3 + max(0, team.youthCoach - 60) / 5, 4, 28);
-        int potFloor = eliteProspect ? 14 + youthBoost : 10 + youthBoost;
-        int potTop = eliteProspect ? 24 + youthBoost : 18 + youthBoost;
-        youth.potential = clampInt(youth.skill + randInt(potFloor, potTop), youth.skill, 99);
-        youth.chemistry = clampInt(youth.chemistry + max(0, team.youthCoach - 55) / 10, 1, 99);
-        youth.professionalism = clampInt(youth.professionalism + max(0, team.youthCoach - 55) / 12, 1, 99);
-        if (eliteProspect) {
-            youth.value = max(youth.value, static_cast<long long>(youth.potential) * 12000LL);
-            youth.role = (pos == "DEL") ? "Poacher" : (pos == "MED" ? "BoxToBox" : defaultRoleForPosition(pos));
-        }
-        team.addPlayer(youth);
-    }
-}
-
 struct TeamTableSnapshot {
     int points;
     int goalsFor;
@@ -2157,7 +2006,7 @@ static void runMonthlyDevelopment(Career& career) {
         int maxSquad = getCompetitionConfig(team->division).maxSquadSize;
         if ((maxSquad <= 0 || static_cast<int>(team->players.size()) < maxSquad) &&
             randInt(1, 100) <= 4 + team->youthFacilityLevel * 3) {
-            addYouthPlayers(*team, 1);
+            player_dev::addYouthPlayers(*team, 1);
             if (team == career.myTeam) {
                 career.addNews("La cantera suma un nuevo prospecto desde la region " + team->youthRegion + ".");
             }
@@ -2169,30 +2018,6 @@ static void runMonthlyDevelopment(Career& career) {
             }
         }
     }
-}
-
-static string weakestSquadPosition(const Team& team) {
-    vector<string> positions = {"ARQ", "DEF", "MED", "DEL"};
-    unordered_map<string, int> counts;
-    unordered_map<string, int> skills;
-    for (const auto& player : team.players) {
-        string pos = normalizePosition(player.position);
-        if (pos == "N/A") continue;
-        counts[pos]++;
-        skills[pos] += player.skill;
-    }
-    string bestPos = "MED";
-    int bestScore = 1000000;
-    for (const auto& pos : positions) {
-        int count = counts[pos];
-        int avgSkill = (count > 0) ? (skills[pos] / count) : 0;
-        int score = count * 20 + avgSkill;
-        if (score < bestScore) {
-            bestScore = score;
-            bestPos = pos;
-        }
-    }
-    return bestPos;
 }
 
 static void updateShortlistAlerts(Career& career) {
@@ -2314,26 +2139,6 @@ static void generateWeeklyNarratives(Career& career, int myTeamPointsDelta) {
     addSquadAlerts(career);
 }
 
-static void applyDepartureShock(Team& team, const Player& player) {
-    bool keyPlayer = player.skill >= team.getAverageSkill();
-    if (!keyPlayer) return;
-    team.morale = clampInt(team.morale - 3, 0, 100);
-    for (auto& mate : team.players) {
-        if (mate.name == player.name) continue;
-        mate.chemistry = clampInt(mate.chemistry - 1, 1, 99);
-        if (player.leadership >= 70) mate.happiness = clampInt(mate.happiness - 1, 1, 99);
-    }
-}
-
-static void detachNamedResponsibilities(Team& team, const string& playerName) {
-    team.preferredXI.erase(remove(team.preferredXI.begin(), team.preferredXI.end(), playerName), team.preferredXI.end());
-    team.preferredBench.erase(remove(team.preferredBench.begin(), team.preferredBench.end(), playerName), team.preferredBench.end());
-    if (team.captain == playerName) team.captain.clear();
-    if (team.penaltyTaker == playerName) team.penaltyTaker.clear();
-    if (team.freeKickTaker == playerName) team.freeKickTaker.clear();
-    if (team.cornerTaker == playerName) team.cornerTaker.clear();
-}
-
 static void processIncomingOffers(Career& career) {
     if (!career.myTeam) return;
     if (career.myTeam->players.size() <= 18) return;
@@ -2362,7 +2167,8 @@ static void processIncomingOffers(Career& career) {
         if (&club == career.myTeam) continue;
         if (club.players.size() >= 26) continue;
         if (club.budget < p.value * 9 / 10) continue;
-        int need = positionFitScore(p, weakestSquadPosition(club)) + teamPrestigeScore(club) - teamPrestigeScore(*career.myTeam) / 2;
+        int need = positionFitScore(p, transfer_market::weakestSquadPosition(club)) +
+                   teamPrestigeScore(club) - teamPrestigeScore(*career.myTeam) / 2;
         if (areRivalClubs(club, *career.myTeam)) need += 8;
         if (need > bidderNeed) {
             bidderNeed = need;
@@ -2408,8 +2214,8 @@ static void processIncomingOffers(Career& career) {
         bidder->addPlayer(moved);
         emitUiMessage("Transferencia aceptada. " + p.name + " vendido a " + bidder->name + ".");
         career.addNews(p.name + " es vendido a " + bidder->name + " por $" + to_string(offer) + ".");
-        detachNamedResponsibilities(*career.myTeam, p.name);
-        applyDepartureShock(*career.myTeam, p);
+        team_mgmt::detachPlayerFromSelections(*career.myTeam, p.name);
+        team_mgmt::applyDepartureShock(*career.myTeam, p);
         career.myTeam->players.erase(career.myTeam->players.begin() + idx);
     } else if (choice == 2) {
         if (counter <= maxOffer && bidder->budget >= counter) {
@@ -2423,88 +2229,14 @@ static void processIncomingOffers(Career& career) {
             bidder->addPlayer(moved);
             emitUiMessage("Contraoferta aceptada. " + p.name + " vendido a " + bidder->name + " por $" + to_string(counter));
             career.addNews(p.name + " es vendido a " + bidder->name + " tras contraoferta por $" + to_string(counter) + ".");
-            detachNamedResponsibilities(*career.myTeam, p.name);
-            applyDepartureShock(*career.myTeam, p);
+            team_mgmt::detachPlayerFromSelections(*career.myTeam, p.name);
+            team_mgmt::applyDepartureShock(*career.myTeam, p);
             career.myTeam->players.erase(career.myTeam->players.begin() + idx);
         } else {
             emitUiMessage("La contraoferta fue rechazada.");
         }
     } else {
         emitUiMessage("Oferta rechazada.");
-    }
-}
-
-static void processCpuTransfers(Career& career) {
-    for (auto& teamRef : career.allTeams) {
-        Team* team = &teamRef;
-        if (career.myTeam == team) continue;
-        ensureTeamIdentity(*team);
-        if (randInt(1, 100) > 14) continue;
-
-        if (team->budget < 120000 && team->players.size() > 18) {
-            int sellIdx = 0;
-            for (size_t i = 1; i < team->players.size(); ++i) {
-                const Player& current = team->players[i];
-                const Player& best = team->players[sellIdx];
-                if (current.value > best.value || (current.value == best.value && current.age > best.age)) {
-                    sellIdx = static_cast<int>(i);
-                }
-            }
-            long long saleValue = team->players[sellIdx].value;
-            detachNamedResponsibilities(*team, team->players[sellIdx].name);
-            team->players.erase(team->players.begin() + sellIdx);
-            team->budget += saleValue;
-        }
-
-        if (team->players.size() >= 24 || team->budget < 150000) continue;
-        string pos = weakestSquadPosition(*team);
-        Team* seller = nullptr;
-        int sellerIdx = -1;
-        int bestScore = -100000;
-        for (auto& club : career.allTeams) {
-            if (&club == team || &club == career.myTeam) continue;
-            if (club.players.size() <= 18) continue;
-            ensureTeamIdentity(club);
-            for (size_t i = 0; i < club.players.size(); ++i) {
-                const Player& target = club.players[i];
-                if (target.onLoan) continue;
-                if (normalizePosition(target.position) != pos) continue;
-                long long fee = max(target.value, target.releaseClause * 55 / 100);
-                if (areRivalClubs(*team, club)) fee = fee * 110 / 100;
-                if (fee > team->budget * 65 / 100) continue;
-                int score = target.skill * 3 + target.potential - target.age * 2;
-                if (target.contractWeeks <= 20) score += 6;
-                score += teamPrestigeScore(*team) / 6;
-                if (score > bestScore) {
-                    bestScore = score;
-                    seller = &club;
-                    sellerIdx = static_cast<int>(i);
-                }
-            }
-        }
-
-        if (seller && sellerIdx >= 0) {
-            Player newP = seller->players[static_cast<size_t>(sellerIdx)];
-            long long fee = max(newP.value, newP.releaseClause * 55 / 100);
-            if (areRivalClubs(*team, *seller)) fee = fee * 110 / 100;
-            team->budget -= fee;
-            seller->budget += fee;
-            newP.releaseClause = max(newP.value * 2, fee * 2);
-            newP.wantsToLeave = false;
-            team->addPlayer(newP);
-            detachNamedResponsibilities(*seller, newP.name);
-            seller->players.erase(seller->players.begin() + sellerIdx);
-        } else {
-            int minSkill, maxSkill;
-            getDivisionSkillRange(team->division, minSkill, maxSkill);
-            Player newP = makeRandomPlayer(pos, minSkill, maxSkill, 18, 29);
-            long long fee = max(newP.value, newP.releaseClause * 55 / 100);
-            if (team->budget >= fee) {
-                team->budget -= fee;
-                newP.releaseClause = max(newP.value * 2, fee * 2);
-                team->addPlayer(newP);
-            }
-        }
     }
 }
 
@@ -2548,8 +2280,8 @@ static void updateContracts(Career& career) {
                     if (team->budget < demandedWage * 6) {
                         emitUiMessage("No hay margen salarial suficiente. " + p.name + " deja el club.");
                         career.addNews(p.name + " deja el club tras no acordar renovacion.");
-                        detachNamedResponsibilities(*team, p.name);
-                        applyDepartureShock(*team, p);
+                        team_mgmt::detachPlayerFromSelections(*team, p.name);
+                        team_mgmt::applyDepartureShock(*team, p);
                         team->players.erase(team->players.begin() + i);
                     } else {
                         p.contractWeeks = demandedWeeks;
@@ -2564,8 +2296,8 @@ static void updateContracts(Career& career) {
                 } else {
                     emitUiMessage(p.name + " deja el club.");
                     career.addNews(p.name + " deja el club al finalizar su contrato.");
-                    detachNamedResponsibilities(*team, p.name);
-                    applyDepartureShock(*team, p);
+                    team_mgmt::detachPlayerFromSelections(*team, p.name);
+                    team_mgmt::applyDepartureShock(*team, p);
                     team->players.erase(team->players.begin() + i);
                 }
             } else {
@@ -2575,41 +2307,10 @@ static void updateContracts(Career& career) {
                     p.releaseClause = max(p.value * 2, p.wage * 45);
                     ++i;
                 } else {
-                    detachNamedResponsibilities(*team, p.name);
+                    team_mgmt::detachPlayerFromSelections(*team, p.name);
                     team->players.erase(team->players.begin() + i);
                 }
             }
-        }
-    }
-}
-
-static void processLoanReturns(Career& career) {
-    for (auto& team : career.allTeams) {
-        for (size_t i = 0; i < team.players.size();) {
-            Player& player = team.players[i];
-            if (!player.onLoan) {
-                ++i;
-                continue;
-            }
-            if (player.loanWeeksRemaining > 0) player.loanWeeksRemaining--;
-            if (player.loanWeeksRemaining > 0) {
-                ++i;
-                continue;
-            }
-            Team* parent = career.findTeamByName(player.parentClub);
-            if (!parent || parent == &team) {
-                player.onLoan = false;
-                player.parentClub.clear();
-                ++i;
-                continue;
-            }
-            Player returning = player;
-            returning.onLoan = false;
-            returning.parentClub.clear();
-            returning.loanWeeksRemaining = 0;
-            parent->addPlayer(returning);
-            career.addNews(returning.name + " regresa desde prestamo a " + parent->name + ".");
-            team.players.erase(team.players.begin() + static_cast<long long>(i));
         }
     }
 }
@@ -2706,7 +2407,7 @@ static void advanceToNextSeason(Career& career) {
     }
     career.resetSeason();
     for (auto* team : career.activeTeams) {
-        addYouthPlayers(*team, 1);
+        player_dev::addYouthPlayers(*team, 1);
     }
 }
 
@@ -3221,14 +2922,14 @@ static void endSeasonSegundaDivision(Career& career) {
                 Team* home = descensoTeams[match.first];
                 Team* away = descensoTeams[match.second];
                 bool verbose = (home == career.myTeam || away == career.myTeam);
-                adjustCpuTactics(*home, *away, career.myTeam);
-                adjustCpuTactics(*away, *home, career.myTeam);
+                team_ai::adjustCpuTactics(*home, *away, career.myTeam);
+                team_ai::adjustCpuTactics(*away, *home, career.myTeam);
                 playMatch(*home, *away, verbose, true);
             }
             for (auto* team : descensoTeams) {
                 healInjuries(*team, false);
                 recoverFitness(*team, 7);
-                applyTrainingPlan(*team);
+                player_dev::applyWeeklyTrainingPlan(*team);
             }
             round++;
         }
@@ -3818,8 +3519,8 @@ void simulateCareerWeek(Career& career) {
         Team* home = career.activeTeams[match.first];
         Team* away = career.activeTeams[match.second];
         bool verbose = (home == career.myTeam || away == career.myTeam);
-        adjustCpuTactics(*home, *away, career.myTeam);
-        adjustCpuTactics(*away, *home, career.myTeam);
+        team_ai::adjustCpuTactics(*home, *away, career.myTeam);
+        team_ai::adjustCpuTactics(*away, *home, career.myTeam);
         bool key = false;
         if (useGroups) {
             int group = groupForTeam(career, home);
@@ -3861,12 +3562,12 @@ void simulateCareerWeek(Career& career) {
     for (auto& team : career.allTeams) {
         healInjuries(team, false);
         recoverFitness(team, 7);
-        applyTrainingPlan(team);
+        player_dev::applyWeeklyTrainingPlan(team);
     }
     updateContracts(career);
     processIncomingOffers(career);
-    processCpuTransfers(career);
-    processLoanReturns(career);
+    transfer_market::processCpuTransfers(career);
+    transfer_market::processLoanReturns(career);
     applyWeeklyFinances(career, pointsBefore);
     career.leagueTable.sortTable();
     if (career.myTeam) {

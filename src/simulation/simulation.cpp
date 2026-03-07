@@ -1,5 +1,6 @@
 ﻿#include "simulation.h"
 
+#include "ai/team_ai.h"
 #include "io.h"
 #include "simulation/match_engine_internal.h"
 #include "utils.h"
@@ -797,6 +798,175 @@ void assignGoalsAndAssists(Team& team, int goals, const vector<int>& xi, const s
 
 static bool playerNamedInXI(const Team& team, const vector<int>& xi, const string& playerName) {
     return lineupPlayerByName(team, xi, playerName) != nullptr;
+}
+
+struct PhaseMatchSummary {
+    int homeGoals = 0;
+    int awayGoals = 0;
+    int homeShots = 0;
+    int awayShots = 0;
+    int homeCorners = 0;
+    int awayCorners = 0;
+    int homeControl = 0;
+};
+
+static int phaseFatiguePenalty(const Team& team, int phaseIndex, int averageStamina) {
+    int penalty = phaseIndex * max(1, team.pressingIntensity + team.tempo - 4);
+    if (team.tactics == "Pressing") penalty += phaseIndex * 2;
+    if (team.tactics == "Offensive") penalty += phaseIndex;
+    if (team.matchInstruction == "Presion final" || team.matchInstruction == "Contra-presion") penalty += phaseIndex;
+    if (team.matchInstruction == "Pausar juego") penalty -= phaseIndex;
+    penalty += max(0, 60 - averageStamina) / 4;
+    return max(0, penalty);
+}
+
+static void applyScoreStatePressure(const Team& team,
+                                    int minute,
+                                    int goalsFor,
+                                    int goalsAgainst,
+                                    int clutch,
+                                    int& attack,
+                                    int& defense) {
+    int scoreDiff = goalsFor - goalsAgainst;
+    if (scoreDiff < 0 && minute >= 60) {
+        attack += 6 + abs(scoreDiff) * 3 + clutch / 2;
+        defense -= 2 + abs(scoreDiff);
+    } else if (scoreDiff > 0 && minute >= 75) {
+        attack -= 2;
+        defense += 4 + clutch / 3;
+    } else if (scoreDiff == 0 && minute >= 75) {
+        attack += clutch / 2;
+    }
+    if (team.morale <= 35 && minute >= 70 && scoreDiff < 0) {
+        attack -= 2;
+        defense -= 1;
+    }
+}
+
+static void addPhaseNarrative(const Team& team,
+                              const Team& opponent,
+                              int minuteStart,
+                              int minuteEnd,
+                              int pressureEdge,
+                              int directBonus,
+                              vector<string>* events) {
+    if (!events) return;
+    int eventMinute = randInt(minuteStart, minuteEnd);
+    if (pressureEdge >= 18 && randInt(1, 100) <= 45) {
+        match_internal::pushTacticalEvent(events, eventMinute, team.name + " inclina el partido en este tramo");
+    } else if (directBonus >= 7 && opponent.defensiveLine >= 4 && randInt(1, 100) <= 40) {
+        match_internal::pushTacticalEvent(events, eventMinute, team.name + " encuentra espacio tras un balon largo");
+    } else if (team.tactics == "Counter" && randInt(1, 100) <= 28) {
+        match_internal::pushTacticalEvent(events, eventMinute, team.name + " sale rapido al contraataque");
+    } else if (team.matchInstruction == "Balon parado" && randInt(1, 100) <= 26) {
+        match_internal::pushTacticalEvent(events, eventMinute, team.name + " amenaza desde la pelota detenida");
+    }
+}
+
+static PhaseMatchSummary simulateMatchByPhases(const Team& home,
+                                               const Team& away,
+                                               const vector<int>& homeXI,
+                                               const vector<int>& awayXI,
+                                               const WeatherEffect& weather,
+                                               int homeCrowd,
+                                               int awayCrowd,
+                                               int homeBaseStamina,
+                                               int awayBaseStamina,
+                                               bool keyMatch,
+                                               vector<string>* events) {
+    PhaseMatchSummary summary;
+    Team homeState = home;
+    Team awayState = away;
+
+    for (int phase = 0; phase < 6; ++phase) {
+        int minuteEnd = (phase + 1) * 15;
+        int minuteStart = minuteEnd - 14;
+
+        team_ai::applyInMatchCpuAdjustment(homeState, awayState, minuteEnd, summary.homeGoals, summary.awayGoals, events);
+        team_ai::applyInMatchCpuAdjustment(awayState, homeState, minuteEnd, summary.awayGoals, summary.homeGoals, events);
+
+        TeamStrength homeStrength = computeStrengthFromXI(homeState, homeXI);
+        TeamStrength awayStrength = computeStrengthFromXI(awayState, awayXI);
+        int homeAttack = homeStrength.attack;
+        int homeDefense = homeStrength.defense;
+        int awayAttack = awayStrength.attack;
+        int awayDefense = awayStrength.defense;
+        int homeRecovery = match_internal::pressingRecoveryBonus(homeState, homeXI);
+        int awayRecovery = match_internal::pressingRecoveryBonus(awayState, awayXI);
+        int homeDirect = match_internal::directPlayBonus(homeState, awayState, homeXI);
+        int awayDirect = match_internal::directPlayBonus(awayState, homeState, awayXI);
+        int homeClutch = match_internal::clutchModifier(homeState, homeXI, keyMatch) + homeCrowd / 2;
+        int awayClutch = match_internal::clutchModifier(awayState, awayXI, keyMatch) + awayCrowd / 2;
+
+        applyTactics(homeState, homeAttack, homeDefense);
+        applyTactics(awayState, awayAttack, awayDefense);
+        match_internal::applyStyleMatchup(homeState, awayState, homeAttack, homeDefense, awayAttack, awayDefense);
+
+        homeAttack += homeRecovery + homeDirect + homeCrowd + homeStrength.avgSkill;
+        homeDefense += homeRecovery / 2 + homeCrowd / 2 + homeStrength.avgSkill;
+        awayAttack += awayRecovery + awayDirect + awayCrowd + awayStrength.avgSkill;
+        awayDefense += awayRecovery / 2 + awayCrowd / 2 + awayStrength.avgSkill;
+
+        double homeMoraleFactor = 0.9 + (homeState.morale / 500.0);
+        double awayMoraleFactor = 0.9 + (awayState.morale / 500.0);
+        homeAttack = static_cast<int>(round(homeAttack * homeMoraleFactor * weather.attackMul));
+        homeDefense = static_cast<int>(round(homeDefense * weather.defenseMul));
+        awayAttack = static_cast<int>(round(awayAttack * awayMoraleFactor * weather.attackMul));
+        awayDefense = static_cast<int>(round(awayDefense * weather.defenseMul));
+
+        int homeStamina = clampInt(homeBaseStamina - phaseFatiguePenalty(homeState, phase, homeBaseStamina), 30, 100);
+        int awayStamina = clampInt(awayBaseStamina - phaseFatiguePenalty(awayState, phase, awayBaseStamina), 30, 100);
+        homeAttack = homeAttack * homeStamina / 100;
+        homeDefense = homeDefense * homeStamina / 100;
+        awayAttack = awayAttack * awayStamina / 100;
+        awayDefense = awayDefense * awayStamina / 100;
+
+        applyScoreStatePressure(homeState, minuteEnd, summary.homeGoals, summary.awayGoals, homeClutch, homeAttack, homeDefense);
+        applyScoreStatePressure(awayState, minuteEnd, summary.awayGoals, summary.homeGoals, awayClutch, awayAttack, awayDefense);
+
+        if (playerNamedInXI(homeState, homeXI, homeState.captain)) {
+            if (const Player* captain = lineupPlayerByName(homeState, homeXI, homeState.captain)) {
+                homeAttack += 1 + captain->leadership / 18;
+                homeDefense += 1 + captain->leadership / 18;
+            }
+        }
+        if (playerNamedInXI(awayState, awayXI, awayState.captain)) {
+            if (const Player* captain = lineupPlayerByName(awayState, awayXI, awayState.captain)) {
+                awayAttack += 1 + captain->leadership / 18;
+                awayDefense += 1 + captain->leadership / 18;
+            }
+        }
+        if (const Player* taker = lineupPlayerByName(homeState, homeXI, homeState.freeKickTaker)) {
+            homeAttack += taker->setPieceSkill / 14;
+        }
+        if (const Player* taker = lineupPlayerByName(awayState, awayXI, awayState.freeKickTaker)) {
+            awayAttack += taker->setPieceSkill / 14;
+        }
+
+        double homeLambda = calcLambda(homeAttack, awayDefense) / 6.0;
+        double awayLambda = calcLambda(awayAttack, homeDefense) / 6.0;
+        int phaseHomeGoals = min(3, samplePoisson(homeLambda));
+        int phaseAwayGoals = min(3, samplePoisson(awayLambda));
+        int phaseHomeShots = clampInt(static_cast<int>(round(1.0 + homeLambda * 3.2 + homeRecovery / 10.0 + homeDirect / 12.0 + randInt(-1, 2))),
+                                      phaseHomeGoals, 7);
+        int phaseAwayShots = clampInt(static_cast<int>(round(1.0 + awayLambda * 3.2 + awayRecovery / 10.0 + awayDirect / 12.0 + randInt(-1, 2))),
+                                      phaseAwayGoals, 7);
+        int phaseHomeCorners = clampInt(phaseHomeShots / 2 + (homeState.matchInstruction == "Laterales altos" ? 1 : 0) + randInt(0, 1), 0, 3);
+        int phaseAwayCorners = clampInt(phaseAwayShots / 2 + (awayState.matchInstruction == "Laterales altos" ? 1 : 0) + randInt(0, 1), 0, 3);
+
+        summary.homeGoals += phaseHomeGoals;
+        summary.awayGoals += phaseAwayGoals;
+        summary.homeShots += phaseHomeShots;
+        summary.awayShots += phaseAwayShots;
+        summary.homeCorners += phaseHomeCorners;
+        summary.awayCorners += phaseAwayCorners;
+        summary.homeControl += clampInt(50 + (homeAttack - awayAttack) / 6 + homeCrowd - awayCrowd, 30, 70);
+
+        addPhaseNarrative(homeState, awayState, minuteStart, minuteEnd, homeAttack - awayDefense, homeDirect, events);
+        addPhaseNarrative(awayState, homeState, minuteStart, minuteEnd, awayAttack - homeDefense, awayDirect, events);
+    }
+
+    return summary;
 }
 
 int teamPenaltyStrength(const Team& team) {

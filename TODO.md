@@ -679,6 +679,10 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - intenta usar CMake primero
   - cae a compilacion directa con `g++` si CMake no es usable en el entorno
   - compila solo desde `src/`
+  - ejecuta el juego usando la raiz del proyecto como directorio de trabajo
+  - soporta argumentos directos como `--cli` y `--validate`
+  - ejecuta `--cli` y `--validate` en la misma consola
+  - mantiene `FM_SKIP_RUN=1` para compilar sin lanzar el juego
 - `CMakeLists.txt` fue rehecho para reflejar la nueva estructura modular del proyecto.
 - `.gitignore` fue ampliado para ignorar:
   - builds

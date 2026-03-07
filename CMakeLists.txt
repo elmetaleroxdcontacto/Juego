@@ -9,6 +9,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(FM_CAREER_SOURCES
     src/career/app_services.cpp
     src/career/career_support.cpp
+    src/career/player_development.cpp
+    src/career/team_management.cpp
+)
+
+set(FM_AI_SOURCES
+    src/ai/team_ai.cpp
 )
 
 set(FM_COMPETITION_SOURCES
@@ -31,6 +37,7 @@ set(FM_SIMULATION_SOURCES
 
 set(FM_TRANSFER_SOURCES
     src/transfers/negotiation_system.cpp
+    src/transfers/transfer_market.cpp
 )
 
 set(FM_UI_SOURCES
@@ -47,6 +54,7 @@ endif()
 
 add_executable(FootballManager
     ${FM_CAREER_SOURCES}
+    ${FM_AI_SOURCES}
     ${FM_COMPETITION_SOURCES}
     ${FM_ENGINE_SOURCES}
     ${FM_IO_SOURCES}

@@ -1,6 +1,7 @@
 #include "app_services.h"
 
 #include "career/career_support.h"
+#include "career/team_management.h"
 #include "competition.h"
 #include "transfers/negotiation_system.h"
 #include "ui.h"
@@ -150,34 +151,8 @@ string opponentSummary(const Career& career) {
            (areRivalClubs(*career.myTeam, *opponent) ? " | clasico" : "");
 }
 
-int playerIndexByName(const Team& team, const string& name) {
-    for (size_t i = 0; i < team.players.size(); ++i) {
-        if (team.players[i].name == name) return static_cast<int>(i);
-    }
-    return -1;
-}
-
 void eraseNamedSelection(vector<string>& values, const string& name) {
     values.erase(remove(values.begin(), values.end(), name), values.end());
-}
-
-void detachPlayerFromSelections(Team& team, const string& playerName) {
-    eraseNamedSelection(team.preferredXI, playerName);
-    eraseNamedSelection(team.preferredBench, playerName);
-    if (team.captain == playerName) team.captain.clear();
-    if (team.penaltyTaker == playerName) team.penaltyTaker.clear();
-    if (team.freeKickTaker == playerName) team.freeKickTaker.clear();
-    if (team.cornerTaker == playerName) team.cornerTaker.clear();
-}
-
-void applyDepartureShock(Team& team, const Player& player) {
-    if (player.skill < team.getAverageSkill()) return;
-    team.morale = clampInt(team.morale - 3, 0, 100);
-    for (auto& mate : team.players) {
-        if (mate.name == player.name) continue;
-        mate.chemistry = clampInt(mate.chemistry - 1, 1, 99);
-        if (player.leadership >= 70) mate.happiness = clampInt(mate.happiness - 1, 1, 99);
-    }
 }
 
 LeagueTable buildTableFromTeams(const vector<Team*>& teams, const string& title, const string& ruleId) {
@@ -482,7 +457,7 @@ ServiceResult buyTransferTargetService(Career& career,
     if (!career.myTeam) return failure("No hay una carrera activa.");
     Team* seller = career.findTeamByName(sellerTeamName);
     if (!seller || seller == career.myTeam) return failure("No se encontro el club vendedor.");
-    int sellerIdx = playerIndexByName(*seller, playerName);
+    int sellerIdx = team_mgmt::playerIndexByName(*seller, playerName);
     if (sellerIdx < 0) return failure("No se encontro el jugador seleccionado.");
     int maxSquadSize = getCompetitionConfig(career.myTeam->division).maxSquadSize;
     if (maxSquadSize > 0 && static_cast<int>(career.myTeam->players.size()) >= maxSquadSize) {
@@ -523,7 +498,7 @@ ServiceResult buyTransferTargetService(Career& career,
     career.myTeam->budget -= (transferFee + agentFee);
     career.myTeam->addPlayer(player);
     seller->budget += transferFee;
-    detachPlayerFromSelections(*seller, player.name);
+    team_mgmt::detachPlayerFromSelections(*seller, player.name);
     eraseNamedSelection(career.scoutingShortlist, seller->name + "|" + player.name);
     seller->players.erase(seller->players.begin() + sellerIdx);
     ensureTeamIdentity(*career.myTeam);
@@ -548,7 +523,7 @@ ServiceResult signPreContractService(Career& career,
     if (!career.myTeam) return failure("No hay una carrera activa.");
     Team* seller = career.findTeamByName(sellerTeamName);
     if (!seller || seller == career.myTeam) return failure("No se encontro el club del jugador.");
-    int sellerIdx = playerIndexByName(*seller, playerName);
+    int sellerIdx = team_mgmt::playerIndexByName(*seller, playerName);
     if (sellerIdx < 0) return failure("No se encontro el jugador seleccionado.");
     const Player& player = seller->players[static_cast<size_t>(sellerIdx)];
     if (player.onLoan) return failure("No se puede firmar precontrato con un jugador cedido.");
@@ -597,7 +572,7 @@ ServiceResult renewPlayerContractService(Career& career,
                                          NegotiationPromise promise) {
     if (!career.myTeam) return failure("No hay una carrera activa.");
     Team& team = *career.myTeam;
-    int index = playerIndexByName(team, playerName);
+    int index = team_mgmt::playerIndexByName(team, playerName);
     if (index < 0) return failure("No se encontro el jugador seleccionado.");
     Player& player = team.players[static_cast<size_t>(index)];
     ensureTeamIdentity(team);
@@ -639,14 +614,14 @@ ServiceResult sellPlayerService(Career& career, const string& playerName) {
     Team& team = *career.myTeam;
     ensureTeamIdentity(team);
     if (team.players.size() <= 18) return failure("Debes mantener al menos 18 jugadores en plantel.");
-    int index = playerIndexByName(team, playerName);
+    int index = team_mgmt::playerIndexByName(team, playerName);
     if (index < 0) return failure("No se encontro el jugador seleccionado.");
     const Player& player = team.players[static_cast<size_t>(index)];
     if (player.onLoan && !player.parentClub.empty()) return failure("No puedes vender un jugador cedido.");
     long long transferFee = max(10000LL, player.value * 105 / 100);
     team.budget += transferFee;
-    detachPlayerFromSelections(team, player.name);
-    applyDepartureShock(team, player);
+    team_mgmt::detachPlayerFromSelections(team, player.name);
+    team_mgmt::applyDepartureShock(team, player);
     career.addNews(player.name + " sale de " + team.name + " por " + formatMoney(transferFee) + ".");
     team.players.erase(team.players.begin() + index);
     ensureTeamIdentity(team);
@@ -659,7 +634,7 @@ ServiceResult sellPlayerService(Career& career, const string& playerName) {
 ServiceResult cyclePlayerDevelopmentPlanService(Career& career, const string& playerName) {
     if (!career.myTeam) return failure("No hay una carrera activa.");
     Team& team = *career.myTeam;
-    int index = playerIndexByName(team, playerName);
+    int index = team_mgmt::playerIndexByName(team, playerName);
     if (index < 0) return failure("No se encontro el jugador seleccionado.");
     Player& player = team.players[static_cast<size_t>(index)];
     player.developmentPlan = nextDevelopmentPlan(player.developmentPlan);
@@ -688,7 +663,7 @@ ServiceResult shortlistPlayerService(Career& career,
     if (!career.myTeam) return failure("No hay una carrera activa.");
     Team* seller = career.findTeamByName(sellerTeamName);
     if (!seller || seller == career.myTeam) return failure("No se encontro el club del jugador.");
-    int sellerIdx = playerIndexByName(*seller, playerName);
+    int sellerIdx = team_mgmt::playerIndexByName(*seller, playerName);
     if (sellerIdx < 0) return failure("No se encontro el jugador seleccionado.");
     const Player& player = seller->players[static_cast<size_t>(sellerIdx)];
 
@@ -728,7 +703,7 @@ ServiceResult followShortlistService(Career& career) {
         if (fields.size() < 2) continue;
         Team* seller = career.findTeamByName(fields[0]);
         if (!seller) continue;
-        int sellerIdx = playerIndexByName(*seller, fields[1]);
+        int sellerIdx = team_mgmt::playerIndexByName(*seller, fields[1]);
         if (sellerIdx < 0) continue;
         const Player& player = seller->players[static_cast<size_t>(sellerIdx)];
         string note = "[Seguimiento] " + player.name + " | " + seller->name +
@@ -887,7 +862,7 @@ std::string buildScoutingSummaryService(const Career& career) {
             if (fields.size() < 2) continue;
             const Team* seller = career.findTeamByName(fields[0]);
             if (!seller) continue;
-            int sellerIdx = playerIndexByName(*seller, fields[1]);
+            int sellerIdx = team_mgmt::playerIndexByName(*seller, fields[1]);
             if (sellerIdx < 0) continue;
             const Player& player = seller->players[static_cast<size_t>(sellerIdx)];
             out << "- " << player.name << " (" << seller->name << ")"
