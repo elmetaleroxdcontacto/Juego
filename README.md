@@ -100,29 +100,35 @@ Possible future integrations:
 
 # 📂 Project Structure
 
-Example structure:
+Current structure:
 
 ```
-/Juego
-│
-├── src
-│   ├── core
-│   ├── league
-│   ├── team
-│   ├── player
-│   ├── match
-│
-├── data
-│   ├── leagues
-│   ├── teams
-│   ├── players
-│
-├── assets
-│
-├── docs
-│
-└── main.cpp
+FootballManagerGame/
+├── include/
+│   ├── career/
+│   ├── simulation/
+│   └── transfers/
+├── src/
+│   ├── career/
+│   ├── competition/
+│   ├── gui/
+│   ├── io/
+│   ├── simulation/
+│   ├── transfers/
+│   ├── ui/
+│   ├── utils/
+│   └── validators/
+├── data/
+│   └── LigaChilena/
+├── saves/
+├── tests/
+├── build.bat
+├── CMakeLists.txt
+└── *.cpp / *.h
 ```
+
+Note:
+The project is currently in a staged migration. Some legacy root `.cpp` / `.h` files remain active while shared logic is being moved into `src/` and `include/`.
 
 ---
 
@@ -143,6 +149,26 @@ Examples:
 * CLion
 
 3. Compile the project
+
+Windows batch build:
+
+```powershell
+build.bat
+```
+
+Build only, without opening the game:
+
+```powershell
+$env:FM_SKIP_RUN='1'
+cmd /c build.bat
+```
+
+If CMake is installed:
+
+```powershell
+cmake -S . -B build-cmake
+cmake --build build-cmake
+```
 
 4. Run the executable
 
@@ -203,4 +229,3 @@ https://github.com/elmetaleroxdcontacto/Juego
 ---
 
 ⚽ *Building a football management simulation from scratch.*
-

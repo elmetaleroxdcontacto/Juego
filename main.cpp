@@ -4,12 +4,12 @@
 #include "io.h"
 #include "models.h"
 #include "simulation.h"
-#include "gui.h"
 #include "ui.h"
 #include "utils.h"
 #include "validators.h"
 
 #ifdef _WIN32
+#include "gui.h"
 #include <windows.h>
 #endif
 
@@ -217,6 +217,7 @@ int main(int argc, char* argv[]) {
 #ifdef _WIN32
     HWND consoleWindow = GetConsoleWindow();
     if (consoleWindow) ShowWindow(consoleWindow, SW_HIDE);
-#endif
     return runGuiApp();
+#endif
+    return runConsoleApp();
 }

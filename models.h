@@ -87,6 +87,8 @@ struct PendingTransfer {
     std::string promisedRole;
 };
 
+class Team;
+
 void applyPositionStats(Player& p);
 std::string defaultRoleForPosition(const std::string& position);
 std::string defaultDevelopmentPlanForPosition(const std::string& position);
@@ -96,6 +98,10 @@ bool playerHasTrait(const Player& p, const std::string& trait);
 int positionFitScore(const Player& p, const std::string& desiredPosition);
 std::string playerReliabilityLabel(const Player& p);
 std::string playerFormLabel(const Player& p);
+void ensureTeamIdentity(Team& team);
+int teamPrestigeScore(const Team& team);
+bool areRivalClubs(const Team& a, const Team& b);
+std::string teamExpectationLabel(const Team& team);
 std::string joinStringValues(const std::vector<std::string>& values, const std::string& separator);
 Player makeRandomPlayer(const std::string& position, int skillMin, int skillMax, int ageMin, int ageMax);
 
@@ -143,6 +149,10 @@ public:
     int youthFacilityLevel;
     int trainingFacilityLevel;
     int fanBase;
+    int clubPrestige;
+    std::string clubStyle;
+    std::string youthIdentity;
+    std::string primaryRival;
     std::string matchInstruction;
     std::vector<HeadToHeadRecord> headToHead;
     std::vector<std::string> achievements;

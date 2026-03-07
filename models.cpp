@@ -9,10 +9,17 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <vector>
+
+#ifdef _WIN32
+#include <direct.h>
+#else
+#include <sys/stat.h>
+#endif
 
 using namespace std;
 
-static constexpr int kCareerSaveVersion = 4;
+static constexpr int kCareerSaveVersion = 5;
 
 void applyPositionStats(Player& p) {
     string norm = normalizePosition(p.position);
@@ -147,6 +154,102 @@ string playerFormLabel(const Player& p) {
     if (p.currentForm >= 60) return "Bien";
     if (p.currentForm >= 45) return "Normal";
     return "Baja";
+}
+
+static int divisionPrestigeBase(const string& division) {
+    string id = toLower(trim(division));
+    if (id == "primera division") return 68;
+    if (id == "primera b") return 56;
+    if (id == "segunda division") return 48;
+    if (id == "tercera a") return 40;
+    if (id == "tercera b") return 32;
+    return 36;
+}
+
+static string inferClubStyle(const Team& team) {
+    if (team.tactics == "Pressing" || team.pressingIntensity >= 4) return "Presion vertical";
+    if (team.matchInstruction == "Juego directo" || team.tempo >= 4) return "Transicion directa";
+    if (team.matchInstruction == "Por bandas" || team.width >= 4) return "Ataque por bandas";
+    if (team.tactics == "Defensive" || team.matchInstruction == "Bloque bajo" || team.defensiveLine <= 2) {
+        return "Bloque ordenado";
+    }
+    if (team.trainingFacilityLevel >= 3 || team.formation.find("4-3-3") != string::npos) {
+        return "Control de posesion";
+    }
+    return "Equilibrio competitivo";
+}
+
+static string inferYouthIdentity(const Team& team) {
+    if (team.youthFacilityLevel >= 4 || team.youthCoach >= 75) return "Cantera estructurada";
+    if (team.youthFacilityLevel >= 3 || team.trainingFacilityLevel >= 3) return "Desarrollo mixto";
+    if (team.fanBase >= 28 && team.clubPrestige >= 60) return "Plantel de mercado";
+    return "Talento local";
+}
+
+static string inferPrimaryRival(const string& clubName) {
+    string id = normalizeTeamId(clubName);
+    static const vector<pair<string, string>> rivals = {
+        {"colocolo", "Universidad de Chile"},
+        {"universidaddechile", "Colo-Colo"},
+        {"universidadcatolica", "Universidad de Chile"},
+        {"deportesiquique", "San Marcos de Arica"},
+        {"sanmarcosdearica", "Deportes Iquique"},
+        {"cobreloa", "Deportes Antofagasta"},
+        {"deportesantofagasta", "Cobreloa"},
+        {"santiagowanderers", "Everton"},
+        {"everton", "Santiago Wanderers"},
+        {"unionespanola", "Palestino"},
+        {"palestino", "Union Espanola"},
+        {"magallanes", "Santiago Morning"},
+        {"santiagomorning", "Magallanes"},
+        {"rangers", "Curico Unido"},
+        {"curicounido", "Rangers"},
+        {"deportesconcepcion", "Fernandez Vial"},
+        {"fernandezvial", "Deportes Concepcion"}
+    };
+    for (const auto& rival : rivals) {
+        if (rival.first == id) return rival.second;
+    }
+    return "";
+}
+
+static int calculateTeamPrestige(const Team& team) {
+    long long achievementScore = static_cast<long long>(team.achievements.size()) * 2;
+    long long financialPower = clampInt(static_cast<int>(team.sponsorWeekly / 60000LL), 0, 10);
+    long long facilities = (team.stadiumLevel - 1) * 3 + (team.youthFacilityLevel - 1) * 3 +
+                           (team.trainingFacilityLevel - 1) * 3;
+    long long crowd = team.fanBase / 3;
+    long long debtPenalty = clampInt(static_cast<int>(team.debt / 250000LL), 0, 14);
+    int prestige = divisionPrestigeBase(team.division) + static_cast<int>(achievementScore + financialPower + facilities + crowd) -
+                   static_cast<int>(debtPenalty);
+    return clampInt(prestige, 20, 95);
+}
+
+int teamPrestigeScore(const Team& team) {
+    return calculateTeamPrestige(team);
+}
+
+void ensureTeamIdentity(Team& team) {
+    team.clubPrestige = calculateTeamPrestige(team);
+    team.clubStyle = inferClubStyle(team);
+    team.youthIdentity = inferYouthIdentity(team);
+    if (team.primaryRival.empty()) team.primaryRival = inferPrimaryRival(team.name);
+}
+
+bool areRivalClubs(const Team& a, const Team& b) {
+    string aName = normalizeTeamId(a.name);
+    string bName = normalizeTeamId(b.name);
+    if (!a.primaryRival.empty() && normalizeTeamId(a.primaryRival) == bName) return true;
+    if (!b.primaryRival.empty() && normalizeTeamId(b.primaryRival) == aName) return true;
+    return false;
+}
+
+string teamExpectationLabel(const Team& team) {
+    int prestige = teamPrestigeScore(team);
+    if (prestige >= 74) return "Pelear arriba";
+    if (prestige >= 58) return "Competir por playoffs";
+    if (prestige >= 44) return "Mitad de tabla";
+    return "Evitar el fondo";
 }
 
 bool playerHasTrait(const Player& p, const string& trait) {
@@ -286,6 +389,10 @@ Team::Team(string n)
       youthFacilityLevel(1),
       trainingFacilityLevel(1),
       fanBase(12),
+      clubPrestige(0),
+      clubStyle(""),
+      youthIdentity(""),
+      primaryRival(""),
       matchInstruction("Equilibrado") {}
 
 void Team::addPlayer(const Player& p) {
@@ -713,18 +820,18 @@ void LeagueTable::displayTable() {
 }
 
 const vector<DivisionInfo> kDivisions = {
-    {"primera division", "LigaChilena/primera division", "Primera Division"},
-    {"primera b", "LigaChilena/primera b", "Primera B"},
-    {"segunda division", "LigaChilena/segunda division", "Segunda Division"},
-    {"tercera division a", "LigaChilena/tercera division a", "Tercera Division A"},
-    {"tercera division b", "LigaChilena/tercera division b", "Tercera Division B"}
+    {"primera division", "data/LigaChilena/primera division", "Primera Division"},
+    {"primera b", "data/LigaChilena/primera b", "Primera B"},
+    {"segunda division", "data/LigaChilena/segunda division", "Segunda Division"},
+    {"tercera division a", "data/LigaChilena/tercera division a", "Tercera Division A"},
+    {"tercera division b", "data/LigaChilena/tercera division b", "Tercera Division B"}
 };
 
 Career::Career()
     : myTeam(nullptr),
       currentSeason(1),
       currentWeek(1),
-      saveFile("career_save.txt"),
+      saveFile("saves/career_save.txt"),
       managerName("Manager"),
       managerReputation(50),
       boardConfidence(60),
@@ -791,6 +898,7 @@ void Career::initializeLeague(bool forceReload) {
             divisions.push_back(div);
         }
     }
+    for (auto& team : allTeams) ensureTeamIdentity(team);
     initialized = true;
 }
 
@@ -1047,6 +1155,27 @@ static int youthPlayersUsed(const Team& team) {
     return count;
 }
 
+static bool promiseCurrentlyAtRisk(const Player& player, int currentWeek) {
+    if (player.promisedRole == "Titular") {
+        return player.startsThisSeason + 2 < max(2, currentWeek * 2 / 3);
+    }
+    if (player.promisedRole == "Rotacion") {
+        return player.startsThisSeason + 1 < max(1, currentWeek / 3);
+    }
+    if (player.promisedRole == "Proyecto") {
+        return player.age <= 22 && player.startsThisSeason < max(1, currentWeek / 4);
+    }
+    return false;
+}
+
+static int promisesAtRiskForBoard(const Team& team, int currentWeek) {
+    int total = 0;
+    for (const auto& player : team.players) {
+        if (promiseCurrentlyAtRisk(player, currentWeek)) total++;
+    }
+    return total;
+}
+
 void Career::resetSeason() {
     for (auto& team : allTeams) {
         team.resetSeasonStats();
@@ -1276,12 +1405,16 @@ void Career::updateBoardConfidence() {
     if (!myTeam || boardExpectedFinish <= 0) return;
     int rank = currentCompetitiveRank();
     int delta = 0;
+    int prestige = teamPrestigeScore(*myTeam);
     if (rank > 0) {
         if (rank <= boardExpectedFinish) delta += 3;
         else delta -= min(5, rank - boardExpectedFinish);
+        if (prestige >= 70 && rank > boardExpectedFinish) delta--;
     }
     if (myTeam->budget >= boardBudgetTarget) delta += 1;
     else delta -= 2;
+    if (myTeam->budget < boardBudgetTarget * 8 / 10) delta -= 1;
+    if (myTeam->debt > myTeam->sponsorWeekly * 16) delta -= 2;
 
     int youthUsed = youthPlayersUsed(*myTeam);
     if (youthUsed >= boardYouthTarget) delta += 1;
@@ -1289,6 +1422,10 @@ void Career::updateBoardConfidence() {
 
     if (myTeam->morale >= 65) delta += 1;
     else if (myTeam->morale <= 35) delta -= 1;
+    if (myTeam->fanBase >= 55 && myTeam->morale <= 42) delta -= 1;
+
+    int promiseRisk = promisesAtRiskForBoard(*myTeam, currentWeek);
+    if (promiseRisk >= 2) delta -= min(3, promiseRisk);
 
     boardConfidence = clampInt(boardConfidence + delta, 0, 100);
     if (boardConfidence < 35) boardWarningWeeks++;
@@ -1427,6 +1564,13 @@ static Player decodePlayerFields(const vector<string>& pf) {
 }
 
 bool Career::saveCareer() {
+    if (saveFile.rfind("saves/", 0) == 0 || saveFile.rfind("saves\\", 0) == 0) {
+#ifdef _WIN32
+        _mkdir("saves");
+#else
+        mkdir("saves", 0755);
+#endif
+    }
     ofstream file(saveFile);
     if (!file.is_open()) return false;
 
@@ -1453,7 +1597,8 @@ bool Career::saveCareer() {
     file << "LASTMATCH " << lastMatchAnalysis << "\n";
     file << "TEAMS " << allTeams.size() << "\n";
 
-    for (const auto& team : allTeams) {
+    for (auto& team : allTeams) {
+        ensureTeamIdentity(team);
         file << "TEAM " << team.name << "|" << team.division << "|" << team.tactics << "|" << team.formation
              << "|" << team.budget << "|" << team.morale << "|" << team.points << "|" << team.goalsFor << "|" << team.goalsAgainst
              << "|" << team.wins << "|" << team.draws << "|" << team.losses << "|" << team.trainingFocus
@@ -1465,7 +1610,9 @@ bool Career::saveCareer() {
              << "|" << team.rotationPolicy << "|" << team.assistantCoach << "|" << team.fitnessCoach << "|" << team.scoutingChief
              << "|" << team.youthCoach << "|" << team.medicalTeam << "|" << team.youthRegion << "|" << team.debt
              << "|" << team.sponsorWeekly << "|" << team.stadiumLevel << "|" << team.youthFacilityLevel
-             << "|" << team.trainingFacilityLevel << "|" << team.fanBase << "|" << team.matchInstruction << "\n";
+             << "|" << team.trainingFacilityLevel << "|" << team.fanBase << "|" << team.matchInstruction
+             << "|" << teamPrestigeScore(team) << "|" << team.clubStyle << "|" << team.youthIdentity
+             << "|" << team.primaryRival << "\n";
         file << "PLAYERS " << team.players.size() << "\n";
         for (const auto& p : team.players) {
             file << "PLAYER " << encodePlayerFields(p) << "\n";
@@ -1476,7 +1623,11 @@ bool Career::saveCareer() {
 }
 
 bool Career::loadCareer() {
-    ifstream file(saveFile);
+    string resolvedSave = saveFile;
+    if (!pathExists(resolvedSave) && resolvedSave == "saves/career_save.txt" && pathExists("career_save.txt")) {
+        resolvedSave = "career_save.txt";
+    }
+    ifstream file(resolvedSave);
     if (!file.is_open()) return false;
 
     string line;
@@ -1685,6 +1836,14 @@ bool Career::loadCareer() {
             else team.fanBase = 12;
             if (fields.size() > extra + 29) team.matchInstruction = fields[extra + 29];
             else team.matchInstruction = "Equilibrado";
+            if (fields.size() > extra + 30) team.clubPrestige = clampInt(stoi(fields[extra + 30]), 1, 99);
+            else team.clubPrestige = 0;
+            if (fields.size() > extra + 31) team.clubStyle = fields[extra + 31];
+            else team.clubStyle.clear();
+            if (fields.size() > extra + 32) team.youthIdentity = fields[extra + 32];
+            else team.youthIdentity.clear();
+            if (fields.size() > extra + 33) team.primaryRival = fields[extra + 33];
+            else team.primaryRival.clear();
             if (fields.size() <= extra + 19) {
                 team.preferredBench.clear();
                 if (fields.size() > extra + 11) team.captain = fields[extra + 11];
@@ -1702,6 +1861,7 @@ bool Career::loadCareer() {
                 team.youthRegion = "Metropolitana";
                 team.matchInstruction = "Equilibrado";
             }
+            ensureTeamIdentity(team);
 
             if (!getline(file, line)) return false;
             if (line.rfind("PLAYERS ", 0) != 0) return false;

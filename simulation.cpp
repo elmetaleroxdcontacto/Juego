@@ -1,6 +1,7 @@
 ﻿#include "simulation.h"
 
 #include "io.h"
+#include "simulation/match_engine_internal.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -223,6 +224,91 @@ static void applyStyleMatchup(const Team& home,
     }
 }
 
+static int pressingRecoveryBonus(const Team& team, const vector<int>& xi) {
+    if (xi.empty()) return 0;
+    int discipline = 0;
+    int pressers = 0;
+    for (int idx : xi) {
+        if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
+        const Player& player = team.players[idx];
+        discipline += player.tacticalDiscipline;
+        if (playerHasTrait(player, "Presiona") || compactToken(player.role) == "pressing") pressers++;
+    }
+    int avgDiscipline = discipline / static_cast<int>(xi.size());
+    int bonus = max(0, team.pressingIntensity - 2) * 3 + max(0, avgDiscipline - 60) / 10 + pressers;
+    if (team.tactics == "Pressing") bonus += 3;
+    if (team.matchInstruction == "Contra-presion") bonus += 3;
+    return clampInt(bonus, 0, 16);
+}
+
+static int directPlayBonus(const Team& attacking, const Team& defending, const vector<int>& xi) {
+    bool direct = attacking.matchInstruction == "Juego directo" || attacking.tactics == "Counter" || attacking.tempo >= 4;
+    if (!direct || defending.defensiveLine <= 3) return 0;
+    int runners = 0;
+    for (int idx : xi) {
+        if (idx < 0 || idx >= static_cast<int>(attacking.players.size())) continue;
+        const Player& player = attacking.players[idx];
+        if (normalizePosition(player.position) == "DEL" || playerHasTrait(player, "Competidor") ||
+            compactToken(player.role) == "poacher" || compactToken(player.role) == "objetivo") {
+            runners++;
+        }
+    }
+    int bonus = (defending.defensiveLine - 3) * 4 + min(4, runners);
+    return clampInt(bonus, 0, 15);
+}
+
+static int crowdSupportBonus(const Team& home, const Team& away, bool neutralVenue) {
+    if (neutralVenue) return 0;
+    int bonus = home.fanBase / 8 + home.stadiumLevel * 2 + teamPrestigeScore(home) / 18;
+    bonus -= away.fanBase / 12;
+    if (areRivalClubs(home, away)) bonus += 3;
+    return clampInt(bonus, 0, 12);
+}
+
+static int clutchModifier(const Team& team, const vector<int>& xi, bool keyMatch) {
+    if (xi.empty()) return 0;
+    int nerve = team.morale;
+    int leaders = 0;
+    for (int idx : xi) {
+        if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
+        const Player& player = team.players[idx];
+        nerve += player.bigMatches / 2;
+        if (!team.captain.empty() && player.name == team.captain) nerve += player.leadership / 2;
+        if (playerHasTrait(player, "Cita grande")) nerve += 6;
+        if (playerHasTrait(player, "Caliente")) nerve -= 3;
+        if (playerHasTrait(player, "Lider")) leaders++;
+    }
+    nerve += leaders * 2;
+    if (keyMatch) nerve += 5;
+    return clampInt((nerve / static_cast<int>(xi.size()) - 45) / 3, -4, 12);
+}
+
+static void pushTacticalEvent(vector<string>* events, int minute, const string& text) {
+    if (!events || text.empty()) return;
+    events->push_back(to_string(minute) + "' " + text);
+}
+
+static void applyIntensityInjuryRisk(Team& team, const vector<int>& participants, vector<string>* events) {
+    int extraRisk = max(0, team.pressingIntensity - 3) * 3;
+    if (team.matchInstruction == "Presion final") extraRisk += 4;
+    if (team.matchInstruction == "Contra-presion") extraRisk += 2;
+    if (extraRisk <= 0) return;
+    for (int idx : participants) {
+        if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
+        Player& player = team.players[idx];
+        if (player.injured || player.fitness > 56) continue;
+        int risk = extraRisk + max(0, 58 - player.fitness) / 4;
+        if (playerHasTrait(player, "Fragil")) risk += 3;
+        if (randInt(1, 100) > risk) continue;
+        player.injured = true;
+        player.injuryHistory++;
+        player.injuryType = "Leve";
+        player.injuryWeeks = max(player.injuryWeeks, randInt(1, 2));
+        pushTacticalEvent(events, randInt(70, 90), "La intensidad rompe a " + player.name + " en " + team.name);
+        break;
+    }
+}
+
 static const Player* lineupPlayerByName(const Team& team, const vector<int>& xi, const string& playerName) {
     if (playerName.empty()) return nullptr;
     for (int idx : xi) {
@@ -361,9 +447,9 @@ TeamStrength computeStrength(Team& team) {
     for (int idx : ts.xi) {
         int att = team.players[idx].attack;
         int def = team.players[idx].defense;
-        applyRoleModifier(team.players[idx], att, def);
-        applyTraitModifier(team.players[idx], att, def);
-        applyPlayerStateModifier(team.players[idx], team, att, def);
+        match_internal::applyRoleModifier(team.players[idx], att, def);
+        match_internal::applyTraitModifier(team.players[idx], att, def);
+        match_internal::applyPlayerStateModifier(team.players[idx], team, att, def);
         ts.attack += att;
         ts.defense += def;
         skill += team.players[idx].skill;
@@ -373,7 +459,7 @@ TeamStrength computeStrength(Team& team) {
         form += team.players[idx].currentForm;
         discipline += team.players[idx].tacticalDiscipline;
     }
-    applyFormationBias(team, ts.xi, ts.attack, ts.defense);
+    match_internal::applyFormationBias(team, ts.xi, ts.attack, ts.defense);
     ts.avgSkill = skill / static_cast<int>(ts.xi.size());
     ts.avgStamina = stamina / static_cast<int>(ts.xi.size());
     ts.attack += chemistry / static_cast<int>(ts.xi.size()) / 4;
@@ -400,9 +486,9 @@ static TeamStrength computeStrengthFromXI(const Team& team, const vector<int>& x
     for (int idx : ts.xi) {
         int att = team.players[idx].attack;
         int def = team.players[idx].defense;
-        applyRoleModifier(team.players[idx], att, def);
-        applyTraitModifier(team.players[idx], att, def);
-        applyPlayerStateModifier(team.players[idx], team, att, def);
+        match_internal::applyRoleModifier(team.players[idx], att, def);
+        match_internal::applyTraitModifier(team.players[idx], att, def);
+        match_internal::applyPlayerStateModifier(team.players[idx], team, att, def);
         ts.attack += att;
         ts.defense += def;
         skill += team.players[idx].skill;
@@ -412,7 +498,7 @@ static TeamStrength computeStrengthFromXI(const Team& team, const vector<int>& x
         form += team.players[idx].currentForm;
         discipline += team.players[idx].tacticalDiscipline;
     }
-    applyFormationBias(team, ts.xi, ts.attack, ts.defense);
+    match_internal::applyFormationBias(team, ts.xi, ts.attack, ts.defense);
     ts.avgSkill = skill / static_cast<int>(ts.xi.size());
     ts.avgStamina = stamina / static_cast<int>(ts.xi.size());
     ts.attack += chemistry / static_cast<int>(ts.xi.size()) / 4;
@@ -534,7 +620,7 @@ void applyTactics(const Team& team, int& attack, int& defense) {
         defense += 4;
         attack -= 2;
     }
-    applyMatchInstruction(team, attack, defense);
+    match_internal::applyMatchInstruction(team, attack, defense);
 }
 
 double calcLambda(int attack, int defense) {
@@ -709,48 +795,7 @@ static void updateMatchForm(Team& team,
 }
 
 void assignGoalsAndAssists(Team& team, int goals, const vector<int>& xi, const string& teamName, vector<string>* events) {
-    if (goals <= 0 || xi.empty()) return;
-    vector<int> attackers;
-    for (int idx : xi) {
-        string pos = normalizePosition(team.players[idx].position);
-        if (pos == "DEL" || pos == "MED") {
-            attackers.push_back(idx);
-            if (playerHasTrait(team.players[idx], "Llega al area") ||
-                playerHasTrait(team.players[idx], "Competidor")) {
-                attackers.push_back(idx);
-            }
-        }
-    }
-    if (attackers.empty()) attackers = xi;
-
-    for (int i = 0; i < goals; ++i) {
-        int scorerIdx = attackers[randInt(0, static_cast<int>(attackers.size()) - 1)];
-        team.players[scorerIdx].goals++;
-
-        string assistName;
-        if (xi.size() > 1) {
-            int assistIdx = scorerIdx;
-            int guard = 0;
-            while (assistIdx == scorerIdx && guard < 10) {
-                assistIdx = xi[randInt(0, static_cast<int>(xi.size()) - 1)];
-                guard++;
-            }
-            if (assistIdx != scorerIdx) {
-                if (playerHasTrait(team.players[assistIdx], "Pase riesgoso") && xi.size() > 2 && randInt(1, 100) <= 35) {
-                    int retry = xi[randInt(0, static_cast<int>(xi.size()) - 1)];
-                    if (retry != scorerIdx) assistIdx = retry;
-                }
-                team.players[assistIdx].assists++;
-                assistName = team.players[assistIdx].name;
-            }
-        }
-        if (events) {
-            int minute = randInt(1, 90);
-            string text = to_string(minute) + "' " + teamName + ": " + team.players[scorerIdx].name;
-            if (!assistName.empty()) text += " (asist: " + assistName + ")";
-            events->push_back(text);
-        }
-    }
+    match_internal::assignGoalsAndAssists(team, goals, xi, teamName, events);
 }
 
 static bool playerNamedInXI(const Team& team, const vector<int>& xi, const string& playerName) {
@@ -776,6 +821,8 @@ int teamPenaltyStrength(const Team& team) {
 MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool neutralVenue) {
     ensureMinimumSquad(home, 11);
     ensureMinimumSquad(away, 11);
+    ensureTeamIdentity(home);
+    ensureTeamIdentity(away);
 
     auto h = computeStrength(home);
     auto a = computeStrength(away);
@@ -825,10 +872,40 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
     int homeDefense = h.defense;
     int awayAttack = a.attack;
     int awayDefense = a.defense;
+    int homeRecovery = match_internal::pressingRecoveryBonus(home, h.xi);
+    int awayRecovery = match_internal::pressingRecoveryBonus(away, a.xi);
+    int homeDirect = match_internal::directPlayBonus(home, away, h.xi);
+    int awayDirect = match_internal::directPlayBonus(away, home, a.xi);
+    int homeCrowd = match_internal::crowdSupportBonus(home, away, neutralVenue);
+    int awayCrowd = match_internal::crowdSupportBonus(away, home, neutralVenue);
 
     applyTactics(home, homeAttack, homeDefense);
     applyTactics(away, awayAttack, awayDefense);
-    applyStyleMatchup(home, away, homeAttack, homeDefense, awayAttack, awayDefense);
+    match_internal::applyStyleMatchup(home, away, homeAttack, homeDefense, awayAttack, awayDefense);
+    homeAttack += homeRecovery + homeDirect + homeCrowd;
+    homeDefense += homeRecovery / 2 + homeCrowd / 2;
+    awayAttack += awayRecovery + awayDirect + awayCrowd;
+    awayDefense += awayRecovery / 2 + awayCrowd / 2;
+    if (eventsPtr) {
+        if (areRivalClubs(home, away)) {
+            match_internal::pushTacticalEvent(eventsPtr, randInt(4, 18), "Se juega con clima de clasico entre " + home.name + " y " + away.name);
+        }
+        if (homeRecovery >= 8) {
+            match_internal::pushTacticalEvent(eventsPtr, randInt(8, 24), home.name + " muerde alto y roba cerca del area rival");
+        }
+        if (awayRecovery >= 8) {
+            match_internal::pushTacticalEvent(eventsPtr, randInt(8, 24), away.name + " activa la presion y corta la salida");
+        }
+        if (homeDirect >= 7) {
+            match_internal::pushTacticalEvent(eventsPtr, randInt(16, 34), home.name + " amenaza con balones largos a la espalda de la linea alta");
+        }
+        if (awayDirect >= 7) {
+            match_internal::pushTacticalEvent(eventsPtr, randInt(16, 34), away.name + " castiga la espalda de la defensa adelantada");
+        }
+        if (homeCrowd >= 6) {
+            match_internal::pushTacticalEvent(eventsPtr, randInt(2, 12), "La localia empuja a " + home.name + " desde el inicio");
+        }
+    }
 
     homeAttack += h.avgSkill;
     homeDefense += h.avgSkill;
@@ -900,6 +977,8 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
 
     int homeShots = clampInt(static_cast<int>(round(8 * (static_cast<double>(homeAttack) / max(1, awayDefense)))) + randInt(-2, 3), 3, 22);
     int awayShots = clampInt(static_cast<int>(round(8 * (static_cast<double>(awayAttack) / max(1, homeDefense)))) + randInt(-2, 3), 3, 22);
+    homeShots = clampInt(homeShots + homeRecovery / 3 + homeDirect / 4, 3, 24);
+    awayShots = clampInt(awayShots + awayRecovery / 3 + awayDirect / 4, 3, 24);
     int homeShotsOn = clampInt(homeGoals + randInt(0, max(0, homeShots - homeGoals)), homeGoals, homeShots);
     int awayShotsOn = clampInt(awayGoals + randInt(0, max(0, awayShots - awayGoals)), awayGoals, awayShots);
     int homeCorners = clampInt(homeShots / 3 + randInt(0, 2), 0, 12);
@@ -908,6 +987,19 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
     if (away.matchInstruction == "Laterales altos") awayCorners = clampInt(awayCorners + 2, 0, 14);
     int homePoss = clampInt(static_cast<int>(round(50 + ((static_cast<double>(homeAttack) / max(1, homeAttack + awayAttack)) - 0.5) * 30 + randInt(-3, 3))), 35, 65);
     int awayPoss = 100 - homePoss;
+    int homeClutch = match_internal::clutchModifier(home, h.xi, keyMatch) + homeCrowd / 2;
+    int awayClutch = match_internal::clutchModifier(away, a.xi, keyMatch) + awayCrowd / 2;
+    if (abs(homeGoals - awayGoals) <= 1) {
+        if (homeClutch - awayClutch >= 5 && randInt(1, 100) <= 24) {
+            homeGoals = clampInt(homeGoals + 1, 0, 7);
+            homeShotsOn = clampInt(homeShotsOn + 1, homeGoals, homeShots);
+            match_internal::pushTacticalEvent(eventsPtr, randInt(74, 90), home.name + " decide mejor en el cierre y golpea al final");
+        } else if (awayClutch - homeClutch >= 5 && randInt(1, 100) <= 24) {
+            awayGoals = clampInt(awayGoals + 1, 0, 7);
+            awayShotsOn = clampInt(awayShotsOn + 1, awayGoals, awayShots);
+            match_internal::pushTacticalEvent(eventsPtr, randInt(74, 90), away.name + " mantiene la calma y castiga en el tramo final");
+        }
+    }
 
     if (verbose) {
         cout << "\n--- Partido ---" << endl;
@@ -919,6 +1011,9 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
         if (neutralVenue) cout << "Sede: Cancha neutral" << endl;
         cout << "Clima: " << weather.name << endl;
         cout << "Condicion promedio: " << homeStam << " vs " << awayStam << endl;
+        cout << "Contexto: prestigio " << teamPrestigeScore(home) << "-" << teamPrestigeScore(away)
+             << " | apoyo local " << homeCrowd << "-" << awayCrowd
+             << " | recuperaciones " << homeRecovery << "-" << awayRecovery << endl;
         if (homeStam < 60 || awayStam < 60) {
             cout << "[AVISO] Condicion baja puede afectar el rendimiento." << endl;
         }
@@ -937,6 +1032,10 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
 
     int yellowHome = cardsForTactics(home, 0, 3);
     int yellowAway = cardsForTactics(away, 0, 3);
+    if (areRivalClubs(home, away)) {
+        yellowHome = clampInt(yellowHome + 1, 0, 6);
+        yellowAway = clampInt(yellowAway + 1, 0, 6);
+    }
     int redHome = (randInt(1, 100) <= redChanceForTactics(home)) ? 1 : 0;
     int redAway = (randInt(1, 100) <= redChanceForTactics(away)) ? 1 : 0;
     home.yellowCards += yellowHome;
@@ -1010,14 +1109,16 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
             simulateInjury(away.players[idx], away.tactics, verbose, eventsPtr);
         }
     }
+    match_internal::applyIntensityInjuryRisk(home, homeParticipants, eventsPtr);
+    match_internal::applyIntensityInjuryRisk(away, awayParticipants, eventsPtr);
 
     applyDevelopment(home, homeParticipants, verbose);
     applyDevelopment(away, awayParticipants, verbose);
     updateMatchForm(home, homeParticipants, homeGoals, awayGoals, keyMatch);
     updateMatchForm(away, awayParticipants, awayGoals, homeGoals, keyMatch);
 
-    applyMatchFatigue(home, homeParticipants, home.tactics);
-    applyMatchFatigue(away, awayParticipants, away.tactics);
+    match_internal::applyMatchFatigue(home, homeParticipants, home.tactics);
+    match_internal::applyMatchFatigue(away, awayParticipants, away.tactics);
 
     if (verbose && !events.empty()) {
         cout << "\nEventos:" << endl;

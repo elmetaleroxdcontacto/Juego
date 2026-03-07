@@ -518,6 +518,7 @@ vector<Team*> loadDivisionFromFolder(const string& folder, const string& divisio
         team.youthRegion = regions[randInt(0, static_cast<int>(regions.size()) - 1)];
         team.sponsorWeekly = max(12000LL, team.getSquadValue() / 25);
         team.fanBase = clampInt(static_cast<int>(team.getSquadValue() / 120000LL), 8, 40);
+        ensureTeamIdentity(team);
 
         allTeams.push_back(std::move(team));
         out.push_back(&allTeams.back());

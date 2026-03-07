@@ -532,3 +532,128 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Validaciones realizadas:
   - compilacion verificada exitosamente con `build.bat`
   - `FootballManager.exe --validate` ejecutado con resultado sin fallas
+
+## Cambios recientes (2026-03-07) - Motor contextual, identidad de club y reportes
+- Reforzado el motor de partidos en `simulation.cpp` para que el resultado responda mejor al contexto futbolistico:
+  - la presion alta ahora aporta recuperaciones y volumen ofensivo real
+  - las lineas defensivas altas sufren mas ante `Juego directo` y transiciones verticales
+  - la localia depende mas de masa social, estadio y prestigio
+  - los clasicos suben la tension competitiva y las tarjetas
+  - el tramo final del partido ahora pondera moral, liderazgo y atributo de `bigMatches`
+- Los eventos del partido ya explican mejor el por que de ciertas acciones:
+  - goles con texto segun rol o rasgo (`Poacher`, `Objetivo`, `Cita grande`, `Llega al area`, etc.)
+  - eventos tacticos de presion, localia, juego directo y clasico
+  - riesgo extra de lesion por intensidad cuando el equipo aprieta con poca energia
+- Agregada identidad persistente de club en `models.h` / `models.cpp`:
+  - `clubPrestige`
+  - `clubStyle`
+  - `youthIdentity`
+  - `primaryRival`
+- La identidad del club se infiere y actualiza automaticamente desde division, infraestructura, masa social, tacticas y rivalidades conocidas.
+- El guardado de carrera sube a `VERSION 5` y mantiene carga retrocompatible para saves anteriores sin estos campos.
+- Mejoradas las negociaciones en `app_services.cpp`:
+  - jugadores pueden rechazar por reputacion/proyecto insuficiente
+  - agentes mas duros encarecen salario, bono y honorarios
+  - clubes rivales directos aplican sobreprecio
+  - renovaciones castigan promesas de rol incumplidas
+- Reforzada la capa de carrera y reportes en `ui.cpp`:
+  - informe rival previo a la proxima fecha
+  - mapa simple por lineas en analisis postpartido y dashboard semanal
+  - alertas por fatiga de lineas, sequia de delanteros y promesas contractuales en riesgo
+  - noticias nuevas de clasicos, entrevistas, rumores de banquillo e identidad de cantera
+  - reputacion del manager ahora tambien responde un poco al estilo de juego
+- Mejorado el mundo de fondo:
+  - otras divisiones generan mas titulares narrativos de lideres, crisis y temporadas destacadas
+  - ofertas entrantes ahora vienen desde clubes concretos y mueven realmente planteles del mundo
+- Mejorada la portabilidad base del proyecto:
+  - agregado `CMakeLists.txt`
+  - `main.cpp` ahora cae a modo CLI fuera de Windows
+  - en Windows se mantiene la GUI como flujo por defecto
+- Validaciones realizadas:
+  - compilacion verificada con `g++ -std=c++17 -static ... -o FootballManager.exe`
+  - `FootballManager.exe --validate` ejecutado con resultado sin fallas
+- Pendiente para una segunda pasada si se quiere seguir esta linea:
+  - modularizacion fuerte de archivos grandes como `app_services.cpp` / `ui.cpp`
+  - soporte de datos de ligas y plantillas en formato mas formal/moddeable (JSON/CSV con esquema)
+  - filtros/comparadores de plantilla mas profundos y ofertas de manager jugables de punta a punta
+
+## Cambios recientes (2026-03-07) - Primera fase de refactor arquitectonico
+- Objetivo de esta fase:
+  - separar responsabilidades entre UI, servicios y logica compartida
+  - preparar una estructura mas escalable sin romper la base actual
+  - empezar a partir archivos grandes por dominios reales del juego
+
+### Hecho
+- Base de estructura nueva creada:
+  - `include/`
+  - `src/career`
+  - `src/transfers`
+  - `src/simulation`
+  - `src/competition`
+  - `src/ui`
+  - `src/gui`
+  - `src/io`
+  - `src/validators`
+  - `src/utils`
+  - `data/`
+  - `saves/`
+  - `tests/`
+- Datos de ligas movidos desde `LigaChilena/` a `data/LigaChilena/`.
+- Guardado por defecto migrado a `saves/career_save.txt` con compatibilidad de carga para el save legacy `career_save.txt` en raiz.
+- Modulo nuevo de negociacion extraido:
+  - `include/transfers/negotiation_system.h`
+  - `src/transfers/negotiation_system.cpp`
+- Ese modulo ya centraliza:
+  - factores de negociacion
+  - promesas contractuales
+  - demanda salarial
+  - honorarios de agente
+  - clima de vestuario
+  - riesgo de promesas incumplidas
+  - rechazo de fichajes por reputacion/proyecto
+- Modulo nuevo de soporte de carrera extraido:
+  - `include/career/career_support.h`
+  - `src/career/career_support.cpp`
+- Ese modulo ya centraliza:
+  - estado de directiva
+  - estilo del manager
+  - mercado de trabajos del entrenador
+  - cambio de club del manager
+  - informe previo del rival
+  - lectura por lineas del equipo
+- `app_services.cpp` y `ui.cpp` ya reutilizan esos modulos y dejaron de duplicar varias reglas de carrera y negociacion.
+- `build.bat` actualizado para:
+  - compilar tambien archivos nuevos dentro de `src/`
+  - usar includes de `include/` y `src/`
+  - seguir abriendo el juego al terminar
+  - permitir `FM_SKIP_RUN=1` para compilar sin lanzar la GUI
+- `CMakeLists.txt` ajustado para detectar fuentes en raiz y en `src/`, y para exponer `include/` y `src/` como include paths.
+- `README.md` actualizado con la nueva estructura y opciones de compilacion.
+- Validaciones realizadas:
+  - `build.bat` ejecutado con `FM_SKIP_RUN=1` sin errores
+  - `FootballManager.exe --validate` ejecutado con resultado sin fallas
+
+### En progreso
+- Division inicial de `simulation.cpp` en submodulos especializados:
+  - `src/simulation/match_tactics.cpp`
+  - `src/simulation/match_events.cpp`
+  - `src/simulation/match_engine_internal.h`
+- `simulation.cpp` ya consume helpers extraidos para:
+  - modificadores tacticos
+  - presion, linea alta y localia
+  - eventos tacticos
+  - fatiga
+  - asignacion de goles y asistencias
+  - riesgo extra de lesion por intensidad
+- La migracion sigue siendo parcial:
+  - persisten archivos legacy grandes
+  - todavia hay logica importante concentrada en `ui.cpp`, `app_services.cpp` y `simulation.cpp`
+  - la nueva estructura convive temporalmente con archivos raiz mientras se completa el traslado
+
+### Siguiente fase
+- Terminar la separacion fuerte entre logica del juego y capa de presentacion.
+- Seguir partiendo `simulation.cpp` en motor de partido, eventos, tacticas e IA rival.
+- Extraer mas responsabilidades desde `ui.cpp` hacia servicios y modelos de reporte.
+- Dividir `app_services.cpp` por dominios como carrera, finanzas, reportes y mercado.
+- Avanzar hacia datos mas moddeables para ligas, equipos y plantillas.
+- Consolidar la reorganizacion fisica de archivos para que la mayor parte del codigo viva ya en `src/` e `include/`.

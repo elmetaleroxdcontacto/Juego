@@ -1,6 +1,8 @@
 #include "app_services.h"
 
+#include "career/career_support.h"
 #include "competition.h"
+#include "transfers/negotiation_system.h"
 #include "ui.h"
 #include "utils.h"
 
@@ -98,90 +100,6 @@ string formatMoney(long long value) {
     return string(negative ? "-$" : "$") + out;
 }
 
-string boardStatusLabel(int confidence) {
-    if (confidence >= 75) return "Muy alta";
-    if (confidence >= 55) return "Estable";
-    if (confidence >= 35) return "En observacion";
-    if (confidence >= 20) return "Bajo presion";
-    return "Critica";
-}
-
-double negotiationFeeFactor(NegotiationProfile profile) {
-    switch (profile) {
-        case NegotiationProfile::Safe: return 1.08;
-        case NegotiationProfile::Balanced: return 1.00;
-        case NegotiationProfile::Aggressive: return 0.93;
-    }
-    return 1.00;
-}
-
-double negotiationWageFactor(NegotiationProfile profile) {
-    switch (profile) {
-        case NegotiationProfile::Safe: return 1.12;
-        case NegotiationProfile::Balanced: return 1.00;
-        case NegotiationProfile::Aggressive: return 0.95;
-    }
-    return 1.00;
-}
-
-double negotiationClauseFactor(NegotiationProfile profile) {
-    switch (profile) {
-        case NegotiationProfile::Safe: return 2.30;
-        case NegotiationProfile::Balanced: return 2.00;
-        case NegotiationProfile::Aggressive: return 1.70;
-    }
-    return 2.00;
-}
-
-string negotiationLabel(NegotiationProfile profile) {
-    switch (profile) {
-        case NegotiationProfile::Safe: return "Segura";
-        case NegotiationProfile::Balanced: return "Balanceada";
-        case NegotiationProfile::Aggressive: return "Agresiva";
-    }
-    return "Balanceada";
-}
-
-string promiseLabel(NegotiationPromise promise) {
-    switch (promise) {
-        case NegotiationPromise::None: return "Sin promesa";
-        case NegotiationPromise::Starter: return "Titular";
-        case NegotiationPromise::Rotation: return "Rotacion";
-        case NegotiationPromise::Prospect: return "Proyecto";
-    }
-    return "Sin promesa";
-}
-
-double promiseWageFactor(NegotiationPromise promise) {
-    switch (promise) {
-        case NegotiationPromise::None: return 1.00;
-        case NegotiationPromise::Starter: return 1.08;
-        case NegotiationPromise::Rotation: return 1.03;
-        case NegotiationPromise::Prospect: return 0.97;
-    }
-    return 1.00;
-}
-
-int promiseContractWeeks(NegotiationPromise promise, int currentWeeks) {
-    switch (promise) {
-        case NegotiationPromise::None: return max(104, currentWeeks);
-        case NegotiationPromise::Starter: return max(124, currentWeeks + 26);
-        case NegotiationPromise::Rotation: return max(104, currentWeeks + 12);
-        case NegotiationPromise::Prospect: return max(156, currentWeeks + 52);
-    }
-    return max(104, currentWeeks);
-}
-
-int desiredStartsForPromise(NegotiationPromise promise, const Player& player) {
-    switch (promise) {
-        case NegotiationPromise::None: return player.desiredStarts;
-        case NegotiationPromise::Starter: return 4;
-        case NegotiationPromise::Rotation: return 2;
-        case NegotiationPromise::Prospect: return (player.age <= 21) ? 2 : 1;
-    }
-    return player.desiredStarts;
-}
-
 string nextDevelopmentPlan(const string& current) {
     static const vector<string> plans = {"Equilibrado", "Fisico", "Defensa", "Creatividad", "Finalizacion", "Liderazgo"};
     for (size_t i = 0; i < plans.size(); ++i) {
@@ -200,84 +118,36 @@ string nextMatchInstruction(const string& current) {
     return instructions.front();
 }
 
-string personalityLabel(const Player& player) {
-    if (playerHasTrait(player, "Lider")) return "Lider";
-    if (player.professionalism >= 75 && player.ambition >= 60) return "Competitivo";
-    if (player.ambition >= 75 && player.happiness < 50) return "Inquieto";
-    if (player.professionalism <= 45) return "Irregular";
-    return "Estable";
-}
-
-vector<const Player*> dressingRoomLeaders(const Team& team) {
-    vector<const Player*> leaders;
-    for (const auto& player : team.players) {
-        if (player.leadership >= 72 || playerHasTrait(player, "Lider")) {
-            leaders.push_back(&player);
-        }
+string opponentSummary(const Career& career) {
+    const Team* opponent = nextOpponent(career);
+    if (!career.myTeam || !opponent) return "Sin informe rival disponible.";
+    int avgFitness = 0;
+    int injured = 0;
+    int defenders = 0;
+    int forwards = 0;
+    for (const auto& player : opponent->players) {
+        avgFitness += player.fitness;
+        if (player.injured) injured++;
+        string pos = normalizePosition(player.position);
+        if (pos == "DEF") defenders++;
+        if (pos == "DEL") forwards++;
     }
-    sort(leaders.begin(), leaders.end(), [](const Player* left, const Player* right) {
-        if (left->leadership != right->leadership) return left->leadership > right->leadership;
-        if (left->chemistry != right->chemistry) return left->chemistry > right->chemistry;
-        return left->name < right->name;
-    });
-    if (leaders.size() > 3) leaders.resize(3);
-    return leaders;
-}
-
-string dressingRoomClimate(const Team& team) {
-    int unhappy = 0;
-    int leaders = 0;
-    int totalChemistry = 0;
-    for (const auto& player : team.players) {
-        totalChemistry += player.chemistry;
-        if (player.happiness <= 40 || player.wantsToLeave) unhappy++;
-        if (player.leadership >= 72 || playerHasTrait(player, "Lider")) leaders++;
-    }
-    int avgChemistry = team.players.empty() ? 50 : totalChemistry / static_cast<int>(team.players.size());
-    if (unhappy >= 4 || avgChemistry <= 42) return "Tenso";
-    if (leaders >= 3 && avgChemistry >= 62 && team.morale >= 58) return "Fuerte";
-    if (team.morale <= 38 || unhappy >= 2) return "Inestable";
-    return "Estable";
-}
-
-bool promiseAtRisk(const Player& player, int currentWeek) {
-    if (player.promisedRole == "Titular") {
-        return player.startsThisSeason + 2 < max(2, currentWeek * 2 / 3);
-    }
-    if (player.promisedRole == "Rotacion") {
-        return player.startsThisSeason + 1 < max(1, currentWeek / 3);
-    }
-    if (player.promisedRole == "Proyecto") {
-        return player.age <= 22 && player.startsThisSeason < max(1, currentWeek / 4);
-    }
-    return false;
-}
-
-int promisesAtRisk(const Team& team, int currentWeek) {
-    int total = 0;
-    for (const auto& player : team.players) {
-        if (promiseAtRisk(player, currentWeek)) total++;
-    }
-    return total;
-}
-
-void applyNegotiatedPromise(Player& player, NegotiationPromise promise) {
-    if (promise == NegotiationPromise::None) return;
-    player.promisedRole = promiseLabel(promise);
-    player.desiredStarts = max(player.desiredStarts, desiredStartsForPromise(promise, player));
-    player.wantsToLeave = false;
-    player.happiness = clampInt(player.happiness + (promise == NegotiationPromise::Starter ? 5 : 3), 1, 99);
-}
-
-long long estimatedAgentFee(const Player& player, long long transferFee) {
-    return max(10000LL, max(transferFee / 20, player.value / 15));
-}
-
-long long wageDemandFor(const Player& player) {
-    long long performancePremium = static_cast<long long>(player.currentForm) * 60 +
-                                   static_cast<long long>(player.bigMatches) * 40 +
-                                   static_cast<long long>(player.consistency) * 30;
-    return max(player.wage, static_cast<long long>(player.skill) * 170 + player.potential * 25 + performancePremium);
+    if (!opponent->players.empty()) avgFitness /= static_cast<int>(opponent->players.size());
+    string style = opponent->clubStyle.empty()
+                       ? (opponent->tactics == "Pressing" ? "Presion vertical"
+                          : opponent->tactics == "Defensive" ? "Bloque ordenado"
+                                                             : "Equilibrio competitivo")
+                       : opponent->clubStyle;
+    string vulnerability = (avgFitness < 62) ? "carga fisica baja"
+                          : (opponent->defensiveLine >= 4 ? "espacio a la espalda"
+                             : (opponent->width >= 4 ? "espacios por dentro" : "ritmo controlado"));
+    return opponent->name + " | estilo " + style +
+           " | prestigio " + to_string(teamPrestigeScore(*opponent)) +
+           " | lesionados " + to_string(injured) +
+           " | fitness medio " + to_string(avgFitness) +
+           " | formacion " + opponent->formation +
+           " | fragilidad sugerida: " + vulnerability +
+           (areRivalClubs(*career.myTeam, *opponent) ? " | clasico" : "");
 }
 
 int playerIndexByName(const Team& team, const string& name) {
@@ -361,23 +231,6 @@ LeagueTable relevantCompetitionTable(const Career& career) {
     }
     string title = competitionGroupTitle(career.activeDivision, group == 0);
     return buildTableFromTeams(teams, title, career.activeDivision);
-}
-
-vector<Team*> buildJobMarket(const Career& career) {
-    vector<Team*> jobs;
-    if (!career.myTeam) return jobs;
-    for (const auto& team : career.allTeams) {
-        if (&team == career.myTeam) continue;
-        if (team.getAverageSkill() <= career.managerReputation + 25 || team.division == career.myTeam->division) {
-            jobs.push_back(const_cast<Team*>(&team));
-        }
-    }
-    sort(jobs.begin(), jobs.end(), [](Team* left, Team* right) {
-        if (left->getSquadValue() != right->getSquadValue()) return left->getSquadValue() > right->getSquadValue();
-        return left->name < right->name;
-    });
-    if (jobs.size() > 8) jobs.resize(8);
-    return jobs;
 }
 
 long long weeklyWage(const Team& team) {
@@ -582,6 +435,7 @@ ServiceResult scoutPlayersService(Career& career, const string& region, const st
 ServiceResult upgradeClubService(Career& career, ClubUpgrade upgrade) {
     if (!career.myTeam) return failure("No hay una carrera activa.");
     Team& team = *career.myTeam;
+    ensureTeamIdentity(team);
     long long cost = upgradeCost(team, upgrade);
     if (team.budget < cost) return failure("Presupuesto insuficiente para mejorar " + upgradeLabel(upgrade) + ".");
     team.budget -= cost;
@@ -610,6 +464,7 @@ ServiceResult upgradeClubService(Career& career, ClubUpgrade upgrade) {
             message = team.name + " fortalece el cuerpo medico.";
             break;
     }
+    ensureTeamIdentity(team);
     career.addNews(message);
     ServiceResult result;
     result.ok = true;
@@ -632,17 +487,28 @@ ServiceResult buyTransferTargetService(Career& career,
         return failure("Tu plantel ya alcanzo el maximo permitido para la division.");
     }
     if (seller->players.size() <= 18) return failure("El club vendedor no libera jugadores con un plantel tan corto.");
+    ensureTeamIdentity(*career.myTeam);
+    ensureTeamIdentity(*seller);
     Player player = seller->players[static_cast<size_t>(sellerIdx)];
     if (player.onLoan) return failure("El jugador esta a prestamo y no esta disponible.");
+    string rejectionReason;
+    if (playerRejectsMove(career, *career.myTeam, *seller, player, promise, rejectionReason)) {
+        return failure(rejectionReason);
+    }
     long long transferFee = max(player.value, player.releaseClause * 65 / 100);
     transferFee = static_cast<long long>(transferFee * negotiationFeeFactor(profile));
+    long long rivalryExtra = rivalrySurcharge(*career.myTeam, *seller, transferFee);
+    transferFee += rivalryExtra;
+    int difficulty = agentDifficulty(player);
     long long agentFee = estimatedAgentFee(player, transferFee);
+    agentFee = agentFee * (100 + difficulty / 3) / 100;
     if (career.myTeam->budget < transferFee + agentFee) {
         return failure("Presupuesto insuficiente para cubrir transferencia y honorarios.");
     }
     player.wage = max(player.wage, static_cast<long long>(wageDemandFor(player) *
                                                           negotiationWageFactor(profile) *
                                                           promiseWageFactor(promise)));
+    player.wage = player.wage * (100 + difficulty / 12) / 100;
     player.contractWeeks = promiseContractWeeks(promise, player.contractWeeks);
     player.releaseClause = max(static_cast<long long>(player.value * negotiationClauseFactor(profile)),
                                static_cast<long long>((transferFee + agentFee) * negotiationClauseFactor(profile)));
@@ -658,13 +524,17 @@ ServiceResult buyTransferTargetService(Career& career,
     detachPlayerFromSelections(*seller, player.name);
     eraseNamedSelection(career.scoutingShortlist, seller->name + "|" + player.name);
     seller->players.erase(seller->players.begin() + sellerIdx);
+    ensureTeamIdentity(*career.myTeam);
+    ensureTeamIdentity(*seller);
     career.addNews(player.name + " firma con " + career.myTeam->name + " desde " + seller->name + ".");
     ServiceResult result;
     result.ok = true;
     result.messages.push_back("Fichaje completado: " + player.name + " llega desde " + seller->name +
                               " por " + formatMoney(transferFee) + " + honorarios " + formatMoney(agentFee) +
                               " | perfil " + negotiationLabel(profile) +
-                              " | promesa " + promiseLabel(promise) + ".");
+                              " | promesa " + promiseLabel(promise) +
+                              (rivalryExtra > 0 ? " | sobreprecio por rivalidad " + formatMoney(rivalryExtra) : "") +
+                              " | agente " + to_string(difficulty) + "/90.");
     return result;
 }
 
@@ -681,21 +551,30 @@ ServiceResult signPreContractService(Career& career,
     const Player& player = seller->players[static_cast<size_t>(sellerIdx)];
     if (player.onLoan) return failure("No se puede firmar precontrato con un jugador cedido.");
     if (player.contractWeeks > 12) return failure("El jugador aun no es elegible para precontrato.");
+    ensureTeamIdentity(*career.myTeam);
+    ensureTeamIdentity(*seller);
+    string rejectionReason;
+    if (playerRejectsMove(career, *career.myTeam, *seller, player, promise, rejectionReason)) {
+        return failure(rejectionReason);
+    }
     for (const auto& move : career.pendingTransfers) {
         if (move.playerName == player.name && move.toTeam == career.myTeam->name && move.preContract) {
             return failure("Ese jugador ya tiene un precontrato pendiente con tu club.");
         }
     }
+    int difficulty = agentDifficulty(player);
     long long signingBonus = max(20000LL, static_cast<long long>(wageDemandFor(player) *
                                                                  (profile == NegotiationProfile::Safe ? 5 : 4) *
                                                                  promiseWageFactor(promise)));
+    signingBonus = signingBonus * (100 + difficulty / 4) / 100;
     if (career.myTeam->budget < signingBonus) return failure("Presupuesto insuficiente para el bono de firma.");
     career.myTeam->budget -= signingBonus;
     eraseNamedSelection(career.scoutingShortlist, seller->name + "|" + player.name);
     career.pendingTransfers.push_back({player.name, seller->name, career.myTeam->name, career.currentSeason + 1, 0, 0,
                                        max(player.wage, static_cast<long long>(wageDemandFor(player) *
                                                                               negotiationWageFactor(profile) *
-                                                                              promiseWageFactor(promise))),
+                                                                              promiseWageFactor(promise))) *
+                                           (100 + difficulty / 12) / 100,
                                        promiseContractWeeks(promise, profile == NegotiationProfile::Aggressive ? 78 : 104),
                                        true,
                                        false,
@@ -705,7 +584,8 @@ ServiceResult signPreContractService(Career& career,
     result.ok = true;
     result.messages.push_back("Precontrato firmado para la temporada siguiente. Bono " + formatMoney(signingBonus) +
                               " | perfil " + negotiationLabel(profile) +
-                              " | promesa " + promiseLabel(promise) + ".");
+                              " | promesa " + promiseLabel(promise) +
+                              " | agente " + to_string(difficulty) + "/90.");
     return result;
 }
 
@@ -718,11 +598,18 @@ ServiceResult renewPlayerContractService(Career& career,
     int index = playerIndexByName(team, playerName);
     if (index < 0) return failure("No se encontro el jugador seleccionado.");
     Player& player = team.players[static_cast<size_t>(index)];
+    ensureTeamIdentity(team);
+    if (renewalNeedsStrongerPromise(player, promise, career.currentWeek)) {
+        return failure(player.name + " exige una promesa contractual acorde a su rol actual antes de renovar.");
+    }
+    int difficulty = agentDifficulty(player);
     long long demandedWage = max(wageDemandFor(player), player.wage + max(5000LL, player.wage / 10));
     if (player.wantsToLeave) demandedWage = demandedWage * 115 / 100;
+    if (promiseAtRisk(player, career.currentWeek)) demandedWage = demandedWage * 108 / 100;
     demandedWage = max(player.wage, static_cast<long long>(demandedWage *
                                                            negotiationWageFactor(profile) *
                                                            promiseWageFactor(promise)));
+    demandedWage = demandedWage * (100 + difficulty / 14) / 100;
     int demandedWeeks = promiseContractWeeks(promise, max(profile == NegotiationProfile::Aggressive ? 78 : 104,
                                                           player.contractWeeks + 52));
     long long demandedClause = max(static_cast<long long>(player.value * negotiationClauseFactor(profile)),
@@ -734,18 +621,21 @@ ServiceResult renewPlayerContractService(Career& career,
     player.wantsToLeave = false;
     player.happiness = clampInt(player.happiness + 6, 1, 99);
     applyNegotiatedPromise(player, promise);
+    ensureTeamIdentity(team);
     career.addNews(player.name + " renueva con " + team.name + ".");
     ServiceResult result;
     result.ok = true;
     result.messages.push_back("Contrato renovado: " + player.name + " | salario " + formatMoney(demandedWage) +
                               " | contrato " + to_string(demandedWeeks) + " sem | perfil " +
-                              negotiationLabel(profile) + " | promesa " + promiseLabel(promise) + ".");
+                              negotiationLabel(profile) + " | promesa " + promiseLabel(promise) +
+                              " | agente " + to_string(difficulty) + "/90.");
     return result;
 }
 
 ServiceResult sellPlayerService(Career& career, const string& playerName) {
     if (!career.myTeam) return failure("No hay una carrera activa.");
     Team& team = *career.myTeam;
+    ensureTeamIdentity(team);
     if (team.players.size() <= 18) return failure("Debes mantener al menos 18 jugadores en plantel.");
     int index = playerIndexByName(team, playerName);
     if (index < 0) return failure("No se encontro el jugador seleccionado.");
@@ -757,6 +647,7 @@ ServiceResult sellPlayerService(Career& career, const string& playerName) {
     applyDepartureShock(team, player);
     career.addNews(player.name + " sale de " + team.name + " por " + formatMoney(transferFee) + ".");
     team.players.erase(team.players.begin() + index);
+    ensureTeamIdentity(team);
     ServiceResult result;
     result.ok = true;
     result.messages.push_back("Venta completada: " + player.name + " deja el club por " + formatMoney(transferFee) + ".");
@@ -781,6 +672,7 @@ ServiceResult cycleMatchInstructionService(Career& career) {
     if (!career.myTeam) return failure("No hay una carrera activa.");
     Team& team = *career.myTeam;
     team.matchInstruction = nextMatchInstruction(team.matchInstruction);
+    ensureTeamIdentity(team);
     career.addNews("Nueva instruccion de partido en " + team.name + ": " + team.matchInstruction + ".");
     ServiceResult result;
     result.ok = true;
@@ -896,6 +788,8 @@ std::string buildCompetitionSummaryService(const Career& career) {
             if (home == career.myTeam || away == career.myTeam) out << " <- tu partido";
             out << "\r\n";
         }
+        out << "\r\nInforme rival:\r\n";
+        out << "- " << opponentSummary(career) << "\r\n";
     }
     return out.str();
 }
@@ -911,9 +805,12 @@ std::string buildBoardSummaryService(const Career& career) {
     out << "=== Directiva ===\r\n";
     out << "Confianza: " << boardStatusLabel(career.boardConfidence) << " (" << career.boardConfidence << "/100)\r\n";
     out << "Reputacion manager: " << career.managerReputation << "/100\r\n";
+    out << "Perfil del DT: juego " << managerStyleLabel(*career.myTeam) << "\r\n";
     out << "Advertencias: " << career.boardWarningWeeks << "\r\n";
     out << "Vestuario: " << dressingRoomClimate(*career.myTeam)
         << " | Promesas en riesgo: " << promisesAtRisk(*career.myTeam, career.currentWeek) << "\r\n";
+    out << "Presion esperada del club: " << teamExpectationLabel(*career.myTeam)
+        << " | Prestigio " << teamPrestigeScore(*career.myTeam) << "\r\n";
     out << "\r\nObjetivos:\r\n";
     out << "- Puesto esperado: " << career.boardExpectedFinish << " | actual " << career.currentCompetitiveRank() << "\r\n";
     out << "- Presupuesto meta: " << formatMoney(career.boardBudgetTarget) << " | actual "
@@ -924,7 +821,7 @@ std::string buildBoardSummaryService(const Career& career) {
         out << career.boardMonthlyObjective << "\r\n";
         out << "Progreso " << career.boardMonthlyProgress << "/" << career.boardMonthlyTarget << "\r\n";
     }
-    out << "\r\nClubes compatibles para moverte: " << jobs.size() << "\r\n";
+    out << "\r\nMercado de manager: " << jobs.size() << " club(es) compatibles\r\n";
     for (Team* job : jobs) {
         out << "- " << job->name << " (" << divisionDisplay(job->division) << ")\r\n";
     }
@@ -945,6 +842,11 @@ std::string buildClubSummaryService(const Career& career) {
     out << "Sponsor semanal: " << formatMoney(team.sponsorWeekly)
         << " | Masa salarial: " << formatMoney(weeklyWage(team)) << "\r\n";
     out << "Hinchas: " << team.fanBase << " | Valor plantel: " << formatMoney(team.getSquadValue()) << "\r\n";
+    out << "Prestigio: " << teamPrestigeScore(team)
+        << " | Identidad: " << (team.clubStyle.empty() ? "Equilibrio competitivo" : team.clubStyle)
+        << " | Cantera: " << (team.youthIdentity.empty() ? "Talento local" : team.youthIdentity) << "\r\n";
+    out << "Rival principal: " << (team.primaryRival.empty() ? string("Sin clasico definido") : team.primaryRival)
+        << " | Expectativa: " << teamExpectationLabel(team) << "\r\n";
     out << "Vestuario: " << dressingRoomClimate(team)
         << " | Instruccion: " << team.matchInstruction
         << " | Proyectos juveniles: " << youthProjects << "\r\n";

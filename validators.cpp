@@ -123,7 +123,7 @@ static ValidationResult validateSaveLoad() {
         return {"Guardado/carga", false, "No hay equipos en la division inicial."};
     }
     career.myTeam = career.activeTeams.front();
-    career.saveFile = "validation_career_save.txt";
+    career.saveFile = "saves/validation_career_save.txt";
     career.currentSeason = 2;
     career.currentWeek = 3;
     career.resetSeason();
@@ -134,6 +134,10 @@ static ValidationResult validateSaveLoad() {
     career.myTeam->medicalTeam = 77;
     career.myTeam->youthRegion = "Sur";
     career.myTeam->matchInstruction = "Balon parado";
+    career.myTeam->clubStyle = "Presion vertical";
+    career.myTeam->youthIdentity = "Cantera estructurada";
+    career.myTeam->primaryRival = "Rival de prueba";
+    career.myTeam->clubPrestige = 81;
     career.boardMonthlyObjective = "Objetivo de prueba";
     career.boardMonthlyTarget = 5;
     career.boardMonthlyProgress = 2;
@@ -166,7 +170,7 @@ static ValidationResult validateSaveLoad() {
     }
 
     Career loaded;
-    loaded.saveFile = "validation_career_save.txt";
+    loaded.saveFile = "saves/validation_career_save.txt";
     loaded.initializeLeague(true);
     if (!loaded.loadCareer()) {
         return {"Guardado/carga", false, "No pudo recargar el archivo de validacion."};
@@ -180,7 +184,10 @@ static ValidationResult validateSaveLoad() {
     if (loaded.myTeam->assistantCoach != career.myTeam->assistantCoach ||
         loaded.myTeam->medicalTeam != career.myTeam->medicalTeam ||
         loaded.myTeam->youthRegion != career.myTeam->youthRegion ||
-        loaded.myTeam->matchInstruction != career.myTeam->matchInstruction) {
+        loaded.myTeam->matchInstruction != career.myTeam->matchInstruction ||
+        loaded.myTeam->clubStyle != career.myTeam->clubStyle ||
+        loaded.myTeam->youthIdentity != career.myTeam->youthIdentity ||
+        loaded.myTeam->primaryRival != career.myTeam->primaryRival) {
         return {"Guardado/carga", false, "No se preservaron correctamente los datos de staff."};
     }
     if (!loaded.myTeam->players.empty() && !career.myTeam->players.empty()) {

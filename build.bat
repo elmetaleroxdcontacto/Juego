@@ -1,5 +1,5 @@
 @echo off
-setlocal EnableExtensions
+setlocal EnableExtensions EnableDelayedExpansion
 
 echo ========================================
 echo   Football Manager - Compilador
@@ -10,33 +10,29 @@ set "SRC_DIR=%~dp0"
 set "BUILD_DIR=%SRC_DIR%build"
 set "OUTPUT=%SRC_DIR%FootballManager.exe"
 set "CXX=g++"
-set "CXXFLAGS=-std=c++17 -static"
+set "CXXFLAGS=-std=c++17 -static -I. -Iinclude -Isrc"
 set "LDFLAGS=-std=c++17 -static -lcomctl32 -lgdi32"
 
 if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"
 
-for %%F in (main io models competition app_services gui simulation ui utils validators) do (
-    echo Compilando %%F.cpp...
-    %CXX% -c "%SRC_DIR%%%F.cpp" -o "%BUILD_DIR%\%%F.o" %CXXFLAGS%
+del /q "%BUILD_DIR%\*.o" 2>nul
+
+set "OBJECTS="
+
+for /R "%SRC_DIR%" %%F in (*.cpp) do (
+    echo Compilando %%~nxF...
+    %CXX% -c "%%~fF" -o "%BUILD_DIR%\%%~nF.o" %CXXFLAGS%
     if errorlevel 1 goto :compile_error
+    set "OBJECTS=!OBJECTS! "%BUILD_DIR%\%%~nF.o""
 )
+
+if not defined OBJECTS goto :no_sources
 
 echo.
 echo Linking...
 echo.
 
-%CXX% ^
-    "%BUILD_DIR%\main.o" ^
-    "%BUILD_DIR%\io.o" ^
-    "%BUILD_DIR%\models.o" ^
-    "%BUILD_DIR%\competition.o" ^
-    "%BUILD_DIR%\app_services.o" ^
-    "%BUILD_DIR%\gui.o" ^
-    "%BUILD_DIR%\simulation.o" ^
-    "%BUILD_DIR%\ui.o" ^
-    "%BUILD_DIR%\utils.o" ^
-    "%BUILD_DIR%\validators.o" ^
-    -o "%OUTPUT%" %LDFLAGS%
+%CXX% !OBJECTS! -o "%OUTPUT%" %LDFLAGS%
 if errorlevel 1 goto :link_error
 
 echo.
@@ -45,6 +41,10 @@ echo   Compilacion exitosa!
 echo   Ejecutable: %OUTPUT%
 echo ========================================
 echo.
+if /i "%FM_SKIP_RUN%"=="1" (
+    echo FM_SKIP_RUN=1 detectado. Se omite la ejecucion del juego.
+    exit /b 0
+)
 echo Abriendo juego...
 start "" "%OUTPUT%"
 exit /b 0
@@ -52,6 +52,11 @@ exit /b 0
 :compile_error
 echo.
 echo [ERROR] Error en la compilacion.
+exit /b 1
+
+:no_sources
+echo.
+echo [ERROR] No se encontraron archivos .cpp para compilar.
 exit /b 1
 
 :link_error

@@ -1,0 +1,232 @@
+#include "transfers/negotiation_system.h"
+
+#include "utils.h"
+
+#include <algorithm>
+
+using namespace std;
+
+double negotiationFeeFactor(NegotiationProfile profile) {
+    switch (profile) {
+        case NegotiationProfile::Safe: return 1.08;
+        case NegotiationProfile::Balanced: return 1.00;
+        case NegotiationProfile::Aggressive: return 0.93;
+    }
+    return 1.00;
+}
+
+double negotiationWageFactor(NegotiationProfile profile) {
+    switch (profile) {
+        case NegotiationProfile::Safe: return 1.12;
+        case NegotiationProfile::Balanced: return 1.00;
+        case NegotiationProfile::Aggressive: return 0.95;
+    }
+    return 1.00;
+}
+
+double negotiationClauseFactor(NegotiationProfile profile) {
+    switch (profile) {
+        case NegotiationProfile::Safe: return 2.30;
+        case NegotiationProfile::Balanced: return 2.00;
+        case NegotiationProfile::Aggressive: return 1.70;
+    }
+    return 2.00;
+}
+
+string negotiationLabel(NegotiationProfile profile) {
+    switch (profile) {
+        case NegotiationProfile::Safe: return "Segura";
+        case NegotiationProfile::Balanced: return "Balanceada";
+        case NegotiationProfile::Aggressive: return "Agresiva";
+    }
+    return "Balanceada";
+}
+
+string promiseLabel(NegotiationPromise promise) {
+    switch (promise) {
+        case NegotiationPromise::None: return "Sin promesa";
+        case NegotiationPromise::Starter: return "Titular";
+        case NegotiationPromise::Rotation: return "Rotacion";
+        case NegotiationPromise::Prospect: return "Proyecto";
+    }
+    return "Sin promesa";
+}
+
+double promiseWageFactor(NegotiationPromise promise) {
+    switch (promise) {
+        case NegotiationPromise::None: return 1.00;
+        case NegotiationPromise::Starter: return 1.08;
+        case NegotiationPromise::Rotation: return 1.03;
+        case NegotiationPromise::Prospect: return 0.97;
+    }
+    return 1.00;
+}
+
+int promiseContractWeeks(NegotiationPromise promise, int currentWeeks) {
+    switch (promise) {
+        case NegotiationPromise::None: return max(104, currentWeeks);
+        case NegotiationPromise::Starter: return max(124, currentWeeks + 26);
+        case NegotiationPromise::Rotation: return max(104, currentWeeks + 12);
+        case NegotiationPromise::Prospect: return max(156, currentWeeks + 52);
+    }
+    return max(104, currentWeeks);
+}
+
+int desiredStartsForPromise(NegotiationPromise promise, const Player& player) {
+    switch (promise) {
+        case NegotiationPromise::None: return player.desiredStarts;
+        case NegotiationPromise::Starter: return 4;
+        case NegotiationPromise::Rotation: return 2;
+        case NegotiationPromise::Prospect: return (player.age <= 21) ? 2 : 1;
+    }
+    return player.desiredStarts;
+}
+
+string personalityLabel(const Player& player) {
+    if (playerHasTrait(player, "Lider")) return "Lider";
+    if (player.professionalism >= 75 && player.ambition >= 60) return "Competitivo";
+    if (player.ambition >= 75 && player.happiness < 50) return "Inquieto";
+    if (player.professionalism <= 45) return "Irregular";
+    return "Estable";
+}
+
+vector<const Player*> dressingRoomLeaders(const Team& team) {
+    vector<const Player*> leaders;
+    for (const auto& player : team.players) {
+        if (player.leadership >= 72 || playerHasTrait(player, "Lider")) {
+            leaders.push_back(&player);
+        }
+    }
+    sort(leaders.begin(), leaders.end(), [](const Player* left, const Player* right) {
+        if (left->leadership != right->leadership) return left->leadership > right->leadership;
+        if (left->chemistry != right->chemistry) return left->chemistry > right->chemistry;
+        return left->name < right->name;
+    });
+    if (leaders.size() > 3) leaders.resize(3);
+    return leaders;
+}
+
+string dressingRoomClimate(const Team& team) {
+    int unhappy = 0;
+    int leaders = 0;
+    int totalChemistry = 0;
+    for (const auto& player : team.players) {
+        totalChemistry += player.chemistry;
+        if (player.happiness <= 40 || player.wantsToLeave) unhappy++;
+        if (player.leadership >= 72 || playerHasTrait(player, "Lider")) leaders++;
+    }
+    int avgChemistry = team.players.empty() ? 50 : totalChemistry / static_cast<int>(team.players.size());
+    if (unhappy >= 4 || avgChemistry <= 42) return "Tenso";
+    if (leaders >= 3 && avgChemistry >= 62 && team.morale >= 58) return "Fuerte";
+    if (team.morale <= 38 || unhappy >= 2) return "Inestable";
+    return "Estable";
+}
+
+bool promiseAtRisk(const Player& player, int currentWeek) {
+    if (player.promisedRole == "Titular") {
+        return player.startsThisSeason + 2 < max(2, currentWeek * 2 / 3);
+    }
+    if (player.promisedRole == "Rotacion") {
+        return player.startsThisSeason + 1 < max(1, currentWeek / 3);
+    }
+    if (player.promisedRole == "Proyecto") {
+        return player.age <= 22 && player.startsThisSeason < max(1, currentWeek / 4);
+    }
+    return false;
+}
+
+int promisesAtRisk(const Team& team, int currentWeek) {
+    int total = 0;
+    for (const auto& player : team.players) {
+        if (promiseAtRisk(player, currentWeek)) total++;
+    }
+    return total;
+}
+
+void applyNegotiatedPromise(Player& player, NegotiationPromise promise) {
+    if (promise == NegotiationPromise::None) return;
+    player.promisedRole = promiseLabel(promise);
+    player.desiredStarts = max(player.desiredStarts, desiredStartsForPromise(promise, player));
+    player.wantsToLeave = false;
+    player.happiness = clampInt(player.happiness + (promise == NegotiationPromise::Starter ? 5 : 3), 1, 99);
+}
+
+long long estimatedAgentFee(const Player& player, long long transferFee) {
+    return max(10000LL, max(transferFee / 20, player.value / 15));
+}
+
+long long wageDemandFor(const Player& player) {
+    long long performancePremium = static_cast<long long>(player.currentForm) * 60 +
+                                   static_cast<long long>(player.bigMatches) * 40 +
+                                   static_cast<long long>(player.consistency) * 30;
+    return max(player.wage, static_cast<long long>(player.skill) * 170 + player.potential * 25 + performancePremium);
+}
+
+int agentDifficulty(const Player& player) {
+    int difficulty = 38 + player.ambition / 2 + max(0, 60 - player.professionalism) / 2;
+    if (player.wantsToLeave) difficulty -= 6;
+    if (playerHasTrait(player, "Caliente")) difficulty += 8;
+    if (playerHasTrait(player, "Lider")) difficulty += 3;
+    if (playerHasTrait(player, "Competidor")) difficulty += 4;
+    return clampInt(difficulty, 20, 90);
+}
+
+int squadCompetitionAtRole(const Team& team, const Player& target) {
+    int competition = 0;
+    for (const auto& mate : team.players) {
+        if (mate.name == target.name) continue;
+        if (positionFitScore(mate, target.position) < 70) continue;
+        if (mate.skill >= target.skill - 3) competition++;
+    }
+    return competition;
+}
+
+long long rivalrySurcharge(const Team& buyer, const Team& seller, long long baseFee) {
+    if (!areRivalClubs(buyer, seller)) return 0;
+    return max(25000LL, baseFee / 8);
+}
+
+int clubAppealScore(const Career& career, const Team& team) {
+    int score = teamPrestigeScore(team);
+    score += clampInt(career.managerReputation / 3, 0, 25);
+    if (team.division == "primera division") score += 8;
+    else if (team.division == "primera b") score += 4;
+    score += clampInt(team.fanBase / 6, 0, 14);
+    score += clampInt(team.trainingFacilityLevel * 2 + team.youthFacilityLevel, 0, 14);
+    return clampInt(score, 20, 99);
+}
+
+bool playerRejectsMove(const Career& career,
+                       const Team& buyer,
+                       const Team& seller,
+                       const Player& player,
+                       NegotiationPromise promise,
+                       string& reason) {
+    int appeal = clubAppealScore(career, buyer);
+    int threshold = teamPrestigeScore(seller) + player.ambition / 4 + agentDifficulty(player) / 6;
+    if (promise == NegotiationPromise::Starter) appeal += 8;
+    else if (promise == NegotiationPromise::Rotation) appeal += 3;
+    else if (promise == NegotiationPromise::Prospect && player.age <= 21) appeal += 5;
+    if (squadCompetitionAtRole(buyer, player) >= 3 && promise != NegotiationPromise::Starter) {
+        threshold += 8;
+    }
+    if (buyer.debt > buyer.sponsorWeekly * 18) threshold += 4;
+    if (appeal >= threshold) return false;
+
+    if (teamPrestigeScore(buyer) + 4 < teamPrestigeScore(seller)) {
+        reason = player.name + " rechaza la propuesta por la diferencia de reputacion entre clubes.";
+    } else if (squadCompetitionAtRole(buyer, player) >= 3) {
+        reason = player.name + " no ve claro el espacio competitivo sin una promesa mas fuerte.";
+    } else {
+        reason = "El agente de " + player.name + " considera insuficiente el proyecto deportivo.";
+    }
+    return true;
+}
+
+bool renewalNeedsStrongerPromise(const Player& player, NegotiationPromise promise, int currentWeek) {
+    if (!promiseAtRisk(player, currentWeek)) return false;
+    if (player.promisedRole == "Titular" && promise != NegotiationPromise::Starter) return true;
+    if (player.promisedRole == "Rotacion" && promise == NegotiationPromise::None) return true;
+    if (player.promisedRole == "Proyecto" && promise == NegotiationPromise::None && player.age <= 22) return true;
+    return false;
+}
