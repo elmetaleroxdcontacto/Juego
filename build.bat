@@ -29,7 +29,7 @@ if not exist "%CMAKE_BUILD_DIR%" mkdir "%CMAKE_BUILD_DIR%"
 cmake -S "%ROOT_DIR%" -B "%CMAKE_BUILD_DIR%" -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=%CXX% > "%CMAKE_BUILD_DIR%\cmake-config.log" 2>&1
 if errorlevel 1 goto :legacy_build_after_cmake_config
 
-cmake --build "%CMAKE_BUILD_DIR%" --config Release > "%CMAKE_BUILD_DIR%\cmake-build.log" 2>&1
+cmake --build "%CMAKE_BUILD_DIR%" --config Release --target FootballManager > "%CMAKE_BUILD_DIR%\cmake-build.log" 2>&1
 if errorlevel 1 goto :legacy_build_after_cmake_build
 
 set "OUTPUT=%CMAKE_BUILD_DIR%\bin\FootballManager.exe"

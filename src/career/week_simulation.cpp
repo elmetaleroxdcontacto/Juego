@@ -3,6 +3,7 @@
 #include "ai/team_ai.h"
 #include "career/career_reports.h"
 #include "career/career_runtime.h"
+#include "career/season_transition.h"
 #include "career/career_support.h"
 #include "career/player_development.h"
 #include "career/team_management.h"
@@ -962,6 +963,14 @@ void simulateBackgroundDivisionWeek(Career& career, const string& divisionId) {
     }
 }
 
+void emitSeasonTransitionSummary(const SeasonTransitionSummary& summary) {
+    emitUiMessage("");
+    emitUiMessage("--- Cierre de Temporada ---");
+    for (const string& line : summary.lines) {
+        emitUiMessage(line);
+    }
+}
+
 
 }  // namespace
 
@@ -980,7 +989,7 @@ void simulateCareerWeek(Career& career) {
         return;
     }
     if (career.currentWeek > static_cast<int>(career.schedule.size())) {
-        endSeason(career);
+        emitSeasonTransitionSummary(endSeason(career));
         return;
     }
 
@@ -1111,6 +1120,6 @@ void simulateCareerWeek(Career& career) {
     career.currentWeek++;
     checkAchievements(career);
     if (career.currentWeek > static_cast<int>(career.schedule.size())) {
-        endSeason(career);
+        emitSeasonTransitionSummary(endSeason(career));
     }
 }

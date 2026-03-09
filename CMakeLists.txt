@@ -13,6 +13,7 @@ set(FM_CAREER_SOURCES
     src/career/career_runtime.cpp
     src/career/career_reports.cpp
     src/career/career_manager.cpp
+    src/career/season_transition.cpp
     src/career/career_support.cpp
     src/career/player_development.cpp
     src/career/team_management.cpp
@@ -31,9 +32,12 @@ set(FM_COMPETITION_SOURCES
 )
 
 set(FM_ENGINE_SOURCES
-    src/engine/game_controller.cpp
     src/engine/game_engine.cpp
     src/engine/models.cpp
+)
+
+set(FM_APP_SOURCES
+    src/engine/game_controller.cpp
 )
 
 set(FM_IO_SOURCES
@@ -91,12 +95,15 @@ set(FM_CORE_SOURCES
     ${FM_SUPPORT_SOURCES}
 )
 
-set(FM_UI_SOURCES
-    src/main.cpp
+set(FM_CONSOLE_UI_SOURCES
     src/ui/career_reports_ui.cpp
     src/ui/cup_ui.cpp
     src/ui/market_ui.cpp
     src/ui/ui.cpp
+)
+
+set(FM_ENTRY_SOURCES
+    src/main.cpp
 )
 
 set(FM_GUI_SOURCES)
@@ -106,7 +113,9 @@ endif()
 
 add_executable(FootballManager
     ${FM_CORE_SOURCES}
-    ${FM_UI_SOURCES}
+    ${FM_APP_SOURCES}
+    ${FM_ENTRY_SOURCES}
+    ${FM_CONSOLE_UI_SOURCES}
     ${FM_VALIDATOR_SOURCES}
     ${FM_GUI_SOURCES}
 )

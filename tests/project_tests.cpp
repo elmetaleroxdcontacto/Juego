@@ -1,5 +1,6 @@
 #include "ai/ai_transfer_manager.h"
 #include "career/career_reports.h"
+#include "career/season_transition.h"
 #include "competition/competition.h"
 #include "engine/models.h"
 #include "simulation/match_context.h"
@@ -267,6 +268,52 @@ void testTransferEvaluationPenalizesUnaffordableDeals() {
            "La IA debe valorar mejor una cesion asumible que una compra imposible.");
 }
 
+void testSeasonTransitionAdvancesCareerWithoutUiDependencies() {
+    Career career;
+    career.currentSeason = 6;
+    career.currentWeek = 34;
+    career.managerName = "Test Manager";
+    career.managerReputation = 70;
+
+    career.allTeams.push_back(makeTeam("Campeon Capital", "primera division", 76, 3, 3, "Balanced", "Equilibrado", 900000));
+    career.allTeams.push_back(makeTeam("Puerto Unido", "primera division", 73, 3, 3, "Balanced", "Equilibrado", 820000));
+    career.allTeams.push_back(makeTeam("Valle FC", "primera division", 67, 2, 2, "Defensive", "Bloque bajo", 510000));
+    career.allTeams.push_back(makeTeam("Mineros del Sur", "primera division", 66, 2, 2, "Defensive", "Pausar juego", 480000));
+
+    career.allTeams.push_back(makeTeam("Ascenso Norte", "primera b", 71, 3, 3, "Balanced", "Equilibrado", 420000));
+    career.allTeams.push_back(makeTeam("Ascenso Sur", "primera b", 70, 3, 3, "Balanced", "Equilibrado", 410000));
+    career.allTeams.push_back(makeTeam("Primera B Central", "primera b", 64, 2, 2, "Balanced", "Equilibrado", 340000));
+    career.allTeams.push_back(makeTeam("Primera B Costa", "primera b", 63, 2, 2, "Balanced", "Equilibrado", 330000));
+
+    career.setActiveDivision("primera division");
+    expect(career.activeTeams.size() == 4, "La division activa debe cargar el bloque de equipos principal.");
+
+    career.myTeam = career.findTeamByName("Campeon Capital");
+    expect(career.myTeam != nullptr, "El equipo del usuario debe existir en el fixture.");
+
+    const vector<int> points = {68, 61, 29, 23};
+    for (size_t i = 0; i < career.activeTeams.size(); ++i) {
+        career.activeTeams[i]->points = points[i];
+        career.activeTeams[i]->goalsFor = 30 - static_cast<int>(i) * 3;
+        career.activeTeams[i]->goalsAgainst = 12 + static_cast<int>(i) * 4;
+        career.activeTeams[i]->wins = points[i] / 3;
+    }
+    career.leagueTable.sortTable();
+
+    SeasonTransitionSummary summary = endSeason(career);
+
+    expect(summary.champion == "Campeon Capital", "La transicion debe reconocer al campeon de la tabla.");
+    expect(!summary.lines.empty(), "La transicion de temporada debe devolver un resumen legible.");
+    expect(career.currentSeason == 7, "El cierre de temporada debe avanzar el ano de carrera.");
+    expect(career.currentWeek == 1, "El cierre de temporada debe reiniciar la semana actual.");
+    expect(!career.history.empty(), "El historial de carrera debe registrar la temporada cerrada.");
+    expect(career.history.back().champion == "Campeon Capital",
+           "El historial debe guardar el campeon del ano que termino.");
+    expect(career.activeDivision == career.myTeam->division,
+           "Tras la transicion la carrera debe seguir la division real del club usuario.");
+    expect(!career.schedule.empty(), "La nueva temporada debe reconstruir su calendario.");
+}
+
 }  // namespace
 
 int main() {
@@ -276,6 +323,7 @@ int main() {
         {"tactical_fatigue", testHighPressRaisesPhaseFatigue},
         {"competition_group_table", testCompetitionGroupTableScopesActiveGroup},
         {"transfer_affordability", testTransferEvaluationPenalizesUnaffordableDeals},
+        {"season_transition", testSeasonTransitionAdvancesCareerWithoutUiDependencies},
     };
 
     int failures = 0;

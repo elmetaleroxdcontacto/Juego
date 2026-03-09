@@ -50,6 +50,7 @@ The target architecture is:
 - `main.cpp` is now a thin entry point; menu flow moved into `engine/game_controller.cpp`.
 - `player_development.cpp` is now a thin adapter over `development/` systems.
 - Financial summaries now use `finance/finance_system.cpp` instead of local one-off calculations.
+- Season transition and promotion/relegation resolution now live in `src/career/season_transition.cpp`; `week_simulation` consumes returned summary data and emits it through UI callbacks.
 - Path handling and save-directory creation now rely on the portable helper layer in `src/utils/utils.cpp`, which preserves Unicode-safe behavior on Windows and remains compatible with the older MinGW fallback toolchain.
 - CMake now defines a `FootballManagerTests` target for logic-level regression coverage when the local generator/toolchain can configure a clean build tree.
 
@@ -58,4 +59,4 @@ The target architecture is:
 - `src/ui/ui.cpp` and `src/simulation/simulation.cpp` are still large and remain active migration targets.
 - `src/engine/models.cpp` still contains both domain behavior and save/load behavior.
 - `app_services.cpp` still acts as a transitional orchestration layer and should be further split by domain.
-- More service-oriented APIs are needed for season flow, cup flow and management interactions.
+- More service-oriented APIs are still needed for cup flow and management interactions.

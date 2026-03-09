@@ -169,6 +169,7 @@ Current test coverage added in this refactor:
 - tactical pressure impact on phase fatigue
 - competition group table selection
 - transfer affordability scoring
+- season-transition flow advancing career state without UI dependencies
 
 ## Current Refactor Highlights
 
@@ -180,13 +181,13 @@ Current test coverage added in this refactor:
 - simulation data returns `MatchContext`, `MatchStats`, and `MatchTimeline`
 - finance and development logic are now reusable modules instead of staying embedded in larger gameplay files
 - weekly career simulation now lives in `src/career/week_simulation.cpp` instead of `src/ui/ui.cpp`
+- season-end resolution now lives in `src/career/season_transition.cpp` instead of `src/ui/ui.cpp`
 - cup mode now has its own UI flow in `src/ui/cup_ui.cpp`
 - path handling uses a Unicode-safe compatibility layer for Windows and portable helpers elsewhere
 
 ## Planned Improvements
 
 - Continue splitting `src/ui/ui.cpp` and `src/engine/models.cpp`
-- Move season-end resolution out of `src/ui/ui.cpp`
 - Deepen Chile 2026 competition-specific rules and edge cases
 - Expand transfer negotiation rounds and competing bids
 - Add richer dressing-room dynamics and promised-role consequences

@@ -1550,6 +1550,7 @@ static void handleManagerStatus(Career& career) {
     takeManagerJob(career, jobs[choice - 1], "Llega tras un despido reciente.");
 }
 
+#if 0  // Legacy season-transition logic moved to career/season_transition.cpp.
 static void recordSeasonHistory(Career& career,
                                 const string& champion,
                                 const vector<Team*>& promoted,
@@ -2667,4 +2668,5 @@ void endSeason(Career& career) {
     recordSeasonHistory(career, champion ? champion->name : "", promote, relegate, "Cierre de temporada regular.");
     advanceToNextSeason(career);
 }
+#endif
 
