@@ -25,4 +25,4 @@ void displaySeasonHistory(const Career& career);
 void displayClubOperations(Career& career);
 void displayAchievementsMenu(Career& career);
 void displayLeagueTables(Career& career);
-void endSeason(Career& career);
+void playCupMode(Career& career);

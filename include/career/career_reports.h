@@ -23,6 +23,8 @@ struct CareerReport {
 
 std::string formatMoneyValue(long long value);
 std::string detectScoutingNeed(const Team& team);
+int competitionGroupForTeam(const Career& career, const Team* team);
+LeagueTable buildCompetitionGroupTable(const Career& career, bool north);
 LeagueTable buildRelevantCompetitionTable(const Career& career);
 
 CareerReport buildCompetitionReport(const Career& career);

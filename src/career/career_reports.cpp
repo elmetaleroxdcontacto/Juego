@@ -25,7 +25,7 @@ LeagueTable buildTableFromTeams(const vector<Team*>& teams, const string& title,
     return table;
 }
 
-int groupForTeam(const Career& career, const Team* team) {
+int competitionGroupForTeamInternal(const Career& career, const Team* team) {
     for (int index : career.groupNorthIdx) {
         if (index >= 0 && index < static_cast<int>(career.activeTeams.size()) &&
             career.activeTeams[static_cast<size_t>(index)] == team) {
@@ -86,6 +86,21 @@ string detectScoutingNeed(const Team& team) {
     return best;
 }
 
+int competitionGroupForTeam(const Career& career, const Team* team) {
+    return competitionGroupForTeamInternal(career, team);
+}
+
+LeagueTable buildCompetitionGroupTable(const Career& career, bool north) {
+    const vector<int>& indices = north ? career.groupNorthIdx : career.groupSouthIdx;
+    vector<Team*> teams;
+    for (int index : indices) {
+        if (index >= 0 && index < static_cast<int>(career.activeTeams.size())) {
+            teams.push_back(career.activeTeams[static_cast<size_t>(index)]);
+        }
+    }
+    return buildTableFromTeams(teams, competitionGroupTitle(career.activeDivision, north), career.activeDivision);
+}
+
 LeagueTable buildRelevantCompetitionTable(const Career& career) {
     if (!career.myTeam) {
         LeagueTable table = career.leagueTable;
@@ -100,7 +115,7 @@ LeagueTable buildRelevantCompetitionTable(const Career& career) {
 
     vector<Team*> teams;
     const vector<int>* indices = nullptr;
-    int group = groupForTeam(career, career.myTeam);
+    int group = competitionGroupForTeamInternal(career, career.myTeam);
     if (group == 0) indices = &career.groupNorthIdx;
     else if (group == 1) indices = &career.groupSouthIdx;
     if (!indices) {

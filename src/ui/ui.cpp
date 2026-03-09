@@ -1,6 +1,7 @@
 ﻿#include "ui.h"
 
 #include "ai/team_ai.h"
+#include "career/career_reports.h"
 #include "career/player_development.h"
 #include "career/team_management.h"
 #include "career/career_support.h"
@@ -20,40 +21,8 @@
 
 using namespace std;
 
-static ManagerJobSelectionCallback g_managerJobSelectionCallback = nullptr;
-static UiMessageCallback g_uiMessageCallback = nullptr;
-static IncomingOfferDecisionCallback g_incomingOfferDecisionCallback = nullptr;
-static ContractRenewalDecisionCallback g_contractRenewalDecisionCallback = nullptr;
-
-void setManagerJobSelectionCallback(ManagerJobSelectionCallback callback) {
-    g_managerJobSelectionCallback = callback;
-}
-
-void setUiMessageCallback(UiMessageCallback callback) {
-    g_uiMessageCallback = callback;
-}
-
-void setIncomingOfferDecisionCallback(IncomingOfferDecisionCallback callback) {
-    g_incomingOfferDecisionCallback = callback;
-}
-
-void setContractRenewalDecisionCallback(ContractRenewalDecisionCallback callback) {
-    g_contractRenewalDecisionCallback = callback;
-}
-
-static void emitUiMessage(const string& message) {
-    if (g_uiMessageCallback) {
-        g_uiMessageCallback(message);
-    } else {
-        cout << message << endl;
-    }
-}
-
 static int playerIndexByName(const Team& team, const string& name) {
-    for (size_t i = 0; i < team.players.size(); ++i) {
-        if (team.players[i].name == name) return static_cast<int>(i);
-    }
-    return -1;
+    return team_mgmt::playerIndexByName(team, name);
 }
 
 static string joinTeamNames(const vector<Team*>& teams) {
@@ -64,521 +33,6 @@ static string joinTeamNames(const vector<Team*>& teams) {
         out += teams[i]->name;
     }
     return out;
-}
-
-static vector<pair<Team*, int>> buildTransferPool(Career& career, const string& filterPos, bool includeClauseTargets) {
-    vector<pair<Team*, int>> pool;
-    for (auto& club : career.allTeams) {
-        if (&club == career.myTeam) continue;
-        if (!includeClauseTargets && club.players.size() <= 18) continue;
-        for (size_t i = 0; i < club.players.size(); ++i) {
-            const Player& player = club.players[i];
-            if (player.onLoan) continue;
-            if (!filterPos.empty() && positionFitScore(player, filterPos) < 70) continue;
-            if (player.age > 35) continue;
-            pool.push_back({&club, static_cast<int>(i)});
-        }
-    }
-    sort(pool.begin(), pool.end(), [](const pair<Team*, int>& a, const pair<Team*, int>& b) {
-        const Player& pa = a.first->players[a.second];
-        const Player& pb = b.first->players[b.second];
-        if (pa.skill != pb.skill) return pa.skill > pb.skill;
-        if (pa.value != pb.value) return pa.value < pb.value;
-        return pa.name < pb.name;
-    });
-    if (pool.size() > 25) pool.resize(25);
-    return pool;
-}
-
-static bool negotiatePersonalTerms(Team& buyer, Player& player, long long transferFee, long long& agentFee) {
-    long long minWage = wageDemandFor(player);
-    int minWeeks = 52;
-    agentFee = estimatedAgentFee(player, transferFee);
-    cout << "Demandas del agente: salario >= $" << minWage
-         << ", contrato minimo " << minWeeks << " semanas"
-         << ", honorarios $" << agentFee << endl;
-    long long offeredWage = readLongLong("Ofrece salario semanal: ", 0, 1000000000000LL);
-    int contractWeeks = readInt("Semanas de contrato: ", 26, 260);
-    if (offeredWage < minWage || contractWeeks < minWeeks) {
-        cout << "El jugador rechazo las condiciones personales." << endl;
-        return false;
-    }
-    if (buyer.budget < transferFee + agentFee) {
-        cout << "Presupuesto insuficiente para cubrir transferencia y honorarios." << endl;
-        return false;
-    }
-    player.wage = offeredWage;
-    player.contractWeeks = contractWeeks;
-    player.releaseClause = max(player.value * 2, (transferFee + agentFee) * 2);
-    return true;
-}
-
-static void finalizeTransfer(Team& buyer, Team* seller, int sellerIndex, Player player, long long transferFee, long long agentFee) {
-    buyer.budget -= (transferFee + agentFee);
-    player.onLoan = false;
-    player.parentClub.clear();
-    player.loanWeeksRemaining = 0;
-    buyer.addPlayer(player);
-    if (seller && sellerIndex >= 0 && sellerIndex < static_cast<int>(seller->players.size())) {
-        seller->budget += transferFee;
-        seller->players.erase(seller->players.begin() + sellerIndex);
-    }
-}
-
-static void buyFromClub(Career& career) {
-    if (!career.myTeam) return;
-    int maxSquadSize = getCompetitionConfig(career.myTeam->division).maxSquadSize;
-    if (maxSquadSize > 0 && static_cast<int>(career.myTeam->players.size()) >= maxSquadSize) {
-        cout << "Tu plantel ya alcanzo el maximo permitido para la division." << endl;
-        return;
-    }
-    string filter = normalizePosition(readLine("Filtrar por posicion (ARQ/DEF/MED/DEL o Enter para todas): "));
-    if (filter == "N/A") filter.clear();
-    auto pool = buildTransferPool(career, filter, false);
-    if (pool.empty()) {
-        cout << "No hay jugadores transferibles en este momento." << endl;
-        return;
-    }
-
-    cout << "\nJugadores disponibles:" << endl;
-    for (size_t i = 0; i < pool.size(); ++i) {
-        Team* seller = pool[i].first;
-        const Player& player = seller->players[pool[i].second];
-        long long ask = max(player.value, player.releaseClause * 65 / 100);
-        cout << i + 1 << ". " << player.name << " (" << player.position << ", " << seller->name << ")"
-             << " Hab " << player.skill << " | Valor $" << player.value
-             << " | Pie " << player.preferredFoot
-             << " | Forma " << playerFormLabel(player)
-             << " | Pedido $" << ask << " | Clausula $" << player.releaseClause << endl;
-    }
-    int choice = readInt("Elige jugador (0 para cancelar): ", 0, static_cast<int>(pool.size()));
-    if (choice == 0) return;
-
-    Team* seller = pool[choice - 1].first;
-    int sellerIdx = pool[choice - 1].second;
-    const Player& target = seller->players[sellerIdx];
-    long long minAccept = max(target.value, target.releaseClause * 60 / 100);
-    long long ask = max(minAccept, target.value * (105 + randInt(0, 20)) / 100);
-    cout << "El club pide alrededor de $" << ask << " por " << target.name << endl;
-    long long offer = readLongLong("Oferta de transferencia: ", 0, 1000000000000LL);
-    if (offer < minAccept) {
-        cout << seller->name << " rechazo la oferta. Minimo estimado: $" << minAccept << endl;
-        return;
-    }
-    if (offer < ask && randInt(1, 100) <= 45) {
-        cout << seller->name << " responde con una contraoferta de $" << ask << endl;
-        int acceptCounter = readInt("Aceptar contraoferta? (1. Si, 2. No): ", 1, 2);
-        if (acceptCounter != 1) return;
-        offer = ask;
-    }
-
-    Player player = target;
-    long long agentFee = 0;
-    if (!negotiatePersonalTerms(*career.myTeam, player, offer, agentFee)) return;
-    finalizeTransfer(*career.myTeam, seller, sellerIdx, player, offer, agentFee);
-    career.addNews(player.name + " firma con " + career.myTeam->name + " desde " + seller->name + ".");
-    cout << "Fichaje completado: " << player.name << " llega desde " << seller->name
-         << " por $" << offer << " + honorarios $" << agentFee << endl;
-}
-
-static void triggerReleaseClause(Career& career) {
-    if (!career.myTeam) return;
-    int maxSquadSize = getCompetitionConfig(career.myTeam->division).maxSquadSize;
-    if (maxSquadSize > 0 && static_cast<int>(career.myTeam->players.size()) >= maxSquadSize) {
-        cout << "Tu plantel ya alcanzo el maximo permitido para la division." << endl;
-        return;
-    }
-    string filter = normalizePosition(readLine("Filtrar por posicion (ARQ/DEF/MED/DEL o Enter para todas): "));
-    if (filter == "N/A") filter.clear();
-    auto pool = buildTransferPool(career, filter, true);
-    if (pool.empty()) {
-        cout << "No hay clausulas ejecutables disponibles." << endl;
-        return;
-    }
-
-    cout << "\nObjetivos con clausula:" << endl;
-    for (size_t i = 0; i < pool.size(); ++i) {
-        Team* seller = pool[i].first;
-        const Player& player = seller->players[pool[i].second];
-        cout << i + 1 << ". " << player.name << " (" << player.position << ", " << seller->name << ")"
-             << " Hab " << player.skill << " | Clausula $" << player.releaseClause
-             << " | Salario actual $" << player.wage << endl;
-    }
-    int choice = readInt("Ejecutar clausula de: ", 0, static_cast<int>(pool.size()));
-    if (choice == 0) return;
-
-    Team* seller = pool[choice - 1].first;
-    int sellerIdx = pool[choice - 1].second;
-    Player player = seller->players[sellerIdx];
-    long long clause = player.releaseClause;
-    long long agentFee = 0;
-    cout << "Ejecutar clausula cuesta $" << clause << endl;
-    if (!negotiatePersonalTerms(*career.myTeam, player, clause, agentFee)) return;
-    finalizeTransfer(*career.myTeam, seller, sellerIdx, player, clause, agentFee);
-    career.addNews(player.name + " llega tras ejecutar su clausula de rescision.");
-    cout << "Clausula ejecutada: " << player.name << " firma inmediatamente." << endl;
-}
-
-static void sellPlayer(Team& team) {
-    const int minSquadSize = 18;
-    if (team.players.size() <= static_cast<size_t>(minSquadSize)) {
-        cout << "No puedes vender. Debes mantener al menos " << minSquadSize << " jugadores." << endl;
-        return;
-    }
-    cout << "Selecciona jugador para vender:" << endl;
-    for (size_t i = 0; i < team.players.size(); ++i) {
-        const Player& player = team.players[i];
-        cout << i + 1 << ". " << player.name << " (" << player.position << ")"
-             << " Valor $" << player.value << " | Clausula $" << player.releaseClause
-             << " | Salario $" << player.wage << endl;
-    }
-    int idx = readInt("Elige jugador: ", 1, static_cast<int>(team.players.size())) - 1;
-    Player player = team.players[idx];
-    long long marketCeiling = player.value * (95 + randInt(0, 35)) / 100;
-    long long askingPrice = readLongLong("Precio pedido: ", 0, 1000000000000LL);
-    if (askingPrice <= marketCeiling) {
-        team.budget += askingPrice;
-        cout << player.name << " vendido por $" << askingPrice << endl;
-        team.players.erase(team.players.begin() + idx);
-        return;
-    }
-    if (askingPrice <= marketCeiling * 115 / 100) {
-        cout << "El mercado responde con una contraoferta de $" << marketCeiling << endl;
-        int accept = readInt("Aceptar? (1. Si, 2. No): ", 1, 2);
-        if (accept == 1) {
-            team.budget += marketCeiling;
-            cout << player.name << " vendido por $" << marketCeiling << endl;
-            team.players.erase(team.players.begin() + idx);
-        } else {
-            cout << "Operacion cancelada." << endl;
-        }
-        return;
-    }
-    cout << "No hubo interesados por ese monto." << endl;
-}
-
-static void loanInPlayer(Career& career) {
-    if (!career.myTeam) return;
-    int maxSquadSize = getCompetitionConfig(career.myTeam->division).maxSquadSize;
-    if (maxSquadSize > 0 && static_cast<int>(career.myTeam->players.size()) >= maxSquadSize) {
-        cout << "Tu plantel ya alcanzo el maximo permitido para la division." << endl;
-        return;
-    }
-    auto pool = buildTransferPool(career, "", false);
-    vector<pair<Team*, int>> loanable;
-    for (const auto& entry : pool) {
-        const Player& player = entry.first->players[entry.second];
-        if (player.onLoan) continue;
-        if (player.contractWeeks <= 12) continue;
-        loanable.push_back(entry);
-    }
-    if (loanable.empty()) {
-        cout << "No hay jugadores disponibles para prestamo." << endl;
-        return;
-    }
-    cout << "\nJugadores disponibles a prestamo:" << endl;
-    for (size_t i = 0; i < loanable.size(); ++i) {
-        const Player& player = loanable[i].first->players[loanable[i].second];
-        cout << i + 1 << ". " << player.name << " (" << player.position << ", " << loanable[i].first->name << ")"
-             << " Hab " << player.skill << " | Valor $" << player.value << endl;
-    }
-    int choice = readInt("Jugador (0 para cancelar): ", 0, static_cast<int>(loanable.size()));
-    if (choice == 0) return;
-
-    Team* seller = loanable[choice - 1].first;
-    int sellerIdx = loanable[choice - 1].second;
-    Player player = seller->players[sellerIdx];
-    int loanWeeks = readInt("Duracion del prestamo (8-26 semanas): ", 8, 26);
-    long long fee = max(15000LL, player.value / 10);
-    long long wageShare = max(player.wage / 2, wageDemandFor(player) * 55 / 100);
-    cout << "Condiciones: cargo de prestamo $" << fee << ", salario semanal $" << wageShare << endl;
-    if (career.myTeam->budget < fee) {
-        cout << "Presupuesto insuficiente." << endl;
-        return;
-    }
-    player.onLoan = true;
-    player.parentClub = seller->name;
-    player.loanWeeksRemaining = loanWeeks;
-    player.wage = wageShare;
-    career.myTeam->budget -= fee;
-    seller->budget += fee;
-    seller->players.erase(seller->players.begin() + sellerIdx);
-    career.myTeam->addPlayer(player);
-    career.addNews(player.name + " llega a prestamo desde " + seller->name + ".");
-    cout << "Prestamo cerrado." << endl;
-}
-
-static void loanOutPlayer(Career& career) {
-    if (!career.myTeam) return;
-    if (career.myTeam->players.size() <= 18) {
-        cout << "Necesitas mantener al menos 18 jugadores en plantel." << endl;
-        return;
-    }
-    vector<int> candidates;
-    for (size_t i = 0; i < career.myTeam->players.size(); ++i) {
-        const Player& player = career.myTeam->players[i];
-        if (player.onLoan) continue;
-        if (player.age > 30) continue;
-        candidates.push_back(static_cast<int>(i));
-    }
-    if (candidates.empty()) {
-        cout << "No hay jugadores aptos para ceder." << endl;
-        return;
-    }
-    cout << "\nJugadores para ceder:" << endl;
-    for (size_t i = 0; i < candidates.size(); ++i) {
-        const Player& player = career.myTeam->players[candidates[i]];
-        cout << i + 1 << ". " << player.name << " (" << player.position << ") Hab " << player.skill
-             << " | Edad " << player.age << endl;
-    }
-    int playerChoice = readInt("Jugador (0 para cancelar): ", 0, static_cast<int>(candidates.size()));
-    if (playerChoice == 0) return;
-
-    vector<Team*> destinations;
-    for (auto* team : career.activeTeams) {
-        int maxSquad = getCompetitionConfig(team->division).maxSquadSize;
-        if (team && team != career.myTeam &&
-            (maxSquad <= 0 || static_cast<int>(team->players.size()) < maxSquad)) {
-            destinations.push_back(team);
-        }
-    }
-    if (destinations.empty()) {
-        cout << "No hay clubes receptores disponibles." << endl;
-        return;
-    }
-    cout << "\nClubes interesados:" << endl;
-    for (size_t i = 0; i < destinations.size(); ++i) {
-        cout << i + 1 << ". " << destinations[i]->name << endl;
-    }
-    int clubChoice = readInt("Club destino: ", 1, static_cast<int>(destinations.size()));
-    int loanWeeks = readInt("Duracion del prestamo (8-26 semanas): ", 8, 26);
-
-    int idx = candidates[playerChoice - 1];
-    Player player = career.myTeam->players[idx];
-    Team* receiver = destinations[clubChoice - 1];
-    long long fee = max(10000LL, player.value / 12);
-    player.onLoan = true;
-    player.parentClub = career.myTeam->name;
-    player.loanWeeksRemaining = loanWeeks;
-    receiver->addPlayer(player);
-    career.myTeam->budget += fee;
-    receiver->budget = max(0LL, receiver->budget - fee);
-    career.myTeam->players.erase(career.myTeam->players.begin() + idx);
-    career.addNews(player.name + " sale a prestamo hacia " + receiver->name + ".");
-    cout << "Prestamo acordado. Ingreso $" << fee << endl;
-}
-
-static void signPreContract(Career& career) {
-    if (!career.myTeam) return;
-    vector<pair<Team*, int>> pool = buildTransferPool(career, "", true);
-    vector<pair<Team*, int>> eligible;
-    for (const auto& entry : pool) {
-        const Player& player = entry.first->players[entry.second];
-        if (player.contractWeeks > 12) continue;
-        if (player.onLoan) continue;
-        bool alreadyPending = false;
-        for (const auto& move : career.pendingTransfers) {
-            if (move.playerName == player.name && move.toTeam == career.myTeam->name && move.preContract) {
-                alreadyPending = true;
-                break;
-            }
-        }
-        if (!alreadyPending) eligible.push_back(entry);
-    }
-    if (eligible.empty()) {
-        cout << "No hay jugadores elegibles para precontrato." << endl;
-        return;
-    }
-    cout << "\nJugadores elegibles para precontrato:" << endl;
-    for (size_t i = 0; i < eligible.size(); ++i) {
-        const Player& player = eligible[i].first->players[eligible[i].second];
-        cout << i + 1 << ". " << player.name << " (" << player.position << ", " << eligible[i].first->name << ")"
-             << " Hab " << player.skill << " | Contrato restante " << player.contractWeeks << " sem" << endl;
-    }
-    int choice = readInt("Jugador (0 para cancelar): ", 0, static_cast<int>(eligible.size()));
-    if (choice == 0) return;
-
-    Team* from = eligible[choice - 1].first;
-    Player player = from->players[eligible[choice - 1].second];
-    long long signingBonus = max(20000LL, wageDemandFor(player) * 4);
-    cout << "Bono de firma: $" << signingBonus << endl;
-    if (career.myTeam->budget < signingBonus) {
-        cout << "Presupuesto insuficiente." << endl;
-        return;
-    }
-    long long newWage = readLongLong("Salario semanal ofrecido: ", 0, 1000000000000LL);
-    int contractWeeks = readInt("Semanas de contrato ofrecidas: ", 52, 260);
-    if (newWage < wageDemandFor(player)) {
-        cout << "El jugador rechazo la oferta." << endl;
-        return;
-    }
-    career.myTeam->budget -= signingBonus;
-    career.pendingTransfers.push_back({player.name, from->name, career.myTeam->name, career.currentSeason + 1, 0, 0,
-                                       newWage, contractWeeks, true, false, "Sin promesa"});
-    career.addNews(player.name + " firma un precontrato con " + career.myTeam->name + ".");
-    cout << "Precontrato firmado para la temporada siguiente." << endl;
-}
-
-void transferMarket(Career& career) {
-    if (!career.myTeam) return;
-    Team& team = *career.myTeam;
-    cout << "\n=== Mercado de Transferencias ===" << endl;
-    cout << "Presupuesto: $" << team.budget << endl;
-    cout << "1. Comprar desde otro club" << endl;
-    cout << "2. Ejecutar clausula de rescision" << endl;
-    cout << "3. Precontrato" << endl;
-    cout << "4. Pedir prestamo" << endl;
-    cout << "5. Ceder a prestamo" << endl;
-    cout << "6. Vender jugador" << endl;
-    cout << "7. Volver" << endl;
-    int choice = readInt("Elige una opcion: ", 1, 7);
-
-    if (choice == 1) {
-        buyFromClub(career);
-    } else if (choice == 2) {
-        triggerReleaseClause(career);
-    } else if (choice == 3) {
-        signPreContract(career);
-    } else if (choice == 4) {
-        loanInPlayer(career);
-    } else if (choice == 5) {
-        loanOutPlayer(career);
-    } else if (choice == 6) {
-        sellPlayer(team);
-    }
-}
-
-void scoutPlayers(Career& career) {
-    if (!career.myTeam) return;
-    Team& team = *career.myTeam;
-    cout << "\n=== Ojeo de Jugadores ===" << endl;
-    cout << "Presupuesto: $" << team.budget << endl;
-    cout << "Jefe de scouting: " << team.scoutingChief << "/99" << endl;
-    long long scoutCost = max(3000LL, 9000LL - team.scoutingChief * 50LL);
-    cout << "Costo de ojeo: $" << scoutCost << endl;
-    cout << "1. Otear jugadores" << endl;
-    cout << "2. Ver informes guardados" << endl;
-    cout << "3. Volver" << endl;
-    int choice = readInt("Elige una opcion: ", 1, 3);
-
-    if (choice == 2) {
-        if (career.scoutInbox.empty()) {
-            cout << "No hay informes guardados." << endl;
-            return;
-        }
-        for (const auto& note : career.scoutInbox) {
-            cout << "- " << note << endl;
-        }
-        return;
-    }
-    if (choice == 3) return;
-
-    if (team.budget < scoutCost) {
-        cout << "Presupuesto insuficiente para ojeo." << endl;
-        return;
-    }
-    team.budget -= scoutCost;
-    cout << "Regiones: 1. Metropolitana 2. Norte 3. Centro 4. Sur 5. Patagonia 6. Todas" << endl;
-    int regionChoice = readInt("Elegir region: ", 1, 6);
-    vector<string> regionOptions = {"Metropolitana", "Norte", "Centro", "Sur", "Patagonia", "Todas"};
-    string region = regionOptions[regionChoice - 1];
-    string focusPos = normalizePosition(readLine("Foco de posicion (ARQ/DEF/MED/DEL o Enter para necesidad): "));
-    if (focusPos == "N/A") {
-        unordered_map<string, int> counts;
-        unordered_map<string, int> skills;
-        for (const auto& player : team.players) {
-            string pos = normalizePosition(player.position);
-            if (pos == "N/A") continue;
-            counts[pos]++;
-            skills[pos] += player.skill;
-        }
-        vector<string> positions = {"ARQ", "DEF", "MED", "DEL"};
-        focusPos = "MED";
-        int bestScore = 1000000;
-        for (const auto& pos : positions) {
-            int countPos = counts[pos];
-            int avgSkill = countPos > 0 ? skills[pos] / countPos : 0;
-            int score = countPos * 20 + avgSkill;
-            if (score < bestScore) {
-                bestScore = score;
-                focusPos = pos;
-            }
-        }
-        cout << "Necesidad detectada: " << focusPos << endl;
-    }
-
-    vector<pair<Team*, int>> reports;
-    for (auto& club : career.allTeams) {
-        if (&club == career.myTeam) continue;
-        if (region != "Todas" && club.youthRegion != region) continue;
-        for (size_t i = 0; i < club.players.size(); ++i) {
-            const Player& player = club.players[i];
-            if (player.onLoan) continue;
-            if (!focusPos.empty() && positionFitScore(player, focusPos) < 70) continue;
-            reports.push_back({&club, static_cast<int>(i)});
-        }
-    }
-    if (reports.empty()) {
-        cout << "No se encontraron jugadores para ese informe." << endl;
-        return;
-    }
-    sort(reports.begin(), reports.end(), [&](const pair<Team*, int>& a, const pair<Team*, int>& b) {
-        const Player& pa = a.first->players[a.second];
-        const Player& pb = b.first->players[b.second];
-        int aFit = positionFitScore(pa, focusPos) + pa.potential + pa.professionalism / 2 + pa.currentForm / 2;
-        int bFit = positionFitScore(pb, focusPos) + pb.potential + pb.professionalism / 2 + pb.currentForm / 2;
-        if (aFit != bFit) return aFit > bFit;
-        return pa.skill > pb.skill;
-    });
-    if (reports.size() > 5) reports.resize(5);
-
-    int error = clampInt(14 - team.scoutingChief / 10, 2, 10);
-    cout << "\nInforme de scouting:" << endl;
-    for (size_t i = 0; i < reports.size(); ++i) {
-        Team* club = reports[i].first;
-        const Player& player = club->players[reports[i].second];
-        int estSkillLo = clampInt(player.skill - error, 1, 99);
-        int estSkillHi = clampInt(player.skill + error, 1, 99);
-        int estPotLo = clampInt(player.potential - error, player.skill, 99);
-        int estPotHi = clampInt(player.potential + error, player.skill, 99);
-        int fitScore = positionFitScore(player, focusPos);
-        string fit = fitScore >= 90 ? "ajuste alto" : (fitScore >= 75 ? "ajuste medio" : "ajuste parcial");
-        cout << i + 1 << ". " << player.name << " (" << player.position << ", " << club->name << ", " << club->youthRegion << ")"
-             << " Hab " << estSkillLo << "-" << estSkillHi
-             << " | Pot " << estPotLo << "-" << estPotHi
-             << " | " << fit
-             << " | Pie " << player.preferredFoot
-             << " | Sec " << (player.secondaryPositions.empty() ? string("-") : joinStringValues(player.secondaryPositions, "/"))
-             << " | Forma " << playerFormLabel(player)
-             << " | Fiabilidad " << playerReliabilityLabel(player)
-             << " | Partidos grandes " << player.bigMatches
-             << " | Valor $" << player.value << endl;
-        career.scoutInbox.push_back(player.name + " | " + club->name + " | " + club->youthRegion + " | Hab " +
-                                    to_string(estSkillLo) + "-" + to_string(estSkillHi) + " | Pot " +
-                                    to_string(estPotLo) + "-" + to_string(estPotHi) +
-                                    " | Pie " + player.preferredFoot +
-                                    " | Sec " + (player.secondaryPositions.empty() ? string("-") : joinStringValues(player.secondaryPositions, "/")) +
-                                    " | Forma " + playerFormLabel(player) +
-                                    " | Perfil " + playerReliabilityLabel(player));
-    }
-    if (career.scoutInbox.size() > 30) {
-        career.scoutInbox.erase(career.scoutInbox.begin(),
-                                career.scoutInbox.begin() + static_cast<long long>(career.scoutInbox.size() - 30));
-    }
-    career.addNews("El scouting completa un informe en la region " + region + " para " + team.name + ".");
-
-    int pursue = readInt("Intentar fichar uno de los informes? (0 para no): ", 0, static_cast<int>(reports.size()));
-    if (pursue == 0) return;
-    Team* seller = reports[pursue - 1].first;
-    int sellerIdx = reports[pursue - 1].second;
-    Player player = seller->players[sellerIdx];
-    long long fee = max(player.value, player.releaseClause * 60 / 100);
-    long long agentFee = 0;
-    cout << "Costo estimado de traspaso: $" << fee << endl;
-    if (!negotiatePersonalTerms(team, player, fee, agentFee)) return;
-    finalizeTransfer(team, seller, sellerIdx, player, fee, agentFee);
-    career.addNews(player.name + " llega tras recomendacion del scouting.");
-    cout << "Fichaje concretado tras el informe." << endl;
 }
 
 void retirePlayer(Team& team) {
@@ -600,15 +54,6 @@ void retirePlayer(Team& team) {
         int index = eligibleIndices[choice - 1];
         cout << team.players[index].name << " se ha retirado." << endl;
         team.players.erase(team.players.begin() + index);
-    }
-}
-
-void checkAchievements(Career& career) {
-    if (!career.myTeam) return;
-    if (career.myTeam->wins >= 10 &&
-        find(career.achievements.begin(), career.achievements.end(), "10 Victorias") == career.achievements.end()) {
-        career.achievements.push_back("10 Victorias");
-        cout << "Logro desbloqueado: 10 Victorias!" << endl;
     }
 }
 
@@ -1276,13 +721,7 @@ static LeagueTable buildGroupTable(const Career& career, const vector<int>& idx,
 }
 
 static int groupForTeam(const Career& career, const Team* team) {
-    for (int i : career.groupNorthIdx) {
-        if (i >= 0 && i < static_cast<int>(career.activeTeams.size()) && career.activeTeams[i] == team) return 0;
-    }
-    for (int i : career.groupSouthIdx) {
-        if (i >= 0 && i < static_cast<int>(career.activeTeams.size()) && career.activeTeams[i] == team) return 1;
-    }
-    return -1;
+    return competitionGroupForTeam(career, team);
 }
 
 static string regionalGroupTitle(const Career& career, bool north) {
@@ -1290,45 +729,14 @@ static string regionalGroupTitle(const Career& career, bool north) {
 }
 
 void displayLeagueTables(Career& career) {
-    if (!usesGroupFormat(career) || career.groupNorthIdx.empty() || career.groupSouthIdx.empty()) {
+    if (!career.usesGroupFormat() || career.groupNorthIdx.empty() || career.groupSouthIdx.empty()) {
         career.leagueTable.displayTable();
         return;
     }
-    LeagueTable north = buildGroupTable(career, career.groupNorthIdx, regionalGroupTitle(career, true));
-    LeagueTable south = buildGroupTable(career, career.groupSouthIdx, regionalGroupTitle(career, false));
+    LeagueTable north = buildCompetitionGroupTable(career, true);
+    LeagueTable south = buildCompetitionGroupTable(career, false);
     north.displayTable();
     south.displayTable();
-}
-
-static LeagueTable relevantCompetitionTable(const Career& career) {
-    if (!career.myTeam) return career.leagueTable;
-    if (!usesGroupFormat(career) || career.groupNorthIdx.empty() || career.groupSouthIdx.empty()) {
-        LeagueTable table = career.leagueTable;
-        table.sortTable();
-        return table;
-    }
-    int group = groupForTeam(career, career.myTeam);
-    if (group == 0) return buildGroupTable(career, career.groupNorthIdx, regionalGroupTitle(career, true));
-    if (group == 1) return buildGroupTable(career, career.groupSouthIdx, regionalGroupTitle(career, false));
-    LeagueTable table = career.leagueTable;
-    table.sortTable();
-    return table;
-}
-
-static void generateManagerCareerEvents(Career& career) {
-    if (!career.myTeam) return;
-    int rank = career.currentCompetitiveRank();
-    int field = max(1, career.currentCompetitiveFieldSize());
-    if (rank > 0 && rank <= max(2, field / 4) && randInt(1, 100) <= 18) {
-        career.addNews("Entrevista: la prensa describe a " + career.managerName + " como un DT " +
-                       managerStyleLabel(*career.myTeam) + ".");
-    }
-    if (career.managerReputation >= 58 && rank > 0 && rank <= career.boardExpectedFinish && randInt(1, 100) <= 12) {
-        vector<Team*> jobs = buildJobMarket(career, false);
-        if (!jobs.empty()) {
-            career.addNews("Rumor de banquillo: " + jobs.front()->name + " sigue a " + career.managerName + ".");
-        }
-    }
 }
 
 void displayCompetitionCenter(Career& career) {
@@ -1966,8 +1374,8 @@ static void processIncomingOffers(Career& career) {
                   (areRivalClubs(*bidder, *career.myTeam) ? " [rival directo]" : ""));
     int choice = 3;
     long long counter = 0;
-    if (g_incomingOfferDecisionCallback) {
-        IncomingOfferDecision decision = g_incomingOfferDecisionCallback(career, p, offer, maxOffer);
+    if (incomingOfferDecisionCallback()) {
+        IncomingOfferDecision decision = incomingOfferDecisionCallback()(career, p, offer, maxOffer);
         if (decision.action >= 1 && decision.action <= 3) {
             choice = decision.action;
             counter = decision.counterOffer;
@@ -2048,8 +1456,8 @@ static void updateContracts(Career& career) {
                     emitUiMessage("Advertencia: " + p.name + " siente que su promesa de rol fue incumplida.");
                 }
                 bool renew = false;
-                if (g_contractRenewalDecisionCallback) {
-                    renew = g_contractRenewalDecisionCallback(career, *team, p, demandedWage, demandedWeeks, demandedClause);
+                if (contractRenewalDecisionCallback()) {
+                    renew = contractRenewalDecisionCallback()(career, *team, p, demandedWage, demandedWeeks, demandedClause);
                 } else {
                     int choice = readInt("Renovar? (1. Si, 2. No): ", 1, 2);
                     renew = (choice == 1);
@@ -2131,8 +1539,8 @@ static void handleManagerStatus(Career& career) {
         emitUiMessage(to_string(i + 1) + ". " + jobs[i]->name + " (" + divisionDisplay(jobs[i]->division) + ")");
     }
     int choice = 1;
-    if (g_managerJobSelectionCallback) {
-        int selected = g_managerJobSelectionCallback(career, jobs);
+    if (managerJobSelectionCallback()) {
+        int selected = managerJobSelectionCallback()(career, jobs);
         if (selected >= 0 && selected < static_cast<int>(jobs.size())) {
             choice = selected + 1;
         }
@@ -2769,7 +2177,7 @@ static void endSeasonSegundaDivision(Career& career) {
         }
         cout << endl;
     }
-    awardSeasonPrizeMoney(career, relevantCompetitionTable(career));
+    awardSeasonPrizeMoney(career, buildRelevantCompetitionTable(career));
     recordSeasonHistory(career, champion ? champion->name : "", promote, relegate, "Temporada con playoff de ascenso y grupo de descenso.");
     advanceToNextSeason(career);
 }
@@ -3116,7 +2524,7 @@ static void endSeasonTerceraB(Career& career) {
     }
     vector<Team*> allPromoted = outcome.directPromoted;
     allPromoted.insert(allPromoted.end(), promotedByPromotion.begin(), promotedByPromotion.end());
-    awardSeasonPrizeMoney(career, relevantCompetitionTable(career));
+    awardSeasonPrizeMoney(career, buildRelevantCompetitionTable(career));
     recordSeasonHistory(career, outcome.champion ? outcome.champion->name : "", allPromoted, {}, "Campeones zonales, final y promocion por playoff.");
     advanceToNextSeason(career);
 }
@@ -3260,189 +2668,3 @@ void endSeason(Career& career) {
     advanceToNextSeason(career);
 }
 
-void simulateCareerWeek(Career& career) {
-    if (career.activeTeams.empty() || career.schedule.empty()) {
-        emitUiMessage("No hay calendario disponible.");
-        return;
-    }
-    if (career.currentWeek > static_cast<int>(career.schedule.size())) {
-        endSeason(career);
-        return;
-    }
-
-    emitUiMessage("");
-    emitUiMessage("Simulando semana " + to_string(career.currentWeek) + "...");
-    career.leagueTable.sortTable();
-    LeagueTable northTable;
-    LeagueTable southTable;
-    bool useGroups = usesGroupFormat(career);
-    if (useGroups) {
-        northTable = buildGroupTable(career, career.groupNorthIdx, regionalGroupTitle(career, true));
-        southTable = buildGroupTable(career, career.groupSouthIdx, regionalGroupTitle(career, false));
-    }
-    const auto& matches = career.schedule[career.currentWeek - 1];
-    vector<vector<int>> suspensionsBefore;
-    suspensionsBefore.reserve(career.activeTeams.size());
-    for (auto* team : career.activeTeams) {
-        vector<int> snapshot;
-        snapshot.reserve(team->players.size());
-        for (const auto& player : team->players) snapshot.push_back(player.matchesSuspended);
-        suspensionsBefore.push_back(snapshot);
-    }
-    vector<int> pointsBefore;
-    pointsBefore.reserve(career.activeTeams.size());
-    for (auto* t : career.activeTeams) pointsBefore.push_back(t->points);
-    int myTeamPointsDelta = 0;
-    for (const auto& match : matches) {
-        Team* home = career.activeTeams[match.first];
-        Team* away = career.activeTeams[match.second];
-        bool verbose = (home == career.myTeam || away == career.myTeam);
-        team_ai::adjustCpuTactics(*home, *away, career.myTeam);
-        team_ai::adjustCpuTactics(*away, *home, career.myTeam);
-        bool key = false;
-        if (useGroups) {
-            int group = groupForTeam(career, home);
-            if (group == groupForTeam(career, away) && group == 0) {
-                key = isKeyMatch(northTable, home, away);
-            } else if (group == groupForTeam(career, away) && group == 1) {
-                key = isKeyMatch(southTable, home, away);
-            } else {
-                key = isKeyMatch(career.leagueTable, home, away);
-            }
-        } else {
-            key = isKeyMatch(career.leagueTable, home, away);
-        }
-        if (verbose && key) {
-            emitUiMessage("[Aviso] Partido clave de la semana.");
-        }
-        MatchResult result = playMatch(*home, *away, verbose, key);
-        storeMatchAnalysis(career, *home, *away, result, false);
-    }
-    for (const auto& division : career.divisions) {
-        simulateBackgroundDivisionWeek(career, division.id);
-    }
-    bool cupWeek = career.cupActive &&
-                   (career.currentWeek == 1 || career.currentWeek % 4 == 0 ||
-                    career.currentWeek == static_cast<int>(career.schedule.size()));
-    if (cupWeek) {
-        simulateSeasonCupRound(career);
-    }
-    for (size_t i = 0; i < career.activeTeams.size(); ++i) {
-        Team* team = career.activeTeams[i];
-        const auto& snapshot = suspensionsBefore[i];
-        size_t limit = min(snapshot.size(), team->players.size());
-        for (size_t j = 0; j < limit; ++j) {
-            if (snapshot[j] > 0 && team->players[j].matchesSuspended > 0) {
-                team->players[j].matchesSuspended--;
-            }
-        }
-    }
-    for (auto& team : career.allTeams) {
-        healInjuries(team, false);
-        recoverFitness(team, 7);
-        player_dev::applyWeeklyTrainingPlan(team);
-    }
-    updateContracts(career);
-    processIncomingOffers(career);
-    transfer_market::processCpuTransfers(career);
-    transfer_market::processLoanReturns(career);
-    applyWeeklyFinances(career, pointsBefore);
-    career.leagueTable.sortTable();
-    if (career.myTeam) {
-        for (size_t i = 0; i < career.activeTeams.size(); ++i) {
-            if (career.activeTeams[i] == career.myTeam) {
-                myTeamPointsDelta = career.myTeam->points - pointsBefore[i];
-                break;
-            }
-        }
-        if (career.boardMonthlyObjective.find("puntos") != string::npos) {
-            career.boardMonthlyProgress += myTeamPointsDelta;
-        }
-        updateSquadDynamics(career, myTeamPointsDelta);
-    }
-    runMonthlyDevelopment(career);
-    updateShortlistAlerts(career);
-    career.updateDynamicObjectiveStatus();
-    career.updateBoardConfidence();
-    updateManagerReputation(career);
-    if (career.myTeam) ensureTeamIdentity(*career.myTeam);
-    weeklyDashboard(career);
-    applyClubEvent(career);
-    if (career.myTeam) {
-        if (myTeamPointsDelta == 3) career.addNews(career.myTeam->name + " gana en la fecha " + to_string(career.currentWeek) + ".");
-        else if (myTeamPointsDelta == 1) career.addNews(career.myTeam->name + " empata en la fecha " + to_string(career.currentWeek) + ".");
-        else career.addNews(career.myTeam->name + " pierde en la fecha " + to_string(career.currentWeek) + ".");
-        if (career.boardWarningWeeks >= 4) {
-            career.addNews("La directiva aumenta la presion sobre " + career.myTeam->name + ".");
-        }
-        generateManagerCareerEvents(career);
-        generateWeeklyNarratives(career, myTeamPointsDelta);
-    }
-    handleManagerStatus(career);
-    career.currentWeek++;
-    checkAchievements(career);
-    if (career.currentWeek > static_cast<int>(career.schedule.size())) {
-        endSeason(career);
-    }
-}
-
-void playCupMode(Career& career) {
-    if (career.divisions.empty()) {
-        cout << "No hay divisiones disponibles." << endl;
-        return;
-    }
-    cout << "\nSelecciona la division para Copa:" << endl;
-    for (size_t i = 0; i < career.divisions.size(); ++i) {
-        cout << i + 1 << ". " << career.divisions[i].display << endl;
-    }
-    int divisionChoice = readInt("Elige una division: ", 1, static_cast<int>(career.divisions.size()));
-    string divisionId = career.divisions[divisionChoice - 1].id;
-    auto teams = career.getDivisionTeams(divisionId);
-    if (teams.size() < 2) {
-        cout << "No hay suficientes equipos para una copa." << endl;
-        return;
-    }
-    cout << "\nElige un equipo para seguir (0 para ninguno):" << endl;
-    for (size_t i = 0; i < teams.size(); ++i) {
-        cout << i + 1 << ". " << teams[i]->name << endl;
-    }
-    int followChoice = readInt("Equipo: ", 0, static_cast<int>(teams.size()));
-    int followIdx = (followChoice == 0) ? -1 : (followChoice - 1);
-
-    vector<Team> cupTeams;
-    cupTeams.reserve(teams.size());
-    for (auto* t : teams) cupTeams.push_back(*t);
-
-    vector<int> alive;
-    for (int i = 0; i < static_cast<int>(cupTeams.size()); ++i) alive.push_back(i);
-    int round = 1;
-    while (alive.size() > 1) {
-        cout << "\n--- Copa: Ronda " << round << " ---" << endl;
-        vector<int> next;
-        if (alive.size() % 2 == 1) {
-            int bye = alive.back();
-            alive.pop_back();
-            next.push_back(bye);
-            cout << "Pase directo: " << cupTeams[bye].name << endl;
-        }
-        for (size_t i = 0; i < alive.size(); i += 2) {
-            int aIdx = alive[i];
-            int bIdx = alive[i + 1];
-            Team& a = cupTeams[aIdx];
-            Team& b = cupTeams[bIdx];
-            bool verbose = (followIdx == aIdx || followIdx == bIdx);
-            cout << a.name << " vs " << b.name << endl;
-            MatchResult r = playMatch(a, b, verbose, true);
-            int winner = aIdx;
-            if (r.homeGoals < r.awayGoals) winner = bIdx;
-            else if (r.homeGoals == r.awayGoals) {
-                winner = (randInt(0, 1) == 0) ? aIdx : bIdx;
-                cout << "Gana por penales: " << cupTeams[winner].name << endl;
-            }
-            next.push_back(winner);
-        }
-        alive.swap(next);
-        round++;
-    }
-    cout << "\nCampeon de la Copa: " << cupTeams[alive.front()].name << endl;
-}

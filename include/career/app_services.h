@@ -11,6 +11,35 @@ struct ServiceResult {
     std::vector<std::string> messages;
 };
 
+struct ScoutingCandidate {
+    std::string playerName;
+    std::string clubName;
+    std::string region;
+    std::string position;
+    std::string preferredFoot;
+    std::string fitLabel;
+    std::string formLabel;
+    std::string reliabilityLabel;
+    std::string personalityLabel;
+    std::vector<std::string> secondaryPositions;
+    std::vector<std::string> traits;
+    int estimatedSkillMin = 0;
+    int estimatedSkillMax = 0;
+    int estimatedPotentialMin = 0;
+    int estimatedPotentialMax = 0;
+    int fitScore = 0;
+    int bigMatches = 0;
+    long long marketValue = 0;
+};
+
+struct ScoutingSessionResult {
+    ServiceResult service;
+    std::string resolvedRegion;
+    std::string resolvedFocusPosition;
+    long long scoutingCost = 0;
+    std::vector<ScoutingCandidate> candidates;
+};
+
 enum class ClubUpgrade {
     Stadium,
     Youth,
@@ -42,6 +71,9 @@ ServiceResult startCareerService(Career& career,
 ServiceResult loadCareerService(Career& career);
 ServiceResult saveCareerService(Career& career);
 ServiceResult simulateCareerWeekService(Career& career);
+ScoutingSessionResult runScoutingSessionService(Career& career,
+                                                const std::string& region = "Todas",
+                                                const std::string& focusPos = "");
 ServiceResult scoutPlayersService(Career& career,
                                   const std::string& region = "Todas",
                                   const std::string& focusPos = "");
@@ -55,6 +87,11 @@ ServiceResult buyTransferTargetService(Career& career,
                                        const std::string& playerName,
                                        NegotiationProfile profile = NegotiationProfile::Balanced,
                                        NegotiationPromise promise = NegotiationPromise::None);
+ServiceResult triggerReleaseClauseService(Career& career,
+                                          const std::string& sellerTeamName,
+                                          const std::string& playerName,
+                                          NegotiationProfile profile = NegotiationProfile::Balanced,
+                                          NegotiationPromise promise = NegotiationPromise::None);
 ServiceResult signPreContractService(Career& career,
                                      const std::string& sellerTeamName,
                                      const std::string& playerName,
@@ -65,6 +102,14 @@ ServiceResult renewPlayerContractService(Career& career,
                                          NegotiationProfile profile = NegotiationProfile::Balanced,
                                          NegotiationPromise promise = NegotiationPromise::None);
 ServiceResult sellPlayerService(Career& career, const std::string& playerName);
+ServiceResult loanInPlayerService(Career& career,
+                                  const std::string& sellerTeamName,
+                                  const std::string& playerName,
+                                  int loanWeeks);
+ServiceResult loanOutPlayerService(Career& career,
+                                   const std::string& playerName,
+                                   const std::string& destinationTeamName,
+                                   int loanWeeks);
 ServiceResult cyclePlayerDevelopmentPlanService(Career& career, const std::string& playerName);
 ServiceResult cycleMatchInstructionService(Career& career);
 ServiceResult shortlistPlayerService(Career& career,

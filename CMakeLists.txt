@@ -8,11 +8,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(FM_CAREER_SOURCES
     src/career/app_services.cpp
+    src/career/career_runtime.cpp
     src/career/career_reports.cpp
     src/career/career_manager.cpp
     src/career/career_support.cpp
     src/career/player_development.cpp
     src/career/team_management.cpp
+    src/career/week_simulation.cpp
 )
 
 set(FM_AI_SOURCES
@@ -66,6 +68,8 @@ set(FM_FINANCE_SOURCES
 set(FM_UI_SOURCES
     src/main.cpp
     src/ui/career_reports_ui.cpp
+    src/ui/cup_ui.cpp
+    src/ui/market_ui.cpp
     src/ui/ui.cpp
     src/utils/utils.cpp
     src/validators/validators.cpp

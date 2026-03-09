@@ -825,3 +825,55 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - compilacion completa por fallback con `g++` sobre todo `src/`
   - linking final correcto
   - `FootballManager.exe --validate` ejecutado con resultado sin fallas en el ejecutable fallback
+
+## Cambios recientes (2026-03-09) - Separacion adicional de UI y simulacion semanal
+- Nueva extraccion de logica de carrera fuera de la UI:
+  - `src/career/week_simulation.cpp`
+  - `include/career/week_simulation.h`
+- La simulacion semanal de carrera ya no vive en `src/ui/ui.cpp`:
+  - `simulateCareerWeek(...)` se movio a la capa `career/`
+  - `checkAchievements(...)` tambien se movio a la capa `career/`
+- Esta extraccion dejo centralizados en `week_simulation.cpp` sistemas como:
+  - finanzas semanales
+  - dashboard semanal
+  - eventos de club
+  - analisis postpartido para carrera
+  - copa de temporada interna
+  - dinamica de vestuario y moral por minutos/promesas/resultados
+  - desarrollo mensual
+  - alertas de shortlist
+  - narrativas semanales
+  - ofertas entrantes
+  - vencimientos y renovaciones de contrato
+  - reputacion del DT y estado laboral
+  - simulacion de divisiones en segundo plano
+- La logica semanal ahora usa `emitUiMessage(...)` y callbacks de runtime en lugar de depender de flujo de entrada/salida embebido en UI.
+- Nuevo modulo UI exclusivo para modo copa:
+  - `src/ui/cup_ui.cpp`
+- `playCupMode(...)` fue removido de `src/ui/ui.cpp` y ahora queda separado como flujo de presentacion especifico.
+- Se ampliaron helpers reutilizables de competicion/reportes:
+  - `competitionGroupForTeam(...)`
+  - `buildCompetitionGroupTable(...)`
+  en:
+  - `include/career/career_reports.h`
+  - `src/career/career_reports.cpp`
+- `src/ui/ui.cpp` ahora consume esos helpers en vez de mantener duplicacion local para tablas por grupos.
+- Build actualizado:
+  - `CMakeLists.txt` ahora incluye:
+    - `src/career/week_simulation.cpp`
+    - `src/ui/cup_ui.cpp`
+- Documentacion actualizada:
+  - `README.md` ahora refleja que:
+    - la simulacion semanal vive en `src/career/week_simulation.cpp`
+    - el flujo de copa vive en `src/ui/cup_ui.cpp`
+    - el manejo de rutas usa capa compatible Unicode/Windows en vez de `std::filesystem` obligatorio
+- Impacto arquitectonico:
+  - `ui.cpp` reduce tamano y responsabilidad
+  - la capa UI queda mas enfocada en mostrar menus y datos
+  - la capa `career/` absorbe una parte critica de la logica de negocio que antes seguia mezclada
+- Validaciones realizadas:
+  - compilacion completa con `build.bat` en fallback `g++`
+  - linking final correcto
+  - `FootballManager.exe --validate` ejecutado con resultado sin fallas
+- Pendiente principal tras esta pasada:
+  - mover tambien la resolucion de fin de temporada fuera de `src/ui/ui.cpp`

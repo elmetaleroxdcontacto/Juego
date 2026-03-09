@@ -27,3 +27,9 @@ void setManagerJobSelectionCallback(ManagerJobSelectionCallback callback);
 void setUiMessageCallback(UiMessageCallback callback);
 void setIncomingOfferDecisionCallback(IncomingOfferDecisionCallback callback);
 void setContractRenewalDecisionCallback(ContractRenewalDecisionCallback callback);
+
+ManagerJobSelectionCallback managerJobSelectionCallback();
+IncomingOfferDecisionCallback incomingOfferDecisionCallback();
+ContractRenewalDecisionCallback contractRenewalDecisionCallback();
+
+void emitUiMessage(const std::string& message);

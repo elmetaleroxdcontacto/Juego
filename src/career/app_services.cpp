@@ -230,41 +230,57 @@ ServiceResult simulateCareerWeekService(Career& career) {
     return result;
 }
 
-ServiceResult scoutPlayersService(Career& career, const string& region, const string& focusPos) {
-    if (!career.myTeam) return failure("No hay una carrera activa.");
+ScoutingSessionResult runScoutingSessionService(Career& career, const string& region, const string& focusPos) {
+    ScoutingSessionResult session;
+    if (!career.myTeam) {
+        session.service = failure("No hay una carrera activa.");
+        return session;
+    }
     Team& team = *career.myTeam;
     long long scoutCost = max(3000LL, 9000LL - team.scoutingChief * 50LL);
-    if (team.budget < scoutCost) return failure("Presupuesto insuficiente para ojeo.");
-    string resolvedRegion = region.empty() ? "Todas" : region;
-    string resolvedPos = normalizePosition(focusPos);
-    if (resolvedPos == "N/A" || resolvedPos.empty()) resolvedPos = detectScoutingNeed(team);
+    if (team.budget < scoutCost) {
+        session.service = failure("Presupuesto insuficiente para ojeo.");
+        return session;
+    }
+    session.resolvedRegion = region.empty() ? "Todas" : region;
+    session.resolvedFocusPosition = normalizePosition(focusPos);
+    if (session.resolvedFocusPosition == "N/A" || session.resolvedFocusPosition.empty()) {
+        session.resolvedFocusPosition = detectScoutingNeed(team);
+    }
+
     vector<pair<Team*, int>> reports;
     for (auto& club : career.allTeams) {
         if (&club == career.myTeam) continue;
-        if (resolvedRegion != "Todas" && club.youthRegion != resolvedRegion) continue;
+        if (session.resolvedRegion != "Todas" && club.youthRegion != session.resolvedRegion) continue;
         for (size_t i = 0; i < club.players.size(); ++i) {
             const Player& player = club.players[i];
             if (player.onLoan) continue;
-            if (positionFitScore(player, resolvedPos) < 70) continue;
+            if (positionFitScore(player, session.resolvedFocusPosition) < 70) continue;
             reports.push_back({&club, static_cast<int>(i)});
         }
     }
-    if (reports.empty()) return failure("No se encontraron jugadores para ese informe.");
+    if (reports.empty()) {
+        session.service = failure("No se encontraron jugadores para ese informe.");
+        return session;
+    }
     sort(reports.begin(), reports.end(), [&](const auto& left, const auto& right) {
         const Player& a = left.first->players[static_cast<size_t>(left.second)];
         const Player& b = right.first->players[static_cast<size_t>(right.second)];
-        int fitA = a.potential + a.professionalism / 2 + a.currentForm / 2 + positionFitScore(a, resolvedPos);
-        int fitB = b.potential + b.professionalism / 2 + b.currentForm / 2 + positionFitScore(b, resolvedPos);
+        int fitA = a.potential + a.professionalism / 2 + a.currentForm / 2 +
+                   positionFitScore(a, session.resolvedFocusPosition);
+        int fitB = b.potential + b.professionalism / 2 + b.currentForm / 2 +
+                   positionFitScore(b, session.resolvedFocusPosition);
         if (fitA != fitB) return fitA > fitB;
         return a.skill > b.skill;
     });
     if (reports.size() > 5) reports.resize(5);
     int error = clampInt(14 - team.scoutingChief / 10, 2, 10);
     team.budget -= scoutCost;
-    ServiceResult result;
-    result.ok = true;
-    result.messages.push_back("Scouting completado en " + resolvedRegion + " con foco " + resolvedPos +
-                              ". Costo " + formatMoneyValue(scoutCost) + ".");
+    session.scoutingCost = scoutCost;
+    session.service.ok = true;
+    session.service.messages.push_back("Scouting completado en " + session.resolvedRegion +
+                                       " con foco " + session.resolvedFocusPosition +
+                                       ". Costo " + formatMoneyValue(scoutCost) + ".");
     for (const auto& report : reports) {
         Team* club = report.first;
         const Player& player = club->players[static_cast<size_t>(report.second)];
@@ -272,6 +288,30 @@ ServiceResult scoutPlayersService(Career& career, const string& region, const st
         int estSkillHi = clampInt(player.skill + error, 1, 99);
         int estPotLo = clampInt(player.potential - error, player.skill, 99);
         int estPotHi = clampInt(player.potential + error, player.skill, 99);
+        int fitScore = positionFitScore(player, session.resolvedFocusPosition);
+        string fitLabel = fitScore >= 90 ? "ajuste alto" : (fitScore >= 75 ? "ajuste medio" : "ajuste parcial");
+
+        ScoutingCandidate candidate;
+        candidate.playerName = player.name;
+        candidate.clubName = club->name;
+        candidate.region = club->youthRegion;
+        candidate.position = player.position;
+        candidate.preferredFoot = player.preferredFoot;
+        candidate.fitLabel = fitLabel;
+        candidate.formLabel = playerFormLabel(player);
+        candidate.reliabilityLabel = playerReliabilityLabel(player);
+        candidate.personalityLabel = personalityLabel(player);
+        candidate.secondaryPositions = player.secondaryPositions;
+        candidate.traits = player.traits;
+        candidate.estimatedSkillMin = estSkillLo;
+        candidate.estimatedSkillMax = estSkillHi;
+        candidate.estimatedPotentialMin = estPotLo;
+        candidate.estimatedPotentialMax = estPotHi;
+        candidate.fitScore = fitScore;
+        candidate.bigMatches = player.bigMatches;
+        candidate.marketValue = player.value;
+        session.candidates.push_back(candidate);
+
         string note = player.name + " | " + club->name + " | " + club->youthRegion + " | Hab " +
                       to_string(estSkillLo) + "-" + to_string(estSkillHi) + " | Pot " +
                       to_string(estPotLo) + "-" + to_string(estPotHi) +
@@ -281,15 +321,19 @@ ServiceResult scoutPlayersService(Career& career, const string& region, const st
                       " | Fiabilidad " + playerReliabilityLabel(player) +
                       " | Rasgos " + joinStringValues(player.traits, ", ") +
                       " | Perfil " + personalityLabel(player);
-        result.messages.push_back("- " + note);
+        session.service.messages.push_back("- " + note);
         career.scoutInbox.push_back(note);
     }
     if (career.scoutInbox.size() > 40) {
         career.scoutInbox.erase(career.scoutInbox.begin(),
                                 career.scoutInbox.begin() + static_cast<long long>(career.scoutInbox.size() - 40));
     }
-    career.addNews("El scouting completa un informe en la region " + resolvedRegion + " para " + team.name + ".");
-    return result;
+    career.addNews("El scouting completa un informe en la region " + session.resolvedRegion + " para " + team.name + ".");
+    return session;
+}
+
+ServiceResult scoutPlayersService(Career& career, const string& region, const string& focusPos) {
+    return runScoutingSessionService(career, region, focusPos).service;
 }
 
 ServiceResult upgradeClubService(Career& career, ClubUpgrade upgrade) {
@@ -442,6 +486,73 @@ ServiceResult buyTransferTargetService(Career& career,
     return result;
 }
 
+ServiceResult triggerReleaseClauseService(Career& career,
+                                          const string& sellerTeamName,
+                                          const string& playerName,
+                                          NegotiationProfile profile,
+                                          NegotiationPromise promise) {
+    if (!career.myTeam) return failure("No hay una carrera activa.");
+    Team* seller = career.findTeamByName(sellerTeamName);
+    if (!seller || seller == career.myTeam) return failure("No se encontro el club vendedor.");
+    int sellerIdx = team_mgmt::playerIndexByName(*seller, playerName);
+    if (sellerIdx < 0) return failure("No se encontro el jugador seleccionado.");
+    int maxSquadSize = getCompetitionConfig(career.myTeam->division).maxSquadSize;
+    if (maxSquadSize > 0 && static_cast<int>(career.myTeam->players.size()) >= maxSquadSize) {
+        return failure("Tu plantel ya alcanzo el maximo permitido para la division.");
+    }
+
+    ensureTeamIdentity(*career.myTeam);
+    ensureTeamIdentity(*seller);
+    Player player = seller->players[static_cast<size_t>(sellerIdx)];
+    if (player.onLoan) return failure("El jugador esta a prestamo y no esta disponible.");
+
+    string rejectionReason;
+    if (playerRejectsMove(career, *career.myTeam, *seller, player, promise, rejectionReason)) {
+        return failure(rejectionReason);
+    }
+
+    long long transferFee = player.releaseClause;
+    int difficulty = agentDifficulty(player);
+    long long agentFee = estimatedAgentFee(player, transferFee);
+    agentFee = agentFee * (100 + difficulty / 3) / 100;
+    if (career.myTeam->budget < transferFee + agentFee) {
+        return failure("Presupuesto insuficiente para ejecutar clausula y honorarios.");
+    }
+
+    player.wage = max(player.wage, static_cast<long long>(wageDemandFor(player) *
+                                                          negotiationWageFactor(profile) *
+                                                          promiseWageFactor(promise)));
+    player.wage = player.wage * (100 + difficulty / 12) / 100;
+    player.contractWeeks = promiseContractWeeks(promise, player.contractWeeks);
+    player.releaseClause = max(static_cast<long long>(player.value * negotiationClauseFactor(profile)),
+                               static_cast<long long>((transferFee + agentFee) * negotiationClauseFactor(profile)));
+    player.onLoan = false;
+    player.parentClub.clear();
+    player.loanWeeksRemaining = 0;
+    player.wantsToLeave = false;
+    player.happiness = clampInt(player.happiness + 4, 1, 99);
+    applyNegotiatedPromise(player, promise);
+
+    career.myTeam->budget -= (transferFee + agentFee);
+    career.myTeam->addPlayer(player);
+    seller->budget += transferFee;
+    team_mgmt::detachPlayerFromSelections(*seller, player.name);
+    eraseNamedSelection(career.scoutingShortlist, seller->name + "|" + player.name);
+    seller->players.erase(seller->players.begin() + sellerIdx);
+    ensureTeamIdentity(*career.myTeam);
+    ensureTeamIdentity(*seller);
+    career.addNews(player.name + " llega a " + career.myTeam->name + " tras ejecutar su clausula en " + seller->name + ".");
+
+    ServiceResult result;
+    result.ok = true;
+    result.messages.push_back("Clausula ejecutada: " + player.name + " llega desde " + seller->name +
+                              " por " + formatMoneyValue(transferFee) + " + honorarios " + formatMoneyValue(agentFee) +
+                              " | perfil " + negotiationLabel(profile) +
+                              " | promesa " + promiseLabel(promise) +
+                              " | agente " + to_string(difficulty) + "/90.");
+    return result;
+}
+
 ServiceResult signPreContractService(Career& career,
                                      const string& sellerTeamName,
                                      const string& playerName,
@@ -555,6 +666,88 @@ ServiceResult sellPlayerService(Career& career, const string& playerName) {
     ServiceResult result;
     result.ok = true;
     result.messages.push_back("Venta completada: " + player.name + " deja el club por " + formatMoneyValue(transferFee) + ".");
+    return result;
+}
+
+ServiceResult loanInPlayerService(Career& career,
+                                  const string& sellerTeamName,
+                                  const string& playerName,
+                                  int loanWeeks) {
+    if (!career.myTeam) return failure("No hay una carrera activa.");
+    Team* seller = career.findTeamByName(sellerTeamName);
+    if (!seller || seller == career.myTeam) return failure("No se encontro el club de origen.");
+    int sellerIdx = team_mgmt::playerIndexByName(*seller, playerName);
+    if (sellerIdx < 0) return failure("No se encontro el jugador seleccionado.");
+    int maxSquadSize = getCompetitionConfig(career.myTeam->division).maxSquadSize;
+    if (maxSquadSize > 0 && static_cast<int>(career.myTeam->players.size()) >= maxSquadSize) {
+        return failure("Tu plantel ya alcanzo el maximo permitido para la division.");
+    }
+
+    Player player = seller->players[static_cast<size_t>(sellerIdx)];
+    if (player.onLoan) return failure("El jugador ya esta cedido.");
+    if (player.contractWeeks <= 12) return failure("El jugador no esta disponible para prestamo por su situacion contractual.");
+
+    loanWeeks = clampInt(loanWeeks, 8, 26);
+    long long fee = max(15000LL, player.value / 10);
+    long long wageShare = max(player.wage / 2, wageDemandFor(player) * 55 / 100);
+    if (career.myTeam->budget < fee) return failure("Presupuesto insuficiente para el cargo de prestamo.");
+
+    player.onLoan = true;
+    player.parentClub = seller->name;
+    player.loanWeeksRemaining = loanWeeks;
+    player.wage = wageShare;
+    career.myTeam->budget -= fee;
+    seller->budget += fee;
+    seller->players.erase(seller->players.begin() + sellerIdx);
+    career.myTeam->addPlayer(player);
+    career.addNews(player.name + " llega a prestamo desde " + seller->name + ".");
+
+    ServiceResult result;
+    result.ok = true;
+    result.messages.push_back("Prestamo cerrado: " + player.name + " llega desde " + seller->name +
+                              " | cargo " + formatMoneyValue(fee) +
+                              " | salario semanal " + formatMoneyValue(wageShare) +
+                              " | duracion " + to_string(loanWeeks) + " semanas.");
+    return result;
+}
+
+ServiceResult loanOutPlayerService(Career& career,
+                                   const string& playerName,
+                                   const string& destinationTeamName,
+                                   int loanWeeks) {
+    if (!career.myTeam) return failure("No hay una carrera activa.");
+    Team* receiver = career.findTeamByName(destinationTeamName);
+    if (!receiver || receiver == career.myTeam) return failure("No se encontro el club destino.");
+    Team& team = *career.myTeam;
+    if (team.players.size() <= 18) return failure("Necesitas mantener al menos 18 jugadores en plantel.");
+
+    int index = team_mgmt::playerIndexByName(team, playerName);
+    if (index < 0) return failure("No se encontro el jugador seleccionado.");
+    const int maxSquad = getCompetitionConfig(receiver->division).maxSquadSize;
+    if (maxSquad > 0 && static_cast<int>(receiver->players.size()) >= maxSquad) {
+        return failure("El club destino no tiene cupo de plantel.");
+    }
+
+    Player player = team.players[static_cast<size_t>(index)];
+    if (player.onLoan) return failure("No puedes ceder un jugador que ya esta prestado.");
+
+    loanWeeks = clampInt(loanWeeks, 8, 26);
+    long long fee = max(10000LL, player.value / 12);
+    player.onLoan = true;
+    player.parentClub = team.name;
+    player.loanWeeksRemaining = loanWeeks;
+    receiver->addPlayer(player);
+    team.budget += fee;
+    receiver->budget = max(0LL, receiver->budget - fee);
+    team_mgmt::detachPlayerFromSelections(team, player.name);
+    team.players.erase(team.players.begin() + index);
+    career.addNews(player.name + " sale a prestamo hacia " + receiver->name + ".");
+
+    ServiceResult result;
+    result.ok = true;
+    result.messages.push_back("Prestamo acordado: " + player.name + " va a " + receiver->name +
+                              " | ingreso " + formatMoneyValue(fee) +
+                              " | duracion " + to_string(loanWeeks) + " semanas.");
     return result;
 }
 

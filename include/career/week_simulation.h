@@ -4,4 +4,4 @@
 
 void checkAchievements(Career& career);
 void simulateCareerWeek(Career& career);
-void playCupMode(Career& career);
+void endSeason(Career& career);
