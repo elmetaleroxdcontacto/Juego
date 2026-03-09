@@ -821,6 +821,7 @@ const vector<DivisionInfo> kDivisions = {
     {"tercera division b", "data/LigaChilena/tercera division b", "Tercera Division B"}
 };
 
+#if 0  // Career state and persistence were moved to engine/career_state.cpp and io/save_serialization.cpp.
 Career::Career()
     : myTeam(nullptr),
       currentSeason(1),
@@ -1990,3 +1991,4 @@ bool Career::loadCareer() {
     initializeDynamicObjective();
     return true;
 }
+#endif

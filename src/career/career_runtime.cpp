@@ -33,6 +33,10 @@ ManagerJobSelectionCallback managerJobSelectionCallback() {
     return g_managerJobSelectionCallback;
 }
 
+UiMessageCallback uiMessageCallback() {
+    return g_uiMessageCallback;
+}
+
 IncomingOfferDecisionCallback incomingOfferDecisionCallback() {
     return g_incomingOfferDecisionCallback;
 }

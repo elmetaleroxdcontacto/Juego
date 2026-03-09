@@ -1,5 +1,6 @@
 #include "ai/ai_transfer_manager.h"
 #include "career/career_reports.h"
+#include "career/season_service.h"
 #include "career/season_transition.h"
 #include "competition/competition.h"
 #include "engine/models.h"
@@ -9,6 +10,7 @@
 #include "validators/validators.h"
 
 #include <exception>
+#include <cstdio>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -314,6 +316,84 @@ void testSeasonTransitionAdvancesCareerWithoutUiDependencies() {
     expect(!career.schedule.empty(), "La nueva temporada debe reconstruir su calendario.");
 }
 
+void testSeasonServiceReturnsStructuredWeekResult() {
+    Career career;
+    career.currentSeason = 3;
+    career.currentWeek = 1;
+
+    career.allTeams.push_back(makeTeam("Servicio Local", "primera division", 72, 4, 4, "Pressing", "Contra-presion", 650000));
+    career.allTeams.push_back(makeTeam("Servicio Visita", "primera division", 69, 2, 2, "Defensive", "Bloque bajo", 520000));
+    career.allTeams.push_back(makeTeam("Servicio Centro", "primera division", 68, 3, 3, "Balanced", "Equilibrado", 500000));
+    career.allTeams.push_back(makeTeam("Servicio Sur", "primera division", 67, 3, 3, "Balanced", "Equilibrado", 470000));
+
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Servicio Local");
+    expect(career.myTeam != nullptr, "El fixture del SeasonService debe tener club de usuario.");
+    expect(!career.schedule.empty(), "El fixture del SeasonService debe crear calendario.");
+
+    SeasonService service;
+    SeasonStepResult result = service.simulateWeek(career);
+
+    expect(result.ok, "SeasonService debe completar la simulacion semanal.");
+    expect(result.week.ok, "WeekSimulationResult debe marcarse como exitoso.");
+    expect(result.week.weekBefore == 1 && result.week.weekAfter == 2,
+           "SeasonService debe avanzar exactamente una semana regular.");
+    expect(result.week.seasonBefore == 3 && result.week.seasonAfter == 3,
+           "Una fecha normal no debe cerrar la temporada.");
+    expect(!result.week.messages.empty(), "SeasonService debe devolver mensajes estructurados.");
+    expect(!result.week.lastMatchAnalysis.empty(), "SeasonService debe propagar el ultimo analisis de partido.");
+}
+
+void testSaveLoadRoundTripPreservesCareerState() {
+    const string savePath = "saves/test_roundtrip_save.txt";
+
+    Career original;
+    original.currentSeason = 8;
+    original.currentWeek = 5;
+    original.managerName = "Arquitecto";
+    original.managerReputation = 77;
+    original.boardConfidence = 66;
+    original.boardExpectedFinish = 3;
+    original.boardBudgetTarget = 250000;
+    original.boardYouthTarget = 2;
+    original.boardWarningWeeks = 1;
+    original.boardMonthlyObjective = "Sumar al menos 6 puntos en 4 semanas";
+    original.boardMonthlyTarget = 6;
+    original.boardMonthlyProgress = 4;
+    original.boardMonthlyDeadlineWeek = 8;
+    original.lastMatchAnalysis = "Control total del mediocampo.";
+    original.newsFeed.push_back("T8-F5: Noticia de prueba");
+    original.scoutInbox.push_back("Informe de ojeo");
+    original.scoutingShortlist.push_back("Promesa del norte");
+    original.history.push_back({7, "primera division", "Club Persistencia", 2, "Club Persistencia", "Ascenso Norte", "Descenso Sur", "Nota historica"});
+    original.pendingTransfers.push_back({"Jugador Pendiente", "Club Persistencia", "Club Destino", 9, 0, 120000, 9000, 104, false, false, "Titular"});
+
+    original.allTeams.push_back(makeTeam("Club Persistencia", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
+    original.allTeams.push_back(makeTeam("Club Destino", "primera division", 68, 3, 3, "Balanced", "Equilibrado", 650000));
+    original.setActiveDivision("primera division");
+    original.myTeam = original.findTeamByName("Club Persistencia");
+    expect(original.myTeam != nullptr, "El fixture de persistencia debe tener club de usuario.");
+    original.saveFile = savePath;
+
+    expect(original.saveCareer(), "El guardado roundtrip debe completarse.");
+
+    Career loaded;
+    loaded.saveFile = savePath;
+    expect(loaded.loadCareer(), "La carga roundtrip debe completarse.");
+    expect(loaded.managerName == original.managerName, "La carga debe preservar el nombre del manager.");
+    expect(loaded.managerReputation == original.managerReputation, "La carga debe preservar la reputacion del manager.");
+    expect(loaded.boardConfidence == original.boardConfidence, "La carga debe preservar confianza de directiva.");
+    expect(loaded.lastMatchAnalysis == original.lastMatchAnalysis, "La carga debe preservar el ultimo analisis de partido.");
+    expect(loaded.history.size() == 1 && loaded.history.front().champion == "Club Persistencia",
+           "La carga debe preservar historial de temporada.");
+    expect(loaded.myTeam != nullptr && loaded.myTeam->name == "Club Persistencia",
+           "La carga debe restaurar el club controlado.");
+    expect(!loaded.pendingTransfers.empty() && loaded.pendingTransfers.front().toTeam == "Club Destino",
+           "La carga debe preservar fichajes pendientes.");
+
+    std::remove(savePath.c_str());
+}
+
 }  // namespace
 
 int main() {
@@ -324,6 +404,8 @@ int main() {
         {"competition_group_table", testCompetitionGroupTableScopesActiveGroup},
         {"transfer_affordability", testTransferEvaluationPenalizesUnaffordableDeals},
         {"season_transition", testSeasonTransitionAdvancesCareerWithoutUiDependencies},
+        {"season_service", testSeasonServiceReturnsStructuredWeekResult},
+        {"save_load_roundtrip", testSaveLoadRoundTripPreservesCareerState},
     };
 
     int failures = 0;

@@ -28,6 +28,10 @@ ServiceResult CareerManager::saveCareer() {
     return saveCareerService(career_);
 }
 
+SeasonStepResult CareerManager::simulateSeasonStep() {
+    return simulateSeasonStepService(career_);
+}
+
 ServiceResult CareerManager::simulateWeek() {
     return simulateCareerWeekService(career_);
 }

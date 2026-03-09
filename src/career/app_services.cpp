@@ -1,5 +1,6 @@
 #include "app_services.h"
 
+#include "career/season_flow_controller.h"
 #include "career/career_reports.h"
 #include "career/career_runtime.h"
 #include "career/career_support.h"
@@ -10,44 +11,11 @@
 #include "utils.h"
 
 #include <algorithm>
-#include <iostream>
 #include <sstream>
-#include <streambuf>
 
 using namespace std;
 
 namespace {
-
-struct StdoutCapture {
-    streambuf* original = nullptr;
-    ostringstream buffer;
-
-    StdoutCapture() : original(cout.rdbuf(buffer.rdbuf())) {}
-    ~StdoutCapture() {
-        cout.rdbuf(original);
-    }
-
-    string str() const {
-        return buffer.str();
-    }
-};
-
-vector<string> splitOutputLines(const string& text) {
-    vector<string> lines;
-    istringstream stream(text);
-    string line;
-    while (getline(stream, line)) {
-        if (!line.empty() && line.back() == '\r') line.pop_back();
-        if (!line.empty()) lines.push_back(line);
-    }
-    return lines;
-}
-
-vector<string>* g_collectedMessages = nullptr;
-
-void collectUiMessage(const string& message) {
-    if (g_collectedMessages && !message.empty()) g_collectedMessages->push_back(message);
-}
 
 IncomingOfferDecision autoOfferDecision(const Career& career,
                                         const Player& player,
@@ -82,12 +50,11 @@ int autoManagerJobDecision(const Career&, const vector<Team*>& jobs) {
     return jobs.empty() ? -1 : 0;
 }
 
-ServiceResult finalizeCapturedResult(bool ok, const vector<string>& messages, const string& capturedStdout) {
+ServiceResult toServiceResult(const SeasonStepResult& step) {
     ServiceResult result;
-    result.ok = ok;
-    result.messages = messages;
-    vector<string> legacyLines = splitOutputLines(capturedStdout);
-    result.messages.insert(result.messages.end(), legacyLines.begin(), legacyLines.end());
+    result.ok = step.ok;
+    result.messages = step.week.messages;
+    if (result.messages.empty()) result.messages.push_back("Semana simulada.");
     return result;
 }
 
@@ -210,24 +177,13 @@ ServiceResult saveCareerService(Career& career) {
     return result;
 }
 
+SeasonStepResult simulateSeasonStepService(Career& career) {
+    SeasonFlowController controller(career);
+    return controller.simulateWeek(autoOfferDecision, autoRenewDecision, autoManagerJobDecision);
+}
+
 ServiceResult simulateCareerWeekService(Career& career) {
-    vector<string> messages;
-    g_collectedMessages = &messages;
-    setUiMessageCallback(collectUiMessage);
-    setIncomingOfferDecisionCallback(autoOfferDecision);
-    setContractRenewalDecisionCallback(autoRenewDecision);
-    setManagerJobSelectionCallback(autoManagerJobDecision);
-    StdoutCapture capture;
-    simulateCareerWeek(career);
-    setManagerJobSelectionCallback(nullptr);
-    setContractRenewalDecisionCallback(nullptr);
-    setIncomingOfferDecisionCallback(nullptr);
-    setUiMessageCallback(nullptr);
-    g_collectedMessages = nullptr;
-    ServiceResult result = finalizeCapturedResult(true, messages, capture.str());
-    if (result.messages.empty()) result.messages.push_back("Semana simulada.");
-    result.ok = true;
-    return result;
+    return toServiceResult(simulateSeasonStepService(career));
 }
 
 ScoutingSessionResult runScoutingSessionService(Career& career, const string& region, const string& focusPos) {

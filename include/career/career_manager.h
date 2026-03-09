@@ -16,6 +16,7 @@ public:
                                  const std::string& managerName);
     ServiceResult loadCareer();
     ServiceResult saveCareer();
+    SeasonStepResult simulateSeasonStep();
     ServiceResult simulateWeek();
 
 private:

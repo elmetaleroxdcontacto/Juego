@@ -29,6 +29,7 @@ void setIncomingOfferDecisionCallback(IncomingOfferDecisionCallback callback);
 void setContractRenewalDecisionCallback(ContractRenewalDecisionCallback callback);
 
 ManagerJobSelectionCallback managerJobSelectionCallback();
+UiMessageCallback uiMessageCallback();
 IncomingOfferDecisionCallback incomingOfferDecisionCallback();
 ContractRenewalDecisionCallback contractRenewalDecisionCallback();
 

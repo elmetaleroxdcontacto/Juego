@@ -13,6 +13,8 @@ set(FM_CAREER_SOURCES
     src/career/career_runtime.cpp
     src/career/career_reports.cpp
     src/career/career_manager.cpp
+    src/career/season_flow_controller.cpp
+    src/career/season_service.cpp
     src/career/season_transition.cpp
     src/career/career_support.cpp
     src/career/player_development.cpp
@@ -32,6 +34,7 @@ set(FM_COMPETITION_SOURCES
 )
 
 set(FM_ENGINE_SOURCES
+    src/engine/career_state.cpp
     src/engine/game_engine.cpp
     src/engine/models.cpp
 )
@@ -42,6 +45,7 @@ set(FM_APP_SOURCES
 
 set(FM_IO_SOURCES
     src/io/io.cpp
+    src/io/save_serialization.cpp
 )
 
 set(FM_SIMULATION_SOURCES

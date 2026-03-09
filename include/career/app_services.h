@@ -1,5 +1,6 @@
 #pragma once
 
+#include "career/season_service.h"
 #include "engine/models.h"
 #include "validators/validators.h"
 
@@ -70,6 +71,7 @@ ServiceResult startCareerService(Career& career,
                                  const std::string& managerName);
 ServiceResult loadCareerService(Career& career);
 ServiceResult saveCareerService(Career& career);
+SeasonStepResult simulateSeasonStepService(Career& career);
 ServiceResult simulateCareerWeekService(Career& career);
 ScoutingSessionResult runScoutingSessionService(Career& career,
                                                 const std::string& region = "Todas",

@@ -929,3 +929,135 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Limitacion de entorno detectada:
   - el target `FootballManagerTests` ya quedo agregado en CMake, pero en este entorno CMake no puede regenerar un arbol limpio por un problema externo de permisos con `ar.exe`/MinGW
   - el codigo quedo igualmente validado por la ruta fallback y por el ejecutable de tests enlazado sobre los objetos compilados
+
+## Cambios recientes (2026-03-09) - Transicion de temporada fuera de UI, test dedicado y verificacion de build principal
+- Se completo una separacion adicional entre logica de carrera y UI moviendo la transicion de fin de temporada a un modulo propio:
+  - nuevo `include/career/season_transition.h`
+  - nuevo `src/career/season_transition.cpp`
+- El cierre de temporada ahora devuelve una estructura de datos `SeasonTransitionSummary` con:
+  - campeon
+  - ascensos
+  - descensos
+  - lineas de resumen
+  - nota de temporada
+- La logica de promociones, descensos, premios, historial y avance de temporada ya no pertenece a `src/ui/ui.cpp`:
+  - `week_simulation.cpp` ahora consume `endSeason(career)` y emite sus lineas por callbacks/UI messages
+  - referencias principales:
+    - `src/career/week_simulation.cpp`
+    - `src/career/season_transition.cpp`
+- El bloque legacy de fin de temporada fue retirado del binario dentro de `src/ui/ui.cpp` para evitar duplicacion y mantener a la UI como capa de presentacion.
+- Impacto arquitectonico:
+  - la UI deja de ser dueña de reglas de ascenso/descenso y reinicio de temporada
+  - la capa `career/` pasa a resolver estado y devolver datos estructurados
+  - queda una base mas limpia para exponer este resumen en consola y GUI
+- Se agrego cobertura nueva de tests para esta extraccion:
+  - `tests/project_tests.cpp`
+  - nuevo caso `season_transition`
+  - valida que:
+    - avance `currentSeason`
+    - reinicie `currentWeek`
+    - registre historial
+    - reconstruya calendario
+    - mantenga la division activa alineada con el club del usuario
+- Build y verificacion:
+  - `build.bat` fue verificado nuevamente usando CMake como camino principal
+  - el ejecutable principal compila correctamente por CMake sin caer al fallback para el flujo normal
+  - `FootballManager.exe --validate` ejecutado con resultado sin fallas
+  - `build/FootballManagerTests.exe` ejecutado manualmente con todos los tests pasando, incluido `season_transition`
+- Estado respecto de la GUI:
+  - la interfaz grafica ya consume esta logica de forma funcional a traves de `simulateCareerWeekService(...)`
+  - el backend nuevo si impacta la GUI
+  - aun queda pendiente mostrar en una vista dedicada todo el detalle completo de `SeasonTransitionSummary`
+- Limitacion de entorno que sigue vigente:
+  - el target `FootballManagerTests` por CMake sigue condicionado por un problema externo de permisos con MinGW/CMake en arboles limpios
+  - esto no afecta la compilacion normal del ejecutable principal ni la validacion manual de la suite de tests
+
+## Cambios recientes (2026-03-09) - SeasonService, separation de persistencia y tests estructurales
+- Se introdujo un servicio central de flujo semanal para carrera:
+  - nuevo `include/career/season_service.h`
+  - nuevo `src/career/season_service.cpp`
+  - nuevo `include/career/season_flow_controller.h`
+  - nuevo `src/career/season_flow_controller.cpp`
+- El flujo semanal ahora devuelve estructuras limpias:
+  - `WeekSimulationResult`
+  - `SeasonStepResult`
+- Este servicio central:
+  - ejecuta `simulateCareerWeek(...)`
+  - captura mensajes del runtime por callback
+  - absorbe tambien el `stdout` legado del motor para convertirlo en mensajes estructurados
+  - devuelve semana inicial/final, temporada inicial/final, confianza de directiva y ultimo analisis de partido
+- `app_services.cpp` fue simplificado:
+  - ya no es el dueño del flujo semanal
+  - ahora expone `simulateSeasonStepService(...)`
+  - `simulateCareerWeekService(...)` pasa a ser un adaptador sobre el nuevo flujo estructurado
+- `CareerManager` ahora tambien expone el flujo estructurado:
+  - nuevo `simulateSeasonStep()`
+
+- Se avanzo la separacion de `models.cpp` en dominio y persistencia:
+  - nuevo `src/engine/career_state.cpp`
+  - nuevo `src/io/save_serialization.cpp`
+- `career_state.cpp` ahora contiene la implementacion activa de:
+  - constructor de `Career`
+  - inicializacion de liga
+  - calendario
+  - seleccion de division activa
+  - reseteo y envejecimiento de plantilla
+  - noticias
+  - transfers pendientes
+  - objetivos y confianza de directiva
+  - estado de copa
+- `save_serialization.cpp` ahora contiene la implementacion activa de:
+  - `Career::saveCareer()`
+  - `Career::loadCareer()`
+  - encoding/decoding de:
+    - historial
+    - pending transfers
+    - listas string
+    - head-to-head
+    - campos de jugador
+- `src/engine/models.cpp` deja de ser la implementacion activa de estado de carrera y persistencia:
+  - el bloque anterior fue retirado del binario con una marca legacy para evitar duplicacion de simbolos
+  - sigue quedando como proxima etapa separar de ahi tambien el dominio restante de `Player` y `Team`
+
+- Build actualizado:
+  - `CMakeLists.txt` ahora incluye:
+    - `src/career/season_service.cpp`
+    - `src/career/season_flow_controller.cpp`
+    - `src/engine/career_state.cpp`
+    - `src/io/save_serialization.cpp`
+
+- Tests nuevos agregados en `tests/project_tests.cpp`:
+  - `season_service`
+    - valida avance de semana y retorno estructurado
+    - valida mensajes y ultimo analisis de partido
+  - `save_load_roundtrip`
+    - valida roundtrip de persistencia para manager, board state, historial, equipo controlado y fichajes pendientes
+
+- Documentacion actualizada:
+  - `README.md` ahora refleja:
+    - el uso de `SeasonService` / `SeasonFlowController`
+    - la separacion entre `career_state.cpp` y `save_serialization.cpp`
+  - `docs/ARCHITECTURE.md` ahora refleja:
+    - el nuevo flujo semanal estructurado
+    - la separacion de runtime de carrera y serializacion
+
+- Validaciones realizadas:
+  - compilacion principal con `build.bat` y CMake como camino principal
+  - `FootballManager.exe --validate` ejecutado con resultado sin fallas
+  - compilacion manual de `build/FootballManagerTests.exe`
+  - ejecucion de tests con resultado:
+    - `validation_suite`
+    - `match_engine_structure`
+    - `tactical_fatigue`
+    - `competition_group_table`
+    - `transfer_affordability`
+    - `season_transition`
+    - `season_service`
+    - `save_load_roundtrip`
+    todos pasando
+
+- Impacto arquitectonico:
+  - la simulacion semanal ya no depende de `app_services` como centro de control
+  - el dominio de carrera queda mas testeable
+  - la persistencia deja de vivir mezclada con el estado de carrera
+  - se reduce el acoplamiento entre logica, serializacion y presentacion
