@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 
 project(FootballManagerGame LANGUAGES CXX)
 
+include(CTest)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -40,10 +42,13 @@ set(FM_IO_SOURCES
 
 set(FM_SIMULATION_SOURCES
     src/simulation/fatigue_engine.cpp
+    src/simulation/match_event_generator.cpp
     src/simulation/match_events.cpp
     src/simulation/match_context.cpp
     src/simulation/match_engine.cpp
+    src/simulation/match_phase.cpp
     src/simulation/match_resolution.cpp
+    src/simulation/match_stats.cpp
     src/simulation/match_tactics.cpp
     src/simulation/morale_engine.cpp
     src/simulation/simulation.cpp
@@ -65,22 +70,15 @@ set(FM_FINANCE_SOURCES
     src/finance/finance_system.cpp
 )
 
-set(FM_UI_SOURCES
-    src/main.cpp
-    src/ui/career_reports_ui.cpp
-    src/ui/cup_ui.cpp
-    src/ui/market_ui.cpp
-    src/ui/ui.cpp
+set(FM_SUPPORT_SOURCES
     src/utils/utils.cpp
+)
+
+set(FM_VALIDATOR_SOURCES
     src/validators/validators.cpp
 )
 
-set(FM_GUI_SOURCES)
-if(WIN32)
-    list(APPEND FM_GUI_SOURCES src/gui/gui.cpp)
-endif()
-
-add_executable(FootballManager
+set(FM_CORE_SOURCES
     ${FM_CAREER_SOURCES}
     ${FM_AI_SOURCES}
     ${FM_COMPETITION_SOURCES}
@@ -90,24 +88,60 @@ add_executable(FootballManager
     ${FM_TRANSFER_SOURCES}
     ${FM_DEVELOPMENT_SOURCES}
     ${FM_FINANCE_SOURCES}
+    ${FM_SUPPORT_SOURCES}
+)
+
+set(FM_UI_SOURCES
+    src/main.cpp
+    src/ui/career_reports_ui.cpp
+    src/ui/cup_ui.cpp
+    src/ui/market_ui.cpp
+    src/ui/ui.cpp
+)
+
+set(FM_GUI_SOURCES)
+if(WIN32)
+    list(APPEND FM_GUI_SOURCES src/gui/gui.cpp)
+endif()
+
+add_executable(FootballManager
+    ${FM_CORE_SOURCES}
     ${FM_UI_SOURCES}
+    ${FM_VALIDATOR_SOURCES}
     ${FM_GUI_SOURCES}
 )
 
-target_include_directories(FootballManager PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
+function(fm_configure_target target_name)
+    target_include_directories(${target_name} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
 
-if(WIN32)
-    target_link_libraries(FootballManager PRIVATE comctl32 gdi32)
+    if(WIN32)
+        target_link_libraries(${target_name} PRIVATE comctl32 gdi32)
+    endif()
+
+    if(MSVC)
+        target_compile_options(${target_name} PRIVATE /W4)
+    else()
+        target_compile_options(${target_name} PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+
+    set_target_properties(${target_name} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    )
+endfunction()
+
+fm_configure_target(FootballManager)
+
+if(BUILD_TESTING)
+    add_executable(FootballManagerTests
+        tests/project_tests.cpp
+        ${FM_CORE_SOURCES}
+        ${FM_VALIDATOR_SOURCES}
+    )
+    fm_configure_target(FootballManagerTests)
+    add_test(NAME FootballManagerTests COMMAND FootballManagerTests)
+    set_tests_properties(FootballManagerTests PROPERTIES
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
 endif()
-
-if(MSVC)
-    target_compile_options(FootballManager PRIVATE /W4)
-else()
-    target_compile_options(FootballManager PRIVATE -Wall -Wextra -Wpedantic)
-endif()
-
-set_target_properties(FootballManager PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-)

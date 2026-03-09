@@ -87,7 +87,7 @@ Key runtime layers:
 - `engine`
   - `GameController`, `GameEngine`, domain models, career state
 - `simulation`
-  - match context, match engine, match resolution, tactics, fatigue, morale
+  - match context, match phases, event generation, event resolution, stats, tactics, fatigue, morale
 - `ai`
   - in-match management, squad planning, transfer evaluation
 - `transfers`
@@ -153,12 +153,30 @@ Fallback validation:
 .\FootballManager.exe --validate
 ```
 
+### Tests
+
+When CMake can configure a clean build tree:
+
+```bash
+cmake --build build-cmake --target FootballManagerTests
+ctest --test-dir build-cmake --output-on-failure
+```
+
+Current test coverage added in this refactor:
+
+- validation suite against external league/save data
+- structured match-engine phase output
+- tactical pressure impact on phase fatigue
+- competition group table selection
+- transfer affordability scoring
+
 ## Current Refactor Highlights
 
 - `src/main.cpp` is now only a thin entry point
 - top-level application flow moved into `src/engine/game_controller.cpp`
 - career orchestration wrapped in `src/career/career_manager.cpp`
 - match flow now goes through `src/simulation/match_engine.cpp`
+- match flow is now split across `match_context`, `match_phase`, `match_event_generator`, `match_resolution`, and `match_stats`
 - simulation data returns `MatchContext`, `MatchStats`, and `MatchTimeline`
 - finance and development logic are now reusable modules instead of staying embedded in larger gameplay files
 - weekly career simulation now lives in `src/career/week_simulation.cpp` instead of `src/ui/ui.cpp`
@@ -184,7 +202,7 @@ Fallback validation:
 - CLI fallback
 - Data files under `data/`
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome!
 
@@ -203,7 +221,7 @@ We are looking for contributors interested in:
 3. Make your changes
 4. Submit a Pull Request
 
-## 📋 Help Wanted
+## Help Wanted
 
 Some areas currently needing work:
 
@@ -215,7 +233,7 @@ Some areas currently needing work:
 
 Check the **Issues** section for available tasks.
 
-## ⭐ Support the Project
+## Support the Project
 
 If you like the project you can help by:
 
@@ -224,7 +242,7 @@ If you like the project you can help by:
 - Reporting bugs
 - Contributing to development
 
-## 📬 Contact
+## Contact
 
 If you want to collaborate, open an **Issue** or contact through GitHub.
 

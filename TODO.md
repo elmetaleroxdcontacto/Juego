@@ -877,3 +877,55 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - `FootballManager.exe --validate` ejecutado con resultado sin fallas
 - Pendiente principal tras esta pasada:
   - mover tambien la resolucion de fin de temporada fuera de `src/ui/ui.cpp`
+
+## Cambios recientes (2026-03-09) - Modularizacion adicional del motor de partidos y tests
+- Se modularizo mas el motor de partidos para sacar responsabilidades de `src/simulation/match_engine.cpp`:
+  - nuevo `include/simulation/match_phase.h`
+  - nuevo `src/simulation/match_phase.cpp`
+  - nuevo `include/simulation/match_event_generator.h`
+  - nuevo `src/simulation/match_event_generator.cpp`
+  - nuevo `include/simulation/match_stats.h`
+  - nuevo `src/simulation/match_stats.cpp`
+- `src/simulation/match_engine.cpp` ahora actua como orquestador del partido y delega en modulos especializados:
+  - `match_phase::evaluatePhase(...)`
+  - `match_event_generator::playChances(...)`
+  - `match_event_generator::registerDiscipline(...)`
+  - `match_event_generator::maybeInjure(...)`
+  - `match_stats::countSubstitutions(...)`
+  - `match_stats::buildLegacyTimeline(...)`
+- Mejoras funcionales aplicadas al motor:
+  - las fases del partido ya calculan posesion, intensidad, probabilidad de ocasion y desgaste en un modulo dedicado
+  - la generacion de eventos quedo separada del armado final del resultado
+  - una expulsion ahora remueve al jugador del `activeXI`, por lo que la inferioridad numerica impacta fases posteriores
+  - la fatiga por fase queda mas ligada a la presion, ritmo e intensidad tactica
+- Build actualizado:
+  - `CMakeLists.txt` ahora incluye:
+    - `src/simulation/match_phase.cpp`
+    - `src/simulation/match_event_generator.cpp`
+    - `src/simulation/match_stats.cpp`
+  - `CMakeLists.txt` ahora tambien define un target de tests:
+    - `FootballManagerTests`
+- Se agrego una base real de tests en:
+  - `tests/project_tests.cpp`
+- Cobertura inicial agregada por tests:
+  - suite de validacion de datos externos y guardado/carga
+  - estructura del motor de partidos y cantidad de fases
+  - impacto tactico de presion alta sobre fatiga de fase
+  - seleccion de tabla relevante por grupos de competicion
+  - evaluacion de asequibilidad en objetivos de fichaje
+- Documentacion actualizada:
+  - `README.md` ahora refleja:
+    - la separacion del flujo de partido en `match_context`, `match_phase`, `match_event_generator`, `match_resolution` y `match_stats`
+    - el uso del target `FootballManagerTests`
+    - la cobertura de tests disponible
+  - `docs/ARCHITECTURE.md` ahora refleja:
+    - que `match_engine.cpp` es capa de orquestacion
+    - que la capa portable de `src/utils/utils.cpp` sigue reemplazando `std::filesystem` obligatorio por compatibilidad con MinGW viejo
+- Validaciones realizadas:
+  - compilacion completa del arbol por fallback real con `g++` usando `build.bat`
+  - linking correcto del ejecutable principal
+  - ejecucion de `FootballManager.exe --validate` con resultado sin fallas
+  - compilacion y ejecucion de `build/FootballManagerTests.exe` con todos los tests pasando
+- Limitacion de entorno detectada:
+  - el target `FootballManagerTests` ya quedo agregado en CMake, pero en este entorno CMake no puede regenerar un arbol limpio por un problema externo de permisos con `ar.exe`/MinGW
+  - el codigo quedo igualmente validado por la ruta fallback y por el ejecutable de tests enlazado sobre los objetos compilados

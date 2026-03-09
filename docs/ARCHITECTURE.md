@@ -11,7 +11,7 @@ Current high-level layers:
 - `include/competition` and `src/competition`
   - Competition rules, table profiles, season handlers and division-specific behavior.
 - `include/simulation` and `src/simulation`
-  - Match engine, match context, tactical modifiers, event resolution, fatigue, morale and typed match timelines.
+  - Match engine, match context, match phases, event generation, event resolution, stats, fatigue, morale and typed match timelines.
 - `include/ai` and `src/ai`
   - In-match management, squad planning and transfer evaluation logic for CPU clubs.
 - `include/career` and `src/career`
@@ -46,10 +46,12 @@ The target architecture is:
 - Compatibility bridge headers exist in `include/` to avoid breaking older include paths during migration.
 - `io` loading now returns structured warnings that can be surfaced by UI/services instead of writing directly to stdout.
 - Match simulation now stores `MatchContext`, `MatchStats`, `MatchTimeline`, warnings and report lines inside `MatchResult`.
+- `match_engine.cpp` now acts as the orchestration layer while `match_phase.cpp`, `match_event_generator.cpp` and `match_stats.cpp` own phase evaluation, event generation and stat aggregation.
 - `main.cpp` is now a thin entry point; menu flow moved into `engine/game_controller.cpp`.
 - `player_development.cpp` is now a thin adapter over `development/` systems.
 - Financial summaries now use `finance/finance_system.cpp` instead of local one-off calculations.
-- Path handling and save-directory creation now rely on `std::filesystem`.
+- Path handling and save-directory creation now rely on the portable helper layer in `src/utils/utils.cpp`, which preserves Unicode-safe behavior on Windows and remains compatible with the older MinGW fallback toolchain.
+- CMake now defines a `FootballManagerTests` target for logic-level regression coverage when the local generator/toolchain can configure a clean build tree.
 
 ## Known Remaining Work
 
