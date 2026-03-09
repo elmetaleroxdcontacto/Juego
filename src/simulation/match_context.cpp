@@ -1,0 +1,166 @@
+#include "simulation/match_context.h"
+
+#include "simulation/fatigue_engine.h"
+#include "simulation/match_engine_internal.h"
+#include "simulation/morale_engine.h"
+#include "utils/utils.h"
+
+#include <algorithm>
+
+using namespace std;
+
+namespace {
+
+struct WeatherProfile {
+    const char* label;
+    double modifier;
+};
+
+WeatherProfile rollWeatherProfile() {
+    const int roll = randInt(1, 100);
+    if (roll <= 55) return {"Despejado", 1.00};
+    if (roll <= 74) return {"Lluvia", 0.95};
+    if (roll <= 84) return {"Viento", 0.97};
+    if (roll <= 93) return {"Calor", 0.92};
+    return {"Frio", 0.94};
+}
+
+TeamMatchSnapshot buildSnapshot(const Team& team,
+                               const Team& opponent,
+                               const vector<int>& xi,
+                               bool keyMatch) {
+    TeamMatchSnapshot snapshot;
+    snapshot.xi = xi.empty() ? team.getStartingXIIndices() : xi;
+    snapshot.tacticalProfile = tactics_engine::buildTacticalProfile(team);
+    if (snapshot.xi.empty()) return snapshot;
+
+    int attack = 0;
+    int defense = 0;
+    int midfield = 0;
+    int skill = 0;
+    int stamina = 0;
+    int form = 0;
+    int morale = team.morale;
+    int fatigue = 0;
+
+    for (int idx : snapshot.xi) {
+        if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
+        const Player& player = team.players[static_cast<size_t>(idx)];
+        int playerAttack = player.attack;
+        int playerDefense = player.defense;
+        match_internal::applyRoleModifier(player, playerAttack, playerDefense);
+        match_internal::applyTraitModifier(player, playerAttack, playerDefense);
+        match_internal::applyPlayerStateModifier(player, team, playerAttack, playerDefense);
+
+        const string pos = normalizePosition(player.position);
+        attack += playerAttack;
+        defense += playerDefense;
+        skill += player.skill;
+        stamina += player.fitness;
+        form += player.currentForm;
+        morale += player.happiness / 2 + player.chemistry / 3;
+        fatigue += max(0, 100 - player.fitness);
+
+        if (pos == "ARQ") {
+            snapshot.goalkeeperPower = max(snapshot.goalkeeperPower,
+                                           playerDefense + player.skill / 2 + player.consistency / 3);
+            midfield += player.tacticalDiscipline / 2;
+        } else if (pos == "DEF") {
+            midfield += playerDefense / 3 + player.tacticalDiscipline / 2;
+        } else if (pos == "MED") {
+            midfield += (playerAttack + playerDefense) / 2 + player.tacticalDiscipline / 2 + player.chemistry / 3;
+        } else if (pos == "DEL") {
+            midfield += playerAttack / 4 + player.currentForm / 2;
+        }
+    }
+
+    match_internal::applyFormationBias(team, snapshot.xi, attack, defense);
+    match_internal::applyMatchInstruction(team, attack, defense);
+
+    if (!team.captain.empty()) {
+        for (int idx : snapshot.xi) {
+            if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
+            const Player& player = team.players[static_cast<size_t>(idx)];
+            if (player.name == team.captain) {
+                defense += player.leadership / 3;
+                midfield += player.leadership / 3;
+                morale += player.leadership / 2;
+                break;
+            }
+        }
+    }
+
+    snapshot.averageSkill = skill / max(1, static_cast<int>(snapshot.xi.size()));
+    snapshot.averageStamina = stamina / max(1, static_cast<int>(snapshot.xi.size()));
+    snapshot.collectiveForm = form / max(1, static_cast<int>(snapshot.xi.size()));
+    snapshot.collectiveMorale = morale / max(1, static_cast<int>(snapshot.xi.size()) + 1);
+    snapshot.collectiveFatigue = fatigue / max(1, static_cast<int>(snapshot.xi.size()));
+    snapshot.attackPower = attack / max(1, static_cast<int>(snapshot.xi.size())) + snapshot.averageSkill / 2;
+    snapshot.defensePower = defense / max(1, static_cast<int>(snapshot.xi.size())) + snapshot.goalkeeperPower / 4 +
+                            snapshot.averageSkill / 3;
+    snapshot.midfieldControl = midfield / max(1, static_cast<int>(snapshot.xi.size())) + snapshot.collectiveForm / 3;
+    snapshot.moraleFactor = morale_engine::collectiveMoraleFactor(team, snapshot.xi, keyMatch);
+    snapshot.fatigueFactor = fatigue_engine::collectiveFatigueFactor(team, snapshot.xi);
+    snapshot.tacticalCompatibility = tactics_engine::tacticalCompatibility(team, snapshot.xi);
+
+    if (team.tactics == "Counter" && opponent.defensiveLine >= 4) snapshot.attackPower += 5;
+    if (team.tactics == "Defensive" && opponent.tactics == "Offensive") snapshot.defensePower += 4;
+    return snapshot;
+}
+
+}  // namespace
+
+namespace match_context {
+
+MatchSetup buildMatchSetup(const Team& home, const Team& away, bool keyMatch, bool neutralVenue) {
+    MatchSetup setup;
+    const WeatherProfile weather = rollWeatherProfile();
+    setup.home = buildSnapshot(home, away, home.getStartingXIIndices(), keyMatch);
+    setup.away = buildSnapshot(away, home, away.getStartingXIIndices(), keyMatch);
+
+    setup.home.tacticalAdvantage = tactics_engine::tacticalAdvantage(home,
+                                                                     away,
+                                                                     setup.home.tacticalProfile,
+                                                                     setup.away.tacticalProfile,
+                                                                     setup.home.xi);
+    setup.away.tacticalAdvantage = tactics_engine::tacticalAdvantage(away,
+                                                                     home,
+                                                                     setup.away.tacticalProfile,
+                                                                     setup.home.tacticalProfile,
+                                                                     setup.away.xi);
+
+    const double crowdImpact = neutralVenue ? 0.0
+                                            : min(0.10,
+                                                  home.fanBase / 240.0 +
+                                                      home.stadiumLevel * 0.01 -
+                                                      away.fanBase / 400.0);
+
+    setup.context.teamStrengthHome = (setup.home.attackPower + setup.home.defensePower + setup.home.midfieldControl) / 3.0;
+    setup.context.teamStrengthAway = (setup.away.attackPower + setup.away.defensePower + setup.away.midfieldControl) / 3.0;
+    setup.context.attackPowerHome = setup.home.attackPower;
+    setup.context.attackPowerAway = setup.away.attackPower;
+    setup.context.defensePowerHome = setup.home.defensePower;
+    setup.context.defensePowerAway = setup.away.defensePower;
+    setup.context.midfieldControlHome = setup.home.midfieldControl;
+    setup.context.midfieldControlAway = setup.away.midfieldControl;
+    setup.context.moraleFactorHome = setup.home.moraleFactor;
+    setup.context.moraleFactorAway = setup.away.moraleFactor;
+    setup.context.fatigueFactorHome = setup.home.fatigueFactor;
+    setup.context.fatigueFactorAway = setup.away.fatigueFactor;
+    setup.context.tacticalAdvantageHome = setup.home.tacticalAdvantage;
+    setup.context.tacticalAdvantageAway = setup.away.tacticalAdvantage;
+    setup.context.weatherModifier = weather.modifier;
+    setup.context.homeAdvantage = neutralVenue ? 1.0 : 1.03 + crowdImpact;
+    setup.context.randomnessSeed = randInt(100000, 999999);
+    setup.context.weather = weather.label;
+    return setup;
+}
+
+TeamMatchSnapshot rebuildSnapshot(const Team& team,
+                                  const Team& opponent,
+                                  const vector<int>& xi,
+                                  bool keyMatch) {
+    return buildSnapshot(team, opponent, xi, keyMatch);
+}
+
+}  // namespace match_context

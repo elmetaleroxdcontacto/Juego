@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "simulation/match_types.h"
+
 #include <deque>
 #include <string>
 #include <utility>
@@ -276,6 +278,9 @@ struct MatchResult {
     std::vector<std::string> reportLines;
     std::vector<std::string> events;
     std::string verdict;
+    MatchContext context;
+    MatchStats stats;
+    MatchTimeline timeline;
 };
 
 struct TeamStrength {

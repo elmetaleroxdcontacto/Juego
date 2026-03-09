@@ -11,12 +11,6 @@
 #include <sstream>
 #include <vector>
 
-#ifdef _WIN32
-#include <direct.h>
-#else
-#include <sys/stat.h>
-#endif
-
 using namespace std;
 
 static constexpr int kCareerSaveVersion = 5;
@@ -1567,11 +1561,7 @@ static Player decodePlayerFields(const vector<string>& pf) {
 
 bool Career::saveCareer() {
     if (saveFile.rfind("saves/", 0) == 0 || saveFile.rfind("saves\\", 0) == 0) {
-#ifdef _WIN32
-        _mkdir("saves");
-#else
-        mkdir("saves", 0755);
-#endif
+        ensureDirectory("saves");
     }
     ofstream file(saveFile);
     if (!file.is_open()) return false;

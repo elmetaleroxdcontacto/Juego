@@ -104,15 +104,13 @@ void trimSquadForDivision(Team& team) {
 }
 
 bool loadTeamFromCsv(const string& filename, Team& team) {
-    ifstream file(filename);
-    if (!file.is_open()) return false;
+    vector<string> lines;
+    if (!readTextFileLines(filename, lines) || lines.empty()) return false;
 
     team.players.clear();
-    string line;
-    if (!getline(file, line)) return false;
-
     unordered_set<string> seen;
-    while (getline(file, line)) {
+    for (size_t lineIndex = 1; lineIndex < lines.size(); ++lineIndex) {
+        string line = lines[lineIndex];
         if (trim(line).empty()) continue;
         auto cols = splitCsvLine(line);
         if (cols.size() < 7) continue;
@@ -219,12 +217,11 @@ bool loadTeamFromCsv(const string& filename, Team& team) {
 }
 
 bool loadTeamFromPlayersTxt(const string& filename, Team& team) {
-    ifstream file(filename);
-    if (!file.is_open()) return false;
+    vector<string> lines;
+    if (!readTextFileLines(filename, lines)) return false;
     team.players.clear();
     unordered_set<string> seen;
-    string line;
-    while (getline(file, line)) {
+    for (string line : lines) {
         line = trim(line);
         if (line.empty()) continue;
         if (line[0] == '-') line = trim(line.substr(1));
@@ -333,11 +330,10 @@ bool loadTeamFromPlayersTxt(const string& filename, Team& team) {
 }
 
 bool loadTeamFromLegacyTxt(const string& filename, Team& team) {
-    ifstream file(filename);
-    if (!file.is_open()) return false;
+    vector<string> lines;
+    if (!readTextFileLines(filename, lines)) return false;
     team.players.clear();
-    string line;
-    while (getline(file, line)) {
+    for (const string& line : lines) {
         if (line.find("Team: ") == 0) {
             team.name = line.substr(6);
         } else if (line.find("- Name: ") == 0) {

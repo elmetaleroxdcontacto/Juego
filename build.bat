@@ -16,6 +16,8 @@ set "CXX=g++"
 set "FALLBACK_CXXFLAGS=-std=c++17 -static -Iinclude -Isrc"
 set "FALLBACK_LDFLAGS=-std=c++17 -static -lcomctl32 -lgdi32"
 
+if /i "%FM_FORCE_FALLBACK%"=="1" goto :legacy_build
+
 where cmake >nul 2>nul
 if errorlevel 1 goto :legacy_build
 
@@ -25,18 +27,23 @@ if errorlevel 1 goto :legacy_build
 echo Usando CMake como sistema principal de compilacion...
 if not exist "%CMAKE_BUILD_DIR%" mkdir "%CMAKE_BUILD_DIR%"
 cmake -S "%ROOT_DIR%" -B "%CMAKE_BUILD_DIR%" -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=%CXX% > "%CMAKE_BUILD_DIR%\cmake-config.log" 2>&1
-if errorlevel 1 goto :legacy_build_after_cmake
+if errorlevel 1 goto :legacy_build_after_cmake_config
 
 cmake --build "%CMAKE_BUILD_DIR%" --config Release > "%CMAKE_BUILD_DIR%\cmake-build.log" 2>&1
-if errorlevel 1 goto :legacy_build_after_cmake
+if errorlevel 1 goto :legacy_build_after_cmake_build
 
 set "OUTPUT=%CMAKE_BUILD_DIR%\bin\FootballManager.exe"
 if not exist "%OUTPUT%" set "OUTPUT=%CMAKE_BUILD_DIR%\FootballManager.exe"
 goto :run_game
 
-:legacy_build_after_cmake
+:legacy_build_after_cmake_config
 echo CMake no pudo configurarse correctamente en este entorno.
 echo Revisa "%CMAKE_BUILD_DIR%\cmake-config.log" para mas detalle.
+goto :legacy_build
+
+:legacy_build_after_cmake_build
+echo CMake se configuro, pero la compilacion fallo en este entorno.
+echo Revisa "%CMAKE_BUILD_DIR%\cmake-build.log" para mas detalle.
 
 :legacy_build
 echo CMake no esta disponible o no pudo configurarse. Se usa fallback directo con g++.

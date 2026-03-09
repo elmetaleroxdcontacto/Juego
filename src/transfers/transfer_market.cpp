@@ -1,43 +1,23 @@
 #include "transfers/transfer_market.h"
 
-#include "competition/competition.h"
+#include "ai/ai_squad_planner.h"
+#include "ai/ai_transfer_manager.h"
 #include "career/team_management.h"
+#include "competition/competition.h"
 #include "transfers/negotiation_system.h"
 #include "utils/utils.h"
 
 #include <algorithm>
-#include <unordered_map>
 
 using namespace std;
 
 namespace {
 
-int squadNeedScore(const Team& team, const string& pos) {
-    int count = 0;
-    int skill = 0;
-    int oldPlayers = 0;
-    for (const auto& player : team.players) {
-        if (normalizePosition(player.position) != pos) continue;
-        count++;
-        skill += player.skill;
-        if (player.age >= 30) oldPlayers++;
+int playerIndexByName(const Team& team, const string& name) {
+    for (size_t i = 0; i < team.players.size(); ++i) {
+        if (team.players[i].name == name) return static_cast<int>(i);
     }
-    int avgSkill = count > 0 ? skill / count : 0;
-    return 100 - (count * 16 + avgSkill + oldPlayers * 3);
-}
-
-string surplusSquadPosition(const Team& team) {
-    static const vector<string> positions = {"ARQ", "DEF", "MED", "DEL"};
-    string surplus = "MED";
-    int bestScore = -100000;
-    for (const auto& pos : positions) {
-        int score = -squadNeedScore(team, pos);
-        if (score > bestScore) {
-            bestScore = score;
-            surplus = pos;
-        }
-    }
-    return surplus;
+    return -1;
 }
 
 }  // namespace
@@ -45,17 +25,36 @@ string surplusSquadPosition(const Team& team) {
 namespace transfer_market {
 
 string weakestSquadPosition(const Team& team) {
-    static const vector<string> positions = {"ARQ", "DEF", "MED", "DEL"};
-    string weakest = "MED";
-    int weakestScore = -1000000;
-    for (const auto& pos : positions) {
-        int score = squadNeedScore(team, pos);
-        if (score > weakestScore) {
-            weakestScore = score;
-            weakest = pos;
+    return ai_squad_planner::analyzeSquad(team).weakestPosition;
+}
+
+vector<TransferTarget> buildTransferShortlist(const Career& career, const Team& team, size_t maxTargets) {
+    vector<TransferTarget> shortlist;
+    const ClubTransferStrategy strategy = ai_transfer_manager::buildClubTransferStrategy(career, team);
+
+    for (const auto& club : career.allTeams) {
+        if (&club == &team || club.players.size() <= 18) continue;
+        for (const auto& player : club.players) {
+            if (player.onLoan) continue;
+            const string normalizedPos = normalizePosition(player.position);
+            if (!strategy.priorityPositions.empty() &&
+                find(strategy.priorityPositions.begin(), strategy.priorityPositions.end(), normalizedPos) == strategy.priorityPositions.end()) {
+                continue;
+            }
+            TransferTarget target = ai_transfer_manager::evaluateTarget(career, team, club, player, strategy);
+            if (target.affordabilityScore < 0 && !target.availableForLoan) continue;
+            shortlist.push_back(target);
         }
     }
-    return weakest;
+
+    sort(shortlist.begin(), shortlist.end(), [](const TransferTarget& left, const TransferTarget& right) {
+        if (left.totalScore != right.totalScore) return left.totalScore > right.totalScore;
+        if (left.expectedFee != right.expectedFee) return left.expectedFee < right.expectedFee;
+        return left.playerName < right.playerName;
+    });
+
+    if (shortlist.size() > maxTargets) shortlist.resize(maxTargets);
+    return shortlist;
 }
 
 void processCpuTransfers(Career& career) {
@@ -65,108 +64,74 @@ void processCpuTransfers(Career& career) {
         ensureTeamIdentity(*team);
         if (randInt(1, 100) > 18) continue;
 
-        int maxSquad = getCompetitionConfig(team->division).maxSquadSize;
-        if ((maxSquad > 0 && static_cast<int>(team->players.size()) > maxSquad) ||
-            (team->budget < 120000 && team->players.size() > 18)) {
-            string surplus = surplusSquadPosition(*team);
+        const SquadNeedReport squad = ai_squad_planner::analyzeSquad(*team);
+        const ClubTransferStrategy strategy = ai_transfer_manager::buildClubTransferStrategy(career, *team);
+        const int maxSquad = getCompetitionConfig(team->division).maxSquadSize;
+
+        if ((maxSquad > 0 && static_cast<int>(team->players.size()) > maxSquad) || strategy.needsLiquidity) {
             int sellIdx = -1;
             int sellScore = -100000;
             for (size_t i = 0; i < team->players.size(); ++i) {
                 const Player& current = team->players[i];
-                if (normalizePosition(current.position) != surplus && !current.wantsToLeave) continue;
-                int score = current.value / 1000 + current.age * 3 + (current.wantsToLeave ? 25 : 0);
+                const bool wrongProfile = normalizePosition(current.position) == squad.surplusPosition || current.wantsToLeave;
+                if (!wrongProfile) continue;
+                int score = static_cast<int>(current.value / 1000) + current.age * 3 + (current.wantsToLeave ? 25 : 0);
                 if (score > sellScore) {
-                    sellIdx = static_cast<int>(i);
                     sellScore = score;
+                    sellIdx = static_cast<int>(i);
                 }
             }
             if (sellIdx >= 0) {
-                long long saleValue = team->players[sellIdx].value;
-                team_mgmt::detachPlayerFromSelections(*team, team->players[sellIdx].name);
+                const long long saleValue = team->players[static_cast<size_t>(sellIdx)].value;
+                team_mgmt::detachPlayerFromSelections(*team, team->players[static_cast<size_t>(sellIdx)].name);
                 team->players.erase(team->players.begin() + sellIdx);
                 team->budget += saleValue;
             }
         }
 
         if (team->players.size() >= 24) continue;
-        string needPos = weakestSquadPosition(*team);
-        bool lowBudget = team->budget < 150000;
-        Team* seller = nullptr;
-        int sellerIdx = -1;
-        bool loanMove = false;
-        int bestScore = -100000;
 
-        for (auto& club : career.allTeams) {
-            if (&club == team || &club == career.myTeam) continue;
-            ensureTeamIdentity(club);
-            if (club.players.size() <= 18) continue;
-            for (size_t i = 0; i < club.players.size(); ++i) {
-                const Player& target = club.players[i];
-                if (target.onLoan) continue;
-                if (normalizePosition(target.position) != needPos) continue;
+        const vector<TransferTarget> shortlist = buildTransferShortlist(career, *team, static_cast<size_t>(strategy.maxTargets));
+        if (!shortlist.empty()) {
+            const TransferTarget& top = shortlist.front();
+            Team* seller = career.findTeamByName(top.clubName);
+            if (!seller) continue;
+            int sellerIdx = playerIndexByName(*seller, top.playerName);
+            if (sellerIdx < 0 || sellerIdx >= static_cast<int>(seller->players.size())) continue;
 
-                string reason;
-                if (playerRejectsMove(career, *team, club, target, NegotiationPromise::Rotation, reason)) continue;
-
-                long long fee = max(target.value, target.releaseClause * 55 / 100);
-                fee += rivalrySurcharge(*team, club, fee);
-                bool affordableTransfer = fee <= team->budget * 65 / 100;
-                bool affordableLoan = lowBudget && club.players.size() >= 22 &&
-                                      target.age <= 24 && target.contractWeeks > 18 &&
-                                      target.skill >= team->getAverageSkill() - 4;
-                if (!affordableTransfer && !affordableLoan) continue;
-
-                int score = target.skill * 3 + target.potential - target.age * 2;
-                score += squadNeedScore(*team, needPos);
-                if (target.contractWeeks <= 20) score += 6;
-                if (affordableLoan) score += 4;
-                if (club.players.size() >= 24) score += 4;
-                if (score > bestScore) {
-                    bestScore = score;
-                    seller = &club;
-                    sellerIdx = static_cast<int>(i);
-                    loanMove = !affordableTransfer && affordableLoan;
-                }
-            }
-        }
-
-        if (seller && sellerIdx >= 0) {
-            Player newP = seller->players[static_cast<size_t>(sellerIdx)];
-            if (loanMove) {
-                long long loanFee = max(12000LL, newP.value / 10);
-                long long wageShare = max(newP.wage / 2, wageDemandFor(newP) * 55 / 100);
-                if (team->budget < loanFee + wageShare * 8) continue;
+            Player newPlayer = seller->players[static_cast<size_t>(sellerIdx)];
+            if (top.availableForLoan && top.expectedFee + top.expectedWage * 8 > team->budget) {
+                const long long loanFee = max(12000LL, newPlayer.value / 10);
+                if (team->budget < loanFee + top.expectedWage * 8) continue;
                 team->budget -= loanFee;
                 seller->budget += loanFee;
-                newP.onLoan = true;
-                newP.parentClub = seller->name;
-                newP.loanWeeksRemaining = randInt(26, 52);
-                newP.wantsToLeave = false;
-                team->addPlayer(newP);
+                newPlayer.onLoan = true;
+                newPlayer.parentClub = seller->name;
+                newPlayer.loanWeeksRemaining = randInt(26, 52);
+                newPlayer.wage = max(newPlayer.wage / 2, top.expectedWage * 55 / 100);
             } else {
-                long long fee = max(newP.value, newP.releaseClause * 55 / 100);
-                fee += rivalrySurcharge(*team, *seller, fee);
-                if (fee > team->budget) continue;
-                team->budget -= fee;
-                seller->budget += fee;
-                newP.releaseClause = max(newP.value * 2, fee * 2);
-                newP.wantsToLeave = false;
-                newP.onLoan = false;
-                newP.parentClub.clear();
-                newP.loanWeeksRemaining = 0;
-                team->addPlayer(newP);
+                if (top.expectedFee > team->budget) continue;
+                team->budget -= top.expectedFee;
+                seller->budget += top.expectedFee;
+                newPlayer.onLoan = false;
+                newPlayer.parentClub.clear();
+                newPlayer.loanWeeksRemaining = 0;
+                newPlayer.releaseClause = max(newPlayer.value * 2, top.expectedFee * 2);
             }
-            team_mgmt::detachPlayerFromSelections(*seller, newP.name);
+            newPlayer.wantsToLeave = false;
+            team->addPlayer(newPlayer);
+            team_mgmt::detachPlayerFromSelections(*seller, newPlayer.name);
             seller->players.erase(seller->players.begin() + sellerIdx);
-        } else if (!lowBudget) {
+        } else if (!strategy.needsLiquidity) {
             int minSkill, maxSkill;
             getDivisionSkillRange(team->division, minSkill, maxSkill);
-            Player newP = makeRandomPlayer(needPos, minSkill, maxSkill, 18, 29);
-            long long fee = max(newP.value, newP.releaseClause * 55 / 100);
+            Player generated = makeRandomPlayer(strategy.weakestPosition.empty() ? squad.weakestPosition : strategy.weakestPosition,
+                                                minSkill, maxSkill, 18, 29);
+            const long long fee = max(generated.value, generated.releaseClause * 55 / 100);
             if (team->budget >= fee) {
                 team->budget -= fee;
-                newP.releaseClause = max(newP.value * 2, fee * 2);
-                team->addPlayer(newP);
+                generated.releaseClause = max(generated.value * 2, fee * 2);
+                team->addPlayer(generated);
             }
         }
     }

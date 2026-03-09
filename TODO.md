@@ -698,3 +698,130 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - `build.bat` ejecutado con `FM_SKIP_RUN=1` y compilacion correcta por fallback directo
   - `FootballManager.exe --validate` ejecutado con resultado sin fallas
   - CMake configurado como camino principal, pero en este entorno concreto falla por un problema externo del toolchain MinGW (`ar.exe` no puede renombrar archivos durante la prueba minima del compilador)
+
+## Cambios recientes (2026-03-09) - Refactor arquitectonico, motor modular y compatibilidad de compilacion
+- Reorganizada la orquestacion principal del juego para separar arranque, control del flujo y carrera:
+  - `src/main.cpp`
+  - `src/engine/game_controller.cpp`
+  - `src/engine/game_engine.cpp`
+  - `src/career/career_manager.cpp`
+  - `include/engine/game_controller.h`
+  - `include/engine/game_engine.h`
+  - `include/career/career_manager.h`
+- Nuevo motor de partidos modular agregado en `include/simulation/` y `src/simulation/` con separacion real de responsabilidades:
+  - `match_types`
+  - `match_context`
+  - `match_resolution`
+  - `match_engine`
+  - `tactics_engine`
+  - `fatigue_engine`
+  - `morale_engine`
+- `MatchResult` fue ampliado para devolver estructura rica de simulacion:
+  - `MatchContext`
+  - `MatchStats`
+  - `MatchTimeline`
+- `simulation.cpp` ahora integra el nuevo motor y aplica consecuencias post-partido reutilizando datos estructurados en vez de depender solo de formulas monoliticas.
+- Agregados modulos de IA deportiva y de mercado:
+  - `src/ai/ai_match_manager.cpp`
+  - `src/ai/ai_squad_planner.cpp`
+  - `src/ai/ai_transfer_manager.cpp`
+  - `include/ai/ai_match_manager.h`
+  - `include/ai/ai_squad_planner.h`
+  - `include/ai/ai_transfer_manager.h`
+- Agregada capa nueva de tipos y evaluacion de fichajes:
+  - `include/transfers/transfer_types.h`
+  - `src/transfers/transfer_market.cpp`
+  - shortlist por necesidad real de plantel
+  - evaluacion por calidad, potencial, costo, salario y encaje
+- Extraidos sistemas de desarrollo y finanzas a modulos propios:
+  - `src/development/player_progression_system.cpp`
+  - `src/development/training_impact_system.cpp`
+  - `src/development/youth_generation_system.cpp`
+  - `src/finance/finance_system.cpp`
+- `src/career/player_development.cpp` paso a usar los sistemas de desarrollo reutilizables en vez de contener logica mezclada.
+- `src/career/app_services.cpp` ahora usa el modulo de finanzas para reportes y proyecciones semanales.
+- Preparada estructura de datos para crecimiento futuro:
+  - `data/configs/`
+  - `data/leagues/`
+  - `data/players/`
+  - `data/teams/`
+- Documentacion y estructura del repo actualizadas:
+  - `README.md` reescrito para reflejar el estado real del proyecto
+  - `docs/ARCHITECTURE.md` actualizado
+  - `CMakeLists.txt` ampliado con los nuevos modulos
+  - `.gitignore` ajustado para builds y artefactos
+
+### Correcciones tecnicas de compilacion realizadas
+- Corregido error en `src/ai/ai_transfer_manager.cpp`:
+  - faltaba incluir `utils/utils.h` para usar `normalizePosition(...)`
+- Eliminada la dependencia obligatoria de `<filesystem>` para compatibilidad con toolchains MinGW/G++ mas antiguos:
+  - `src/utils/utils.cpp` ahora implementa manejo de rutas y directorios con capa compatible Windows/POSIX
+  - `src/engine/models.cpp` ahora usa `ensureDirectory("saves")`
+- Eliminada la dependencia directa de `std::clamp` en modulos del motor:
+  - nuevo helper `clampValue(...)` en `include/utils/utils.h`
+  - aplicado en `fatigue_engine.cpp`, `morale_engine.cpp`, `tactics_engine.cpp`, `match_resolution.cpp` y `match_engine.cpp`
+- Mejorado `build.bat`:
+  - distingue fallo de configuracion de CMake y fallo de compilacion de CMake
+  - apunta al log correcto segun el tipo de error
+  - mantiene fallback completo con `g++`
+
+### Validaciones realizadas
+- Compilacion verificada con `build.bat` usando CMake como camino principal.
+- Compilacion fallback completa verificada manualmente con `g++` sobre todo `src/` y link final correcto.
+- `src/engine/models.cpp`, `src/utils/utils.cpp` y los modulos nuevos compilan correctamente en el entorno actual.
+
+## Cambios recientes (2026-03-09) - Reportes estructurados, servicios de club y rutas Unicode
+- Nueva capa de reportes de carrera agregada en:
+  - `include/career/career_reports.h`
+  - `src/career/career_reports.cpp`
+- Esta capa devuelve estructuras `CareerReport`, `ReportFact` y `ReportBlock` para:
+  - competicion
+  - directiva
+  - club y finanzas
+  - scouting
+- `app_services.cpp` ya no contiene la logica de armado de estos reportes; ahora delega en la nueva capa y solo expone wrappers como:
+  - `buildCompetitionSummaryService(...)`
+  - `buildBoardSummaryService(...)`
+  - `buildClubSummaryService(...)`
+  - `buildScoutingSummaryService(...)`
+- Nueva separacion de runtime entre carrera y UI:
+  - `include/career/career_runtime.h`
+  - `include/career/week_simulation.h`
+- Con esto `app_services.cpp` deja de depender directamente de `ui.h` para callbacks y simulacion semanal.
+- Nuevo modulo UI para pantallas de reportes y operaciones de club:
+  - `include/ui/career_reports_ui.h`
+  - `src/ui/career_reports_ui.cpp`
+- `ui.cpp` fue aligerado:
+  - `displayCompetitionCenter(...)`
+  - `displayBoardStatus(...)`
+  - `displayNewsFeed(...)`
+  - `displaySeasonHistory(...)`
+  - `displayClubOperations(...)`
+  ahora son wrappers del nuevo modulo.
+- Las operaciones de club se movieron a servicios reutilizables:
+  - `upgradeClubService(...)` ahora tambien soporta:
+    - asistente tecnico
+    - preparador fisico
+    - jefe de juveniles
+  - nuevo `changeYouthRegionService(...)`
+  - nuevo `takeManagerJobService(...)`
+  - nuevo `listYouthRegionsService()`
+- Corregido el problema de carga de equipos con tildes/Ñ tras la eliminacion previa de `std::filesystem`:
+  - `src/utils/utils.cpp` ahora usa WinAPI wide para `pathExists`, `isDirectory` y `listDirectories`
+  - nuevo helper `readTextFileLines(...)` para leer archivos UTF-8 por ruta Unicode en Windows
+  - `src/io/io.cpp` deja de depender de `ifstream` directo para carga de `players.csv`, `players.txt` y formatos legacy
+  - `loadTeamsList(...)` tambien usa lectura de archivos compatible con UTF-8
+- Esto restablecio correctamente la carga de clubes como:
+  - `CD Ñublense`
+  - `CD Universidad Católica`
+  - `Deportes Concepción`
+  - `Universidad de Concepción`
+  - `Unión La Calera`
+- Build y documentacion:
+  - `CMakeLists.txt` actualizado con `career_reports.cpp` y `career_reports_ui.cpp`
+  - `README.md` actualizado con `FM_FORCE_FALLBACK=1`
+  - `build.bat` ahora permite forzar el build directo con `g++` via `FM_FORCE_FALLBACK=1`
+- Validaciones realizadas:
+  - compilacion completa por fallback con `g++` sobre todo `src/`
+  - linking final correcto
+  - `FootballManager.exe --validate` ejecutado con resultado sin fallas en el ejecutable fallback

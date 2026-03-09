@@ -16,7 +16,10 @@ enum class ClubUpgrade {
     Youth,
     Training,
     Scouting,
-    Medical
+    Medical,
+    AssistantCoach,
+    FitnessCoach,
+    YouthCoach
 };
 
 enum class NegotiationProfile {
@@ -43,6 +46,10 @@ ServiceResult scoutPlayersService(Career& career,
                                   const std::string& region = "Todas",
                                   const std::string& focusPos = "");
 ServiceResult upgradeClubService(Career& career, ClubUpgrade upgrade);
+ServiceResult changeYouthRegionService(Career& career, const std::string& region);
+ServiceResult takeManagerJobService(Career& career,
+                                    const std::string& teamName,
+                                    const std::string& reason = "Cambio de club voluntario.");
 ServiceResult buyTransferTargetService(Career& career,
                                        const std::string& sellerTeamName,
                                        const std::string& playerName,
@@ -64,6 +71,7 @@ ServiceResult shortlistPlayerService(Career& career,
                                      const std::string& sellerTeamName,
                                      const std::string& playerName);
 ServiceResult followShortlistService(Career& career);
+std::vector<std::string> listYouthRegionsService();
 std::string buildCompetitionSummaryService(const Career& career);
 std::string buildBoardSummaryService(const Career& career);
 std::string buildClubSummaryService(const Career& career);

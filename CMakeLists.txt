@@ -8,13 +8,18 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(FM_CAREER_SOURCES
     src/career/app_services.cpp
+    src/career/career_reports.cpp
+    src/career/career_manager.cpp
     src/career/career_support.cpp
     src/career/player_development.cpp
     src/career/team_management.cpp
 )
 
 set(FM_AI_SOURCES
+    src/ai/ai_match_manager.cpp
+    src/ai/ai_squad_planner.cpp
     src/ai/team_ai.cpp
+    src/ai/ai_transfer_manager.cpp
 )
 
 set(FM_COMPETITION_SOURCES
@@ -22,6 +27,8 @@ set(FM_COMPETITION_SOURCES
 )
 
 set(FM_ENGINE_SOURCES
+    src/engine/game_controller.cpp
+    src/engine/game_engine.cpp
     src/engine/models.cpp
 )
 
@@ -30,9 +37,15 @@ set(FM_IO_SOURCES
 )
 
 set(FM_SIMULATION_SOURCES
+    src/simulation/fatigue_engine.cpp
     src/simulation/match_events.cpp
+    src/simulation/match_context.cpp
+    src/simulation/match_engine.cpp
+    src/simulation/match_resolution.cpp
     src/simulation/match_tactics.cpp
+    src/simulation/morale_engine.cpp
     src/simulation/simulation.cpp
+    src/simulation/tactics_engine.cpp
 )
 
 set(FM_TRANSFER_SOURCES
@@ -40,8 +53,19 @@ set(FM_TRANSFER_SOURCES
     src/transfers/transfer_market.cpp
 )
 
+set(FM_DEVELOPMENT_SOURCES
+    src/development/player_progression_system.cpp
+    src/development/training_impact_system.cpp
+    src/development/youth_generation_system.cpp
+)
+
+set(FM_FINANCE_SOURCES
+    src/finance/finance_system.cpp
+)
+
 set(FM_UI_SOURCES
     src/main.cpp
+    src/ui/career_reports_ui.cpp
     src/ui/ui.cpp
     src/utils/utils.cpp
     src/validators/validators.cpp
@@ -60,6 +84,8 @@ add_executable(FootballManager
     ${FM_IO_SOURCES}
     ${FM_SIMULATION_SOURCES}
     ${FM_TRANSFER_SOURCES}
+    ${FM_DEVELOPMENT_SOURCES}
+    ${FM_FINANCE_SOURCES}
     ${FM_UI_SOURCES}
     ${FM_GUI_SOURCES}
 )

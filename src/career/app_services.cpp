@@ -1,10 +1,12 @@
 #include "app_services.h"
 
+#include "career/career_reports.h"
+#include "career/career_runtime.h"
 #include "career/career_support.h"
+#include "career/week_simulation.h"
 #include "career/team_management.h"
 #include "competition.h"
 #include "transfers/negotiation_system.h"
-#include "ui.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -89,18 +91,6 @@ ServiceResult finalizeCapturedResult(bool ok, const vector<string>& messages, co
     return result;
 }
 
-string formatMoney(long long value) {
-    bool negative = value < 0;
-    unsigned long long absValue = static_cast<unsigned long long>(negative ? -value : value);
-    string digits = to_string(absValue);
-    string out;
-    for (size_t i = 0; i < digits.size(); ++i) {
-        if (i > 0 && (digits.size() - i) % 3 == 0) out += ',';
-        out += digits[i];
-    }
-    return string(negative ? "-$" : "$") + out;
-}
-
 string nextDevelopmentPlan(const string& current) {
     static const vector<string> plans = {"Equilibrado", "Fisico", "Defensa", "Creatividad", "Finalizacion", "Liderazgo"};
     for (size_t i = 0; i < plans.size(); ++i) {
@@ -119,121 +109,8 @@ string nextMatchInstruction(const string& current) {
     return instructions.front();
 }
 
-string opponentSummary(const Career& career) {
-    const Team* opponent = nextOpponent(career);
-    if (!career.myTeam || !opponent) return "Sin informe rival disponible.";
-    int avgFitness = 0;
-    int injured = 0;
-    int defenders = 0;
-    int forwards = 0;
-    for (const auto& player : opponent->players) {
-        avgFitness += player.fitness;
-        if (player.injured) injured++;
-        string pos = normalizePosition(player.position);
-        if (pos == "DEF") defenders++;
-        if (pos == "DEL") forwards++;
-    }
-    if (!opponent->players.empty()) avgFitness /= static_cast<int>(opponent->players.size());
-    string style = opponent->clubStyle.empty()
-                       ? (opponent->tactics == "Pressing" ? "Presion vertical"
-                          : opponent->tactics == "Defensive" ? "Bloque ordenado"
-                                                             : "Equilibrio competitivo")
-                       : opponent->clubStyle;
-    string vulnerability = (avgFitness < 62) ? "carga fisica baja"
-                          : (opponent->defensiveLine >= 4 ? "espacio a la espalda"
-                             : (opponent->width >= 4 ? "espacios por dentro" : "ritmo controlado"));
-    return opponent->name + " | estilo " + style +
-           " | prestigio " + to_string(teamPrestigeScore(*opponent)) +
-           " | lesionados " + to_string(injured) +
-           " | fitness medio " + to_string(avgFitness) +
-           " | formacion " + opponent->formation +
-           " | fragilidad sugerida: " + vulnerability +
-           (areRivalClubs(*career.myTeam, *opponent) ? " | clasico" : "");
-}
-
 void eraseNamedSelection(vector<string>& values, const string& name) {
     values.erase(remove(values.begin(), values.end(), name), values.end());
-}
-
-LeagueTable buildTableFromTeams(const vector<Team*>& teams, const string& title, const string& ruleId) {
-    LeagueTable table;
-    table.title = title;
-    table.ruleId = ruleId;
-    for (Team* team : teams) {
-        if (team) table.addTeam(team);
-    }
-    table.sortTable();
-    return table;
-}
-
-int groupForTeam(const Career& career, const Team* team) {
-    for (int index : career.groupNorthIdx) {
-        if (index >= 0 && index < static_cast<int>(career.activeTeams.size()) &&
-            career.activeTeams[static_cast<size_t>(index)] == team) {
-            return 0;
-        }
-    }
-    for (int index : career.groupSouthIdx) {
-        if (index >= 0 && index < static_cast<int>(career.activeTeams.size()) &&
-            career.activeTeams[static_cast<size_t>(index)] == team) {
-            return 1;
-        }
-    }
-    return -1;
-}
-
-LeagueTable relevantCompetitionTable(const Career& career) {
-    if (!career.myTeam) return career.leagueTable;
-    if (!career.usesGroupFormat() || career.groupNorthIdx.empty() || career.groupSouthIdx.empty()) {
-        LeagueTable table = career.leagueTable;
-        table.sortTable();
-        return table;
-    }
-    vector<Team*> teams;
-    const vector<int>* indices = nullptr;
-    int group = groupForTeam(career, career.myTeam);
-    if (group == 0) indices = &career.groupNorthIdx;
-    else if (group == 1) indices = &career.groupSouthIdx;
-    if (!indices) {
-        LeagueTable table = career.leagueTable;
-        table.sortTable();
-        return table;
-    }
-    for (int index : *indices) {
-        if (index >= 0 && index < static_cast<int>(career.activeTeams.size())) {
-            teams.push_back(career.activeTeams[static_cast<size_t>(index)]);
-        }
-    }
-    string title = competitionGroupTitle(career.activeDivision, group == 0);
-    return buildTableFromTeams(teams, title, career.activeDivision);
-}
-
-long long weeklyWage(const Team& team) {
-    long long wages = 0;
-    for (const auto& player : team.players) wages += player.wage;
-    return wages * getCompetitionConfig(team.division).wageFactor / 100;
-}
-
-string detectScoutingNeed(const Team& team) {
-    vector<string> positions = {"ARQ", "DEF", "MED", "DEL"};
-    string best = "MED";
-    int bestScore = 1000000;
-    for (const auto& pos : positions) {
-        int count = 0;
-        int totalSkill = 0;
-        for (const auto& player : team.players) {
-            if (normalizePosition(player.position) != pos) continue;
-            count++;
-            totalSkill += player.skill;
-        }
-        int average = count > 0 ? totalSkill / count : 0;
-        int score = count * 20 + average;
-        if (score < bestScore) {
-            bestScore = score;
-            best = pos;
-        }
-    }
-    return best;
 }
 
 long long upgradeCost(const Team& team, ClubUpgrade upgrade) {
@@ -243,6 +120,9 @@ long long upgradeCost(const Team& team, ClubUpgrade upgrade) {
         case ClubUpgrade::Training: return 55000LL * (team.trainingFacilityLevel + 1);
         case ClubUpgrade::Scouting: return 36000LL + static_cast<long long>(team.scoutingChief) * 1300LL;
         case ClubUpgrade::Medical: return 33000LL + static_cast<long long>(team.medicalTeam) * 1200LL;
+        case ClubUpgrade::AssistantCoach: return 35000LL + static_cast<long long>(team.assistantCoach) * 1200LL;
+        case ClubUpgrade::FitnessCoach: return 32000LL + static_cast<long long>(team.fitnessCoach) * 1200LL;
+        case ClubUpgrade::YouthCoach: return 34000LL + static_cast<long long>(team.youthCoach) * 1200LL;
     }
     return 0;
 }
@@ -254,6 +134,9 @@ string upgradeLabel(ClubUpgrade upgrade) {
         case ClubUpgrade::Training: return "entrenamiento";
         case ClubUpgrade::Scouting: return "scouting";
         case ClubUpgrade::Medical: return "medico";
+        case ClubUpgrade::AssistantCoach: return "asistente tecnico";
+        case ClubUpgrade::FitnessCoach: return "preparador fisico";
+        case ClubUpgrade::YouthCoach: return "jefe de juveniles";
     }
     return "club";
 }
@@ -381,7 +264,7 @@ ServiceResult scoutPlayersService(Career& career, const string& region, const st
     ServiceResult result;
     result.ok = true;
     result.messages.push_back("Scouting completado en " + resolvedRegion + " con foco " + resolvedPos +
-                              ". Costo " + formatMoney(scoutCost) + ".");
+                              ". Costo " + formatMoneyValue(scoutCost) + ".");
     for (const auto& report : reports) {
         Team* club = report.first;
         const Player& player = club->players[static_cast<size_t>(report.second)];
@@ -440,12 +323,56 @@ ServiceResult upgradeClubService(Career& career, ClubUpgrade upgrade) {
             team.medicalTeam = clampInt(team.medicalTeam + 5, 1, 99);
             message = team.name + " fortalece el cuerpo medico.";
             break;
+        case ClubUpgrade::AssistantCoach:
+            team.assistantCoach = clampInt(team.assistantCoach + 5, 1, 99);
+            message = team.name + " refuerza su cuerpo tecnico.";
+            break;
+        case ClubUpgrade::FitnessCoach:
+            team.fitnessCoach = clampInt(team.fitnessCoach + 5, 1, 99);
+            message = team.name + " mejora su preparacion fisica.";
+            break;
+        case ClubUpgrade::YouthCoach:
+            team.youthCoach = clampInt(team.youthCoach + 5, 1, 99);
+            message = team.name + " mejora la conduccion de juveniles.";
+            break;
     }
     ensureTeamIdentity(team);
     career.addNews(message);
     ServiceResult result;
     result.ok = true;
-    result.messages.push_back(message + " Inversion " + formatMoney(cost) + ".");
+    result.messages.push_back(message + " Inversion " + formatMoneyValue(cost) + ".");
+    return result;
+}
+
+ServiceResult changeYouthRegionService(Career& career, const string& region) {
+    if (!career.myTeam) return failure("No hay una carrera activa.");
+    static const vector<string> regions = {"Metropolitana", "Norte", "Centro", "Sur", "Patagonia"};
+    if (find(regions.begin(), regions.end(), region) == regions.end()) {
+        return failure("La region juvenil indicada no es valida.");
+    }
+    Team& team = *career.myTeam;
+    if (team.youthRegion == region) return failure("Esa region juvenil ya esta activa.");
+    const long long cost = 12000LL;
+    if (team.budget < cost) return failure("Presupuesto insuficiente para reorientar la captacion juvenil.");
+    team.budget -= cost;
+    team.youthRegion = region;
+    ensureTeamIdentity(team);
+    career.addNews(team.name + " reorienta su captacion juvenil hacia " + team.youthRegion + ".");
+    ServiceResult result;
+    result.ok = true;
+    result.messages.push_back("Nueva region juvenil: " + region + ". Inversion " + formatMoneyValue(cost) + ".");
+    return result;
+}
+
+ServiceResult takeManagerJobService(Career& career, const string& teamName, const string& reason) {
+    if (!career.myTeam) return failure("No hay una carrera activa.");
+    Team* team = career.findTeamByName(teamName);
+    if (!team) return failure("No se encontro el club seleccionado.");
+    if (team == career.myTeam) return failure("Ya diriges ese club.");
+    takeManagerJob(career, team, reason.empty() ? string("Cambio de club voluntario.") : reason);
+    ServiceResult result;
+    result.ok = true;
+    result.messages.push_back("Nuevo destino: " + career.myTeam->name + ".");
     return result;
 }
 
@@ -507,10 +434,10 @@ ServiceResult buyTransferTargetService(Career& career,
     ServiceResult result;
     result.ok = true;
     result.messages.push_back("Fichaje completado: " + player.name + " llega desde " + seller->name +
-                              " por " + formatMoney(transferFee) + " + honorarios " + formatMoney(agentFee) +
+                              " por " + formatMoneyValue(transferFee) + " + honorarios " + formatMoneyValue(agentFee) +
                               " | perfil " + negotiationLabel(profile) +
                               " | promesa " + promiseLabel(promise) +
-                              (rivalryExtra > 0 ? " | sobreprecio por rivalidad " + formatMoney(rivalryExtra) : "") +
+                              (rivalryExtra > 0 ? " | sobreprecio por rivalidad " + formatMoneyValue(rivalryExtra) : "") +
                               " | agente " + to_string(difficulty) + "/90.");
     return result;
 }
@@ -559,7 +486,7 @@ ServiceResult signPreContractService(Career& career,
     career.addNews(player.name + " firma un precontrato con " + career.myTeam->name + ".");
     ServiceResult result;
     result.ok = true;
-    result.messages.push_back("Precontrato firmado para la temporada siguiente. Bono " + formatMoney(signingBonus) +
+    result.messages.push_back("Precontrato firmado para la temporada siguiente. Bono " + formatMoneyValue(signingBonus) +
                               " | perfil " + negotiationLabel(profile) +
                               " | promesa " + promiseLabel(promise) +
                               " | agente " + to_string(difficulty) + "/90.");
@@ -602,7 +529,7 @@ ServiceResult renewPlayerContractService(Career& career,
     career.addNews(player.name + " renueva con " + team.name + ".");
     ServiceResult result;
     result.ok = true;
-    result.messages.push_back("Contrato renovado: " + player.name + " | salario " + formatMoney(demandedWage) +
+    result.messages.push_back("Contrato renovado: " + player.name + " | salario " + formatMoneyValue(demandedWage) +
                               " | contrato " + to_string(demandedWeeks) + " sem | perfil " +
                               negotiationLabel(profile) + " | promesa " + promiseLabel(promise) +
                               " | agente " + to_string(difficulty) + "/90.");
@@ -622,12 +549,12 @@ ServiceResult sellPlayerService(Career& career, const string& playerName) {
     team.budget += transferFee;
     team_mgmt::detachPlayerFromSelections(team, player.name);
     team_mgmt::applyDepartureShock(team, player);
-    career.addNews(player.name + " sale de " + team.name + " por " + formatMoney(transferFee) + ".");
+    career.addNews(player.name + " sale de " + team.name + " por " + formatMoneyValue(transferFee) + ".");
     team.players.erase(team.players.begin() + index);
     ensureTeamIdentity(team);
     ServiceResult result;
     result.ok = true;
-    result.messages.push_back("Venta completada: " + player.name + " deja el club por " + formatMoney(transferFee) + ".");
+    result.messages.push_back("Venta completada: " + player.name + " deja el club por " + formatMoneyValue(transferFee) + ".");
     return result;
 }
 
@@ -695,7 +622,7 @@ ServiceResult followShortlistService(Career& career) {
 
     ServiceResult result;
     result.ok = true;
-    result.messages.push_back("Seguimiento de shortlist completado. Costo " + formatMoney(cost) + ".");
+    result.messages.push_back("Seguimiento de shortlist completado. Costo " + formatMoneyValue(cost) + ".");
     int error = clampInt(8 - team.scoutingChief / 18, 1, 5);
 
     for (const auto& item : career.scoutingShortlist) {
@@ -712,7 +639,7 @@ ServiceResult followShortlistService(Career& career) {
                       " | Pot " + to_string(clampInt(player.potential - error, player.skill, 99)) + "-" +
                       to_string(clampInt(player.potential + error, player.skill, 99)) +
                       " | Contrato " + to_string(player.contractWeeks) +
-                      " | Valor " + formatMoney(player.value) +
+                      " | Valor " + formatMoneyValue(player.value) +
                       " | Pie " + player.preferredFoot +
                       " | Sec " + (player.secondaryPositions.empty() ? string("-") : joinStringValues(player.secondaryPositions, "/")) +
                       " | Forma " + playerFormLabel(player) +
@@ -731,160 +658,24 @@ ServiceResult followShortlistService(Career& career) {
     return result;
 }
 
+std::vector<std::string> listYouthRegionsService() {
+    return {"Metropolitana", "Norte", "Centro", "Sur", "Patagonia"};
+}
+
 std::string buildCompetitionSummaryService(const Career& career) {
-    if (!career.myTeam) return "No hay carrera activa.";
-    LeagueTable table = relevantCompetitionTable(career);
-    ostringstream out;
-    out << "=== Competicion ===\r\n";
-    out << "Division: " << divisionDisplay(career.activeDivision) << " | Temporada " << career.currentSeason
-        << " | Fecha " << career.currentWeek << "/" << max(1, static_cast<int>(career.schedule.size())) << "\r\n";
-    out << "Club: " << career.myTeam->name << " | Posicion " << career.currentCompetitiveRank() << "/"
-        << max(1, career.currentCompetitiveFieldSize()) << " | Pts " << career.myTeam->points << " | DG "
-        << (career.myTeam->goalsFor - career.myTeam->goalsAgainst) << "\r\n";
-    if (!table.teams.empty()) {
-        out << "\r\nTop 5:\r\n";
-        int limit = min(5, static_cast<int>(table.teams.size()));
-        for (int i = 0; i < limit; ++i) {
-            Team* team = table.teams[static_cast<size_t>(i)];
-            out << i + 1 << ". " << team->name << " | " << team->points << " pts";
-            if (team == career.myTeam) out << " <- tu club";
-            out << "\r\n";
-        }
-    }
-    if (career.currentWeek >= 1 && career.currentWeek <= static_cast<int>(career.schedule.size())) {
-        out << "\r\nProxima fecha:\r\n";
-        for (const auto& match : career.schedule[static_cast<size_t>(career.currentWeek - 1)]) {
-            if (match.first < 0 || match.second < 0 ||
-                match.first >= static_cast<int>(career.activeTeams.size()) ||
-                match.second >= static_cast<int>(career.activeTeams.size())) {
-                continue;
-            }
-            Team* home = career.activeTeams[static_cast<size_t>(match.first)];
-            Team* away = career.activeTeams[static_cast<size_t>(match.second)];
-            out << "- " << home->name << " vs " << away->name;
-            if (home == career.myTeam || away == career.myTeam) out << " <- tu partido";
-            out << "\r\n";
-        }
-        out << "\r\nInforme rival:\r\n";
-        out << "- " << opponentSummary(career) << "\r\n";
-    }
-    return out.str();
+    return formatCareerReport(buildCompetitionReport(career));
 }
 
 std::string buildBoardSummaryService(const Career& career) {
-    if (!career.myTeam) return "No hay carrera activa.";
-    int youthUsed = 0;
-    for (const auto& player : career.myTeam->players) {
-        if (player.age <= 20 && player.matchesPlayed > 0) youthUsed++;
-    }
-    vector<Team*> jobs = buildJobMarket(career);
-    ostringstream out;
-    out << "=== Directiva ===\r\n";
-    out << "Confianza: " << boardStatusLabel(career.boardConfidence) << " (" << career.boardConfidence << "/100)\r\n";
-    out << "Reputacion manager: " << career.managerReputation << "/100\r\n";
-    out << "Perfil del DT: juego " << managerStyleLabel(*career.myTeam) << "\r\n";
-    out << "Advertencias: " << career.boardWarningWeeks << "\r\n";
-    out << "Vestuario: " << dressingRoomClimate(*career.myTeam)
-        << " | Promesas en riesgo: " << promisesAtRisk(*career.myTeam, career.currentWeek) << "\r\n";
-    out << "Presion esperada del club: " << teamExpectationLabel(*career.myTeam)
-        << " | Prestigio " << teamPrestigeScore(*career.myTeam) << "\r\n";
-    out << "\r\nObjetivos:\r\n";
-    out << "- Puesto esperado: " << career.boardExpectedFinish << " | actual " << career.currentCompetitiveRank() << "\r\n";
-    out << "- Presupuesto meta: " << formatMoney(career.boardBudgetTarget) << " | actual "
-        << formatMoney(career.myTeam->budget) << "\r\n";
-    out << "- Juveniles con minutos: " << youthUsed << "/" << career.boardYouthTarget << "\r\n";
-    if (!career.boardMonthlyObjective.empty()) {
-        out << "\r\nObjetivo mensual:\r\n";
-        out << career.boardMonthlyObjective << "\r\n";
-        out << "Progreso " << career.boardMonthlyProgress << "/" << career.boardMonthlyTarget << "\r\n";
-    }
-    out << "\r\nMercado de manager: " << jobs.size() << " club(es) compatibles\r\n";
-    for (Team* job : jobs) {
-        out << "- " << job->name << " (" << divisionDisplay(job->division) << ")\r\n";
-    }
-    return out.str();
+    return formatCareerReport(buildBoardReport(career));
 }
 
 std::string buildClubSummaryService(const Career& career) {
-    if (!career.myTeam) return "No hay carrera activa.";
-    const Team& team = *career.myTeam;
-    int youthProjects = 0;
-    for (const auto& player : team.players) {
-        if (player.age <= 20 && player.potential - player.skill >= 8) youthProjects++;
-    }
-    vector<const Player*> leaders = dressingRoomLeaders(team);
-    ostringstream out;
-    out << "=== Club y Finanzas ===\r\n";
-    out << "Presupuesto: " << formatMoney(team.budget) << " | Deuda: " << formatMoney(team.debt) << "\r\n";
-    out << "Sponsor semanal: " << formatMoney(team.sponsorWeekly)
-        << " | Masa salarial: " << formatMoney(weeklyWage(team)) << "\r\n";
-    out << "Hinchas: " << team.fanBase << " | Valor plantel: " << formatMoney(team.getSquadValue()) << "\r\n";
-    out << "Prestigio: " << teamPrestigeScore(team)
-        << " | Identidad: " << (team.clubStyle.empty() ? "Equilibrio competitivo" : team.clubStyle)
-        << " | Cantera: " << (team.youthIdentity.empty() ? "Talento local" : team.youthIdentity) << "\r\n";
-    out << "Rival principal: " << (team.primaryRival.empty() ? string("Sin clasico definido") : team.primaryRival)
-        << " | Expectativa: " << teamExpectationLabel(team) << "\r\n";
-    out << "Vestuario: " << dressingRoomClimate(team)
-        << " | Instruccion: " << team.matchInstruction
-        << " | Proyectos juveniles: " << youthProjects << "\r\n";
-    if (!leaders.empty()) {
-        out << "Nucleo de lideres: ";
-        for (size_t i = 0; i < leaders.size(); ++i) {
-            if (i) out << ", ";
-            out << leaders[i]->name;
-        }
-        out << "\r\n";
-    }
-    out << "\r\nInfraestructura:\r\n";
-    out << "- Estadio " << team.stadiumLevel << " | mejora " << formatMoney(upgradeCost(team, ClubUpgrade::Stadium)) << "\r\n";
-    out << "- Cantera " << team.youthFacilityLevel << " | mejora " << formatMoney(upgradeCost(team, ClubUpgrade::Youth)) << "\r\n";
-    out << "- Entrenamiento " << team.trainingFacilityLevel << " | mejora " << formatMoney(upgradeCost(team, ClubUpgrade::Training)) << "\r\n";
-    out << "- Scouting " << team.scoutingChief << " | mejora " << formatMoney(upgradeCost(team, ClubUpgrade::Scouting)) << "\r\n";
-    out << "- Medico " << team.medicalTeam << " | mejora " << formatMoney(upgradeCost(team, ClubUpgrade::Medical)) << "\r\n";
-    out << "\r\nRegion juvenil: " << team.youthRegion << "\r\n";
-    return out.str();
+    return formatCareerReport(buildClubReport(career));
 }
 
 std::string buildScoutingSummaryService(const Career& career) {
-    if (!career.myTeam) return "No hay carrera activa.";
-    const Team& team = *career.myTeam;
-    ostringstream out;
-    out << "=== Scouting ===\r\n";
-    out << "Jefe de scouting: " << team.scoutingChief << "/99\r\n";
-    out << "Costo de informe: " << formatMoney(max(3000LL, 9000LL - team.scoutingChief * 50LL)) << "\r\n";
-    out << "Necesidad detectada: " << detectScoutingNeed(team) << "\r\n";
-    out << "Informes guardados: " << career.scoutInbox.size() << "\r\n";
-    out << "Shortlist activa: " << career.scoutingShortlist.size() << "\r\n";
-    if (!career.scoutingShortlist.empty()) {
-        out << "\r\nShortlist:\r\n";
-        for (const auto& item : career.scoutingShortlist) {
-            auto fields = splitByDelimiter(item, '|');
-            if (fields.size() < 2) continue;
-            const Team* seller = career.findTeamByName(fields[0]);
-            if (!seller) continue;
-            int sellerIdx = team_mgmt::playerIndexByName(*seller, fields[1]);
-            if (sellerIdx < 0) continue;
-            const Player& player = seller->players[static_cast<size_t>(sellerIdx)];
-            out << "- " << player.name << " (" << seller->name << ")"
-                << " | Contrato " << player.contractWeeks
-                << " | Valor " << formatMoney(player.value)
-                << " | Pie " << player.preferredFoot
-                << " | Forma " << playerFormLabel(player)
-                << " | Fiabilidad " << playerReliabilityLabel(player)
-                << " | Rasgos " << joinStringValues(player.traits, ", ")
-                << " | Perfil " << personalityLabel(player) << "\r\n";
-        }
-    }
-    if (career.scoutInbox.empty()) {
-        out << "\r\nNo hay informes disponibles.";
-        return out.str();
-    }
-    out << "\r\nUltimos informes:\r\n";
-    int start = max(0, static_cast<int>(career.scoutInbox.size()) - 10);
-    for (size_t i = static_cast<size_t>(start); i < career.scoutInbox.size(); ++i) {
-        out << "- " << career.scoutInbox[i] << "\r\n";
-    }
-    return out.str();
+    return formatCareerReport(buildScoutingReport(career));
 }
 
 ValidationSuiteSummary runValidationService() {

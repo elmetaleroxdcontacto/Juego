@@ -8,6 +8,7 @@
 #include "simulation.h"
 #include "transfers/negotiation_system.h"
 #include "transfers/transfer_market.h"
+#include "ui/career_reports_ui.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -1314,18 +1315,6 @@ static LeagueTable relevantCompetitionTable(const Career& career) {
     return table;
 }
 
-static void displayTableSlice(const LeagueTable& table, int start, int count) {
-    int end = min(static_cast<int>(table.teams.size()), start + count);
-    for (int i = start; i < end; ++i) {
-        Team* team = table.teams[i];
-        int gd = team->goalsFor - team->goalsAgainst;
-        cout << setw(2) << i + 1 << ". " << left << setw(22) << team->name.substr(0, 22)
-             << right << " Pts " << setw(3) << team->points
-             << " DG " << setw(3) << gd
-             << " G " << team->wins << endl;
-    }
-}
-
 static void generateManagerCareerEvents(Career& career) {
     if (!career.myTeam) return;
     int rank = career.currentCompetitiveRank();
@@ -1343,234 +1332,23 @@ static void generateManagerCareerEvents(Career& career) {
 }
 
 void displayCompetitionCenter(Career& career) {
-    if (!career.myTeam) return;
-    career.leagueTable.sortTable();
-    LeagueTable table = relevantCompetitionTable(career);
-    int rank = career.currentCompetitiveRank();
-    int totalWeeks = static_cast<int>(career.schedule.size());
-    int remaining = max(0, totalWeeks - career.currentWeek + 1);
-
-    cout << "\n=== Centro de Competicion ===" << endl;
-    cout << "Division: " << divisionDisplay(career.activeDivision)
-         << " | Temporada " << career.currentSeason
-         << " | Fecha " << career.currentWeek << "/" << totalWeeks << endl;
-    cout << "Equipo: " << career.myTeam->name
-         << " | Posicion: " << rank << "/" << max(1, career.currentCompetitiveFieldSize())
-         << " | Pts: " << career.myTeam->points
-         << " | DG: " << (career.myTeam->goalsFor - career.myTeam->goalsAgainst) << endl;
-    cout << "Confianza directiva: " << boardStatusLabel(career.boardConfidence)
-         << " (" << career.boardConfidence << "/100)" << endl;
-    cout << "Identidad: " << career.myTeam->clubStyle
-         << " | Cantera: " << career.myTeam->youthIdentity
-         << " | Rival: " << (career.myTeam->primaryRival.empty() ? string("-") : career.myTeam->primaryRival) << endl;
-    cout << "Fechas por jugar: " << remaining << endl;
-    if (!career.boardMonthlyObjective.empty()) {
-        int weeksLeft = max(0, career.boardMonthlyDeadlineWeek - career.currentWeek);
-        cout << "Objetivo mensual: " << career.boardMonthlyObjective
-             << " | Progreso " << career.boardMonthlyProgress << "/" << career.boardMonthlyTarget
-             << " | Cierre en " << weeksLeft << " semana(s)" << endl;
-    }
-    if (!career.cupChampion.empty()) {
-        cout << "Copa de temporada: campeon " << career.cupChampion << endl;
-    } else if (career.cupActive) {
-        cout << "Copa de temporada: ronda " << career.cupRound + 1
-             << " | Equipos vivos " << career.cupRemainingTeams.size() << endl;
-    }
-
-    cout << "\nZona alta:" << endl;
-    displayTableSlice(table, 0, min(5, static_cast<int>(table.teams.size())));
-    if (static_cast<int>(table.teams.size()) > 5) {
-        cout << "\nZona baja:" << endl;
-        displayTableSlice(table, max(0, static_cast<int>(table.teams.size()) - 3), 3);
-    }
-
-    if (career.currentWeek <= static_cast<int>(career.schedule.size())) {
-        cout << "\nProxima fecha:" << endl;
-        const auto& matches = career.schedule[career.currentWeek - 1];
-        for (const auto& match : matches) {
-            Team* home = career.activeTeams[match.first];
-            Team* away = career.activeTeams[match.second];
-            string marker = (home == career.myTeam || away == career.myTeam) ? " <- tu partido" : "";
-            cout << "- " << home->name << " vs " << away->name << marker << endl;
-        }
-        cout << "Informe rival: " << buildOpponentReport(career) << endl;
-    }
-
-    if (!career.newsFeed.empty()) {
-        cout << "\nUltimas noticias:" << endl;
-        int start = max(0, static_cast<int>(career.newsFeed.size()) - 3);
-        for (size_t i = static_cast<size_t>(start); i < career.newsFeed.size(); ++i) {
-            cout << "- " << career.newsFeed[i] << endl;
-        }
-    }
-    if (!career.lastMatchAnalysis.empty()) {
-        cout << "\nUltimo analisis:" << endl;
-        cout << career.lastMatchAnalysis << endl;
-    }
+    ui_reports::displayCompetitionCenter(career);
 }
 
 void displayBoardStatus(Career& career) {
-    if (!career.myTeam) return;
-    int youthUsed = 0;
-    for (const auto& player : career.myTeam->players) {
-        if (player.age <= 20 && player.matchesPlayed > 0) youthUsed++;
-    }
-    int rank = career.currentCompetitiveRank();
-
-    cout << "\n=== Objetivos y Directiva ===" << endl;
-    cout << "Confianza: " << boardStatusLabel(career.boardConfidence)
-         << " (" << career.boardConfidence << "/100)" << endl;
-    cout << "Rachas de advertencia: " << career.boardWarningWeeks << endl;
-    cout << "Perfil del DT: " << managerStyleLabel(*career.myTeam)
-         << " | Prestigio del club: " << teamPrestigeScore(*career.myTeam) << endl;
-    cout << "\nObjetivos de temporada:" << endl;
-    cout << "- Terminar en puesto " << career.boardExpectedFinish << " o mejor. Actual: " << rank << endl;
-    cout << "- Cerrar con presupuesto >= $" << career.boardBudgetTarget
-         << ". Actual: $" << career.myTeam->budget << endl;
-    cout << "- Dar minutos a " << career.boardYouthTarget << " juvenil(es) sub-20. Actual: " << youthUsed << endl;
-    cout << "- Reputacion del manager: " << career.managerReputation << "/100" << endl;
-    if (!career.boardMonthlyObjective.empty()) {
-        int weeksLeft = max(0, career.boardMonthlyDeadlineWeek - career.currentWeek);
-        cout << "\nObjetivo mensual:" << endl;
-        cout << "- " << career.boardMonthlyObjective << endl;
-        cout << "- Progreso: " << career.boardMonthlyProgress << " / " << career.boardMonthlyTarget << endl;
-        cout << "- Semanas restantes: " << weeksLeft << endl;
-    }
-
-    if (career.boardConfidence < 20) {
-        cout << "\nEstado: la directiva considera un ultimatum deportivo." << endl;
-    } else if (career.boardConfidence < 35) {
-        cout << "\nEstado: el cargo esta bajo presion." << endl;
-    } else {
-        cout << "\nEstado: situacion controlada." << endl;
-    }
-
-    cout << "\n1. Buscar ofertas de club" << endl;
-    cout << "2. Volver" << endl;
-    int action = readInt("Elige opcion: ", 1, 2);
-    if (action != 1) return;
-
-    vector<Team*> jobs = buildJobMarket(career, false);
-    if (jobs.empty()) {
-        cout << "No hay ofertas adecuadas por ahora." << endl;
-        return;
-    }
-    cout << "\nOfertas disponibles:" << endl;
-    for (size_t i = 0; i < jobs.size(); ++i) {
-        cout << i + 1 << ". " << jobs[i]->name << " (" << divisionDisplay(jobs[i]->division) << ")"
-             << " Valor plantel $" << jobs[i]->getSquadValue() << endl;
-    }
-    int choice = readInt("Club (0 para cancelar): ", 0, static_cast<int>(jobs.size()));
-    if (choice == 0) return;
-    takeManagerJob(career, jobs[choice - 1], "Cambio de club voluntario.");
-    cout << "Nuevo destino: " << career.myTeam->name << endl;
+    ui_reports::displayBoardStatus(career);
 }
 
 void displayNewsFeed(const Career& career) {
-    cout << "\n=== Noticias ===" << endl;
-    if (career.newsFeed.empty()) {
-        cout << "No hay novedades registradas." << endl;
-        return;
-    }
-    int start = max(0, static_cast<int>(career.newsFeed.size()) - 15);
-    for (size_t i = static_cast<size_t>(start); i < career.newsFeed.size(); ++i) {
-        cout << "- " << career.newsFeed[i] << endl;
-    }
+    ui_reports::displayNewsFeed(career);
 }
 
 void displaySeasonHistory(const Career& career) {
-    cout << "\n=== Historial de Temporadas ===" << endl;
-    if (career.history.empty()) {
-        cout << "Aun no hay temporadas finalizadas." << endl;
-        return;
-    }
-    for (const auto& entry : career.history) {
-        cout << "Temporada " << entry.season << " | " << divisionDisplay(entry.division)
-             << " | Club " << entry.club << " | Puesto " << entry.finish << endl;
-        cout << "  Campeon: " << entry.champion << endl;
-        if (!entry.promoted.empty()) cout << "  Ascensos: " << entry.promoted << endl;
-        if (!entry.relegated.empty()) cout << "  Descensos: " << entry.relegated << endl;
-        if (!entry.note.empty()) cout << "  Nota: " << entry.note << endl;
-    }
+    ui_reports::displaySeasonHistory(career);
 }
 
 void displayClubOperations(Career& career) {
-    if (!career.myTeam) return;
-    Team& team = *career.myTeam;
-    cout << "\n=== Club y Finanzas ===" << endl;
-    cout << "Presupuesto: $" << team.budget << " | Deuda: $" << team.debt << endl;
-    cout << "Sponsor semanal: $" << team.sponsorWeekly << " | Base de hinchas: " << team.fanBase << endl;
-    cout << "Estadio: Nivel " << team.stadiumLevel
-         << " | Juveniles: Nivel " << team.youthFacilityLevel
-         << " | Entrenamiento: Nivel " << team.trainingFacilityLevel << endl;
-    cout << "Staff A/F/S/J/M: " << team.assistantCoach << "/" << team.fitnessCoach << "/" << team.scoutingChief
-         << "/" << team.youthCoach << "/" << team.medicalTeam << endl;
-    cout << "Region juvenil actual: " << team.youthRegion << endl;
-    cout << "1. Mejorar estadio" << endl;
-    cout << "2. Mejorar cantera" << endl;
-    cout << "3. Mejorar centro de entrenamiento" << endl;
-    cout << "4. Contratar asistente tecnico" << endl;
-    cout << "5. Contratar preparador fisico" << endl;
-    cout << "6. Contratar jefe de scouting" << endl;
-    cout << "7. Contratar jefe de juveniles" << endl;
-    cout << "8. Mejorar cuerpo medico" << endl;
-    cout << "9. Cambiar region juvenil" << endl;
-    cout << "10. Volver" << endl;
-    int choice = readInt("Elige opcion: ", 1, 10);
-    if (choice == 10) return;
-
-    long long cost = 0;
-    if (choice == 1) cost = 60000LL * (team.stadiumLevel + 1);
-    else if (choice == 2) cost = 50000LL * (team.youthFacilityLevel + 1);
-    else if (choice == 3) cost = 55000LL * (team.trainingFacilityLevel + 1);
-    else if (choice == 4) cost = 35000LL + static_cast<long long>(team.assistantCoach) * 1200LL;
-    else if (choice == 5) cost = 32000LL + static_cast<long long>(team.fitnessCoach) * 1200LL;
-    else if (choice == 6) cost = 36000LL + static_cast<long long>(team.scoutingChief) * 1300LL;
-    else if (choice == 7) cost = 34000LL + static_cast<long long>(team.youthCoach) * 1200LL;
-    else if (choice == 8) cost = 33000LL + static_cast<long long>(team.medicalTeam) * 1200LL;
-    else cost = 12000LL;
-    if (team.budget < cost) {
-        cout << "Presupuesto insuficiente para la inversion." << endl;
-        return;
-    }
-    team.budget -= cost;
-    if (choice == 1) {
-        team.stadiumLevel++;
-        team.fanBase += 3;
-        team.sponsorWeekly += 5000;
-        career.addNews(team.name + " amplia su estadio.");
-    } else if (choice == 2) {
-        team.youthFacilityLevel++;
-        career.addNews(team.name + " mejora su cantera.");
-    } else if (choice == 3) {
-        team.trainingFacilityLevel++;
-        career.addNews(team.name + " mejora su centro de entrenamiento.");
-    } else if (choice == 4) {
-        team.assistantCoach = clampInt(team.assistantCoach + 5, 1, 99);
-        career.addNews(team.name + " refuerza su cuerpo tecnico.");
-    } else if (choice == 5) {
-        team.fitnessCoach = clampInt(team.fitnessCoach + 5, 1, 99);
-        career.addNews(team.name + " mejora su preparacion fisica.");
-    } else if (choice == 6) {
-        team.scoutingChief = clampInt(team.scoutingChief + 5, 1, 99);
-        career.addNews(team.name + " fortalece su red de scouting.");
-    } else if (choice == 7) {
-        team.youthCoach = clampInt(team.youthCoach + 5, 1, 99);
-        career.addNews(team.name + " mejora la conduccion de juveniles.");
-    } else if (choice == 8) {
-        team.medicalTeam = clampInt(team.medicalTeam + 5, 1, 99);
-        career.addNews(team.name + " fortalece el cuerpo medico.");
-    } else {
-        vector<string> regions = {"Metropolitana", "Norte", "Centro", "Sur", "Patagonia"};
-        for (size_t i = 0; i < regions.size(); ++i) {
-            cout << i + 1 << ". " << regions[i] << endl;
-        }
-        int regionChoice = readInt("Nueva region juvenil: ", 1, static_cast<int>(regions.size()));
-        team.youthRegion = regions[regionChoice - 1];
-        career.addNews(team.name + " reorienta su captacion juvenil hacia " + team.youthRegion + ".");
-    }
-    ensureTeamIdentity(team);
-    cout << "Inversion completada por $" << cost << endl;
+    ui_reports::displayClubOperations(career);
 }
 
 static int teamRank(const LeagueTable& table, const Team* team) {

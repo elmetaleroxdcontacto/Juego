@@ -1,8 +1,11 @@
 ﻿#include "simulation.h"
 
 #include "ai/team_ai.h"
+#include "development/player_progression_system.h"
 #include "io.h"
+#include "simulation/match_engine.h"
 #include "simulation/match_engine_internal.h"
+#include "simulation/morale_engine.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -431,6 +434,91 @@ static void registerCards(Team& team, const vector<int>& xi, int yellowCards, in
     }
 }
 
+static void registerNamedCards(Team& team,
+                               const vector<string>& yellowNames,
+                               const vector<string>& redNames,
+                               vector<string>* events) {
+    for (const string& name : yellowNames) {
+        for (auto& player : team.players) {
+            if (player.name != name) continue;
+            player.seasonYellowCards++;
+            player.yellowAccumulation++;
+            if (player.yellowAccumulation >= 5) {
+                player.yellowAccumulation -= 5;
+                player.matchesSuspended++;
+                if (events) {
+                    events->push_back("Sancion por acumulacion: " + player.name);
+                }
+            }
+            break;
+        }
+    }
+
+    for (const string& name : redNames) {
+        for (auto& player : team.players) {
+            if (player.name != name) continue;
+            player.seasonRedCards++;
+            player.matchesSuspended++;
+            break;
+        }
+    }
+}
+
+static int applyGoalContributions(Team& team,
+                                  const vector<GoalContribution>& contributions,
+                                  vector<string>* events) {
+    int applied = 0;
+    for (const auto& contribution : contributions) {
+        bool scorerApplied = false;
+        for (auto& player : team.players) {
+            if (player.name != contribution.scorerName) continue;
+            player.goals++;
+            scorerApplied = true;
+            applied++;
+            break;
+        }
+        if (!scorerApplied) continue;
+        if (!contribution.assisterName.empty() && contribution.assisterName != contribution.scorerName) {
+            for (auto& player : team.players) {
+                if (player.name == contribution.assisterName) {
+                    player.assists++;
+                    break;
+                }
+            }
+        }
+        if (events) {
+            string text = to_string(contribution.minute) + "' Gol confirmado: " + contribution.scorerName;
+            if (!contribution.assisterName.empty() && contribution.assisterName != contribution.scorerName) {
+                text += " (asist: " + contribution.assisterName + ")";
+            }
+            events->push_back(text);
+        }
+    }
+    return applied;
+}
+
+static void applyNamedInjuries(Team& team, const vector<string>& injuredNames) {
+    for (const string& name : injuredNames) {
+        for (auto& player : team.players) {
+            if (player.name != name || player.injured) continue;
+            player.injured = true;
+            player.injuryHistory++;
+            int roll = randInt(1, 100);
+            if (roll <= 65) {
+                player.injuryType = "Leve";
+                player.injuryWeeks = randInt(1, 2);
+            } else if (roll <= 90) {
+                player.injuryType = "Media";
+                player.injuryWeeks = randInt(3, 6);
+            } else {
+                player.injuryType = "Grave";
+                player.injuryWeeks = randInt(7, 12);
+            }
+            break;
+        }
+    }
+}
+
 TeamStrength computeStrength(Team& team) {
     TeamStrength ts;
     ts.xi = team.getStartingXIIndices();
@@ -723,35 +811,7 @@ void recoverFitness(Team& team, int days) {
 }
 
 static void applyDevelopment(Team& team, const vector<int>& xi, vector<string>* events) {
-    for (int idx : xi) {
-        if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
-        Player& p = team.players[idx];
-        if (p.age > 23) continue;
-        if (p.skill >= p.potential) continue;
-        int chance = clampInt(12 - (p.age - 17), 3, 12);
-        chance += max(0, team.youthCoach - 55) / 12;
-        chance += max(0, team.assistantCoach - 55) / 15;
-        chance += max(0, p.professionalism - 55) / 18;
-        chance += max(0, p.currentForm - 55) / 18;
-        chance += max(0, p.consistency - 60) / 20;
-        chance = clampInt(chance, 3, 25);
-        if (randInt(1, 100) <= chance) {
-            p.skill = min(100, p.skill + 1);
-            string pos = normalizePosition(p.position);
-            if (pos == "ARQ" || pos == "DEF") {
-                p.defense = min(100, p.defense + 1);
-            } else if (pos == "MED") {
-                p.attack = min(100, p.attack + 1);
-                p.defense = min(100, p.defense + 1);
-            } else {
-                p.attack = min(100, p.attack + 1);
-            }
-            if (events) {
-                events->push_back("[Progreso] " + p.name + " mejora su habilidad a " + to_string(p.skill) + ".");
-            }
-            p.currentForm = clampInt(p.currentForm + 1, 1, 99);
-        }
-    }
+    development::applyMatchExperience(team, xi, events);
 }
 
 static int keyMatchModifier(const Team& team, const vector<int>& xi) {
@@ -985,7 +1045,7 @@ int teamPenaltyStrength(const Team& team) {
     return total / static_cast<int>(xi.size());
 }
 
-MatchResult simulateMatch(Team& home, Team& away, bool keyMatch, bool neutralVenue) {
+static MatchResult simulateMatchLegacy(Team& home, Team& away, bool keyMatch, bool neutralVenue) {
     ensureMinimumSquad(home, 11);
     ensureMinimumSquad(away, 11);
     ensureTeamIdentity(home);
@@ -1292,6 +1352,91 @@ MatchResult simulateMatch(Team& home, Team& away, bool keyMatch, bool neutralVen
 
     return {homeGoals, awayGoals, homeShots, awayShots, homePoss, awayPoss, homeSubs, awaySubs,
             homeCorners, awayCorners, weather.name, warnings, reportLines, events, verdict};
+}
+
+MatchResult simulateMatch(Team& home, Team& away, bool keyMatch, bool neutralVenue) {
+    ensureMinimumSquad(home, 11);
+    ensureMinimumSquad(away, 11);
+    ensureTeamIdentity(home);
+    ensureTeamIdentity(away);
+
+    const vector<int> homeStartXI = home.getStartingXIIndices();
+    const vector<int> awayStartXI = away.getStartingXIIndices();
+    for (int idx : homeStartXI) {
+        if (idx >= 0 && idx < static_cast<int>(home.players.size())) home.players[idx].startsThisSeason++;
+    }
+    for (int idx : awayStartXI) {
+        if (idx >= 0 && idx < static_cast<int>(away.players.size())) away.players[idx].startsThisSeason++;
+    }
+
+    match_engine::MatchSimulationData simulation = match_engine::simulate(home, away, keyMatch, neutralVenue);
+    MatchResult result = simulation.result;
+
+    home.goalsFor += result.homeGoals;
+    home.goalsAgainst += result.awayGoals;
+    away.goalsFor += result.awayGoals;
+    away.goalsAgainst += result.homeGoals;
+    away.awayGoals += result.awayGoals;
+    home.yellowCards += result.stats.homeYellowCards;
+    away.yellowCards += result.stats.awayYellowCards;
+    home.redCards += result.stats.homeRedCards;
+    away.redCards += result.stats.awayRedCards;
+
+    if (result.homeGoals > result.awayGoals) {
+        home.points += 3;
+        home.wins++;
+        away.losses++;
+        home.addHeadToHeadPoints(away.name, 3);
+        away.addHeadToHeadPoints(home.name, 0);
+    } else if (result.homeGoals < result.awayGoals) {
+        away.points += 3;
+        away.wins++;
+        home.losses++;
+        home.addHeadToHeadPoints(away.name, 0);
+        away.addHeadToHeadPoints(home.name, 3);
+    } else {
+        home.points += 1;
+        away.points += 1;
+        home.draws++;
+        away.draws++;
+        home.addHeadToHeadPoints(away.name, 1);
+        away.addHeadToHeadPoints(home.name, 1);
+    }
+
+    home.morale = clampInt(home.morale + morale_engine::postMatchMoraleDelta(home, result.homeGoals, result.awayGoals, keyMatch), 0, 100);
+    away.morale = clampInt(away.morale + morale_engine::postMatchMoraleDelta(away, result.awayGoals, result.homeGoals, keyMatch), 0, 100);
+
+    const vector<int> homeParticipants = simulation.homeParticipants.empty() ? homeStartXI : simulation.homeParticipants;
+    const vector<int> awayParticipants = simulation.awayParticipants.empty() ? awayStartXI : simulation.awayParticipants;
+    for (int idx : homeParticipants) {
+        if (idx >= 0 && idx < static_cast<int>(home.players.size())) home.players[idx].matchesPlayed++;
+    }
+    for (int idx : awayParticipants) {
+        if (idx >= 0 && idx < static_cast<int>(away.players.size())) away.players[idx].matchesPlayed++;
+    }
+
+    registerNamedCards(home, simulation.homeYellowCardPlayers, simulation.homeRedCardPlayers, nullptr);
+    registerNamedCards(away, simulation.awayYellowCardPlayers, simulation.awayRedCardPlayers, nullptr);
+
+    const int appliedHomeGoals = applyGoalContributions(home, simulation.homeGoals, nullptr);
+    const int appliedAwayGoals = applyGoalContributions(away, simulation.awayGoals, nullptr);
+    if (appliedHomeGoals < result.homeGoals) {
+        assignGoalsAndAssists(home, result.homeGoals - appliedHomeGoals, homeStartXI, home.name, nullptr);
+    }
+    if (appliedAwayGoals < result.awayGoals) {
+        assignGoalsAndAssists(away, result.awayGoals - appliedAwayGoals, awayStartXI, away.name, nullptr);
+    }
+
+    applyNamedInjuries(home, simulation.homeInjuredPlayers);
+    applyNamedInjuries(away, simulation.awayInjuredPlayers);
+    applyDevelopment(home, homeParticipants, nullptr);
+    applyDevelopment(away, awayParticipants, nullptr);
+    updateMatchForm(home, homeParticipants, result.homeGoals, result.awayGoals, keyMatch);
+    updateMatchForm(away, awayParticipants, result.awayGoals, result.homeGoals, keyMatch);
+    match_internal::applyMatchFatigue(home, homeParticipants, home.tactics);
+    match_internal::applyMatchFatigue(away, awayParticipants, away.tactics);
+
+    return result;
 }
 
 MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool neutralVenue) {

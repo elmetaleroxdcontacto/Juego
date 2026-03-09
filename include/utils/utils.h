@@ -4,6 +4,13 @@
 #include <utility>
 #include <vector>
 
+template <typename T>
+T clampValue(T value, T lo, T hi) {
+    if (value < lo) return lo;
+    if (value > hi) return hi;
+    return value;
+}
+
 int randInt(int minVal, int maxVal);
 double rand01();
 
@@ -12,6 +19,8 @@ std::string toLower(const std::string& s);
 
 bool pathExists(const std::string& path);
 bool isDirectory(const std::string& path);
+bool ensureDirectory(const std::string& path);
+bool readTextFileLines(const std::string& path, std::vector<std::string>& lines);
 std::string joinPath(const std::string& a, const std::string& b);
 std::string pathFilename(const std::string& path);
 std::string pathExtension(const std::string& path);
