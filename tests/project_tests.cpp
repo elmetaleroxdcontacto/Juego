@@ -8,6 +8,7 @@
 #include "simulation/match_context.h"
 #include "simulation/match_engine.h"
 #include "simulation/match_phase.h"
+#include "simulation/simulation.h"
 #include "transfers/negotiation_system.h"
 #include "validators/validators.h"
 
@@ -185,6 +186,11 @@ void testMatchSimulationProducesStructuredPhases() {
            "El reporte del partido debe incluir una explicacion probable.");
     expect(!result.report.playerOfTheMatch.empty(),
            "El reporte del partido debe identificar una figura del partido.");
+    const string reportText = joinLines(result.reportLines);
+    expect(reportText.find("Riesgo tactico:") != string::npos,
+           "El resumen del partido debe exponer el riesgo tactico.");
+    expect(reportText.find("Disciplina:") != string::npos,
+           "El resumen del partido debe explicar el impacto disciplinario.");
 }
 
 void testHighPressRaisesPhaseFatigue() {
@@ -466,6 +472,33 @@ void testSaveLoadRoundTripPreservesCareerState() {
     std::remove(savePath.c_str());
 }
 
+void testSimulateMatchAppliesPostProcessState() {
+    Team home = makeTeam("Aplicacion Local", "primera division", 71, 4, 4, "Pressing", "Contra-presion", 700000);
+    Team away = makeTeam("Aplicacion Visita", "primera division", 68, 2, 3, "Balanced", "Equilibrado", 620000);
+
+    const MatchResult result = simulateMatch(home, away, true, false);
+
+    expect(home.goalsFor == result.homeGoals && home.goalsAgainst == result.awayGoals,
+           "La aplicacion postpartido debe actualizar goles del local.");
+    expect(away.goalsFor == result.awayGoals && away.goalsAgainst == result.homeGoals,
+           "La aplicacion postpartido debe actualizar goles del visitante.");
+    expect(away.awayGoals == result.awayGoals,
+           "La aplicacion postpartido debe contabilizar goles de visita.");
+    expect(home.points + away.points >= 2 && home.points + away.points <= 3,
+           "La aplicacion postpartido debe repartir puntos validos.");
+
+    int homePlayed = 0;
+    for (const Player& player : home.players) {
+        if (player.matchesPlayed > 0) homePlayed++;
+    }
+    int awayPlayed = 0;
+    for (const Player& player : away.players) {
+        if (player.matchesPlayed > 0) awayPlayed++;
+    }
+    expect(homePlayed >= 11 && awayPlayed >= 11,
+           "La aplicacion postpartido debe registrar minutos para los participantes.");
+}
+
 }  // namespace
 
 int main() {
@@ -479,6 +512,7 @@ int main() {
         {"season_transition", testSeasonTransitionAdvancesCareerWithoutUiDependencies},
         {"season_service", testSeasonServiceReturnsStructuredWeekResult},
         {"opponent_report", testOpponentReportExplainsNextFixture},
+        {"simulate_match_state", testSimulateMatchAppliesPostProcessState},
         {"save_load_roundtrip", testSaveLoadRoundTripPreservesCareerState},
     };
 

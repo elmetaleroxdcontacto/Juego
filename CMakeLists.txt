@@ -56,11 +56,13 @@ set(FM_SIMULATION_SOURCES
     src/simulation/match_context.cpp
     src/simulation/match_engine.cpp
     src/simulation/match_phase.cpp
+    src/simulation/match_postprocess.cpp
     src/simulation/match_report.cpp
     src/simulation/match_resolution.cpp
     src/simulation/match_stats.cpp
     src/simulation/match_tactics.cpp
     src/simulation/morale_engine.cpp
+    src/simulation/player_condition.cpp
     src/simulation/simulation.cpp
     src/simulation/tactics_engine.cpp
 )

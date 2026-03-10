@@ -31,9 +31,9 @@ TacticalProfile buildTacticalProfile(const Team& team) {
     else if (team.tactics == "Counter") profile.mentality += 0.08;
     else if (team.tactics == "Defensive") profile.mentality -= 0.18;
 
-    profile.pressing = 0.30 + team.pressingIntensity * 0.12;
-    profile.tempo = 0.35 + team.tempo * 0.12;
-    profile.width = 0.35 + team.width * 0.10;
+    profile.pressing = 0.26 + team.pressingIntensity * 0.13;
+    profile.tempo = 0.30 + team.tempo * 0.13;
+    profile.width = 0.32 + team.width * 0.11;
     profile.defensiveBlock = 0.30 + (6 - team.defensiveLine) * 0.11;
     profile.directness = (team.matchInstruction == "Juego directo" ? 0.34 : 0.0) +
                          (team.tactics == "Counter" ? 0.18 : 0.0) +
@@ -43,11 +43,11 @@ TacticalProfile buildTacticalProfile(const Team& team) {
                                max(0, team.pressingIntensity - 3) * 0.05;
     profile.setPieceThreat = (team.matchInstruction == "Balon parado" ? 0.34 : 0.0) +
                              max(0, team.width - 3) * 0.04;
-    profile.risk = profile.mentality * 0.35 +
-                   profile.pressing * 0.20 +
-                   profile.tempo * 0.20 +
+    profile.risk = profile.mentality * 0.33 +
+                   profile.pressing * 0.22 +
+                   profile.tempo * 0.22 +
                    max(0.0, profile.width - 0.60) * 0.12 +
-                   max(0.0, static_cast<double>(team.defensiveLine - 3)) * 0.10;
+                   max(0.0, static_cast<double>(team.defensiveLine - 3)) * 0.13;
     return profile;
 }
 
@@ -104,9 +104,11 @@ double tacticalAdvantage(const Team& team,
     if (team.matchInstruction == "Bloque bajo" && opponent.tactics == "Offensive") advantage += 0.08;
     if (team.matchInstruction == "Contra-presion" && opponent.tempo >= 4) advantage += 0.07;
     if (team.tactics == "Counter" && opponent.tactics == "Pressing") advantage += 0.10;
+    if (team.pressingIntensity >= 4 && team.defensiveLine >= 4 && opponent.tempo <= 3) advantage += 0.06;
+    if (team.defensiveLine >= 4 && opponent.matchInstruction == "Juego directo") advantage -= 0.07;
     if (team.tactics == "Offensive" && opponent.tactics == "Defensive") advantage -= 0.03;
     if (team.markingStyle == "Hombre" && opponent.width >= 4) advantage -= 0.05;
-    return clampValue(advantage, -0.35, 0.35);
+    return clampValue(advantage, -0.40, 0.40);
 }
 
 double possessionWeight(const TacticalProfile& profile) {

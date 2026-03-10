@@ -502,6 +502,8 @@ NegotiationState runRenewalNegotiation(const Career& career,
                                        NegotiationProfile profile,
                                        NegotiationPromise promise,
                                        int currentWeek) {
+    (void)career;
+    (void)team;
     NegotiationState state;
     if (renewalNeedsStrongerPromise(player, promise, currentWeek)) {
         state.status = player.name + " exige una promesa contractual acorde a su rol actual.";

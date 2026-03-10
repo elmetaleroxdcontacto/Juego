@@ -20,10 +20,6 @@ struct ValidationResult {
     string detail;
 };
 
-static void pushResult(vector<ValidationResult>& results, const string& name, bool ok, const string& detail) {
-    results.push_back({name, ok, detail});
-}
-
 static string pairKey(const string& a, const string& b) {
     return (a < b) ? (a + "||" + b) : (b + "||" + a);
 }

@@ -46,8 +46,8 @@ MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch, 
     MatchSimulationData data;
     const MatchSetup setup = match_context::buildMatchSetup(home, away, keyMatch, neutralVenue);
 
-    TeamRuntimeState homeState{home, setup.home.xi, setup.home.xi};
-    TeamRuntimeState awayState{away, setup.away.xi, setup.away.xi};
+    TeamRuntimeState homeState{home, setup.home.xi, setup.home.xi, {}, {}, {}, {}};
+    TeamRuntimeState awayState{away, setup.away.xi, setup.away.xi, {}, {}, {}, {}};
     MatchStats stats;
     MatchTimeline timeline;
     int homePossAccumulator = 0;

@@ -42,6 +42,9 @@ int substitutionNeedScore(const Team& team, int playerIndex, bool cautioned) {
     need += max(0, 58 - player.fitness) * 2;
     need += max(0, player.age - 30);
     if (cautioned) need += 10;
+    if (team.pressingIntensity >= 4 && player.fitness < 64) need += 6;
+    if (team.tempo >= 4 && player.fitness < 62) need += 4;
+    if (cautioned && (team.markingStyle == "Hombre" || team.pressingIntensity >= 4)) need += 4;
     if (playerHasTrait(player, "Caliente")) need += 4;
     if (team.rotationPolicy == "Rotacion" && player.fitness < 66) need += 4;
     return need;

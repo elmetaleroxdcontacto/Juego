@@ -72,6 +72,10 @@ MatchReport buildReport(const MatchSetup& setup,
     int homeLateFatigue = 0;
     int awayLateFatigue = 0;
     int tacticalChanges = 0;
+    int homeTotalAttacks = 0;
+    int awayTotalAttacks = 0;
+    double homeRiskLoad = 0.0;
+    double awayRiskLoad = 0.0;
 
     for (size_t i = 0; i < timeline.phases.size(); ++i) {
         const MatchPhaseReport& phase = timeline.phases[i];
@@ -84,13 +88,18 @@ MatchReport buildReport(const MatchSetup& setup,
             homeLateFatigue += phase.homeFatigueGain;
             awayLateFatigue += phase.awayFatigueGain;
         }
+        homeTotalAttacks += phase.homeAttacks;
+        awayTotalAttacks += phase.awayAttacks;
+        homeRiskLoad += phase.homeDefensiveRisk;
+        awayRiskLoad += phase.awayDefensiveRisk;
 
         ostringstream line;
         line << phase.minuteStart << "-" << phase.minuteEnd << ": domina " << phase.dominantTeam
              << ", posesion " << phase.homePossessionShare << "-" << phase.awayPossessionShare
              << ", progresiones " << phase.homeProgressions << "-" << phase.awayProgressions
              << ", ataques " << phase.homeAttacks << "-" << phase.awayAttacks
-             << ", remates " << phase.homeShotsGenerated << "-" << phase.awayShotsGenerated;
+             << ", remates " << phase.homeShotsGenerated << "-" << phase.awayShotsGenerated
+             << ", riesgo " << formatDouble2(phase.homeDefensiveRisk) << "-" << formatDouble2(phase.awayDefensiveRisk);
         if (phase.homeTacticalChange || phase.awayTacticalChange) {
             line << ", ajustes tacticos";
         }
@@ -143,13 +152,32 @@ MatchReport buildReport(const MatchSetup& setup,
     }
 
     report.explanation.likelyReason = buildLikelyReason(setup, stats, home, away);
-    report.explanation.tacticalStory =
+    const string dominanceStory =
         (homeDominantPhases > awayDominantPhases)
             ? home.name + " impuso mas fases de control (" + to_string(homeDominantPhases) + " de " +
                   to_string(static_cast<int>(timeline.phases.size())) + ")."
             : (awayDominantPhases > homeDominantPhases)
                   ? away.name + " sostuvo mas tramos de dominio territorial."
                   : "Ningun equipo monopolizo el partido; hubo alternancia de control.";
+    string riskStory;
+    const double avgHomeRisk = timeline.phases.empty() ? 0.0 : homeRiskLoad / timeline.phases.size();
+    const double avgAwayRisk = timeline.phases.empty() ? 0.0 : awayRiskLoad / timeline.phases.size();
+    if (avgHomeRisk > avgAwayRisk + 0.08) {
+        riskStory = home.name + " asumio mas riesgo defensivo y dejo mas ventanas de transicion.";
+    } else if (avgAwayRisk > avgHomeRisk + 0.08) {
+        riskStory = away.name + " se expuso mas cuando debio correr hacia atras.";
+    } else {
+        riskStory = "Los riesgos defensivos estuvieron bastante equilibrados.";
+    }
+    string fatigueOverlay;
+    if (report.fatigueImpact.homeLateDrop && report.tacticalImpact.homePressingLoad > report.tacticalImpact.awayPressingLoad + 1.0) {
+        fatigueOverlay = "La presion del local perdio altura en el cierre.";
+    } else if (report.fatigueImpact.awayLateDrop &&
+               report.tacticalImpact.awayPressingLoad > report.tacticalImpact.homePressingLoad + 1.0) {
+        fatigueOverlay = "La visita no pudo sostener su agresividad hasta el final.";
+    }
+    report.explanation.tacticalStory = dominanceStory + " " + riskStory +
+                                       (fatigueOverlay.empty() ? "" : " " + fatigueOverlay);
     report.explanation.fatigueStory = report.fatigueImpact.summary;
     report.explanation.disciplineStory =
         (stats.homeRedCards + stats.awayRedCards > 0)
@@ -159,6 +187,7 @@ MatchReport buildReport(const MatchSetup& setup,
     report.explanation.chanceStory =
         "xG " + formatDouble2(stats.homeExpectedGoals) + "-" + formatDouble2(stats.awayExpectedGoals) +
         " | ocasiones claras " + to_string(stats.homeBigChances) + "-" + to_string(stats.awayBigChances) +
+        " | ataques " + to_string(homeTotalAttacks) + "-" + to_string(awayTotalAttacks) +
         " | cambios tacticos " + to_string(tacticalChanges);
     if (!playerScores.empty()) {
         auto best = max_element(playerScores.begin(), playerScores.end(),
@@ -180,12 +209,17 @@ MatchReport buildReport(const MatchSetup& setup,
 
 void appendSummaryLines(const MatchReport& report, vector<string>& lines) {
     lines.push_back("Impacto tactico: " + report.tacticalImpact.homeSummary + " || " + report.tacticalImpact.awaySummary);
+    lines.push_back("Riesgo tactico: control " + formatDouble2(report.tacticalImpact.homeControlScore) + "-" +
+                    formatDouble2(report.tacticalImpact.awayControlScore) +
+                    " | transicion " + formatDouble2(report.tacticalImpact.homeTransitionThreat) + "-" +
+                    formatDouble2(report.tacticalImpact.awayTransitionThreat));
     if (!report.playerOfTheMatch.empty()) {
         lines.push_back("Figura: " + report.playerOfTheMatch + " (" + to_string(report.playerOfTheMatchScore) + ")");
     }
     lines.push_back("Claves: " + report.explanation.likelyReason);
     lines.push_back("Tactica: " + report.explanation.tacticalStory);
     lines.push_back("Fatiga: " + report.explanation.fatigueStory);
+    lines.push_back("Disciplina: " + report.explanation.disciplineStory);
     lines.push_back("Detalle: " + report.explanation.chanceStory);
     lines.push_back("Impacto posterior: " + report.postMatchImpact);
     for (const string& phase : report.phaseSummaries) {

@@ -1309,3 +1309,216 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - tactica e IA tienen efecto mas visible sobre el desarrollo del partido
   - el mercado deja historial y logica de negociacion reusable
   - queda una base mejor para seguir con match center, scouting avanzado y dinamica de vestuario
+
+## 2026-03-10 - Persistencia desacoplada, reportes visibles y validacion de datos
+
+- Se siguio limpiando la frontera entre dominio y persistencia:
+  - `include/io/save_manager.h`
+  - `include/io/save_serialization.h`
+  - `src/io/save_manager.cpp`
+  - `src/io/save_serialization.cpp`
+  - `CMakeLists.txt`
+
+- Nuevo esquema de persistencia:
+  - `save_manager` ahora se encarga de:
+    - resolver rutas
+    - abrir archivos
+    - coordinar guardado/carga
+  - `save_serialization` ahora trabaja por stream con:
+    - `serializeCareer(...)`
+    - `deserializeCareer(...)`
+  - `Career::saveCareer()` y `Career::loadCareer()` quedan como delegados finos sobre esa capa
+
+- Mejora concreta de guardado/carga:
+  - se corrigio una regresion donde el guardado podia recalcular y sobrescribir identidad de club
+  - ahora se preservan correctamente datos como:
+    - `clubPrestige`
+    - `clubStyle`
+    - `youthIdentity`
+    - `primaryRival`
+
+- Se reforzo la utilidad del reporte de partido:
+  - `include/simulation/match_types.h`
+  - `src/simulation/match_report.cpp`
+  - `src/career/week_simulation.cpp`
+  - `src/ui/ui.cpp`
+
+- Nuevos datos visibles del postpartido:
+  - `playerOfTheMatch`
+  - `playerOfTheMatchScore`
+  - `postMatchImpact`
+
+- El analisis del ultimo partido ahora puede mostrar:
+  - figura del partido
+  - lectura de fatiga
+  - impacto posterior del encuentro
+
+- Se mejoro la presentacion de informacion al jugador:
+  - `src/career/career_support.cpp`
+  - `src/gui/gui_views.cpp`
+
+- El informe rival ahora incluye:
+  - estilo del rival
+  - plan ofensivo esperado
+  - amenaza principal
+  - lectura por lineas
+  - alerta tactica
+  - contexto de clasico si corresponde
+
+- La GUI aprovecha mejor esta informacion:
+  - dashboard con informe rival visible
+  - pantalla tactica con informe rival en el detalle
+  - mejor reutilizacion del ultimo analisis de partido dentro de paneles ya existentes
+
+- Se mejoro la validacion automatica de datos externos:
+  - `src/validators/validators.cpp`
+
+- Nueva validacion:
+  - revisa estructura minima de planteles
+  - detecta nombres duplicados dentro del mismo club
+  - reporta advertencias de cobertura por lineas sin romper la suite sobre datos legacy que el juego ya acepta
+
+- Tests agregados/mejorados:
+  - `tests/project_tests.cpp`
+  - nuevo test:
+    - `opponent_report`
+  - se reforzo cobertura del reporte de partido con figura del encuentro
+  - se mantuvo cobertura de:
+    - `save_load_roundtrip`
+    - `season_service`
+    - `validation_suite`
+
+- Build actualizado:
+  - `CMakeLists.txt` ahora incluye:
+    - `src/io/save_manager.cpp`
+
+- Validacion realizada:
+  - `build.bat --validate`
+  - compilacion principal exitosa por CMake
+  - compilacion manual de `build/FootballManagerTests.exe` con `g++`
+  - suite completa de tests pasando nuevamente
+
+- Limite conocido del entorno:
+  - siguen apareciendo dos lineas `Acceso denegado.` despues del `build.bat --validate`
+  - el ejecutable principal se genera bien
+  - la suite manual tambien queda validada
+
+- Impacto arquitectonico:
+  - persistencia mas aislada del dominio
+  - save/load mas facil de probar y mantener
+  - reportes mas utiles para el jugador sin mover logica a UI
+  - mejor base para seguir con mods, save manager mas rico y reportes semanales especializados
+
+2026-03-10
+
+- Refactor importante del motor de partidos:
+  - `src/simulation/simulation.cpp` dejo de ser un archivo tan cargado de responsabilidades
+  - ahora funciona como fachada publica de compatibilidad para:
+    - `computeStrength`
+    - `applyTactics`
+    - `simulateMatch`
+    - `playMatch`
+
+- Nuevos modulos creados para separar responsabilidades:
+  - `include/simulation/match_postprocess.h`
+  - `src/simulation/match_postprocess.cpp`
+  - `src/simulation/player_condition.cpp`
+
+- Nuevo modulo `match_postprocess`:
+  - centraliza la aplicacion del resultado del partido al estado real del mundo
+  - ahora resuelve en un solo lugar:
+    - puntos
+    - goles a favor/en contra
+    - goles de visita
+    - moral postpartido
+    - tarjetas nominales
+    - goles y asistencias
+    - lesiones nominales
+    - desarrollo por partido
+    - forma postpartido
+    - fatiga final
+
+- Nuevo modulo `player_condition`:
+  - mueve fuera de `simulation.cpp` la logica de:
+    - `simulateInjury(...)`
+    - `healInjuries(...)`
+    - `recoverFitness(...)`
+  - mejora la separacion entre simulacion de partido y mantenimiento fisico del plantel
+
+- Mejora del impacto tactico real en el motor moderno:
+  - `src/simulation/tactics_engine.cpp`
+  - `src/simulation/match_phase.cpp`
+
+- Ajustes tacticos aplicados:
+  - mayor peso de:
+    - presion
+    - ritmo
+    - anchura
+    - linea defensiva
+  - mas riesgo al usar linea alta contra juego directo
+  - mayor influencia tactica en:
+    - posesion por fase
+    - riesgo defensivo
+    - transiciones
+    - control territorial
+
+- Reportes del partido mejorados:
+  - `src/simulation/match_report.cpp`
+
+- El reporte ahora expone mejor:
+  - riesgo tactico por partido
+  - impacto disciplinario
+  - riesgo defensivo por fase
+  - mejor explicacion del dominio territorial
+  - mejor lectura del desgaste por presion sostenida
+
+- Mejora conductual de IA en cambios:
+  - `src/simulation/fatigue_engine.cpp`
+  - los equipos con:
+    - presion alta
+    - ritmo alto
+    - marcaje mas agresivo
+    - varios amonestados
+  - ahora empujan antes cambios por fatiga/riesgo
+
+- Build actualizado:
+  - `CMakeLists.txt` ahora incluye:
+    - `src/simulation/match_postprocess.cpp`
+    - `src/simulation/player_condition.cpp`
+
+- Tests ampliados:
+  - `tests/project_tests.cpp`
+  - se agrego:
+    - `simulate_match_state`
+  - se reforzo `match_engine_structure` para exigir:
+    - `Riesgo tactico:` en `reportLines`
+    - `Disciplina:` en `reportLines`
+
+- Validacion realizada:
+  - `build.bat --validate`
+  - compilacion principal exitosa por CMake
+  - compilacion manual de `build/FootballManagerTests.exe` con `g++`
+  - suite completa de tests pasando:
+    - `validation_suite`
+    - `match_engine_structure`
+    - `tactical_fatigue`
+    - `competition_group_table`
+    - `transfer_affordability`
+    - `transfer_negotiation`
+    - `season_transition`
+    - `season_service`
+    - `opponent_report`
+    - `simulate_match_state`
+    - `save_load_roundtrip`
+
+- Limpieza tecnica adicional:
+  - se eliminaron warnings evitables en:
+    - `src/simulation/match_engine.cpp`
+    - `src/transfers/negotiation_system.cpp`
+    - `src/validators/validators.cpp`
+
+- Impacto arquitectonico:
+  - menor acoplamiento entre simulacion y aplicacion del estado del mundo
+  - `simulation.cpp` mucho mas controlable para futuras extracciones
+  - mejor frontera entre motor de partido, postproceso y estado fisico
+  - base mas limpia para seguir rompiendo el motor en modulos pequenos

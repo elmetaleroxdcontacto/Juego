@@ -29,7 +29,7 @@ MatchPhaseEvaluation evaluatePhase(const MatchSetup& setup,
         static_cast<int>(round(50.0 + (homeSnapshot.midfieldControl - awaySnapshot.midfieldControl) / 3.4 +
                                (tactics_engine::possessionWeight(homeSnapshot.tacticalProfile) -
                                 tactics_engine::possessionWeight(awaySnapshot.tacticalProfile)) *
-                                   10.0)),
+                                   13.0)),
         32, 68);
     const int awayPossessionShare = 100 - homePossessionShare;
     const double intensity = clampValue(0.92 + phaseIndex * 0.04 +
@@ -73,10 +73,14 @@ MatchPhaseEvaluation evaluatePhase(const MatchSetup& setup,
     phase.homeChanceProbability = homeOpportunity;
     phase.awayChanceProbability = awayOpportunity;
     phase.homeDefensiveRisk = clampValue(0.14 + awayTransition * 0.32 + awaySnapshot.tacticalProfile.directness * 0.12 +
-                                             homeSnapshot.tacticalProfile.risk * 0.16 - homeSecurity * 0.18,
+                                             homeSnapshot.tacticalProfile.risk * 0.20 -
+                                             homeSecurity * 0.18 +
+                                             max(0.0, static_cast<double>(home.defensiveLine - 3)) * 0.04,
                                          0.06, 0.82);
     phase.awayDefensiveRisk = clampValue(0.14 + homeTransition * 0.32 + homeSnapshot.tacticalProfile.directness * 0.12 +
-                                             awaySnapshot.tacticalProfile.risk * 0.16 - awaySecurity * 0.18,
+                                             awaySnapshot.tacticalProfile.risk * 0.20 -
+                                             awaySecurity * 0.18 +
+                                             max(0.0, static_cast<double>(away.defensiveLine - 3)) * 0.04,
                                          0.06, 0.82);
     phase.homeFatigueGain =
         static_cast<int>(round(intensity * fatigue_engine::phaseFatigueGain(home, phaseIndex)));
