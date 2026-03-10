@@ -303,6 +303,10 @@ static bool isActivePageButton(const AppState& state, int id) {
     return isPageButtonId(id) && pageForControlId(id) == state.currentPage;
 }
 
+static bool titleMatches(const std::string& value, const char* expected) {
+    return value == expected;
+}
+
 void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     if (!drawItem) return;
     HDC hdc = drawItem->hDC;
@@ -390,35 +394,83 @@ LRESULT handleListCustomDraw(AppState& state, LPNMHDR header) {
     if (header->idFrom == IDC_TABLE_LIST) {
         std::string first = listViewText(state.tableList, row, 0);
         std::string second = listViewText(state.tableList, row, 1);
-        if (second.find('*') != std::string::npos) {
+        if (titleMatches(state.currentModel.primary.title, "LeagueTableView")) {
+            int totalRows = ListView_GetItemCount(state.tableList);
+            int position = std::atoi(first.c_str());
+            int relegationStart = std::max(1, totalRows - 1);
+            int continentalSpots = std::max(1, totalRows / 4);
+            if (second.find('*') != std::string::npos) {
+                bg = RGB(24, 71, 54);
+                text = RGB(242, 252, 247);
+            } else if (position > 0 && position <= continentalSpots) {
+                bg = RGB(20, 67, 49);
+            } else if (position >= relegationStart) {
+                bg = RGB(88, 34, 38);
+                text = RGB(255, 237, 237);
+            } else if (position > totalRows / 2) {
+                bg = RGB(79, 64, 20);
+            }
+        } else if (second.find('*') != std::string::npos) {
             bg = RGB(22, 66, 51);
         } else if (first == "1" || row == 0) {
             bg = RGB(58, 48, 17);
             text = RGB(255, 244, 208);
         }
     } else if (header->idFrom == IDC_SQUAD_LIST) {
-        std::string fitness = listViewText(state.squadList, row, 7);
-        std::string morale = listViewText(state.squadList, row, 5);
-        std::string status = listViewText(state.squadList, row, std::max(0, Header_GetItemCount(ListView_GetHeader(state.squadList)) - 1));
-        int fitnessValue = fitness.empty() ? 80 : std::atoi(fitness.c_str());
-        int moraleValue = morale.empty() ? 60 : std::atoi(morale.c_str());
-        if (status.find("Les") != std::string::npos) {
-            bg = RGB(82, 34, 36);
-        } else if (fitnessValue < 62 || moraleValue < 45) {
-            bg = RGB(82, 62, 20);
-        } else if (fitnessValue >= 85 && moraleValue >= 65) {
-            bg = RGB(19, 62, 47);
+        if (titleMatches(state.currentModel.secondary.title, "TeamStatusPanel")) {
+            std::string level = listViewText(state.squadList, row, 1);
+            if (level == "Alta" && row >= 2) {
+                bg = RGB(88, 34, 38);
+                text = RGB(255, 237, 237);
+            } else if (level == "Alta") {
+                bg = RGB(21, 69, 52);
+            } else if (level == "Media") {
+                bg = RGB(84, 68, 24);
+            } else if (level == "Baja" && row <= 1) {
+                bg = RGB(88, 34, 38);
+                text = RGB(255, 237, 237);
+            } else if (level == "Baja") {
+                bg = RGB(21, 69, 52);
+            } else if (level == "Sin datos") {
+                bg = RGB(33, 45, 56);
+            }
+        } else {
+            std::string fitness = listViewText(state.squadList, row, 7);
+            std::string morale = listViewText(state.squadList, row, 5);
+            std::string status = listViewText(state.squadList, row, std::max(0, Header_GetItemCount(ListView_GetHeader(state.squadList)) - 1));
+            int fitnessValue = fitness.empty() ? 80 : std::atoi(fitness.c_str());
+            int moraleValue = morale.empty() ? 60 : std::atoi(morale.c_str());
+            if (status.find("Les") != std::string::npos) {
+                bg = RGB(82, 34, 36);
+            } else if (fitnessValue < 62 || moraleValue < 45) {
+                bg = RGB(82, 62, 20);
+            } else if (fitnessValue >= 85 && moraleValue >= 65) {
+                bg = RGB(19, 62, 47);
+            }
         }
     } else if (header->idFrom == IDC_TRANSFER_LIST) {
-        std::string type = listViewText(state.transferList, row, 0);
-        if (type.find("Mercado") != std::string::npos || type.find("Objetivo") != std::string::npos) {
-            bg = RGB(19, 61, 47);
-        } else if (type.find("Contrato") != std::string::npos || type.find("Precontrato") != std::string::npos) {
-            bg = RGB(66, 50, 19);
-        } else if (type.find("Salida") != std::string::npos) {
-            bg = RGB(78, 33, 35);
-        } else if (type.find("Prestamo") != std::string::npos) {
-            bg = RGB(24, 42, 64);
+        if (titleMatches(state.currentModel.footer.title, "InjuryListWidget")) {
+            std::string issueType = listViewText(state.transferList, row, 1);
+            std::string note = listViewText(state.transferList, row, 4);
+            if (issueType == "-" && note.find("Plantilla completa") != std::string::npos) {
+                bg = RGB(21, 69, 52);
+            } else if (issueType.find("Fatiga") != std::string::npos) {
+                bg = RGB(84, 68, 24);
+            } else {
+                bg = RGB(88, 34, 38);
+                text = RGB(255, 237, 237);
+            }
+        } else {
+            std::string type = listViewText(state.transferList, row, 0);
+            if (type.find("Mercado") != std::string::npos || type.find("Objetivo") != std::string::npos) {
+                bg = RGB(19, 61, 47);
+            } else if (type.find("Contrato") != std::string::npos || type.find("Precontrato") != std::string::npos) {
+                bg = RGB(66, 50, 19);
+            } else if (type.find("Salida") != std::string::npos) {
+                bg = RGB(78, 33, 35);
+            } else if (type.find("Prestamo") != std::string::npos) {
+                bg = RGB(24, 42, 64);
+            }
         }
     }
 

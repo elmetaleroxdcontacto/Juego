@@ -187,18 +187,20 @@ void layoutWindow(AppState& state) {
     GetClientRect(state.window, &client);
 
     const int padding = 12;
-    const int sideWidth = 150;
+    const int sideWidth = 164;
     const int topBarHeight = 116;
     const int contentLeft = padding + sideWidth + 16;
     const int contentTop = topBarHeight + 56;
     const int infoWidth = 318;
     const int contentWidth = std::max(560, static_cast<int>(client.right - contentLeft - infoWidth - padding * 3));
     const int infoLeft = contentLeft + contentWidth + padding;
-    const int summaryWidth = std::max(340, contentWidth * 36 / 100);
+    const bool dashboardLayout = state.currentPage == GuiPage::Dashboard;
+    const int summaryWidth = std::max(360, dashboardLayout ? contentWidth * 58 / 100 : contentWidth * 36 / 100);
     const int tableWidth = contentWidth - summaryWidth - padding;
-    const int topPanelHeight = 182;
-    const int midPanelHeight = 238;
-    const int footerHeight = std::max(140, static_cast<int>(client.bottom - (contentTop + topPanelHeight + midPanelHeight + 136)));
+    const int topPanelHeight = dashboardLayout ? 214 : 182;
+    const int midPanelHeight = dashboardLayout ? 152 : 238;
+    const int footerHeight = std::max(dashboardLayout ? 152 : 140,
+                                      static_cast<int>(client.bottom - (contentTop + topPanelHeight + midPanelHeight + 136)));
 
     MoveWindow(state.divisionCombo, 92, 14, 184, 400, TRUE);
     MoveWindow(state.teamCombo, 360, 14, 224, 400, TRUE);
@@ -262,11 +264,18 @@ void layoutWindow(AppState& state) {
     MoveWindow(state.transferLabel, contentLeft, footerTop, contentWidth, 18, TRUE);
     MoveWindow(state.transferList, contentLeft, footerTop + 18, contentWidth, footerHeight, TRUE);
 
-    MoveWindow(state.detailLabel, infoLeft, panelsTop, infoWidth, 18, TRUE);
-    MoveWindow(state.detailEdit, infoLeft, panelsTop + 18, infoWidth, topPanelHeight + 120, TRUE);
-    int feedTop = panelsTop + topPanelHeight + 162;
-    MoveWindow(state.newsLabel, infoLeft, feedTop, infoWidth, 18, TRUE);
-    MoveWindow(state.newsList, infoLeft, feedTop + 18, infoWidth, client.bottom - feedTop - 56, TRUE);
+    if (dashboardLayout) {
+        MoveWindow(state.detailLabel, infoLeft, secondTop, infoWidth, 18, TRUE);
+        MoveWindow(state.detailEdit, infoLeft, secondTop + 18, infoWidth, midPanelHeight, TRUE);
+        MoveWindow(state.newsLabel, infoLeft, footerTop, infoWidth, 18, TRUE);
+        MoveWindow(state.newsList, infoLeft, footerTop + 18, infoWidth, footerHeight, TRUE);
+    } else {
+        MoveWindow(state.detailLabel, infoLeft, panelsTop, infoWidth, 18, TRUE);
+        MoveWindow(state.detailEdit, infoLeft, panelsTop + 18, infoWidth, topPanelHeight + 120, TRUE);
+        int feedTop = panelsTop + topPanelHeight + 162;
+        MoveWindow(state.newsLabel, infoLeft, feedTop, infoWidth, 18, TRUE);
+        MoveWindow(state.newsList, infoLeft, feedTop + 18, infoWidth, client.bottom - feedTop - 56, TRUE);
+    }
 
     MoveWindow(state.statusLabel, padding, client.bottom - 26, client.right - padding * 2, 18, TRUE);
 }
@@ -307,16 +316,16 @@ void initializeInterface(AppState& state) {
     state.simulateButton = createControl(state, 0, L"BUTTON", L"Simular", buttonStyle, 0, 0, 126, 28, state.window, IDC_SIMULATE_BUTTON);
     state.validateButton = createControl(state, 0, L"BUTTON", L"Validar", buttonStyle, 0, 0, 92, 28, state.window, IDC_VALIDATE_BUTTON);
 
-    state.dashboardButton = createControl(state, 0, L"BUTTON", L"Inicio", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_DASHBOARD_BUTTON);
-    state.squadButton = createControl(state, 0, L"BUTTON", L"Plantilla", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_SQUAD_BUTTON);
-    state.tacticsButton = createControl(state, 0, L"BUTTON", L"Tacticas", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_TACTICS_BUTTON);
-    state.calendarButton = createControl(state, 0, L"BUTTON", L"Calendario", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_CALENDAR_BUTTON);
-    state.leagueButton = createControl(state, 0, L"BUTTON", L"Liga", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_LEAGUE_BUTTON);
-    state.transfersButton = createControl(state, 0, L"BUTTON", L"Fichajes", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_TRANSFERS_BUTTON);
-    state.financesButton = createControl(state, 0, L"BUTTON", L"Finanzas", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_FINANCES_BUTTON);
-    state.youthButton = createControl(state, 0, L"BUTTON", L"Cantera", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_YOUTH_BUTTON);
-    state.boardButton = createControl(state, 0, L"BUTTON", L"Directiva", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_BOARD_BUTTON);
-    state.newsButton = createControl(state, 0, L"BUTTON", L"Noticias", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_NEWS_BUTTON);
+    state.dashboardButton = createControl(state, 0, L"BUTTON", L"[H] Inicio", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_DASHBOARD_BUTTON);
+    state.squadButton = createControl(state, 0, L"BUTTON", L"[P] Plantilla", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_SQUAD_BUTTON);
+    state.tacticsButton = createControl(state, 0, L"BUTTON", L"[T] Tacticas", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_TACTICS_BUTTON);
+    state.calendarButton = createControl(state, 0, L"BUTTON", L"[C] Calendario", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_CALENDAR_BUTTON);
+    state.leagueButton = createControl(state, 0, L"BUTTON", L"[L] Liga", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_LEAGUE_BUTTON);
+    state.transfersButton = createControl(state, 0, L"BUTTON", L"[$] Fichajes", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_TRANSFERS_BUTTON);
+    state.financesButton = createControl(state, 0, L"BUTTON", L"[F] Finanzas", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_FINANCES_BUTTON);
+    state.youthButton = createControl(state, 0, L"BUTTON", L"[Y] Cantera", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_YOUTH_BUTTON);
+    state.boardButton = createControl(state, 0, L"BUTTON", L"[D] Directiva", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_BOARD_BUTTON);
+    state.newsButton = createControl(state, 0, L"BUTTON", L"[N] Noticias", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_NEWS_BUTTON);
 
     state.scoutActionButton = createControl(state, 0, L"BUTTON", L"Otear", buttonStyle, 0, 0, 92, 26, state.window, IDC_SCOUT_BUTTON);
     state.shortlistButton = createControl(state, 0, L"BUTTON", L"Shortlist", buttonStyle, 0, 0, 92, 26, state.window, IDC_SHORTLIST_BUTTON);
@@ -332,22 +341,22 @@ void initializeInterface(AppState& state) {
     state.scoutingUpgradeButton = createControl(state, 0, L"BUTTON", L"Scout+", buttonStyle, 0, 0, 94, 26, state.window, IDC_SCOUTING_UPGRADE_BUTTON);
     state.stadiumUpgradeButton = createControl(state, 0, L"BUTTON", L"Estadio+", buttonStyle, 0, 0, 96, 26, state.window, IDC_STADIUM_UPGRADE_BUTTON);
 
-    state.breadcrumbLabel = createControl(state, 0, L"STATIC", L"Inicio", WS_CHILD | WS_VISIBLE, 0, 0, 320, 18, state.window, 0);
-    state.pageTitleLabel = createControl(state, 0, L"STATIC", L"Dashboard", WS_CHILD | WS_VISIBLE, 0, 0, 360, 24, state.window, 0);
+    state.breadcrumbLabel = createControl(state, 0, L"STATIC", L"Club > Resumen del club", WS_CHILD | WS_VISIBLE, 0, 0, 320, 18, state.window, 0);
+    state.pageTitleLabel = createControl(state, 0, L"STATIC", L"Resumen del club", WS_CHILD | WS_VISIBLE, 0, 0, 360, 24, state.window, 0);
     state.infoLabel = createControl(state, 0, L"STATIC", L"", WS_CHILD | WS_VISIBLE, 0, 0, 400, 22, state.window, 0);
-    state.summaryLabel = createControl(state, 0, L"STATIC", L"DashboardPanel", WS_CHILD | WS_VISIBLE, 0, 0, 240, 18, state.window, 0);
+    state.summaryLabel = createControl(state, 0, L"STATIC", L"Proximo partido", WS_CHILD | WS_VISIBLE, 0, 0, 240, 18, state.window, 0);
     state.summaryEdit = createControl(state, WS_EX_CLIENTEDGE, L"EDIT", L"", WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL, 0, 0, 300, 180, state.window, IDC_SUMMARY_EDIT);
-    state.tableLabel = createControl(state, 0, L"STATIC", L"LeaguePositionWidget", WS_CHILD | WS_VISIBLE, 0, 0, 240, 18, state.window, 0);
+    state.tableLabel = createControl(state, 0, L"STATIC", L"Tabla de liga", WS_CHILD | WS_VISIBLE, 0, 0, 240, 18, state.window, 0);
     state.tableList = createControl(state, WS_EX_CLIENTEDGE, WC_LISTVIEWW, L"", WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_SHOWSELALWAYS, 0, 0, 300, 180, state.window, IDC_TABLE_LIST);
-    state.squadLabel = createControl(state, 0, L"STATIC", L"PlayerTableView", WS_CHILD | WS_VISIBLE, 0, 0, 240, 18, state.window, 0);
+    state.squadLabel = createControl(state, 0, L"STATIC", L"Estado del equipo", WS_CHILD | WS_VISIBLE, 0, 0, 240, 18, state.window, 0);
     state.squadList = createControl(state, WS_EX_CLIENTEDGE, WC_LISTVIEWW, L"", WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_SHOWSELALWAYS, 0, 0, 300, 180, state.window, IDC_SQUAD_LIST);
-    state.transferLabel = createControl(state, 0, L"STATIC", L"TransferMarketView", WS_CHILD | WS_VISIBLE, 0, 0, 260, 18, state.window, 0);
+    state.transferLabel = createControl(state, 0, L"STATIC", L"Lesiones", WS_CHILD | WS_VISIBLE, 0, 0, 260, 18, state.window, 0);
     state.transferList = createControl(state, WS_EX_CLIENTEDGE, WC_LISTVIEWW, L"", WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_SHOWSELALWAYS, 0, 0, 300, 180, state.window, IDC_TRANSFER_LIST);
-    state.detailLabel = createControl(state, 0, L"STATIC", L"OptionalInfoPanel", WS_CHILD | WS_VISIBLE, 0, 0, 220, 18, state.window, 0);
+    state.detailLabel = createControl(state, 0, L"STATIC", L"Ultimo resultado", WS_CHILD | WS_VISIBLE, 0, 0, 220, 18, state.window, 0);
     state.detailEdit = createControl(state, WS_EX_CLIENTEDGE, L"EDIT", L"", WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL, 0, 0, 280, 240, state.window, IDC_DETAIL_EDIT);
-    state.newsLabel = createControl(state, 0, L"STATIC", L"AlertPanel / NewsFeedPanel", WS_CHILD | WS_VISIBLE, 0, 0, 240, 18, state.window, 0);
+    state.newsLabel = createControl(state, 0, L"STATIC", L"Noticias", WS_CHILD | WS_VISIBLE, 0, 0, 240, 18, state.window, 0);
     state.newsList = createControl(state, WS_EX_CLIENTEDGE, L"LISTBOX", L"", WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_NOINTEGRALHEIGHT, 0, 0, 280, 220, state.window, IDC_NEWS_LIST);
-    state.statusLabel = createControl(state, 0, L"STATIC", L"Listo.", WS_CHILD | WS_VISIBLE, 0, 0, 420, 18, state.window, 0);
+    state.statusLabel = createControl(state, 0, L"STATIC", L"Interfaz lista.", WS_CHILD | WS_VISIBLE, 0, 0, 420, 18, state.window, 0);
 
     setLabelFont(state.pageTitleLabel, state.titleFont);
     setLabelFont(state.summaryLabel, state.sectionFont);

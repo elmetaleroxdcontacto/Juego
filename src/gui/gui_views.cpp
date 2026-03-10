@@ -32,7 +32,7 @@ struct TransferPreviewItem {
 
 std::string pageTitleFor(GuiPage page) {
     switch (page) {
-        case GuiPage::Dashboard: return "Inicio";
+        case GuiPage::Dashboard: return "Resumen del club";
         case GuiPage::Squad: return "Plantilla";
         case GuiPage::Tactics: return "Tacticas";
         case GuiPage::Calendar: return "Calendario";
@@ -43,11 +43,66 @@ std::string pageTitleFor(GuiPage page) {
         case GuiPage::Board: return "Directiva";
         case GuiPage::News: return "Noticias";
     }
-    return "Inicio";
+    return "Resumen del club";
 }
 
 std::string breadcrumbFor(GuiPage page) {
-    return "Career > " + pageTitleFor(page);
+    return "Club > " + pageTitleFor(page);
+}
+
+std::string friendlyPanelTitle(const std::string& title) {
+    if (title == "DashboardPanel") return "Resumen del club";
+    if (title == "LeagueTableView") return "Tabla de liga";
+    if (title == "MatchSummaryPanel") return "Proximo partido";
+    if (title == "InjuryListWidget") return "Lesiones";
+    if (title == "FixtureListView") return "Calendario";
+    if (title == "UpcomingMatchWidget") return "Proximo partido";
+    if (title == "LastResultPanel") return "Ultimo resultado";
+    if (title == "TeamStatusPanel") return "Estado del equipo";
+    if (title == "LeaguePositionWidget") return "Posicion en liga";
+    if (title == "TeamMoraleWidget") return "Estado del vestuario";
+    if (title == "PlayerTableView") return "Plantilla";
+    if (title == "YouthPlayerTableView") return "Cantera";
+    if (title == "PlayerProfilePanel") return "Ficha del jugador";
+    if (title == "PlayerComparisonPanel") return "Comparador";
+    if (title == "SquadSummaryPanel") return "Resumen de plantilla";
+    if (title == "YouthSummaryPanel") return "Resumen de cantera";
+    if (title == "PlayerDevelopmentPanel") return "Desarrollo";
+    if (title == "SquadUnitOverview") return "Balance por lineas";
+    if (title == "TacticalSummary") return "Resumen tactico";
+    if (title == "TacticsBoard") return "Disposicion en el campo";
+    if (title == "FormationSelector") return "Once titular";
+    if (title == "TacticalImpactSummary") return "Impacto tactico";
+    if (title == "MatchAnalysisPanel") return "Informe tactico";
+    if (title == "CalendarSummary") return "Resumen del calendario";
+    if (title == "CupAndSeasonNotes") return "Competiciones";
+    if (title == "SeasonHistory") return "Historial de temporada";
+    if (title == "SeasonFlowController") return "Resumen semanal";
+    if (title == "CompetitionSummary") return "Resumen competitivo";
+    if (title == "RaceContext") return "Contexto de la tabla";
+    if (title == "SeasonRecords") return "Historial reciente";
+    if (title == "CompetitionReport") return "Informe de liga";
+    if (title == "TransferSearchPanel") return "Buscador de mercado";
+    if (title == "TransferMarketView") return "Mercado de fichajes";
+    if (title == "TransferTargetCard") return "Objetivo seleccionado";
+    if (title == "TransferPipeline") return "Operaciones en curso";
+    if (title == "FinanceSummary") return "Resumen financiero";
+    if (title == "FinanceBreakdown") return "Balance economico";
+    if (title == "SalaryTable") return "Masa salarial";
+    if (title == "Infrastructure") return "Infraestructura";
+    if (title == "ClubFinancePanel") return "Panel financiero";
+    if (title == "BoardObjectives") return "Objetivos de directiva";
+    if (title == "BoardObjectiveTable") return "Seguimiento de objetivos";
+    if (title == "ClubProfile") return "Perfil del club";
+    if (title == "CoachHistory") return "Historial del entrenador";
+    if (title == "BoardReport") return "Informe de directiva";
+    if (title == "NewsFeedPanel") return "Noticias";
+    if (title == "NewsCardList") return "Titulares";
+    if (title == "ScoutingInbox") return "Bandeja de scouting";
+    if (title == "NewsDetail") return "Detalle";
+    if (title == "AlertPanel") return "Alertas";
+    if (title == "AlertPanel / NewsFeedPanel") return "Noticias y alertas";
+    return title;
 }
 
 std::vector<std::string> filterOptionsForPage(GuiPage page) {
@@ -188,6 +243,24 @@ std::vector<std::string> buildAlertLines(const Career& career) {
         alerts.push_back("[Estado] No hay alertas criticas esta semana");
     }
     return alerts;
+}
+
+std::string teamConditionLabel(int averageFitness) {
+    if (averageFitness >= 84) return "Alta";
+    if (averageFitness >= 68) return "Media";
+    return "Baja";
+}
+
+std::string teamMoraleLabel(int morale) {
+    if (morale >= 72) return "Alta";
+    if (morale >= 52) return "Media";
+    return "Baja";
+}
+
+std::string severityLabel(int value, int high, int medium) {
+    if (value >= high) return "Alta";
+    if (value >= medium) return "Media";
+    return "Baja";
 }
 
 bool newsMatchesFilter(const std::string& line, const std::string& filter) {
@@ -351,6 +424,40 @@ std::string buildPlayerProfile(const Team& team, const Player* player) {
     return out.str();
 }
 
+ListPanelModel buildTeamStatusModel(const Career& career) {
+    ListPanelModel model;
+    model.title = "TeamStatusPanel";
+    model.columns = {{L"Indicador", 160}, {L"Estado", 100}, {L"Detalle", 300}};
+    if (!career.myTeam) {
+        model.rows.push_back({"Estado general", "Sin datos", "No hay carrera activa. Crea una nueva partida para comenzar."});
+        return model;
+    }
+
+    const Team& team = *career.myTeam;
+    int injured = 0;
+    int suspended = 0;
+    int lowMorale = 0;
+    int lowFitness = 0;
+    int fitnessTotal = 0;
+    for (const auto& player : team.players) {
+        fitnessTotal += player.fitness;
+        if (player.injured) ++injured;
+        if (player.matchesSuspended > 0) ++suspended;
+        if (player.happiness < 45) ++lowMorale;
+        if (player.fitness < 62) ++lowFitness;
+    }
+    int squadSize = std::max(1, static_cast<int>(team.players.size()));
+    int averageFitness = fitnessTotal / squadSize;
+
+    model.rows.push_back({"Fatiga", teamConditionLabel(averageFitness), "Promedio fisico " + std::to_string(averageFitness) + " / 100"});
+    model.rows.push_back({"Moral", teamMoraleLabel(team.morale), "Moral colectiva " + std::to_string(team.morale) + " / 100"});
+    model.rows.push_back({"Lesionados", severityLabel(injured, 3, 1), std::to_string(injured) + " jugadores fuera"});
+    model.rows.push_back({"Suspendidos", severityLabel(suspended, 2, 1), std::to_string(suspended) + " jugadores sancionados"});
+    model.rows.push_back({"Carga alta", severityLabel(lowFitness, 4, 2), std::to_string(lowFitness) + " jugadores con fisico bajo"});
+    model.rows.push_back({"Vestuario", severityLabel(lowMorale, 4, 2), std::to_string(lowMorale) + " jugadores con moral baja"});
+    return model;
+}
+
 ListPanelModel buildLeagueTableModel(const Career& career, const std::string& filter) {
     ListPanelModel model;
     model.title = "LeagueTableView";
@@ -391,11 +498,11 @@ ListPanelModel buildInjuryModel(const Career& career) {
             player.injured ? player.injuryType : "Fatiga",
             player.injured ? std::to_string(player.injuryWeeks) : "-",
             std::to_string(player.fitness),
-            player.injured ? "No disponible" : "Gestionar cargas"
+            player.injured ? "No disponible" : "Reducir cargas"
         });
     }
     if (model.rows.empty()) {
-        model.rows.push_back({"Sin bajas", "-", "-", "-", "Plantilla disponible"});
+        model.rows.push_back({"No hay lesiones actualmente", "-", "-", "-", "Plantilla completa y disponible"});
     }
     return model;
 }
@@ -406,7 +513,7 @@ ListPanelModel buildFixtureModel(const Career& career, int limit) {
     model.columns = {{L"Sem", 48}, {L"Comp", 120}, {L"Rival", 220}, {L"Sede", 70}, {L"Estado", 100}};
     model.rows = buildFixtureRows(career, limit);
     if (model.rows.empty()) {
-        model.rows.push_back({"-", "-", "Sin fechas visibles", "-", "-"});
+        model.rows.push_back({"-", "-", "No hay partidos programados", "-", "-"});
     }
     return model;
 }
@@ -607,19 +714,20 @@ GuiPageModel buildDashboardModel(AppState& state) {
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state.career, alerts);
     model.infoLine = state.career.myTeam
-        ? "Proximo partido: " + findNextMatchLine(state.career)
-        : "Selecciona division, club y manager para entrar al dashboard.";
-    model.summary.title = "DashboardPanel";
+        ? "Vista rapida del club con partido, tabla, estado y noticias."
+        : "No hay carrera activa. Crea una nueva partida para comenzar.";
+    model.summary.title = "UpcomingMatchWidget";
     model.primary = buildLeagueTableModel(state.career, "Grupo actual");
-    model.secondary = buildInjuryModel(state.career);
-    model.footer = buildFixtureModel(state.career, 6);
-    model.detail.title = "MatchSummaryPanel";
-    model.feed.title = "AlertPanel / NewsFeedPanel";
+    model.secondary = buildTeamStatusModel(state.career);
+    model.footer = buildInjuryModel(state.career);
+    model.detail.title = "LastResultPanel";
+    model.feed.title = "NewsFeedPanel";
     model.feed.lines = state.currentFilter == "Alertas" ? alerts : buildFeedLines(state.career, state.currentFilter == "Todo" ? "" : state.currentFilter);
 
     if (!state.career.myTeam) {
-        model.summary.content = "No hay carrera activa.";
-        model.detail.content = "Crea o carga una partida.";
+        model.summary.content = "No hay carrera activa.\r\n\r\nCrea una nueva partida o carga un guardado para abrir el centro del club.";
+        model.detail.content = "Aun no hay ultimo resultado disponible.\r\n\r\nCuando inicies una carrera aqui veras el analisis del partido mas reciente.";
+        if (model.primary.rows.empty()) model.primary.rows.push_back({"-", "No hay tabla disponible", "-", "-", "-", "-", "-", "-", "-", "-", "-"});
         return model;
     }
 
@@ -632,31 +740,21 @@ GuiPageModel buildDashboardModel(AppState& state) {
     }
 
     std::ostringstream out;
-    out << "UpcomingMatchWidget\r\n";
     out << findNextMatchLine(state.career) << "\r\n\r\n";
-    out << "LeaguePositionWidget\r\n";
     out << "Posicion " << state.career.currentCompetitiveRank() << "/" << state.career.currentCompetitiveFieldSize()
-        << " | Puntos " << team.points << " | DG " << (team.goalsFor - team.goalsAgainst) << "\r\n\r\n";
-    out << "TeamMoraleWidget\r\n";
-    out << "Moral del equipo " << team.morale << " | Jugadores con moral baja " << lowMorale << "\r\n";
-    out << "Bajas actuales " << injured << " | Objetivo directiva " << state.career.boardMonthlyObjective << "\r\n";
-    out << "\r\nVestuario\r\n" << dressingRoomPanelText(state.career, 3);
-    out << "\r\nInforme rival\r\n" << buildOpponentReport(state.career);
-    out << "\r\nUltimo partido\r\n" << lastMatchPanelText(state.career, 3, 3);
+        << " | Puntos " << team.points << " | DG " << (team.goalsFor - team.goalsAgainst) << "\r\n";
+    out << "Moral " << team.morale << " | Lesionados " << injured << " | Riesgos de vestuario " << lowMorale << "\r\n";
+    out << "Objetivo: " << (state.career.boardMonthlyObjective.empty() ? "Sin objetivo mensual activo" : state.career.boardMonthlyObjective) << "\r\n\r\n";
+    out << "Informe rival\r\n" << buildOpponentReport(state.career);
     model.summary.content = out.str();
 
     std::ostringstream detail;
-    detail << "Objetivo directiva\r\n";
-    detail << (state.career.boardMonthlyObjective.empty() ? "Sin objetivo mensual activo" : state.career.boardMonthlyObjective) << "\r\n";
-    detail << "Progreso " << state.career.boardMonthlyProgress << "/" << state.career.boardMonthlyTarget
-           << " | Confianza " << state.career.boardConfidence << "/100\r\n\r\n";
-    detail << "Vestuario\r\n" << dressingRoomPanelText(state.career, 5) << "\r\n";
-    detail << "Informe rival\r\n" << buildOpponentReport(state.career) << "\r\n\r\n";
-    detail << "Ultimo partido\r\n" << lastMatchPanelText(state.career, 5, 6) << "\r\n";
-    detail << "Noticias recientes\r\n";
-    for (size_t i = 0; i < model.feed.lines.size() && i < 4; ++i) {
-        detail << "- " << model.feed.lines[i] << "\r\n";
-    }
+    detail << "Ultimo resultado\r\n";
+    detail << lastMatchPanelText(state.career, 6, 6) << "\r\n\r\n";
+    detail << "Impacto inmediato\r\n";
+    detail << "Confianza " << state.career.boardConfidence << "/100"
+           << " | Progreso " << state.career.boardMonthlyProgress << "/" << state.career.boardMonthlyTarget << "\r\n";
+    detail << dressingRoomPanelText(state.career, 4);
     model.detail.content = detail.str();
     return model;
 }
@@ -667,7 +765,7 @@ GuiPageModel buildSquadModel(AppState& state, bool youthOnly) {
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state.career, alerts);
-    model.infoLine = youthOnly ? "Vista de cantera y perfiles de desarrollo." : "Tabla completa de plantilla con orden y ficha.";
+    model.infoLine = youthOnly ? "Cantera con filtro por edad y potencial." : "Plantilla completa con orden por columnas y ficha detallada.";
     model.summary.title = youthOnly ? "YouthSummaryPanel" : "SquadSummaryPanel";
     model.primary = state.career.myTeam ? buildSquadUnitModel(*state.career.myTeam) : ListPanelModel{};
     model.secondary = buildPlayerTableModel(state, youthOnly);
@@ -680,7 +778,7 @@ GuiPageModel buildSquadModel(AppState& state, bool youthOnly) {
     }
     model.footer = buildComparisonModel(state.career, selected);
     model.detail.title = "PlayerProfilePanel";
-    model.detail.content = state.career.myTeam ? buildPlayerProfile(*state.career.myTeam, selected)
+        model.detail.content = state.career.myTeam ? buildPlayerProfile(*state.career.myTeam, selected)
                                                : "Selecciona una carrera para mostrar jugadores.";
 
     if (!state.career.myTeam) {
@@ -702,7 +800,6 @@ GuiPageModel buildSquadModel(AppState& state, bool youthOnly) {
     }
     count = std::max(1, count);
     std::ostringstream out;
-    out << (youthOnly ? "PlayerDevelopmentPanel" : "PlayerTableView") << "\r\n";
     out << "Jugadores visibles " << count
         << " | Edad media " << (avgAge / count)
         << " | Potencial medio " << (avgPotential / count)
@@ -720,7 +817,7 @@ GuiPageModel buildTacticsModel(AppState& state) {
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state.career, alerts);
-    model.infoLine = "TacticsBoard + TacticalSliderPanel con efectos estimados.";
+    model.infoLine = "Lee el plan tactico, el once inicial y el impacto esperado de cada ajuste.";
     model.summary.title = "TacticalSummary";
     model.primary.title = "TacticsBoard";
     model.primary.columns = {{L"Variable", 120}, {L"Valor", 70}, {L"Efecto estimado", 280}};
@@ -740,7 +837,7 @@ GuiPageModel buildTacticsModel(AppState& state) {
 
     Team& team = *state.career.myTeam;
     model.summary.content =
-        "TacticsBoard\r\nFormacion " + team.formation + " | Mentalidad " + team.tactics +
+        "Formacion " + team.formation + " | Mentalidad " + team.tactics +
         "\r\nPresion " + std::to_string(team.pressingIntensity) +
         " | Ritmo " + std::to_string(team.tempo) +
         " | Anchura " + std::to_string(team.width) +
@@ -782,7 +879,6 @@ GuiPageModel buildTacticsModel(AppState& state) {
     model.footer.rows.push_back({"Defensa", team.defensiveLine >= 4 ? "Bloque adelantado" : "Bloque medio/bajo", team.defensiveLine >= 4 ? "Espalda expuesta" : "Mayor asedio rival"});
 
     std::ostringstream detail;
-    detail << "TacticalSliderPanel\r\n";
     detail << "Presion alta aumenta recuperaciones, pero castiga a jugadores con fisico bajo.\r\n";
     detail << "Ritmo alto acelera la llegada, aunque empeora la precision en equipos con forma baja.\r\n";
     detail << "Bloque bajo reduce espacio interior y aumenta probabilidad de centros rivales.\r\n";
@@ -799,7 +895,7 @@ GuiPageModel buildCalendarModel(AppState& state) {
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state.career, alerts);
-    model.infoLine = "FixtureListView con calendario competitivo del club.";
+    model.infoLine = "Calendario competitivo con proximos partidos, copa y contexto de temporada.";
     model.summary.title = "CalendarSummary";
     model.primary = buildFixtureModel(state.career, state.currentFilter == "Toda la fase" ? 24 : (state.currentFilter == "Proximos 10" ? 10 : 5));
     model.secondary.title = "CupAndSeasonNotes";
@@ -816,7 +912,7 @@ GuiPageModel buildCalendarModel(AppState& state) {
         return model;
     }
 
-    model.summary.content = "FixtureListView\r\n" + findNextMatchLine(state.career) +
+    model.summary.content = findNextMatchLine(state.career) +
                             "\r\nPartidos visibles: " + std::to_string(model.primary.rows.size());
     model.secondary.rows.push_back({"Division activa", divisionDisplay(state.career.activeDivision), "Sem " + std::to_string(state.career.currentWeek)});
     model.secondary.rows.push_back({"Copa", state.career.cupActive ? "Activa" : "Cerrada", state.career.cupChampion.empty() ? "Sin campeon" : state.career.cupChampion});
@@ -828,7 +924,7 @@ GuiPageModel buildCalendarModel(AppState& state) {
         });
     }
     if (model.footer.rows.empty()) model.footer.rows.push_back({"-", "-", "-", "-", "Sin historial"});
-    model.detail.content = "SeasonFlowController\r\nEl flujo semanal sincroniza calendario, finanzas, desarrollo y copa.\r\n" +
+    model.detail.content = "El flujo semanal sincroniza calendario, finanzas, desarrollo y copa.\r\n" +
                            std::string("Filtro actual: ") + state.currentFilter;
     return model;
 }
@@ -839,7 +935,7 @@ GuiPageModel buildLeagueModel(AppState& state) {
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state.career, alerts);
-    model.infoLine = "LeagueTableView y contexto competitivo del club.";
+    model.infoLine = "Tabla de liga, zonas de objetivo y contexto competitivo del club.";
     model.summary.title = "CompetitionSummary";
     model.primary = buildLeagueTableModel(state.career, state.currentFilter);
     model.secondary.title = "RaceContext";
@@ -883,7 +979,7 @@ GuiPageModel buildTransfersModel(AppState& state) {
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state.career, alerts);
-    model.infoLine = "TransferMarketView con filtros y tarjetas de negociacion.";
+    model.infoLine = "Mercado de fichajes con filtros, lectura del plantel y objetivos prioritarios.";
     model.summary.title = "TransferSearchPanel";
     model.primary.title = "TransferSearchPanel";
     model.primary.columns = {{L"Area", 120}, {L"Valor", 120}, {L"Lectura", 280}};
@@ -904,8 +1000,7 @@ GuiPageModel buildTransfersModel(AppState& state) {
     }
 
     Team& team = *state.career.myTeam;
-    model.summary.content = "TransferSearchPanel\r\n"
-                            "Presupuesto actual " + formatMoneyValue(team.budget) + "\r\n"
+    model.summary.content = "Presupuesto actual " + formatMoneyValue(team.budget) + "\r\n"
                             "Filtro " + state.currentFilter + "\r\n"
                             "Pendientes " + std::to_string(state.career.pendingTransfers.size()) + "\r\n"
                             "Shortlist " + std::to_string(state.career.scoutingShortlist.size());
@@ -945,7 +1040,6 @@ GuiPageModel buildTransfersModel(AppState& state) {
         model.detail.content = "Selecciona un objetivo para ver detalle.";
     } else {
         std::ostringstream detail;
-        detail << "TransferTargetCard\r\n";
         detail << player->name << " | " << seller->name << " | " << normalizePosition(player->position) << "\r\n";
         detail << "Media " << player->skill << " | Potencial " << player->potential << " | Edad " << player->age << "\r\n";
         detail << "Valor " << formatMoneyValue(player->value) << " | Salario " << formatMoneyValue(player->wage) << "\r\n";
@@ -1003,7 +1097,7 @@ GuiPageModel buildFinancesModel(AppState& state) {
     model.footer.rows.push_back({"Scouting", std::to_string(team.scoutingChief), std::to_string(team.scoutingChief), "Afecta mercado y reportes"});
     model.footer.rows.push_back({"Estadio", std::to_string(team.stadiumLevel), std::to_string(team.fanBase), "Impacta recaudacion"});
 
-    model.detail.content = "ClubFinancePanel\r\nPresupuesto " + formatMoneyValue(team.budget) +
+    model.detail.content = "Presupuesto " + formatMoneyValue(team.budget) +
                            "\r\nDeuda " + formatMoneyValue(team.debt) +
                            "\r\nSponsor " + formatMoneyValue(team.sponsorWeekly) +
                            "\r\nFanbase " + std::to_string(team.fanBase);
@@ -1058,7 +1152,7 @@ GuiPageModel buildNewsModel(AppState& state) {
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state.career, alerts);
-    model.infoLine = "NewsFeedPanel y tarjetas narrativas del mundo de juego.";
+    model.infoLine = "Noticias, scouting y alertas para seguir el pulso del mundo de juego.";
     model.summary.title = "NewsFeedPanel";
     model.primary.title = "NewsCardList";
     model.primary.columns = {{L"Tipo", 120}, {L"Titular", 620}};
@@ -1088,7 +1182,7 @@ GuiPageModel buildNewsModel(AppState& state) {
     for (const auto& alert : alerts) {
         model.footer.rows.push_back({"Alerta", alert});
     }
-    model.summary.content = "NewsFeedPanel\r\nEntradas visibles: " + std::to_string(model.feed.lines.size()) +
+    model.summary.content = "Entradas visibles: " + std::to_string(model.feed.lines.size()) +
                             "\r\nFiltro actual: " + state.currentFilter;
     model.detail.content = lastMatchPanelText(state.career, 5, 8) + "\r\n" + dressingRoomPanelText(state.career, 4);
     return model;
@@ -1112,14 +1206,16 @@ GuiPageModel buildModel(AppState& state) {
 
 void renderFeed(HWND list, const std::vector<std::string>& lines) {
     SendMessageW(list, LB_RESETCONTENT, 0, 0);
-    for (const auto& line : lines) {
+    std::vector<std::string> safeLines = lines;
+    if (safeLines.empty()) safeLines.push_back("No hay noticias recientes.");
+    for (const auto& line : safeLines) {
         std::wstring wide = utf8ToWide(line);
         SendMessageW(list, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(wide.c_str()));
     }
 }
 
 void renderListPanel(HWND label, HWND list, const ListPanelModel& model) {
-    setWindowTextUtf8(label, model.title);
+    setWindowTextUtf8(label, friendlyPanelTitle(model.title));
     resetListViewColumns(list, model.columns);
     clearListView(list);
     for (const auto& row : model.rows) {
@@ -1202,11 +1298,11 @@ void refreshCurrentPage(AppState& state) {
     setWindowTextUtf8(state.pageTitleLabel, state.currentModel.title);
     setWindowTextUtf8(state.breadcrumbLabel, state.currentModel.breadcrumb);
     setWindowTextUtf8(state.infoLabel, state.currentModel.infoLine);
-    setWindowTextUtf8(state.summaryLabel, state.currentModel.summary.title);
+    setWindowTextUtf8(state.summaryLabel, friendlyPanelTitle(state.currentModel.summary.title));
     setWindowTextUtf8(state.summaryEdit, state.currentModel.summary.content);
-    setWindowTextUtf8(state.detailLabel, state.currentModel.detail.title);
+    setWindowTextUtf8(state.detailLabel, friendlyPanelTitle(state.currentModel.detail.title));
     setWindowTextUtf8(state.detailEdit, state.currentModel.detail.content);
-    setWindowTextUtf8(state.newsLabel, state.currentModel.feed.title);
+    setWindowTextUtf8(state.newsLabel, friendlyPanelTitle(state.currentModel.feed.title));
 
     renderListPanel(state.tableLabel, state.tableList, state.currentModel.primary);
     renderListPanel(state.squadLabel, state.squadList, state.currentModel.secondary);

@@ -1850,3 +1850,83 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - el juego ya no depende solo del `loader` para descubrir errores de datos
   - existe una barrera real de calidad para auditar la base externa antes de jugar
   - queda preparada la base para endurecer la validacion y bloquear arranque cuando la base este saneada
+
+## 2026-03-10 - Mejora visual de la GUI y claridad de informacion
+
+- Se mejoro la interfaz grafica sin tocar la logica del juego en:
+  - `src/gui/gui_views.cpp`
+  - `src/gui/gui_layout.cpp`
+  - `src/gui/gui_shared.cpp`
+
+- Se agrego un mapeo de nombres amigables para la interfaz:
+  - los ids tecnicos se mantienen en codigo
+  - la GUI ahora muestra textos como:
+    - `Resumen del club`
+    - `Tabla de liga`
+    - `Proximo partido`
+    - `Lesiones`
+    - `Calendario`
+
+- Se rediseño el dashboard principal:
+  - el panel de `Proximo partido` ahora tiene mayor peso visual
+  - se reorganizo el layout para mostrar:
+    - `Proximo partido`
+    - `Tabla de liga`
+    - `Estado del equipo`
+    - `Ultimo resultado`
+    - `Lesiones`
+    - `Noticias`
+
+- Se agrego un panel nuevo:
+  - `TeamStatusPanel`
+  - muestra:
+    - fatiga del equipo
+    - moral del equipo
+    - lesionados
+    - suspendidos
+    - carga alta
+    - estado del vestuario
+
+- Se mejoro el menu lateral:
+  - se mantuvo la navegacion existente
+  - se hicieron las entradas mas visuales con prefijos tipo:
+    - `[H] Inicio`
+    - `[P] Plantilla`
+    - `[T] Tacticas`
+    - `[$] Fichajes`
+    - `[Y] Cantera`
+
+- Se reforzo la jerarquia visual:
+  - el dashboard usa un layout especial con panel principal mas ancho
+  - la columna derecha muestra `Ultimo resultado` y `Noticias`
+  - se redujo espacio vacio en la pantalla principal
+
+- Se agregaron colores informativos en tablas:
+  - verde para estados positivos
+  - amarillo para advertencias
+  - rojo para problemas
+  - la tabla de liga ahora colorea:
+    - puestos altos
+    - mitad de tabla
+    - descenso
+  - las tablas de estado del equipo y lesiones ahora resaltan riesgo de forma visible
+
+- Se mejoraron mensajes vacios:
+  - `No hay carrera activa. Crea una nueva partida para comenzar.`
+  - `No hay partidos programados`
+  - `No hay lesiones actualmente`
+  - `No hay noticias recientes`
+
+- Se mantuvo la arquitectura actual:
+  - no se movio logica de juego a GUI
+  - la capa visual sigue consumiendo datos estructurados del motor
+
+- Validacion realizada:
+  - `build.bat --validate`
+  - compilacion principal exitosa por CMake
+  - ejecutable generado en `build-cmake/bin/FootballManager.exe`
+
+- Impacto en UX:
+  - la interfaz deja de exponer nombres internos al jugador
+  - mejora lectura rapida de estado, riesgo y contexto competitivo
+  - el dashboard se acerca mas a una experiencia tipo manager moderno
