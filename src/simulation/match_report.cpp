@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <map>
 #include <sstream>
 
 using namespace std;
@@ -48,6 +49,10 @@ string buildLikelyReason(const MatchSetup& setup, const MatchStats& stats, const
     return "El resultado se definio por detalles en un partido de margenes cortos.";
 }
 
+string playerKey(const string& teamName, const string& playerName) {
+    return teamName + "|" + playerName;
+}
+
 }  // namespace
 
 namespace match_report {
@@ -58,6 +63,8 @@ MatchReport buildReport(const MatchSetup& setup,
                         const MatchTimeline& timeline,
                         const MatchStats& stats) {
     MatchReport report;
+    map<string, int> playerScores;
+    map<string, string> playerNames;
     int homeDominantPhases = 0;
     int awayDominantPhases = 0;
     int homeFatigueLoad = 0;
@@ -88,6 +95,26 @@ MatchReport buildReport(const MatchSetup& setup,
             line << ", ajustes tacticos";
         }
         report.phaseSummaries.push_back(line.str());
+    }
+
+    for (const MatchEvent& event : timeline.events) {
+        if (event.playerName.empty() || event.teamName.empty()) continue;
+        const string key = playerKey(event.teamName, event.playerName);
+        playerNames[key] = event.playerName;
+        int delta = 0;
+        switch (event.type) {
+            case MatchEventType::Goal: delta = 12; break;
+            case MatchEventType::BigChance: delta = 5; break;
+            case MatchEventType::Save: delta = 6; break;
+            case MatchEventType::Shot: delta = 2; break;
+            case MatchEventType::AttackBuildUp: delta = 1; break;
+            case MatchEventType::Counterattack: delta = 2; break;
+            case MatchEventType::YellowCard: delta = -2; break;
+            case MatchEventType::RedCard: delta = -7; break;
+            case MatchEventType::Injury: delta = -2; break;
+            default: break;
+        }
+        playerScores[key] += delta;
     }
 
     report.tacticalImpact.homeControlScore =
@@ -133,15 +160,34 @@ MatchReport buildReport(const MatchSetup& setup,
         "xG " + formatDouble2(stats.homeExpectedGoals) + "-" + formatDouble2(stats.awayExpectedGoals) +
         " | ocasiones claras " + to_string(stats.homeBigChances) + "-" + to_string(stats.awayBigChances) +
         " | cambios tacticos " + to_string(tacticalChanges);
+    if (!playerScores.empty()) {
+        auto best = max_element(playerScores.begin(), playerScores.end(),
+                                [](const pair<string, int>& left, const pair<string, int>& right) {
+                                    if (left.second != right.second) return left.second < right.second;
+                                    return left.first > right.first;
+                                });
+        report.playerOfTheMatch = playerNames[best->first];
+        report.playerOfTheMatchScore = best->second;
+    }
+    report.postMatchImpact =
+        "Moral " + to_string(stats.homeGoals > stats.awayGoals ? +3 : stats.homeGoals < stats.awayGoals ? -2 : +1) +
+        "/" +
+        to_string(stats.awayGoals > stats.homeGoals ? +3 : stats.awayGoals < stats.homeGoals ? -2 : +1) +
+        " | disciplina " + to_string(stats.homeYellowCards + stats.homeRedCards) +
+        "-" + to_string(stats.awayYellowCards + stats.awayRedCards);
     return report;
 }
 
 void appendSummaryLines(const MatchReport& report, vector<string>& lines) {
     lines.push_back("Impacto tactico: " + report.tacticalImpact.homeSummary + " || " + report.tacticalImpact.awaySummary);
+    if (!report.playerOfTheMatch.empty()) {
+        lines.push_back("Figura: " + report.playerOfTheMatch + " (" + to_string(report.playerOfTheMatchScore) + ")");
+    }
     lines.push_back("Claves: " + report.explanation.likelyReason);
     lines.push_back("Tactica: " + report.explanation.tacticalStory);
     lines.push_back("Fatiga: " + report.explanation.fatigueStory);
     lines.push_back("Detalle: " + report.explanation.chanceStory);
+    lines.push_back("Impacto posterior: " + report.postMatchImpact);
     for (const string& phase : report.phaseSummaries) {
         lines.push_back("Fase " + phase);
     }

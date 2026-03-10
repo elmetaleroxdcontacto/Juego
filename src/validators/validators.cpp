@@ -65,6 +65,44 @@ static ValidationResult validateRosterCaps(Career& career) {
     return {"Planteles", true, "Planteles dentro de rangos validos."};
 }
 
+static ValidationResult validateRosterStructure(Career& career) {
+    int warningCount = 0;
+    vector<string> examples;
+    for (auto& team : career.allTeams) {
+        int goalkeepers = 0;
+        int defenders = 0;
+        int midfielders = 0;
+        int forwards = 0;
+        set<string> playerNames;
+        for (const auto& player : team.players) {
+            string key = toLower(trim(player.name));
+            if (!playerNames.insert(key).second) {
+                return {"Estructura plantel", false, team.name + " tiene jugadores duplicados: " + player.name};
+            }
+            string pos = normalizePosition(player.position);
+            if (pos == "ARQ") goalkeepers++;
+            else if (pos == "DEF") defenders++;
+            else if (pos == "MED") midfielders++;
+            else if (pos == "DEL") forwards++;
+        }
+        if (goalkeepers < 1 || defenders < 2 || (midfielders < 2 && forwards < 2)) {
+            warningCount++;
+            if (examples.size() < 3) {
+                string note = team.name + " (ARQ " + to_string(goalkeepers) +
+                              ", DEF " + to_string(defenders) +
+                              ", MED " + to_string(midfielders) +
+                              ", DEL " + to_string(forwards) + ")";
+                examples.push_back(note);
+            }
+        }
+    }
+    string detail = "Cobertura minima de posiciones revisada.";
+    if (warningCount > 0) {
+        detail += " Advertencias en " + to_string(warningCount) + " planteles: " + joinStringValues(examples, " | ");
+    }
+    return {"Estructura plantel", true, detail};
+}
+
 static ValidationResult validateSchedules(Career& career) {
     for (const auto& div : career.divisions) {
         career.setActiveDivision(div.id);
@@ -246,6 +284,7 @@ ValidationSuiteSummary buildValidationSuiteSummary() {
     results.push_back(validateDivisionCounts(career));
     results.push_back(validateUniqueTeams(career));
     results.push_back(validateRosterCaps(career));
+    results.push_back(validateRosterStructure(career));
     results.push_back(validateSchedules(career));
     results.push_back(validateSaveLoad());
     results.push_back(validateTableSorting());

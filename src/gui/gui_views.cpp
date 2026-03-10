@@ -2,6 +2,7 @@
 
 #ifdef _WIN32
 
+#include "career/career_support.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -628,6 +629,7 @@ GuiPageModel buildDashboardModel(AppState& state) {
     out << "TeamMoraleWidget\r\n";
     out << "Moral del equipo " << team.morale << " | Jugadores con moral baja " << lowMorale << "\r\n";
     out << "Bajas actuales " << injured << " | Objetivo directiva " << state.career.boardMonthlyObjective << "\r\n";
+    out << "\r\nInforme rival\r\n" << buildOpponentReport(state.career);
     if (!state.career.lastMatchAnalysis.empty()) {
         out << "\r\nUltimos resultados\r\n" << state.career.lastMatchAnalysis;
     }
@@ -638,6 +640,7 @@ GuiPageModel buildDashboardModel(AppState& state) {
     detail << (state.career.boardMonthlyObjective.empty() ? "Sin objetivo mensual activo" : state.career.boardMonthlyObjective) << "\r\n";
     detail << "Progreso " << state.career.boardMonthlyProgress << "/" << state.career.boardMonthlyTarget
            << " | Confianza " << state.career.boardConfidence << "/100\r\n\r\n";
+    detail << "Informe rival\r\n" << buildOpponentReport(state.career) << "\r\n\r\n";
     detail << "Noticias recientes\r\n";
     for (size_t i = 0; i < model.feed.lines.size() && i < 4; ++i) {
         detail << "- " << model.feed.lines[i] << "\r\n";
@@ -771,6 +774,7 @@ GuiPageModel buildTacticsModel(AppState& state) {
     detail << "Presion alta aumenta recuperaciones, pero castiga a jugadores con fisico bajo.\r\n";
     detail << "Ritmo alto acelera la llegada, aunque empeora la precision en equipos con forma baja.\r\n";
     detail << "Bloque bajo reduce espacio interior y aumenta probabilidad de centros rivales.\r\n";
+    detail << "Informe rival: " << buildOpponentReport(state.career) << "\r\n";
     detail << "Ultimo analisis: " << (state.career.lastMatchAnalysis.empty() ? "sin partido reciente" : state.career.lastMatchAnalysis);
     model.detail.content = detail.str();
     return model;

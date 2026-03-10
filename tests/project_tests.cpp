@@ -1,5 +1,6 @@
 #include "ai/ai_transfer_manager.h"
 #include "career/career_reports.h"
+#include "career/career_support.h"
 #include "career/season_service.h"
 #include "career/season_transition.h"
 #include "competition/competition.h"
@@ -182,6 +183,8 @@ void testMatchSimulationProducesStructuredPhases() {
     expect(result.report.phaseSummaries.size() == 6, "El reporte debe resumir las seis fases del partido.");
     expect(!result.report.explanation.likelyReason.empty(),
            "El reporte del partido debe incluir una explicacion probable.");
+    expect(!result.report.playerOfTheMatch.empty(),
+           "El reporte del partido debe identificar una figura del partido.");
 }
 
 void testHighPressRaisesPhaseFatigue() {
@@ -392,6 +395,27 @@ void testSeasonServiceReturnsStructuredWeekResult() {
     expect(!result.week.lastMatchAnalysis.empty(), "SeasonService debe propagar el ultimo analisis de partido.");
 }
 
+void testOpponentReportExplainsNextFixture() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 1;
+
+    career.allTeams.push_back(makeTeam("Reporte Azul", "primera division", 71, 4, 3, "Pressing", "Contra-presion", 600000));
+    career.allTeams.push_back(makeTeam("Reporte Rival", "primera division", 69, 2, 4, "Counter", "Juego directo", 520000));
+    career.allTeams.push_back(makeTeam("Reporte Centro", "primera division", 67, 3, 3, "Balanced", "Equilibrado", 500000));
+    career.allTeams.push_back(makeTeam("Reporte Sur", "primera division", 66, 2, 2, "Defensive", "Bloque bajo", 470000));
+
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Reporte Azul");
+    expect(career.myTeam != nullptr, "El reporte rival necesita club usuario.");
+
+    const string report = buildOpponentReport(career);
+    expect(report.find("Sin informe rival disponible") == string::npos,
+           "El informe rival no debe quedar vacio cuando existe una fecha activa.");
+    expect(report.find("lineas") != string::npos, "El informe rival debe incluir lectura por lineas.");
+    expect(report.find("alerta") != string::npos, "El informe rival debe incluir una vulnerabilidad o alerta.");
+}
+
 void testSaveLoadRoundTripPreservesCareerState() {
     const string savePath = "saves/test_roundtrip_save.txt";
 
@@ -454,6 +478,7 @@ int main() {
         {"transfer_negotiation", testTransferNegotiationBuildsStructuredDeal},
         {"season_transition", testSeasonTransitionAdvancesCareerWithoutUiDependencies},
         {"season_service", testSeasonServiceReturnsStructuredWeekResult},
+        {"opponent_report", testOpponentReportExplainsNextFixture},
         {"save_load_roundtrip", testSaveLoadRoundTripPreservesCareerState},
     };
 

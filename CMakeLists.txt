@@ -45,6 +45,7 @@ set(FM_APP_SOURCES
 
 set(FM_IO_SOURCES
     src/io/io.cpp
+    src/io/save_manager.cpp
     src/io/save_serialization.cpp
 )
 

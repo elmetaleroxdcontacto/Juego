@@ -1,4 +1,4 @@
-#include "engine/models.h"
+#include "io/save_serialization.h"
 
 #include "utils/utils.h"
 
@@ -234,12 +234,40 @@ Player decodePlayerFields(const vector<string>& fields) {
 
 }  // namespace
 
-bool Career::saveCareer() {
-    if (saveFile.rfind("saves/", 0) == 0 || saveFile.rfind("saves\\", 0) == 0) {
-        ensureDirectory("saves");
-    }
-    ofstream file(saveFile);
-    if (!file.is_open()) return false;
+namespace save_serialization {
+
+int currentCareerSaveVersion() {
+    return kCareerSaveVersion;
+}
+
+bool serializeCareer(ostream& file, const Career& career) {
+    const int& currentSeason = career.currentSeason;
+    const int& currentWeek = career.currentWeek;
+    const string& activeDivision = career.activeDivision;
+    Team* const& myTeam = career.myTeam;
+    const string& managerName = career.managerName;
+    const int& managerReputation = career.managerReputation;
+    const string& boardMonthlyObjective = career.boardMonthlyObjective;
+    const int& boardMonthlyTarget = career.boardMonthlyTarget;
+    const int& boardMonthlyProgress = career.boardMonthlyProgress;
+    const int& boardMonthlyDeadlineWeek = career.boardMonthlyDeadlineWeek;
+    const vector<string>& achievements = career.achievements;
+    const int& boardConfidence = career.boardConfidence;
+    const int& boardExpectedFinish = career.boardExpectedFinish;
+    const long long& boardBudgetTarget = career.boardBudgetTarget;
+    const int& boardYouthTarget = career.boardYouthTarget;
+    const int& boardWarningWeeks = career.boardWarningWeeks;
+    const vector<string>& newsFeed = career.newsFeed;
+    const vector<string>& scoutInbox = career.scoutInbox;
+    const vector<string>& scoutingShortlist = career.scoutingShortlist;
+    const vector<SeasonHistoryEntry>& history = career.history;
+    const vector<PendingTransfer>& pendingTransfers = career.pendingTransfers;
+    const bool& cupActive = career.cupActive;
+    const int& cupRound = career.cupRound;
+    const vector<string>& cupRemainingTeams = career.cupRemainingTeams;
+    const string& cupChampion = career.cupChampion;
+    const string& lastMatchAnalysis = career.lastMatchAnalysis;
+    const deque<Team>& allTeams = career.allTeams;
 
     file << "VERSION " << kCareerSaveVersion << "\n";
     file << "SEASON " << currentSeason << " WEEK " << currentWeek << "\n";
@@ -262,8 +290,10 @@ bool Career::saveCareer() {
     file << "LASTMATCH " << lastMatchAnalysis << "\n";
     file << "TEAMS " << allTeams.size() << "\n";
 
-    for (auto& team : allTeams) {
-        ensureTeamIdentity(team);
+    for (const auto& team : allTeams) {
+        const int storedPrestige = team.clubPrestige > 0 ? team.clubPrestige : teamPrestigeScore(team);
+        const string storedClubStyle = team.clubStyle.empty() ? "Equilibrio competitivo" : team.clubStyle;
+        const string storedYouthIdentity = team.youthIdentity.empty() ? "Talento local" : team.youthIdentity;
         file << "TEAM " << team.name << "|" << team.division << "|" << team.tactics << "|" << team.formation << "|"
              << team.budget << "|" << team.morale << "|" << team.points << "|" << team.goalsFor << "|"
              << team.goalsAgainst << "|" << team.wins << "|" << team.draws << "|" << team.losses << "|"
@@ -276,24 +306,47 @@ bool Career::saveCareer() {
              << team.scoutingChief << "|" << team.youthCoach << "|" << team.medicalTeam << "|" << team.youthRegion
              << "|" << team.debt << "|" << team.sponsorWeekly << "|" << team.stadiumLevel << "|"
              << team.youthFacilityLevel << "|" << team.trainingFacilityLevel << "|" << team.fanBase << "|"
-             << team.matchInstruction << "|" << teamPrestigeScore(team) << "|" << team.clubStyle << "|"
-             << team.youthIdentity << "|" << team.primaryRival << "\n";
+             << team.matchInstruction << "|" << storedPrestige << "|" << storedClubStyle << "|"
+             << storedYouthIdentity << "|" << team.primaryRival << "\n";
         file << "PLAYERS " << team.players.size() << "\n";
         for (const auto& player : team.players) {
             file << "PLAYER " << encodePlayerFields(player) << "\n";
         }
         file << "ENDTEAM\n";
     }
-    return true;
+    return file.good();
 }
 
-bool Career::loadCareer() {
-    string resolvedSave = saveFile;
-    if (!pathExists(resolvedSave) && resolvedSave == "saves/career_save.txt" && pathExists("career_save.txt")) {
-        resolvedSave = "career_save.txt";
-    }
-    ifstream file(resolvedSave);
-    if (!file.is_open()) return false;
+bool deserializeCareer(istream& file, Career& career) {
+    auto& currentSeason = career.currentSeason;
+    auto& currentWeek = career.currentWeek;
+    auto& activeDivision = career.activeDivision;
+    auto& myTeam = career.myTeam;
+    auto& managerName = career.managerName;
+    auto& managerReputation = career.managerReputation;
+    auto& boardMonthlyObjective = career.boardMonthlyObjective;
+    auto& boardMonthlyTarget = career.boardMonthlyTarget;
+    auto& boardMonthlyProgress = career.boardMonthlyProgress;
+    auto& boardMonthlyDeadlineWeek = career.boardMonthlyDeadlineWeek;
+    auto& achievements = career.achievements;
+    auto& boardConfidence = career.boardConfidence;
+    auto& boardExpectedFinish = career.boardExpectedFinish;
+    auto& boardBudgetTarget = career.boardBudgetTarget;
+    auto& boardYouthTarget = career.boardYouthTarget;
+    auto& boardWarningWeeks = career.boardWarningWeeks;
+    auto& newsFeed = career.newsFeed;
+    auto& scoutInbox = career.scoutInbox;
+    auto& scoutingShortlist = career.scoutingShortlist;
+    auto& history = career.history;
+    auto& pendingTransfers = career.pendingTransfers;
+    auto& cupActive = career.cupActive;
+    auto& cupRound = career.cupRound;
+    auto& cupRemainingTeams = career.cupRemainingTeams;
+    auto& cupChampion = career.cupChampion;
+    auto& lastMatchAnalysis = career.lastMatchAnalysis;
+    auto& allTeams = career.allTeams;
+    auto& divisions = career.divisions;
+    auto& initialized = career.initialized;
 
     string line;
     if (!getline(file, line)) return false;
@@ -490,7 +543,15 @@ bool Career::loadCareer() {
                 team.youthRegion = "Metropolitana";
                 team.matchInstruction = "Equilibrado";
             }
+            const int loadedPrestige = team.clubPrestige;
+            const string loadedClubStyle = team.clubStyle;
+            const string loadedYouthIdentity = team.youthIdentity;
+            const string loadedPrimaryRival = team.primaryRival;
             ensureTeamIdentity(team);
+            if (loadedPrestige > 0) team.clubPrestige = loadedPrestige;
+            if (!loadedClubStyle.empty()) team.clubStyle = loadedClubStyle;
+            if (!loadedYouthIdentity.empty()) team.youthIdentity = loadedYouthIdentity;
+            if (!loadedPrimaryRival.empty()) team.primaryRival = loadedPrimaryRival;
 
             if (!getline(file, line) || line.rfind("PLAYERS ", 0) != 0) return false;
             int playersCount = stoi(trim(line.substr(8)));
@@ -506,7 +567,7 @@ bool Career::loadCareer() {
 
         initialized = true;
         if (activeDivision.empty() && !allTeams.empty()) activeDivision = allTeams.front().division;
-        setActiveDivision(activeDivision);
+        career.setActiveDivision(activeDivision);
 
         myTeam = nullptr;
         for (auto& team : allTeams) {
@@ -515,9 +576,9 @@ bool Career::loadCareer() {
                 break;
             }
         }
-        if (boardExpectedFinish <= 0) initializeBoardObjectives();
-        if (boardMonthlyObjective.empty()) initializeDynamicObjective();
-        if (!cupActive && !activeTeams.empty()) initializeSeasonCup();
+        if (boardExpectedFinish <= 0) career.initializeBoardObjectives();
+        if (boardMonthlyObjective.empty()) career.initializeDynamicObjective();
+        if (!cupActive && !career.activeTeams.empty()) career.initializeSeasonCup();
         return true;
     }
 
@@ -548,7 +609,7 @@ bool Career::loadCareer() {
     getline(file, teamName);
     getline(file, teamName);
 
-    initializeLeague(true);
+    career.initializeLeague(true);
     myTeam = nullptr;
     for (auto& team : allTeams) {
         if (team.name == teamName) {
@@ -617,9 +678,11 @@ bool Career::loadCareer() {
 
     if (myTeam) activeDivision = myTeam->division;
     else if (!divisions.empty()) activeDivision = divisions.front().id;
-    if (!activeDivision.empty()) setActiveDivision(activeDivision);
-    initializeBoardObjectives();
-    initializeSeasonCup();
-    initializeDynamicObjective();
+    if (!activeDivision.empty()) career.setActiveDivision(activeDivision);
+    career.initializeBoardObjectives();
+    career.initializeSeasonCup();
+    career.initializeDynamicObjective();
     return true;
 }
+
+}  // namespace save_serialization

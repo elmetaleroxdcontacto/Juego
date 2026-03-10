@@ -101,15 +101,28 @@ string lineMap(const Team& team) {
 string buildOpponentReport(const Career& career) {
     const Team* opponent = nextOpponent(career);
     if (!career.myTeam || !opponent) return "Sin informe rival disponible.";
-    int fitness = averageFitnessForLine(*opponent, "MED");
+    int midfieldFitness = averageFitnessForLine(*opponent, "MED");
+    int defenseThreat = lineThreatScore(*opponent, "DEF");
+    int midfieldThreat = lineThreatScore(*opponent, "MED");
+    int attackThreat = lineThreatScore(*opponent, "DEL");
     string vulnerability = opponent->defensiveLine >= 4 ? "espacio a la espalda"
                           : opponent->width >= 4 ? "pasillos interiores"
-                          : fitness < 62 ? "fatiga en el mediocampo"
-                                         : "bloque ordenado";
+                          : midfieldFitness < 62 ? "fatiga en el mediocampo"
+                                                 : "bloque ordenado";
+    string offensiveShape = opponent->matchInstruction == "Juego directo" ? "busca ruptura rapida"
+                             : opponent->width >= 4 ? "carga bandas y centros"
+                             : opponent->tempo >= 4 ? "acelera cada recuperacion"
+                                                    : "circula con paciencia";
+    string mainThreat = attackThreat >= midfieldThreat + 4 ? "delantera"
+                        : midfieldThreat >= defenseThreat + 4 ? "mediocampo"
+                                                              : "estructura equilibrada";
     return opponent->name + " | estilo " + (opponent->clubStyle.empty() ? string("equilibrado") : opponent->clubStyle) +
            " | formacion " + opponent->formation +
            " | moral " + to_string(opponent->morale) +
            " | prestigio " + to_string(teamPrestigeScore(*opponent)) +
+           " | amenaza " + mainThreat +
+           " | plan " + offensiveShape +
+           " | lineas " + lineMap(*opponent) +
            " | alerta " + vulnerability +
            (areRivalClubs(*career.myTeam, *opponent) ? " | clasico" : "");
 }

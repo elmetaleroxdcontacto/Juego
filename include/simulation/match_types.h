@@ -160,6 +160,9 @@ struct MatchReport {
     MatchExplanation explanation;
     TacticalImpactSummary tacticalImpact;
     FatigueImpactSummary fatigueImpact;
+    std::string playerOfTheMatch;
+    int playerOfTheMatchScore = 0;
+    std::string postMatchImpact;
 };
 
 struct MatchContext {

@@ -1031,7 +1031,9 @@ static void storeMatchAnalysis(Career& career,
         " | " + verdict +
         " | Clave: " + reason +
         " | Recomendacion: " + recommendation +
-        (result.report.explanation.fatigueStory.empty() ? "" : " | Fatiga: " + result.report.explanation.fatigueStory);
+        (result.report.explanation.fatigueStory.empty() ? "" : " | Fatiga: " + result.report.explanation.fatigueStory) +
+        (result.report.playerOfTheMatch.empty() ? "" : " | Figura: " + result.report.playerOfTheMatch) +
+        (result.report.postMatchImpact.empty() ? "" : " | Post: " + result.report.postMatchImpact);
 }
 
 static void simulateSeasonCupRound(Career& career) {
