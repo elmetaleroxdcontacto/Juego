@@ -112,7 +112,13 @@ set(FM_ENTRY_SOURCES
 
 set(FM_GUI_SOURCES)
 if(WIN32)
-    list(APPEND FM_GUI_SOURCES src/gui/gui.cpp)
+    list(APPEND FM_GUI_SOURCES
+        src/gui/gui.cpp
+        src/gui/gui_actions.cpp
+        src/gui/gui_layout.cpp
+        src/gui/gui_shared.cpp
+        src/gui/gui_views.cpp
+    )
 endif()
 
 add_executable(FootballManager

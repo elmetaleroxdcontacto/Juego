@@ -1061,3 +1061,127 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - el dominio de carrera queda mas testeable
   - la persistencia deja de vivir mezclada con el estado de carrera
   - se reduce el acoplamiento entre logica, serializacion y presentacion
+
+## Cambios recientes (2026-03-10) - Refactor fuerte de GUI Windows y navegacion tipo manager
+
+- Se refactorizo la GUI Windows para dejar de depender de un `src/gui/gui.cpp` monolitico:
+  - nuevo `include/gui/gui_internal.h`
+  - nuevo `src/gui/gui_shared.cpp`
+  - nuevo `src/gui/gui_layout.cpp`
+  - nuevo `src/gui/gui_views.cpp`
+  - nuevo `src/gui/gui_actions.cpp`
+  - `src/gui/gui.cpp` queda reducido a:
+    - `windowProc`
+    - `runGuiApp()`
+
+- Se agrego una estructura visual base mas cercana a un manager moderno:
+  - `TopBar`
+    - muestra club, fecha/semana, presupuesto, reputacion y alertas
+  - `SideMenu`
+    - Inicio
+    - Plantilla
+    - Tacticas
+    - Calendario
+    - Liga
+    - Fichajes
+    - Finanzas
+    - Cantera
+    - Directiva
+    - Noticias
+  - `MainContentPanel`
+  - `OptionalInfoPanel`
+
+- Se introdujo un contrato interno reutilizable para vistas GUI:
+  - `GuiPage`
+  - `GuiPageModel`
+  - `AppState`
+  - `DashboardMetric`
+  - `TextPanelModel`
+  - `ListPanelModel`
+  - `FeedPanelModel`
+
+- Componentes reutilizables agregados o consolidados:
+  - `Card`
+  - `TableView`
+  - `SectionHeader`
+  - `StatBar`
+  - `ActionButton`
+  - `TacticsBoard`
+  - helpers de dibujo y tema en `src/gui/gui_shared.cpp`
+
+- Se implementaron pantallas y paneles especializados en `src/gui/gui_views.cpp`:
+  - `DashboardPanel`
+  - `UpcomingMatchWidget`
+  - `LeaguePositionWidget`
+  - `TeamMoraleWidget`
+  - `InjuryListWidget`
+  - `NewsFeedWidget`
+  - `PlayerTableView`
+  - `PlayerProfilePanel`
+  - `PlayerComparisonPanel`
+  - `LeagueTableView`
+  - `FixtureListView`
+  - `TransferMarketView`
+  - `TransferTargetCard`
+  - `AlertPanel`
+  - `NewsFeedPanel`
+
+- Mejoras funcionales visibles:
+  - dashboard con:
+    - proximo partido
+    - posicion en liga
+    - estado del vestuario
+    - lesionados
+    - objetivo de directiva
+    - noticias y alertas
+  - pantalla de plantilla con:
+    - tabla completa
+    - orden por columnas
+    - filtros por posicion
+    - ficha lateral del jugador
+    - comparador de jugador
+  - pantalla tactica con:
+    - campo dibujado
+    - once inicial posicionado por lineas
+    - barras tacticas de presion, ritmo, anchura, linea y moral
+    - explicacion de impacto tactico
+  - pantalla de fichajes con:
+    - vista tipo base de datos
+    - filtros por posicion/edad/potencial/costo
+    - tarjeta de objetivo
+    - pipeline de movimientos pendientes
+  - pantallas de:
+    - finanzas
+    - cantera
+    - directiva
+    - noticias
+    - calendario
+    - liga
+
+- Separacion de responsabilidades aplicada:
+  - `gui_actions.cpp` solo coordina acciones de UI contra servicios
+  - `gui_views.cpp` construye modelos de pantalla
+  - `gui_layout.cpp` controla layout y chrome visual
+  - `gui_shared.cpp` concentra helpers Win32, draw y estilo
+  - la UI consume datos ya preparados, en vez de mezclar layout con logica dispersa
+
+- Build actualizado:
+  - `CMakeLists.txt` ahora incluye:
+    - `src/gui/gui_actions.cpp`
+    - `src/gui/gui_layout.cpp`
+    - `src/gui/gui_shared.cpp`
+    - `src/gui/gui_views.cpp`
+
+- Validacion realizada:
+  - compilacion con `build.bat --validate`
+  - compilacion principal exitosa por CMake
+
+- Estado actual / limite conocido:
+  - el resumen y analisis post-partido ya se exponen mejor en dashboard/noticias
+  - aun queda pendiente una pantalla dedicada de partido en vivo con timeline persistido completo
+
+- Impacto arquitectonico:
+  - la GUI ya no depende de un unico archivo gigante
+  - la navegacion es mucho mas clara
+  - la informacion queda mejor distribuida sin saturar una sola vista
+  - queda una base mucho mas mantenible para seguir profundizando match center, modales y comparadores
