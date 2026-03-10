@@ -47,6 +47,13 @@ struct NegotiationState {
     long long sellerExpectation = 0;
     long long playerDemand = 0;
     long long latestCounter = 0;
+    long long agreedFee = 0;
+    long long agreedWage = 0;
+    long long agreedBonus = 0;
+    long long agreedClause = 0;
+    int agreedContractWeeks = 0;
+    std::string agreedPromisedRole;
+    std::vector<std::string> roundSummaries;
 };
 
 struct ClubTransferStrategy {

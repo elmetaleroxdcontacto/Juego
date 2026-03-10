@@ -37,6 +37,10 @@ MatchPhaseEvaluation evaluatePhase(const MatchSetup& setup,
                                             (homeSnapshot.tacticalProfile.pressing + awaySnapshot.tacticalProfile.pressing) *
                                                 0.15,
                                         0.90, 1.65);
+    const double homeSecurity = tactics_engine::defensiveSecurityWeight(homeSnapshot.tacticalProfile);
+    const double awaySecurity = tactics_engine::defensiveSecurityWeight(awaySnapshot.tacticalProfile);
+    const double homeTransition = tactics_engine::transitionThreatWeight(homeSnapshot.tacticalProfile);
+    const double awayTransition = tactics_engine::transitionThreatWeight(awaySnapshot.tacticalProfile);
 
     const double homeAttack =
         max(12.0, (homeSnapshot.attackPower * homeSnapshot.moraleFactor * homeSnapshot.fatigueFactor +
@@ -68,6 +72,12 @@ MatchPhaseEvaluation evaluatePhase(const MatchSetup& setup,
     phase.intensity = intensity;
     phase.homeChanceProbability = homeOpportunity;
     phase.awayChanceProbability = awayOpportunity;
+    phase.homeDefensiveRisk = clampValue(0.14 + awayTransition * 0.32 + awaySnapshot.tacticalProfile.directness * 0.12 +
+                                             homeSnapshot.tacticalProfile.risk * 0.16 - homeSecurity * 0.18,
+                                         0.06, 0.82);
+    phase.awayDefensiveRisk = clampValue(0.14 + homeTransition * 0.32 + homeSnapshot.tacticalProfile.directness * 0.12 +
+                                             awaySnapshot.tacticalProfile.risk * 0.16 - awaySecurity * 0.18,
+                                         0.06, 0.82);
     phase.homeFatigueGain =
         static_cast<int>(round(intensity * fatigue_engine::phaseFatigueGain(home, phaseIndex)));
     phase.awayFatigueGain =
@@ -75,18 +85,80 @@ MatchPhaseEvaluation evaluatePhase(const MatchSetup& setup,
     phase.injuryRisk =
         clampValue(0.05 + intensity * 0.04 + (phase.homeFatigueGain + phase.awayFatigueGain) / 160.0, 0.05, 0.22);
 
+    const int homePossessionChains = clampInt(
+        static_cast<int>(round(3.0 + homePossessionShare / 11.0 + intensity * 1.6 +
+                               homeSnapshot.tacticalProfile.tempo * 1.1 + homeSnapshot.tacticalProfile.width * 0.8)),
+        3, 11);
+    const int awayPossessionChains = clampInt(
+        static_cast<int>(round(3.0 + awayPossessionShare / 11.0 + intensity * 1.6 +
+                               awaySnapshot.tacticalProfile.tempo * 1.1 + awaySnapshot.tacticalProfile.width * 0.8)),
+        3, 11);
+
+    const double homeProgressionRate = clampValue(0.34 + homeSnapshot.tacticalProfile.width * 0.10 +
+                                                      homeSnapshot.tacticalProfile.directness * 0.08 +
+                                                      homeOpportunity * 0.18 - awaySecurity * 0.08,
+                                                  0.20, 0.88);
+    const double awayProgressionRate = clampValue(0.34 + awaySnapshot.tacticalProfile.width * 0.10 +
+                                                      awaySnapshot.tacticalProfile.directness * 0.08 +
+                                                      awayOpportunity * 0.18 - homeSecurity * 0.08,
+                                                  0.20, 0.88);
+
+    const int homeProgressions = clampInt(
+        static_cast<int>(round(homePossessionChains * homeProgressionRate + rand01() * 1.4 - 0.3)),
+        1, homePossessionChains);
+    const int awayProgressions = clampInt(
+        static_cast<int>(round(awayPossessionChains * awayProgressionRate + rand01() * 1.4 - 0.3)),
+        1, awayPossessionChains);
+
+    const double homeAttackRate = clampValue(0.30 + homeSnapshot.tacticalProfile.mentality * 0.14 +
+                                                 homeTransition * 0.16 + max(0.0, homeAttack - awayDefense) / 320.0 -
+                                                 awaySecurity * 0.12,
+                                             0.16, 0.86);
+    const double awayAttackRate = clampValue(0.30 + awaySnapshot.tacticalProfile.mentality * 0.14 +
+                                                 awayTransition * 0.16 + max(0.0, awayAttack - homeDefense) / 320.0 -
+                                                 homeSecurity * 0.12,
+                                             0.16, 0.86);
+
+    const int homeAttacks = clampInt(
+        static_cast<int>(round(homeProgressions * homeAttackRate + rand01() * 1.2 - 0.2)),
+        0, homeProgressions);
+    const int awayAttacks = clampInt(
+        static_cast<int>(round(awayProgressions * awayAttackRate + rand01() * 1.2 - 0.2)),
+        0, awayProgressions);
+
+    const double homeChanceRate = clampValue(0.10 + homeOpportunity * 0.22 +
+                                                 max(0.0, homeAttack - awayDefense) / 430.0 +
+                                                 homeSnapshot.tacticalProfile.directness * 0.05 -
+                                                 awaySecurity * 0.06,
+                                             0.04, 0.65);
+    const double awayChanceRate = clampValue(0.10 + awayOpportunity * 0.22 +
+                                                 max(0.0, awayAttack - homeDefense) / 430.0 +
+                                                 awaySnapshot.tacticalProfile.directness * 0.05 -
+                                                 homeSecurity * 0.06,
+                                             0.04, 0.65);
+
     evaluation.homeAttack = homeAttack;
     evaluation.awayAttack = awayAttack;
     evaluation.homeDefense = homeDefense;
     evaluation.awayDefense = awayDefense;
+    evaluation.homePossessionChains = homePossessionChains;
+    evaluation.awayPossessionChains = awayPossessionChains;
+    evaluation.homeProgressions = homeProgressions;
+    evaluation.awayProgressions = awayProgressions;
+    evaluation.homeAttacks = homeAttacks;
+    evaluation.awayAttacks = awayAttacks;
+    phase.homePossessionChains = homePossessionChains;
+    phase.awayPossessionChains = awayPossessionChains;
+    phase.homeProgressions = homeProgressions;
+    phase.awayProgressions = awayProgressions;
+    phase.homeAttacks = homeAttacks;
+    phase.awayAttacks = awayAttacks;
     evaluation.homeChanceCount =
-        clampInt(static_cast<int>(round(homeOpportunity * (homePossessionShare >= 54 ? 5.2 : 3.8) * intensity +
-                                       rand01() * 1.4 - 0.3)),
-                 0, 4);
+        clampInt(static_cast<int>(round(homeAttacks * homeChanceRate + rand01() * 1.1 - 0.2)),
+                 0, min(4, homeAttacks));
     evaluation.awayChanceCount =
-        clampInt(static_cast<int>(round(awayOpportunity * (awayPossessionShare >= 54 ? 5.2 : 3.8) * intensity +
-                                       rand01() * 1.4 - 0.3)),
-                 0, 4);
+        clampInt(static_cast<int>(round(awayAttacks * awayChanceRate + rand01() * 1.1 - 0.2)),
+                 0, min(4, awayAttacks));
     return evaluation;
 }
 

@@ -35,43 +35,87 @@ void removeActivePlayer(vector<int>& activeXI, int playerIndex) {
 
 namespace match_event_generator {
 
-void playChances(Team& attacking,
-                 Team& defending,
-                 const vector<int>& attackingXI,
-                 const vector<int>& defendingXI,
-                 const TeamMatchSnapshot& attackingSnapshot,
-                 const TeamMatchSnapshot& defendingSnapshot,
-                 bool attackingIsHome,
-                 int minuteStart,
-                 int minuteEnd,
-                 int chanceCount,
-                 double attackingEdge,
-                 MatchTimeline& timeline,
-                 MatchStats& stats,
-                 vector<GoalContribution>& goals) {
-    for (int i = 0; i < chanceCount; ++i) {
+void playPhaseSequences(Team& attacking,
+                        Team& defending,
+                        const vector<int>& attackingXI,
+                        const vector<int>& defendingXI,
+                        const TeamMatchSnapshot& attackingSnapshot,
+                        const TeamMatchSnapshot& defendingSnapshot,
+                        bool attackingIsHome,
+                        int minuteStart,
+                        int minuteEnd,
+                        int possessionChains,
+                        int progressionCount,
+                        int attackCount,
+                        int chanceCount,
+                        double attackingEdge,
+                        double defensiveRisk,
+                        MatchTimeline& timeline,
+                        MatchStats& stats,
+                        vector<GoalContribution>& goals) {
+    if (attackCount <= 0 && chanceCount <= 0) return;
+
+    const double transitionThreat = tactics_engine::transitionThreatWeight(attackingSnapshot.tacticalProfile);
+    const double attackingSecurity = tactics_engine::defensiveSecurityWeight(attackingSnapshot.tacticalProfile);
+    const double progressionSuccess = clampValue(0.40 + attackingSnapshot.tacticalProfile.width * 0.08 +
+                                                     attackingSnapshot.tacticalProfile.tempo * 0.07 +
+                                                     possessionChains * 0.015 + attackingEdge * 0.002 +
+                                                     defensiveRisk * 0.10,
+                                                 0.18, 0.92);
+    const double chanceReachProbability = clampValue(
+        0.12 + static_cast<double>(chanceCount + 1) / static_cast<double>(max(1, attackCount + 2)) +
+            attackingEdge * 0.003 + transitionThreat * 0.12 + defensiveRisk * 0.10 + attackingSecurity * 0.04,
+        0.08, 0.82);
+
+    for (int i = 0; i < attackCount; ++i) {
         const int minute = randInt(minuteStart, minuteEnd);
-        const bool bigChance =
-            rand01() <= clampValue(0.12 + max(0.0, attackingEdge) * 0.02 +
-                                       tactics_engine::transitionThreatWeight(attackingSnapshot.tacticalProfile) * 0.10,
-                                   0.10, 0.42);
+        const bool directTransition = attacking.tactics == "Counter" ||
+                                      attacking.matchInstruction == "Juego directo" ||
+                                      rand01() <= clampValue(0.18 + transitionThreat * 0.45, 0.10, 0.62);
+
+        if (i < progressionCount && rand01() <= progressionSuccess) {
+            MatchEvent progression;
+            progression.minute = max(minuteStart, minute - 2);
+            progression.teamName = attacking.name;
+            progression.type = MatchEventType::Progression;
+            progression.description = directTransition ? attacking.name + " gana metros con una ruptura directa"
+                                                       : attacking.name + " progresa entre lineas";
+            match_stats::pushEvent(timeline, stats, progression);
+        }
 
         MatchEvent buildUp;
         buildUp.minute = max(minuteStart, minute - 1);
         buildUp.teamName = attacking.name;
-        buildUp.type = (attacking.tactics == "Counter" || attacking.matchInstruction == "Juego directo")
-                           ? MatchEventType::Counterattack
-                           : MatchEventType::AttackBuildUp;
-        buildUp.description = (buildUp.type == MatchEventType::Counterattack ? attacking.name + " acelera la transicion"
-                                                                             : attacking.name + " arma la jugada con paciencia");
-        timeline.events.push_back(buildUp);
+        buildUp.type = directTransition ? MatchEventType::Counterattack : MatchEventType::AttackBuildUp;
+        buildUp.description = directTransition ? attacking.name + " acelera la transicion"
+                                               : attacking.name + " madura el ataque en campo rival";
+        match_stats::pushEvent(timeline, stats, buildUp);
+
+        if (rand01() > chanceReachProbability) {
+            if (rand01() <= clampValue(0.10 + max(0.0, 0.45 - defensiveRisk) * 0.24, 0.05, 0.28)) {
+                MatchEvent interruption;
+                interruption.minute = minute;
+                interruption.teamName = attacking.name;
+                interruption.type = rand01() <= 0.60 ? MatchEventType::Offside : MatchEventType::Foul;
+                interruption.description = interruption.type == MatchEventType::Offside
+                                               ? attacking.name + " rompe mal la linea y cae en offside"
+                                               : defending.name + " corta la jugada antes del remate";
+                match_stats::pushEvent(timeline, stats, interruption);
+            }
+            continue;
+        }
+
+        const bool bigChance =
+            rand01() <= clampValue(0.10 + max(0.0, attackingEdge) * 0.018 + transitionThreat * 0.12 -
+                                       defensiveRisk * 0.05,
+                                   0.10, 0.42);
 
         ChanceResolutionInput input;
         input.minute = minute;
         input.bigChance = bigChance;
         input.attackingTeamIsHome = attackingIsHome;
-        input.chanceQuality = clampValue(0.08 + attackingEdge * 0.012 + bigChance * 0.18 +
-                                             tactics_engine::transitionThreatWeight(attackingSnapshot.tacticalProfile) * 0.10 -
+        input.chanceQuality = clampValue(0.06 + attackingEdge * 0.010 + bigChance * 0.18 +
+                                             transitionThreat * 0.12 -
                                              tactics_engine::defensiveSecurityWeight(defendingSnapshot.tacticalProfile) * 0.05,
                                          0.06, 0.70);
         input.attackingEdge = attackingEdge;

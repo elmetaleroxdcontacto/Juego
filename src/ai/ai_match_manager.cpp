@@ -93,7 +93,14 @@ bool applyInMatchManagement(Team& team,
                             MatchTimeline& timeline) {
     bool changed = false;
     vector<string> notes;
-    if (team_ai::applyInMatchCpuAdjustment(team, opponent, minute, goalsFor, goalsAgainst, &notes)) {
+    if (team_ai::applyInMatchCpuAdjustment(team,
+                                           opponent,
+                                           minute,
+                                           goalsFor,
+                                           goalsAgainst,
+                                           &notes,
+                                           static_cast<int>(xi.size()),
+                                           static_cast<int>(cautionedPlayers.size()))) {
         changed = true;
         for (const string& note : notes) {
             MatchEvent event;

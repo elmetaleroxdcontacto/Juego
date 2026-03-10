@@ -7,6 +7,7 @@
 #include "simulation/match_context.h"
 #include "simulation/match_engine.h"
 #include "simulation/match_phase.h"
+#include "transfers/negotiation_system.h"
 #include "validators/validators.h"
 
 #include <exception>
@@ -161,6 +162,10 @@ void testMatchSimulationProducesStructuredPhases() {
                "Los limites de fase no coinciden con la estructura esperada.");
         expect(phase.homePossessionShare + phase.awayPossessionShare == 100,
                "La posesion por fase debe sumar 100.");
+        expect(phase.homeProgressions >= phase.homeAttacks && phase.awayProgressions >= phase.awayAttacks,
+               "Una fase no puede generar mas ataques que progresiones.");
+        expect(phase.homeAttacks >= phase.homeShotsGenerated && phase.awayAttacks >= phase.awayShotsGenerated,
+               "No puede haber mas remates que ataques maduros en una fase.");
     }
 
     expect(result.homePossession + result.awayPossession == 100, "La posesion final debe sumar 100.");
@@ -174,6 +179,9 @@ void testMatchSimulationProducesStructuredPhases() {
     expect(result.stats.homeExpectedGoals >= 0.0 && result.stats.awayExpectedGoals >= 0.0,
            "El xG no puede ser negativo.");
     expect(!result.reportLines.empty(), "El motor debe producir lineas de reporte legibles.");
+    expect(result.report.phaseSummaries.size() == 6, "El reporte debe resumir las seis fases del partido.");
+    expect(!result.report.explanation.likelyReason.empty(),
+           "El reporte del partido debe incluir una explicacion probable.");
 }
 
 void testHighPressRaisesPhaseFatigue() {
@@ -268,6 +276,46 @@ void testTransferEvaluationPenalizesUnaffordableDeals() {
     expect(loanTarget.availableForLoan, "Un juvenil con contrato largo debe quedar disponible para cesion.");
     expect(loanTarget.affordabilityScore > expensiveTarget.affordabilityScore,
            "La IA debe valorar mejor una cesion asumible que una compra imposible.");
+}
+
+void testTransferNegotiationBuildsStructuredDeal() {
+    Career career;
+    career.currentSeason = 5;
+    career.managerReputation = 78;
+
+    Team buyer = makeTeam("Comprador Tactico", "primera division", 72, 4, 4, "Pressing", "Contra-presion", 2200000);
+    buyer.sponsorWeekly = 140000;
+    buyer.fanBase = 72;
+    buyer.trainingFacilityLevel = 5;
+    buyer.youthFacilityLevel = 4;
+    ensureTeamIdentity(buyer);
+
+    Team seller = makeTeam("Vendedor Historico", "primera b", 69, 3, 3, "Balanced", "Equilibrado", 480000);
+    seller.fanBase = 18;
+    seller.trainingFacilityLevel = 2;
+    seller.youthFacilityLevel = 2;
+    ensureTeamIdentity(seller);
+
+    Player target = makePlayer("Mediapunta Premium", "MED", 77, 82, 24, 75, 77);
+    target.value = 520000;
+    target.releaseClause = 900000;
+    target.wage = 24000;
+    target.contractWeeks = 84;
+    target.currentForm = 74;
+    target.consistency = 70;
+    target.ambition = 68;
+    target.professionalism = 73;
+
+    const NegotiationState state = runTransferNegotiation(
+        career, buyer, seller, target, NegotiationProfile::Balanced, NegotiationPromise::Starter);
+
+    expect(state.clubAccepted, "La negociacion estructurada debe cerrar el acuerdo con el club en este escenario.");
+    expect(state.playerAccepted, "La negociacion estructurada debe cerrar el acuerdo con el jugador en este escenario.");
+    expect(state.round >= 5, "La negociacion debe registrar varias rondas de ida y vuelta.");
+    expect(state.agreedFee >= state.sellerExpectation * 90 / 100,
+           "El fee acordado debe aproximarse a la expectativa del vendedor.");
+    expect(state.agreedWage >= target.wage, "El salario acordado no puede empeorar el contrato actual del jugador.");
+    expect(!state.roundSummaries.empty(), "La negociacion debe devolver trazabilidad de sus rondas.");
 }
 
 void testSeasonTransitionAdvancesCareerWithoutUiDependencies() {
@@ -403,6 +451,7 @@ int main() {
         {"tactical_fatigue", testHighPressRaisesPhaseFatigue},
         {"competition_group_table", testCompetitionGroupTableScopesActiveGroup},
         {"transfer_affordability", testTransferEvaluationPenalizesUnaffordableDeals},
+        {"transfer_negotiation", testTransferNegotiationBuildsStructuredDeal},
         {"season_transition", testSeasonTransitionAdvancesCareerWithoutUiDependencies},
         {"season_service", testSeasonServiceReturnsStructuredWeekResult},
         {"save_load_roundtrip", testSaveLoadRoundTripPreservesCareerState},

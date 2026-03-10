@@ -4,6 +4,12 @@
 
 struct MatchPhaseEvaluation {
     MatchPhaseReport report;
+    int homePossessionChains = 0;
+    int awayPossessionChains = 0;
+    int homeProgressions = 0;
+    int awayProgressions = 0;
+    int homeAttacks = 0;
+    int awayAttacks = 0;
     int homeChanceCount = 0;
     int awayChanceCount = 0;
     double homeAttack = 0.0;

@@ -281,6 +281,7 @@ struct MatchResult {
     MatchContext context;
     MatchStats stats;
     MatchTimeline timeline;
+    MatchReport report;
 };
 
 struct TeamStrength {

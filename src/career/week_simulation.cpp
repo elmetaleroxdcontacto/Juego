@@ -298,6 +298,12 @@ void storeMatchAnalysis(Career& career,
     } else if (myPoss >= 55 && myGoals == 0) {
         recommendation = "Mantener posesion pero acelerar ultimo tercio con juego mas directo";
     }
+    if (!result.report.explanation.likelyReason.empty()) {
+        reason = result.report.explanation.likelyReason;
+    }
+    if (!result.report.explanation.tacticalStory.empty()) {
+        recommendation = result.report.explanation.tacticalStory;
+    }
 
     career.lastMatchAnalysis =
         string(cupMatch ? "Copa" : "Liga") + ": " + career.myTeam->name + " " +
@@ -312,7 +318,8 @@ void storeMatchAnalysis(Career& career,
         " | " + lineMap(myTeam) +
         " | " + verdict +
         " | Clave: " + reason +
-        " | Recomendacion: " + recommendation;
+        " | Recomendacion: " + recommendation +
+        (result.report.explanation.fatigueStory.empty() ? "" : " | Fatiga: " + result.report.explanation.fatigueStory);
 }
 
 void simulateSeasonCupRound(Career& career) {

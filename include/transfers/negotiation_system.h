@@ -2,6 +2,7 @@
 
 #include "career/app_services.h"
 #include "engine/models.h"
+#include "transfers/transfer_types.h"
 
 #include <string>
 #include <vector>
@@ -37,3 +38,28 @@ bool playerRejectsMove(const Career& career,
                        NegotiationPromise promise,
                        std::string& reason);
 bool renewalNeedsStrongerPromise(const Player& player, NegotiationPromise promise, int currentWeek);
+
+NegotiationState runTransferNegotiation(const Career& career,
+                                        const Team& buyer,
+                                        const Team& seller,
+                                        const Player& player,
+                                        NegotiationProfile profile,
+                                        NegotiationPromise promise);
+NegotiationState runReleaseClauseNegotiation(const Career& career,
+                                             const Team& buyer,
+                                             const Team& seller,
+                                             const Player& player,
+                                             NegotiationProfile profile,
+                                             NegotiationPromise promise);
+NegotiationState runPreContractNegotiation(const Career& career,
+                                           const Team& buyer,
+                                           const Team& seller,
+                                           const Player& player,
+                                           NegotiationProfile profile,
+                                           NegotiationPromise promise);
+NegotiationState runRenewalNegotiation(const Career& career,
+                                       const Team& team,
+                                       const Player& player,
+                                       NegotiationProfile profile,
+                                       NegotiationPromise promise,
+                                       int currentWeek);

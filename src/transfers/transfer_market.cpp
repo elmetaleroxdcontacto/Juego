@@ -110,13 +110,28 @@ void processCpuTransfers(Career& career) {
                 newPlayer.loanWeeksRemaining = randInt(26, 52);
                 newPlayer.wage = max(newPlayer.wage / 2, top.expectedWage * 55 / 100);
             } else {
-                if (top.expectedFee > team->budget) continue;
-                team->budget -= top.expectedFee;
-                seller->budget += top.expectedFee;
+                const NegotiationProfile profile = strategy.promotionPush ? NegotiationProfile::Safe
+                                                  : strategy.needsLiquidity ? NegotiationProfile::Balanced
+                                                                           : NegotiationProfile::Aggressive;
+                const NegotiationPromise promise = strategy.youthFocus && newPlayer.age <= 21
+                                                       ? NegotiationPromise::Prospect
+                                                       : strategy.promotionPush
+                                                             ? NegotiationPromise::Starter
+                                                             : NegotiationPromise::Rotation;
+                const NegotiationState negotiation =
+                    runTransferNegotiation(career, *team, *seller, newPlayer, profile, promise);
+                if (!negotiation.clubAccepted || !negotiation.playerAccepted) continue;
+                if (team->budget < negotiation.agreedFee + negotiation.agreedBonus) continue;
+
+                team->budget -= (negotiation.agreedFee + negotiation.agreedBonus);
+                seller->budget += negotiation.agreedFee;
                 newPlayer.onLoan = false;
                 newPlayer.parentClub.clear();
                 newPlayer.loanWeeksRemaining = 0;
-                newPlayer.releaseClause = max(newPlayer.value * 2, top.expectedFee * 2);
+                newPlayer.wage = negotiation.agreedWage;
+                newPlayer.contractWeeks = negotiation.agreedContractWeeks;
+                newPlayer.releaseClause = negotiation.agreedClause;
+                applyNegotiatedPromise(newPlayer, promise);
             }
             newPlayer.wantsToLeave = false;
             team->addPlayer(newPlayer);

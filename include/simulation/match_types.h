@@ -5,6 +5,7 @@
 
 enum class MatchEventType {
     PossessionPhase,
+    Progression,
     AttackBuildUp,
     Shot,
     BigChance,
@@ -25,6 +26,7 @@ enum class MatchEventType {
 inline const char* matchEventTypeLabel(MatchEventType type) {
     switch (type) {
         case MatchEventType::PossessionPhase: return "possession_phase";
+        case MatchEventType::Progression: return "progression";
         case MatchEventType::AttackBuildUp: return "attack_build_up";
         case MatchEventType::Shot: return "shot";
         case MatchEventType::BigChance: return "big_chance";
@@ -78,9 +80,19 @@ struct MatchPhaseReport {
     std::string dominantTeam;
     int homePossessionShare = 50;
     int awayPossessionShare = 50;
+    int homePossessionChains = 0;
+    int awayPossessionChains = 0;
+    int homeProgressions = 0;
+    int awayProgressions = 0;
+    int homeAttacks = 0;
+    int awayAttacks = 0;
+    int homeShotsGenerated = 0;
+    int awayShotsGenerated = 0;
     double intensity = 1.0;
     double homeChanceProbability = 0.0;
     double awayChanceProbability = 0.0;
+    double homeDefensiveRisk = 0.0;
+    double awayDefensiveRisk = 0.0;
     double injuryRisk = 0.0;
     int homeFatigueGain = 0;
     int awayFatigueGain = 0;
@@ -114,6 +126,40 @@ struct MatchStats {
     int awayBigChances = 0;
     double homeExpectedGoals = 0.0;
     double awayExpectedGoals = 0.0;
+};
+
+struct TacticalImpactSummary {
+    std::string homeSummary;
+    std::string awaySummary;
+    double homeControlScore = 0.0;
+    double awayControlScore = 0.0;
+    double homePressingLoad = 0.0;
+    double awayPressingLoad = 0.0;
+    double homeTransitionThreat = 0.0;
+    double awayTransitionThreat = 0.0;
+};
+
+struct FatigueImpactSummary {
+    int homeFatigueLoad = 0;
+    int awayFatigueLoad = 0;
+    bool homeLateDrop = false;
+    bool awayLateDrop = false;
+    std::string summary;
+};
+
+struct MatchExplanation {
+    std::string likelyReason;
+    std::string tacticalStory;
+    std::string fatigueStory;
+    std::string disciplineStory;
+    std::string chanceStory;
+};
+
+struct MatchReport {
+    std::vector<std::string> phaseSummaries;
+    MatchExplanation explanation;
+    TacticalImpactSummary tacticalImpact;
+    FatigueImpactSummary fatigueImpact;
 };
 
 struct MatchContext {

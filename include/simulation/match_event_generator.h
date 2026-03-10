@@ -8,20 +8,24 @@
 
 namespace match_event_generator {
 
-void playChances(Team& attacking,
-                 Team& defending,
-                 const std::vector<int>& attackingXI,
-                 const std::vector<int>& defendingXI,
-                 const TeamMatchSnapshot& attackingSnapshot,
-                 const TeamMatchSnapshot& defendingSnapshot,
-                 bool attackingIsHome,
-                 int minuteStart,
-                 int minuteEnd,
-                 int chanceCount,
-                 double attackingEdge,
-                 MatchTimeline& timeline,
-                 MatchStats& stats,
-                 std::vector<GoalContribution>& goals);
+void playPhaseSequences(Team& attacking,
+                        Team& defending,
+                        const std::vector<int>& attackingXI,
+                        const std::vector<int>& defendingXI,
+                        const TeamMatchSnapshot& attackingSnapshot,
+                        const TeamMatchSnapshot& defendingSnapshot,
+                        bool attackingIsHome,
+                        int minuteStart,
+                        int minuteEnd,
+                        int possessionChains,
+                        int progressionCount,
+                        int attackCount,
+                        int chanceCount,
+                        double attackingEdge,
+                        double defensiveRisk,
+                        MatchTimeline& timeline,
+                        MatchStats& stats,
+                        std::vector<GoalContribution>& goals);
 
 void registerDiscipline(Team& team,
                         std::vector<int>& activeXI,

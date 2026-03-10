@@ -1,8 +1,10 @@
 #include "transfers/negotiation_system.h"
 
+#include "career/career_reports.h"
 #include "utils.h"
 
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -229,4 +231,328 @@ bool renewalNeedsStrongerPromise(const Player& player, NegotiationPromise promis
     if (player.promisedRole == "Rotacion" && promise == NegotiationPromise::None) return true;
     if (player.promisedRole == "Proyecto" && promise == NegotiationPromise::None && player.age <= 22) return true;
     return false;
+}
+
+namespace {
+
+long long moveTowards(long long from, long long to, double ratio) {
+    if (from >= to) return from;
+    return from + static_cast<long long>((to - from) * ratio + 0.5);
+}
+
+void pushRound(NegotiationState& state, const string& line) {
+    state.round++;
+    state.roundSummaries.push_back("R" + to_string(state.round) + ": " + line);
+}
+
+int competitionPressureScore(const Career& career, const Team& buyer, const Team& seller, const Player& player) {
+    int score = max(0, player.skill - buyer.getAverageSkill() + 6);
+    score += max(0, player.potential - 78) / 2;
+    score += max(0, teamPrestigeScore(seller) - teamPrestigeScore(buyer) + 6) / 2;
+    score += clampInt(career.managerReputation / 10, 0, 8);
+    score += player.ambition / 12;
+    return clampInt(score, 0, 40);
+}
+
+long long transferExpectation(const Team& buyer,
+                              const Team& seller,
+                              const Player& player,
+                              bool competingClubPresent) {
+    long long expectation = max(player.value, player.releaseClause * 65 / 100);
+    if (player.contractWeeks <= 20) expectation = expectation * 92 / 100;
+    if (player.wantsToLeave) expectation = expectation * 90 / 100;
+    expectation += rivalrySurcharge(buyer, seller, expectation);
+    if (competingClubPresent) expectation += max(15000LL, expectation / 10);
+    return expectation;
+}
+
+long long transferThreshold(long long expectation, const Player& player) {
+    long long threshold = expectation * 96 / 100;
+    if (player.contractWeeks <= 20) threshold = expectation * 90 / 100;
+    if (player.wantsToLeave) threshold = min(threshold, expectation * 88 / 100);
+    return threshold;
+}
+
+long long negotiatedWageDemand(const Career& career,
+                               const Team& buyer,
+                               const Team& seller,
+                               const Player& player,
+                               NegotiationProfile profile,
+                               NegotiationPromise promise,
+                               bool competingClubPresent) {
+    long long wage = max(player.wage, static_cast<long long>(wageDemandFor(player) *
+                                                             negotiationWageFactor(profile) *
+                                                             promiseWageFactor(promise)));
+    wage = wage * (100 + agentDifficulty(player) / 14) / 100;
+    if (competingClubPresent) wage = wage * 106 / 100;
+    if (teamPrestigeScore(buyer) + 4 < teamPrestigeScore(seller)) wage = wage * 103 / 100;
+    if (promise == NegotiationPromise::Starter) wage = wage * 102 / 100;
+    if (promise == NegotiationPromise::Prospect && player.age <= 21) wage = wage * 97 / 100;
+    if (buyer.debt > buyer.sponsorWeekly * 18) wage = wage * 102 / 100;
+    if (clubAppealScore(career, buyer) > clubAppealScore(career, seller) + 10) wage = wage * 97 / 100;
+    return max(player.wage, wage);
+}
+
+long long signingBonusDemand(const Player& player, long long referenceFee, bool preContract) {
+    long long basis = preContract ? wageDemandFor(player) * 4 : estimatedAgentFee(player, referenceFee);
+    return max(preContract ? 20000LL : 12000LL, basis / (preContract ? 1 : 2));
+}
+
+bool negotiatePlayerSide(const Career& career,
+                         const Team& buyer,
+                         const Team& seller,
+                         const Player& player,
+                         NegotiationProfile profile,
+                         NegotiationPromise promise,
+                         bool competingClubPresent,
+                         bool preContract,
+                         long long referenceFee,
+                         NegotiationState& state) {
+    string rejectionReason;
+    if (playerRejectsMove(career, buyer, seller, player, promise, rejectionReason)) {
+        state.status = rejectionReason;
+        pushRound(state, rejectionReason);
+        return false;
+    }
+
+    const long long demandedWage =
+        negotiatedWageDemand(career, buyer, seller, player, profile, promise, competingClubPresent);
+    const long long demandedBonus = signingBonusDemand(player, referenceFee, preContract);
+    const int demandedWeeks = promiseContractWeeks(promise, max(preContract ? 104 : player.contractWeeks, 78));
+    const long long demandedClause =
+        max(static_cast<long long>(player.value * negotiationClauseFactor(profile)),
+            max(demandedWage * 42, (referenceFee + demandedBonus) * 2));
+
+    state.playerDemand = demandedWage;
+    state.agreedPromisedRole = promiseLabel(promise);
+
+    long long openingWage = max(player.wage, demandedWage * (profile == NegotiationProfile::Safe ? 98 : 91) / 100);
+    if (profile == NegotiationProfile::Aggressive) openingWage = max(player.wage, demandedWage * 84 / 100);
+    pushRound(state,
+              "Propuesta salarial " + formatMoneyValue(openingWage) +
+                  " | demanda del agente " + formatMoneyValue(demandedWage) +
+                  (competingClubPresent ? " | hay competencia" : ""));
+
+    long long improvedWage = moveTowards(openingWage,
+                                         demandedWage,
+                                         profile == NegotiationProfile::Safe ? 0.82
+                                         : profile == NegotiationProfile::Balanced ? 0.66
+                                                                                  : 0.52);
+    pushRound(state, "El club mejora salario a " + formatMoneyValue(improvedWage) +
+                         " y ofrece rol " + promiseLabel(promise) + ".");
+
+    long long finalWage = moveTowards(improvedWage,
+                                      demandedWage,
+                                      profile == NegotiationProfile::Safe ? 0.90
+                                      : profile == NegotiationProfile::Balanced ? 0.80
+                                                                               : 0.68);
+    long long acceptanceFloor = demandedWage * (promise == NegotiationPromise::Starter ? 95 : 97) / 100;
+    if (promise == NegotiationPromise::Prospect && player.age <= 21) {
+        acceptanceFloor = demandedWage * 93 / 100;
+    }
+
+    if (finalWage < acceptanceFloor) {
+        state.status = "El entorno de " + player.name + " considera insuficiente la propuesta contractual.";
+        pushRound(state, state.status);
+        return false;
+    }
+
+    state.playerAccepted = true;
+    state.agreedWage = finalWage;
+    state.agreedBonus = demandedBonus;
+    state.agreedClause = demandedClause;
+    state.agreedContractWeeks = demandedWeeks;
+    pushRound(state,
+              "Acuerdo con el jugador: salario " + formatMoneyValue(state.agreedWage) +
+                  ", bono " + formatMoneyValue(state.agreedBonus) +
+                  ", clausula " + formatMoneyValue(state.agreedClause) + ".");
+    return true;
+}
+
+}  // namespace
+
+NegotiationState runTransferNegotiation(const Career& career,
+                                        const Team& buyer,
+                                        const Team& seller,
+                                        const Player& player,
+                                        NegotiationProfile profile,
+                                        NegotiationPromise promise) {
+    NegotiationState state;
+    state.competingClubPresent = competitionPressureScore(career, buyer, seller, player) >= 16;
+    state.sellerExpectation = transferExpectation(buyer, seller, player, state.competingClubPresent);
+
+    long long openingFee = state.sellerExpectation * (profile == NegotiationProfile::Safe ? 97 : 90) / 100;
+    if (profile == NegotiationProfile::Aggressive) openingFee = state.sellerExpectation * 83 / 100;
+    pushRound(state,
+              "Oferta inicial al club: " + formatMoneyValue(openingFee) +
+                  " | expectativa vendedora " + formatMoneyValue(state.sellerExpectation) +
+                  (state.competingClubPresent ? " | otro club sigue la operacion" : ""));
+
+    long long sellerCounter = moveTowards(openingFee, state.sellerExpectation, 0.72);
+    state.latestCounter = sellerCounter;
+    pushRound(state, seller.name + " responde con " + formatMoneyValue(sellerCounter) + ".");
+
+    long long improvedFee = moveTowards(openingFee,
+                                        state.sellerExpectation,
+                                        profile == NegotiationProfile::Safe ? 0.78
+                                        : profile == NegotiationProfile::Balanced ? 0.64
+                                                                                  : 0.48);
+    pushRound(state, buyer.name + " mejora la oferta a " + formatMoneyValue(improvedFee) + ".");
+
+    long long finalFee = moveTowards(improvedFee,
+                                     state.sellerExpectation,
+                                     profile == NegotiationProfile::Safe ? 0.92
+                                     : profile == NegotiationProfile::Balanced ? 0.82
+                                                                              : 0.68);
+    if (state.competingClubPresent) finalFee += max(10000LL, state.sellerExpectation / 28);
+    state.latestCounter = finalFee;
+
+    if (finalFee < transferThreshold(state.sellerExpectation, player)) {
+        state.status = seller.name + " mantiene una contraoferta fuera de mercado para " + player.name + ".";
+        pushRound(state, state.status);
+        return state;
+    }
+
+    state.clubAccepted = true;
+    state.agreedFee = finalFee;
+    pushRound(state, "Acuerdo con " + seller.name + " por " + formatMoneyValue(state.agreedFee) + ".");
+
+    if (!negotiatePlayerSide(career,
+                             buyer,
+                             seller,
+                             player,
+                             profile,
+                             promise,
+                             state.competingClubPresent,
+                             false,
+                             state.agreedFee,
+                             state)) {
+        return state;
+    }
+
+    state.status = "Acuerdo total";
+    return state;
+}
+
+NegotiationState runReleaseClauseNegotiation(const Career& career,
+                                             const Team& buyer,
+                                             const Team& seller,
+                                             const Player& player,
+                                             NegotiationProfile profile,
+                                             NegotiationPromise promise) {
+    NegotiationState state;
+    state.clubAccepted = true;
+    state.agreedFee = player.releaseClause;
+    state.sellerExpectation = player.releaseClause;
+    state.latestCounter = player.releaseClause;
+    pushRound(state, "Se ejecuta clausula de " + formatMoneyValue(player.releaseClause) + " ante " + seller.name + ".");
+
+    state.competingClubPresent = competitionPressureScore(career, buyer, seller, player) >= 18;
+    if (!negotiatePlayerSide(career,
+                             buyer,
+                             seller,
+                             player,
+                             profile,
+                             promise,
+                             state.competingClubPresent,
+                             false,
+                             state.agreedFee,
+                             state)) {
+        return state;
+    }
+
+    state.status = "Clausula y contrato acordados";
+    return state;
+}
+
+NegotiationState runPreContractNegotiation(const Career& career,
+                                           const Team& buyer,
+                                           const Team& seller,
+                                           const Player& player,
+                                           NegotiationProfile profile,
+                                           NegotiationPromise promise) {
+    NegotiationState state;
+    state.clubAccepted = true;
+    state.agreedFee = 0;
+    state.sellerExpectation = 0;
+    state.latestCounter = 0;
+    pushRound(state, "El club actual no recibe fee, pero el agente exige un paquete de entrada competitivo.");
+
+    state.competingClubPresent = competitionPressureScore(career, buyer, seller, player) >= 12;
+    if (!negotiatePlayerSide(career,
+                             buyer,
+                             seller,
+                             player,
+                             profile,
+                             promise,
+                             state.competingClubPresent,
+                             true,
+                             0,
+                             state)) {
+        return state;
+    }
+
+    state.status = "Precontrato acordado";
+    return state;
+}
+
+NegotiationState runRenewalNegotiation(const Career& career,
+                                       const Team& team,
+                                       const Player& player,
+                                       NegotiationProfile profile,
+                                       NegotiationPromise promise,
+                                       int currentWeek) {
+    NegotiationState state;
+    if (renewalNeedsStrongerPromise(player, promise, currentWeek)) {
+        state.status = player.name + " exige una promesa contractual acorde a su rol actual.";
+        pushRound(state, state.status);
+        return state;
+    }
+
+    state.clubAccepted = true;
+    state.sellerExpectation = 0;
+    state.competingClubPresent = false;
+    const long long demandedWage = max(player.wage,
+                                       static_cast<long long>(wageDemandFor(player) *
+                                                              negotiationWageFactor(profile) *
+                                                              promiseWageFactor(promise)));
+    state.playerDemand = demandedWage * (100 + agentDifficulty(player) / 16) / 100;
+    long long openingWage = max(player.wage, state.playerDemand * (profile == NegotiationProfile::Safe ? 97 : 90) / 100);
+    if (profile == NegotiationProfile::Aggressive) openingWage = max(player.wage, state.playerDemand * 84 / 100);
+    pushRound(state, "Renovacion: oferta inicial " + formatMoneyValue(openingWage) +
+                         " | demanda " + formatMoneyValue(state.playerDemand) + ".");
+
+    long long improvedWage = moveTowards(openingWage,
+                                         state.playerDemand,
+                                         profile == NegotiationProfile::Safe ? 0.78
+                                         : profile == NegotiationProfile::Balanced ? 0.62
+                                                                                  : 0.48);
+    pushRound(state, "El agente estira la cuerda y el club responde con " + formatMoneyValue(improvedWage) + ".");
+
+    long long finalWage = moveTowards(improvedWage,
+                                      state.playerDemand,
+                                      profile == NegotiationProfile::Safe ? 0.88
+                                      : profile == NegotiationProfile::Balanced ? 0.78
+                                                                               : 0.66);
+    long long acceptanceFloor = state.playerDemand * (promise == NegotiationPromise::Starter ? 95 : 97) / 100;
+    if (player.wantsToLeave) acceptanceFloor = state.playerDemand;
+    if (finalWage < acceptanceFloor) {
+        state.status = player.name + " no acepta renovar en esos terminos.";
+        pushRound(state, state.status);
+        return state;
+    }
+
+    state.playerAccepted = true;
+    state.agreedWage = finalWage;
+    state.agreedBonus = max(10000LL, finalWage * 3);
+    state.agreedClause = max(static_cast<long long>(player.value * negotiationClauseFactor(profile)),
+                             finalWage * (profile == NegotiationProfile::Safe ? 48 : 40));
+    state.agreedContractWeeks =
+        promiseContractWeeks(promise, max(profile == NegotiationProfile::Aggressive ? 78 : 104, player.contractWeeks + 52));
+    state.agreedPromisedRole = promiseLabel(promise);
+    pushRound(state,
+              "Renovacion cerrada: salario " + formatMoneyValue(state.agreedWage) +
+                  ", contrato " + to_string(state.agreedContractWeeks) + " semanas.");
+    state.status = "Renovacion acordada";
+    return state;
 }

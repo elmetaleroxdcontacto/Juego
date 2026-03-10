@@ -141,7 +141,9 @@ bool applyInMatchCpuAdjustment(Team& team,
                                int minute,
                                int goalsFor,
                                int goalsAgainst,
-                               vector<string>* events) {
+                               vector<string>* events,
+                               int availablePlayers,
+                               int cautionedPlayers) {
     bool changed = false;
     int scoreDiff = goalsFor - goalsAgainst;
     int avgFitness = averageAvailableFitness(team);
@@ -183,6 +185,37 @@ bool applyInMatchCpuAdjustment(Team& team,
         if (fatigueChanged) {
             changed = true;
             if (note.empty()) note = team.name + " baja revoluciones por desgaste";
+        }
+    }
+
+    if (availablePlayers <= 10) {
+        bool redCardChanged = false;
+        redCardChanged |= applySetting(team.defensiveLine, team.defensiveLine - 1, 1, 5);
+        redCardChanged |= applySetting(team.width, team.width - 1, 1, 5);
+        if (scoreDiff >= 0) {
+            redCardChanged |= applySetting(team.tactics, "Defensive");
+            redCardChanged |= applySetting(team.matchInstruction, "Bloque bajo");
+            redCardChanged |= applySetting(team.pressingIntensity, team.pressingIntensity - 1, 1, 5);
+            redCardChanged |= applySetting(team.tempo, team.tempo - 1, 1, 5);
+        } else {
+            redCardChanged |= applySetting(team.tactics, "Counter");
+            redCardChanged |= applySetting(team.matchInstruction, "Juego directo");
+        }
+        if (redCardChanged) {
+            changed = true;
+            note = note.empty() ? team.name + " recompone su estructura tras la expulsion"
+                                : note + "; " + team.name + " protege zonas tras quedarse con diez";
+        }
+    }
+
+    if (cautionedPlayers >= 3 && minute >= 45) {
+        bool cautionChanged = false;
+        cautionChanged |= applySetting(team.pressingIntensity, team.pressingIntensity - 1, 1, 5);
+        cautionChanged |= applySetting(team.markingStyle, "Zonal");
+        if (cautionChanged) {
+            changed = true;
+            note = note.empty() ? team.name + " baja agresividad para proteger a los amonestados"
+                                : note + "; " + team.name + " reduce riesgos disciplinarios";
         }
     }
 

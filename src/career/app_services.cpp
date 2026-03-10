@@ -115,6 +115,18 @@ ServiceResult failure(const string& message) {
     return result;
 }
 
+ServiceResult failureFromNegotiation(const NegotiationState& state, const string& fallback) {
+    ServiceResult result;
+    result.ok = false;
+    result.messages.push_back(state.status.empty() ? fallback : state.status);
+    result.messages.insert(result.messages.end(), state.roundSummaries.begin(), state.roundSummaries.end());
+    return result;
+}
+
+void appendNegotiationMessages(ServiceResult& result, const NegotiationState& state) {
+    result.messages.insert(result.messages.end(), state.roundSummaries.begin(), state.roundSummaries.end());
+}
+
 }  // namespace
 
 ServiceResult startCareerService(Career& career,
@@ -395,36 +407,27 @@ ServiceResult buyTransferTargetService(Career& career,
     ensureTeamIdentity(*seller);
     Player player = seller->players[static_cast<size_t>(sellerIdx)];
     if (player.onLoan) return failure("El jugador esta a prestamo y no esta disponible.");
-    string rejectionReason;
-    if (playerRejectsMove(career, *career.myTeam, *seller, player, promise, rejectionReason)) {
-        return failure(rejectionReason);
+
+    NegotiationState negotiation = runTransferNegotiation(career, *career.myTeam, *seller, player, profile, promise);
+    if (!negotiation.clubAccepted || !negotiation.playerAccepted) {
+        return failureFromNegotiation(negotiation, "La negociacion no pudo cerrarse.");
     }
-    long long transferFee = max(player.value, player.releaseClause * 65 / 100);
-    transferFee = static_cast<long long>(transferFee * negotiationFeeFactor(profile));
-    long long rivalryExtra = rivalrySurcharge(*career.myTeam, *seller, transferFee);
-    transferFee += rivalryExtra;
-    int difficulty = agentDifficulty(player);
-    long long agentFee = estimatedAgentFee(player, transferFee);
-    agentFee = agentFee * (100 + difficulty / 3) / 100;
-    if (career.myTeam->budget < transferFee + agentFee) {
-        return failure("Presupuesto insuficiente para cubrir transferencia y honorarios.");
+    if (career.myTeam->budget < negotiation.agreedFee + negotiation.agreedBonus) {
+        return failureFromNegotiation(negotiation, "Presupuesto insuficiente para cerrar la operacion.");
     }
-    player.wage = max(player.wage, static_cast<long long>(wageDemandFor(player) *
-                                                          negotiationWageFactor(profile) *
-                                                          promiseWageFactor(promise)));
-    player.wage = player.wage * (100 + difficulty / 12) / 100;
-    player.contractWeeks = promiseContractWeeks(promise, player.contractWeeks);
-    player.releaseClause = max(static_cast<long long>(player.value * negotiationClauseFactor(profile)),
-                               static_cast<long long>((transferFee + agentFee) * negotiationClauseFactor(profile)));
+
+    player.wage = negotiation.agreedWage;
+    player.contractWeeks = negotiation.agreedContractWeeks;
+    player.releaseClause = negotiation.agreedClause;
     player.onLoan = false;
     player.parentClub.clear();
     player.loanWeeksRemaining = 0;
     player.wantsToLeave = false;
     player.happiness = clampInt(player.happiness + 4, 1, 99);
     applyNegotiatedPromise(player, promise);
-    career.myTeam->budget -= (transferFee + agentFee);
+    career.myTeam->budget -= (negotiation.agreedFee + negotiation.agreedBonus);
     career.myTeam->addPlayer(player);
-    seller->budget += transferFee;
+    seller->budget += negotiation.agreedFee;
     team_mgmt::detachPlayerFromSelections(*seller, player.name);
     eraseNamedSelection(career.scoutingShortlist, seller->name + "|" + player.name);
     seller->players.erase(seller->players.begin() + sellerIdx);
@@ -434,11 +437,12 @@ ServiceResult buyTransferTargetService(Career& career,
     ServiceResult result;
     result.ok = true;
     result.messages.push_back("Fichaje completado: " + player.name + " llega desde " + seller->name +
-                              " por " + formatMoneyValue(transferFee) + " + honorarios " + formatMoneyValue(agentFee) +
-                              " | perfil " + negotiationLabel(profile) +
-                              " | promesa " + promiseLabel(promise) +
-                              (rivalryExtra > 0 ? " | sobreprecio por rivalidad " + formatMoneyValue(rivalryExtra) : "") +
-                              " | agente " + to_string(difficulty) + "/90.");
+                              " por " + formatMoneyValue(negotiation.agreedFee) +
+                              " | bono/agente " + formatMoneyValue(negotiation.agreedBonus) +
+                              " | salario " + formatMoneyValue(negotiation.agreedWage) +
+                              " | contrato " + to_string(negotiation.agreedContractWeeks) +
+                              " sem | promesa " + negotiation.agreedPromisedRole + ".");
+    appendNegotiationMessages(result, negotiation);
     return result;
 }
 
@@ -462,26 +466,18 @@ ServiceResult triggerReleaseClauseService(Career& career,
     Player player = seller->players[static_cast<size_t>(sellerIdx)];
     if (player.onLoan) return failure("El jugador esta a prestamo y no esta disponible.");
 
-    string rejectionReason;
-    if (playerRejectsMove(career, *career.myTeam, *seller, player, promise, rejectionReason)) {
-        return failure(rejectionReason);
+    NegotiationState negotiation =
+        runReleaseClauseNegotiation(career, *career.myTeam, *seller, player, profile, promise);
+    if (!negotiation.clubAccepted || !negotiation.playerAccepted) {
+        return failureFromNegotiation(negotiation, "No se pudo cerrar la clausula.");
+    }
+    if (career.myTeam->budget < negotiation.agreedFee + negotiation.agreedBonus) {
+        return failureFromNegotiation(negotiation, "Presupuesto insuficiente para ejecutar la clausula.");
     }
 
-    long long transferFee = player.releaseClause;
-    int difficulty = agentDifficulty(player);
-    long long agentFee = estimatedAgentFee(player, transferFee);
-    agentFee = agentFee * (100 + difficulty / 3) / 100;
-    if (career.myTeam->budget < transferFee + agentFee) {
-        return failure("Presupuesto insuficiente para ejecutar clausula y honorarios.");
-    }
-
-    player.wage = max(player.wage, static_cast<long long>(wageDemandFor(player) *
-                                                          negotiationWageFactor(profile) *
-                                                          promiseWageFactor(promise)));
-    player.wage = player.wage * (100 + difficulty / 12) / 100;
-    player.contractWeeks = promiseContractWeeks(promise, player.contractWeeks);
-    player.releaseClause = max(static_cast<long long>(player.value * negotiationClauseFactor(profile)),
-                               static_cast<long long>((transferFee + agentFee) * negotiationClauseFactor(profile)));
+    player.wage = negotiation.agreedWage;
+    player.contractWeeks = negotiation.agreedContractWeeks;
+    player.releaseClause = negotiation.agreedClause;
     player.onLoan = false;
     player.parentClub.clear();
     player.loanWeeksRemaining = 0;
@@ -489,9 +485,9 @@ ServiceResult triggerReleaseClauseService(Career& career,
     player.happiness = clampInt(player.happiness + 4, 1, 99);
     applyNegotiatedPromise(player, promise);
 
-    career.myTeam->budget -= (transferFee + agentFee);
+    career.myTeam->budget -= (negotiation.agreedFee + negotiation.agreedBonus);
     career.myTeam->addPlayer(player);
-    seller->budget += transferFee;
+    seller->budget += negotiation.agreedFee;
     team_mgmt::detachPlayerFromSelections(*seller, player.name);
     eraseNamedSelection(career.scoutingShortlist, seller->name + "|" + player.name);
     seller->players.erase(seller->players.begin() + sellerIdx);
@@ -502,10 +498,11 @@ ServiceResult triggerReleaseClauseService(Career& career,
     ServiceResult result;
     result.ok = true;
     result.messages.push_back("Clausula ejecutada: " + player.name + " llega desde " + seller->name +
-                              " por " + formatMoneyValue(transferFee) + " + honorarios " + formatMoneyValue(agentFee) +
-                              " | perfil " + negotiationLabel(profile) +
-                              " | promesa " + promiseLabel(promise) +
-                              " | agente " + to_string(difficulty) + "/90.");
+                              " por " + formatMoneyValue(negotiation.agreedFee) +
+                              " | bono/agente " + formatMoneyValue(negotiation.agreedBonus) +
+                              " | salario " + formatMoneyValue(negotiation.agreedWage) +
+                              " | promesa " + negotiation.agreedPromisedRole + ".");
+    appendNegotiationMessages(result, negotiation);
     return result;
 }
 
@@ -524,39 +521,36 @@ ServiceResult signPreContractService(Career& career,
     if (player.contractWeeks > 12) return failure("El jugador aun no es elegible para precontrato.");
     ensureTeamIdentity(*career.myTeam);
     ensureTeamIdentity(*seller);
-    string rejectionReason;
-    if (playerRejectsMove(career, *career.myTeam, *seller, player, promise, rejectionReason)) {
-        return failure(rejectionReason);
-    }
     for (const auto& move : career.pendingTransfers) {
         if (move.playerName == player.name && move.toTeam == career.myTeam->name && move.preContract) {
             return failure("Ese jugador ya tiene un precontrato pendiente con tu club.");
         }
     }
-    int difficulty = agentDifficulty(player);
-    long long signingBonus = max(20000LL, static_cast<long long>(wageDemandFor(player) *
-                                                                 (profile == NegotiationProfile::Safe ? 5 : 4) *
-                                                                 promiseWageFactor(promise)));
-    signingBonus = signingBonus * (100 + difficulty / 4) / 100;
-    if (career.myTeam->budget < signingBonus) return failure("Presupuesto insuficiente para el bono de firma.");
-    career.myTeam->budget -= signingBonus;
+
+    NegotiationState negotiation =
+        runPreContractNegotiation(career, *career.myTeam, *seller, player, profile, promise);
+    if (!negotiation.playerAccepted) {
+        return failureFromNegotiation(negotiation, "El precontrato no pudo cerrarse.");
+    }
+    if (career.myTeam->budget < negotiation.agreedBonus) {
+        return failureFromNegotiation(negotiation, "Presupuesto insuficiente para el bono de firma.");
+    }
+    career.myTeam->budget -= negotiation.agreedBonus;
     eraseNamedSelection(career.scoutingShortlist, seller->name + "|" + player.name);
     career.pendingTransfers.push_back({player.name, seller->name, career.myTeam->name, career.currentSeason + 1, 0, 0,
-                                       max(player.wage, static_cast<long long>(wageDemandFor(player) *
-                                                                              negotiationWageFactor(profile) *
-                                                                              promiseWageFactor(promise))) *
-                                           (100 + difficulty / 12) / 100,
-                                       promiseContractWeeks(promise, profile == NegotiationProfile::Aggressive ? 78 : 104),
+                                       negotiation.agreedWage,
+                                       negotiation.agreedContractWeeks,
                                        true,
                                        false,
-                                       promiseLabel(promise)});
+                                       negotiation.agreedPromisedRole});
     career.addNews(player.name + " firma un precontrato con " + career.myTeam->name + ".");
     ServiceResult result;
     result.ok = true;
-    result.messages.push_back("Precontrato firmado para la temporada siguiente. Bono " + formatMoneyValue(signingBonus) +
-                              " | perfil " + negotiationLabel(profile) +
-                              " | promesa " + promiseLabel(promise) +
-                              " | agente " + to_string(difficulty) + "/90.");
+    result.messages.push_back("Precontrato firmado para la temporada siguiente. Bono " +
+                              formatMoneyValue(negotiation.agreedBonus) +
+                              " | salario " + formatMoneyValue(negotiation.agreedWage) +
+                              " | promesa " + negotiation.agreedPromisedRole + ".");
+    appendNegotiationMessages(result, negotiation);
     return result;
 }
 
@@ -570,25 +564,19 @@ ServiceResult renewPlayerContractService(Career& career,
     if (index < 0) return failure("No se encontro el jugador seleccionado.");
     Player& player = team.players[static_cast<size_t>(index)];
     ensureTeamIdentity(team);
-    if (renewalNeedsStrongerPromise(player, promise, career.currentWeek)) {
-        return failure(player.name + " exige una promesa contractual acorde a su rol actual antes de renovar.");
+
+    NegotiationState negotiation =
+        runRenewalNegotiation(career, team, player, profile, promise, career.currentWeek);
+    if (!negotiation.playerAccepted) {
+        return failureFromNegotiation(negotiation, "La renovacion no pudo cerrarse.");
     }
-    int difficulty = agentDifficulty(player);
-    long long demandedWage = max(wageDemandFor(player), player.wage + max(5000LL, player.wage / 10));
-    if (player.wantsToLeave) demandedWage = demandedWage * 115 / 100;
-    if (promiseAtRisk(player, career.currentWeek)) demandedWage = demandedWage * 108 / 100;
-    demandedWage = max(player.wage, static_cast<long long>(demandedWage *
-                                                           negotiationWageFactor(profile) *
-                                                           promiseWageFactor(promise)));
-    demandedWage = demandedWage * (100 + difficulty / 14) / 100;
-    int demandedWeeks = promiseContractWeeks(promise, max(profile == NegotiationProfile::Aggressive ? 78 : 104,
-                                                          player.contractWeeks + 52));
-    long long demandedClause = max(static_cast<long long>(player.value * negotiationClauseFactor(profile)),
-                                   demandedWage * (profile == NegotiationProfile::Safe ? 48 : 40));
-    if (team.budget < demandedWage * 6) return failure("Presupuesto insuficiente para renovar a " + player.name + ".");
-    player.wage = demandedWage;
-    player.contractWeeks = demandedWeeks;
-    player.releaseClause = demandedClause;
+    if (team.budget < negotiation.agreedWage * 6) {
+        return failureFromNegotiation(negotiation, "Presupuesto insuficiente para renovar al jugador.");
+    }
+
+    player.wage = negotiation.agreedWage;
+    player.contractWeeks = negotiation.agreedContractWeeks;
+    player.releaseClause = negotiation.agreedClause;
     player.wantsToLeave = false;
     player.happiness = clampInt(player.happiness + 6, 1, 99);
     applyNegotiatedPromise(player, promise);
@@ -596,10 +584,11 @@ ServiceResult renewPlayerContractService(Career& career,
     career.addNews(player.name + " renueva con " + team.name + ".");
     ServiceResult result;
     result.ok = true;
-    result.messages.push_back("Contrato renovado: " + player.name + " | salario " + formatMoneyValue(demandedWage) +
-                              " | contrato " + to_string(demandedWeeks) + " sem | perfil " +
-                              negotiationLabel(profile) + " | promesa " + promiseLabel(promise) +
-                              " | agente " + to_string(difficulty) + "/90.");
+    result.messages.push_back("Contrato renovado: " + player.name + " | salario " +
+                              formatMoneyValue(negotiation.agreedWage) +
+                              " | contrato " + to_string(negotiation.agreedContractWeeks) +
+                              " sem | promesa " + negotiation.agreedPromisedRole + ".");
+    appendNegotiationMessages(result, negotiation);
     return result;
 }
 

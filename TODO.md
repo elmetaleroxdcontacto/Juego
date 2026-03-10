@@ -1185,3 +1185,127 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - la navegacion es mucho mas clara
   - la informacion queda mejor distribuida sin saturar una sola vista
   - queda una base mucho mas mantenible para seguir profundizando match center, modales y comparadores
+
+## 2026-03-10 - Match Engine, IA Tactica y Negociacion Estructurada
+
+- Se profundizo el motor de partidos para que la cadena de simulacion deje de saltar tan rapido de dominio a remate:
+  - `include/simulation/match_types.h`
+  - `include/simulation/match_phase.h`
+  - `include/simulation/match_event_generator.h`
+  - `src/simulation/match_phase.cpp`
+  - `src/simulation/match_event_generator.cpp`
+  - `src/simulation/match_engine.cpp`
+
+- Nuevas capacidades del motor:
+  - fases con:
+    - posesiones
+    - progresiones
+    - ataques maduros
+    - remates generados
+    - riesgo defensivo
+  - nuevo tipo de evento:
+    - `Progression`
+  - no todos los ataques terminan en remate
+  - el partido ahora sigue mejor la cadena:
+    - posesion
+    - progresion
+    - ataque
+    - ocasion
+    - remate
+    - gol/parada/fallo
+
+- Se agrego un sistema de reporte explicativo del partido:
+  - `include/simulation/match_report.h`
+  - `src/simulation/match_report.cpp`
+  - `include/engine/models.h`
+
+- Nuevas estructuras de reporte:
+  - `MatchReport`
+  - `MatchExplanation`
+  - `TacticalImpactSummary`
+  - `FatigueImpactSummary`
+
+- El resultado del partido ahora incluye:
+  - resumen por fases
+  - explicacion probable del partido
+  - impacto tactico
+  - lectura de fatiga
+  - trazabilidad de dominio y ocasiones
+
+- Se corrigio una perdida de informacion en el motor:
+  - los flags `homeTacticalChange` y `awayTacticalChange` ahora se preservan correctamente en cada fase despues de la reevaluacion del contexto
+
+- Se mejoro la IA tactica en partido:
+  - `include/ai/team_ai.h`
+  - `src/ai/team_ai.cpp`
+  - `src/ai/ai_match_manager.cpp`
+
+- Nuevas reacciones de IA:
+  - ajuste tras expulsiones
+  - proteccion de amonestados
+  - reduccion de agresividad por riesgo disciplinario
+  - reestructuracion mas conservadora o de contra segun contexto
+
+- Se profundizo el mercado de fichajes con negociacion real por rondas:
+  - `include/transfers/transfer_types.h`
+  - `include/transfers/negotiation_system.h`
+  - `src/transfers/negotiation_system.cpp`
+  - `src/career/app_services.cpp`
+  - `src/transfers/transfer_market.cpp`
+
+- Nuevas capacidades de negociacion:
+  - multiples rondas
+  - expectativa del club vendedor
+  - demanda salarial del jugador
+  - contraofertas
+  - competencia de otros clubes
+  - acuerdo final con:
+    - fee
+    - salario
+    - bono/agente
+    - clausula
+    - duracion
+    - rol prometido
+  - trazabilidad via `roundSummaries`
+
+- Servicios conectados a la negociacion estructurada:
+  - `buyTransferTargetService(...)`
+  - `triggerReleaseClauseService(...)`
+  - `signPreContractService(...)`
+  - `renewPlayerContractService(...)`
+
+- La IA de mercado CPU tambien paso a usar esta base de negociacion para compras normales, manteniendo compatibilidad con prestamos y limites de presupuesto
+
+- Se conecto el nuevo analisis del partido a carrera/UI:
+  - `src/career/week_simulation.cpp`
+  - `src/ui/ui.cpp`
+
+- `career.lastMatchAnalysis` ahora puede reflejar:
+  - explicacion probable del partido
+  - lectura tactica
+  - impacto de fatiga
+
+- Build actualizado:
+  - `CMakeLists.txt` ahora incluye:
+    - `src/simulation/match_report.cpp`
+
+- Tests agregados/mejorados:
+  - `tests/project_tests.cpp`
+  - se reforzo `match_engine_structure`
+  - se agrego `transfer_negotiation`
+
+- Validacion realizada:
+  - `build.bat --validate`
+  - compilacion principal exitosa por CMake
+  - compilacion manual de `build/FootballManagerTests.exe` con `g++`
+  - suite completa de tests pasando
+
+- Limite conocido del entorno:
+  - el target `FootballManagerTests` dentro de `build-cmake` sigue afectado por permisos temporales de MinGW/CTest al escribir archivos auxiliares
+  - el codigo del proyecto y la suite manual quedaron validados igualmente
+
+- Impacto arquitectonico:
+  - el motor de partidos es mas explicable y menos dependiente de una formula comprimida
+  - tactica e IA tienen efecto mas visible sobre el desarrollo del partido
+  - el mercado deja historial y logica de negociacion reusable
+  - queda una base mejor para seguir con match center, scouting avanzado y dinamica de vestuario

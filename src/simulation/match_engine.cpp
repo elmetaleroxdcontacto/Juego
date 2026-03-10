@@ -5,6 +5,7 @@
 #include "simulation/match_context.h"
 #include "simulation/match_event_generator.h"
 #include "simulation/match_phase.h"
+#include "simulation/match_report.h"
 #include "simulation/match_resolution.h"
 #include "simulation/match_stats.h"
 #include "simulation/tactics_engine.h"
@@ -37,28 +38,6 @@ string formatDouble2(double value) {
     return out.str();
 }
 
-string buildProbableReason(const MatchSetup& setup, const MatchStats& stats, const Team& home, const Team& away) {
-    if (stats.homeExpectedGoals > stats.awayExpectedGoals + 0.35) {
-        return home.name + " genero ocasiones mas limpias y aprovecho mejor sus fases dominantes.";
-    }
-    if (stats.awayExpectedGoals > stats.homeExpectedGoals + 0.35) {
-        return away.name + " encontro mejores ventanas de remate y castigo la estructura rival.";
-    }
-    if (setup.context.midfieldControlHome > setup.context.midfieldControlAway + 4.0) {
-        return home.name + " controlo mejor el mediocampo y redujo la respuesta rival.";
-    }
-    if (setup.context.midfieldControlAway > setup.context.midfieldControlHome + 4.0) {
-        return away.name + " gano el centro del campo y sostuvo su plan con mas continuidad.";
-    }
-    if (setup.context.tacticalAdvantageHome > setup.context.tacticalAdvantageAway + 0.08) {
-        return home.name + " encontro un emparejamiento tactico mas favorable.";
-    }
-    if (setup.context.tacticalAdvantageAway > setup.context.tacticalAdvantageHome + 0.08) {
-        return away.name + " saco ventaja del planteamiento y del contexto del partido.";
-    }
-    return "El resultado se definio por detalles dentro de un tramite parejo.";
-}
-
 }  // namespace
 
 namespace match_engine {
@@ -81,24 +60,24 @@ MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch, 
         phase.minuteStart = minuteStart;
         phase.minuteEnd = minuteEnd;
 
-        phase.homeTacticalChange = ai_match_manager::applyInMatchManagement(homeState.team,
-                                                                            awayState.team,
-                                                                            homeState.xi,
-                                                                            homeState.participants,
-                                                                            homeState.cautionedPlayers,
-                                                                            minuteEnd,
-                                                                            stats.homeGoals,
-                                                                            stats.awayGoals,
-                                                                            timeline);
-        phase.awayTacticalChange = ai_match_manager::applyInMatchManagement(awayState.team,
-                                                                            homeState.team,
-                                                                            awayState.xi,
-                                                                            awayState.participants,
-                                                                            awayState.cautionedPlayers,
-                                                                            minuteEnd,
-                                                                            stats.awayGoals,
-                                                                            stats.homeGoals,
-                                                                            timeline);
+        const bool homeTacticalChange = ai_match_manager::applyInMatchManagement(homeState.team,
+                                                                                 awayState.team,
+                                                                                 homeState.xi,
+                                                                                 homeState.participants,
+                                                                                 homeState.cautionedPlayers,
+                                                                                 minuteEnd,
+                                                                                 stats.homeGoals,
+                                                                                 stats.awayGoals,
+                                                                                 timeline);
+        const bool awayTacticalChange = ai_match_manager::applyInMatchManagement(awayState.team,
+                                                                                 homeState.team,
+                                                                                 awayState.xi,
+                                                                                 awayState.participants,
+                                                                                 awayState.cautionedPlayers,
+                                                                                 minuteEnd,
+                                                                                 stats.awayGoals,
+                                                                                 stats.homeGoals,
+                                                                                 timeline);
 
         const TeamMatchSnapshot homeSnapshot = match_context::rebuildSnapshot(homeState.team, awayState.team, homeState.xi, keyMatch);
         const TeamMatchSnapshot awaySnapshot = match_context::rebuildSnapshot(awayState.team, homeState.team, awayState.xi, keyMatch);
@@ -111,6 +90,8 @@ MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch, 
                                                                           minuteStart,
                                                                           minuteEnd);
         phase = phaseEval.report;
+        phase.homeTacticalChange = homeTacticalChange;
+        phase.awayTacticalChange = awayTacticalChange;
         timeline.phases.push_back(phase);
 
         MatchEvent controlEvent;
@@ -122,34 +103,46 @@ MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch, 
 
         homePossAccumulator += phase.homePossessionShare;
 
-        match_event_generator::playChances(homeState.team,
-                                           awayState.team,
-                                           homeState.xi,
-                                           awayState.xi,
-                                           homeSnapshot,
-                                           awaySnapshot,
-                                           true,
-                                           minuteStart,
-                                           minuteEnd,
-                                           phaseEval.homeChanceCount,
-                                           phaseEval.homeAttack - phaseEval.awayDefense,
-                                           timeline,
-                                           stats,
-                                           homeState.goals);
-        match_event_generator::playChances(awayState.team,
-                                           homeState.team,
-                                           awayState.xi,
-                                           homeState.xi,
-                                           awaySnapshot,
-                                           homeSnapshot,
-                                           false,
-                                           minuteStart,
-                                           minuteEnd,
-                                           phaseEval.awayChanceCount,
-                                           phaseEval.awayAttack - phaseEval.homeDefense,
-                                           timeline,
-                                           stats,
-                                           awayState.goals);
+        const int homeShotsBefore = stats.homeShots;
+        const int awayShotsBefore = stats.awayShots;
+        match_event_generator::playPhaseSequences(homeState.team,
+                                                  awayState.team,
+                                                  homeState.xi,
+                                                  awayState.xi,
+                                                  homeSnapshot,
+                                                  awaySnapshot,
+                                                  true,
+                                                  minuteStart,
+                                                  minuteEnd,
+                                                  phaseEval.homePossessionChains,
+                                                  phaseEval.homeProgressions,
+                                                  phaseEval.homeAttacks,
+                                                  phaseEval.homeChanceCount,
+                                                  phaseEval.homeAttack - phaseEval.awayDefense,
+                                                  phase.awayDefensiveRisk,
+                                                  timeline,
+                                                  stats,
+                                                  homeState.goals);
+        match_event_generator::playPhaseSequences(awayState.team,
+                                                  homeState.team,
+                                                  awayState.xi,
+                                                  homeState.xi,
+                                                  awaySnapshot,
+                                                  homeSnapshot,
+                                                  false,
+                                                  minuteStart,
+                                                  minuteEnd,
+                                                  phaseEval.awayPossessionChains,
+                                                  phaseEval.awayProgressions,
+                                                  phaseEval.awayAttacks,
+                                                  phaseEval.awayChanceCount,
+                                                  phaseEval.awayAttack - phaseEval.homeDefense,
+                                                  phase.homeDefensiveRisk,
+                                                  timeline,
+                                                  stats,
+                                                  awayState.goals);
+        timeline.phases.back().homeShotsGenerated = stats.homeShots - homeShotsBefore;
+        timeline.phases.back().awayShotsGenerated = stats.awayShots - awayShotsBefore;
 
         match_event_generator::registerDiscipline(homeState.team,
                                                   homeState.xi,
@@ -213,6 +206,7 @@ MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch, 
     result.context = setup.context;
     result.stats = stats;
     result.timeline = timeline;
+    result.report = match_report::buildReport(setup, homeState.team, awayState.team, timeline, stats);
     result.events = match_stats::buildLegacyTimeline(timeline);
     result.reportLines.push_back("--- Partido ---");
     result.reportLines.push_back(home.name + " vs " + away.name);
@@ -226,7 +220,7 @@ MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch, 
                                  ", Posesion " + to_string(stats.homePossession) + "%-" +
                                  to_string(stats.awayPossession) + "%" +
                                  ", Corners " + to_string(stats.homeCorners) + "-" + to_string(stats.awayCorners));
-    result.reportLines.push_back("Analisis probable: " + buildProbableReason(setup, stats, home, away));
+    match_report::appendSummaryLines(result.report, result.reportLines);
     if (setup.context.fatigueFactorHome < 0.92 || setup.context.fatigueFactorAway < 0.92) {
         result.warnings.push_back("El desgaste acumulado tuvo impacto directo en el rendimiento.");
     }
