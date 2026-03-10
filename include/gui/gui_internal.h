@@ -61,7 +61,10 @@ enum ControlId {
     IDC_PAGE_FINANCES_BUTTON,
     IDC_PAGE_YOUTH_BUTTON,
     IDC_PAGE_BOARD_BUTTON,
-    IDC_PAGE_NEWS_BUTTON
+    IDC_PAGE_NEWS_BUTTON,
+    IDC_EMPTY_NEW_BUTTON,
+    IDC_EMPTY_LOAD_BUTTON,
+    IDC_EMPTY_VALIDATE_BUTTON
 };
 
 enum class GuiPage {
@@ -164,6 +167,9 @@ struct AppState {
     HWND youthButton = nullptr;
     HWND boardButton = nullptr;
     HWND newsButton = nullptr;
+    HWND emptyNewButton = nullptr;
+    HWND emptyLoadButton = nullptr;
+    HWND emptyValidateButton = nullptr;
 
     HWND scoutActionButton = nullptr;
     HWND shortlistButton = nullptr;

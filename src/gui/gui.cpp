@@ -119,6 +119,15 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 case IDC_VALIDATE_BUTTON:
                     validateSystem(*state);
                     return 0;
+                case IDC_EMPTY_NEW_BUTTON:
+                    startNewCareer(*state);
+                    return 0;
+                case IDC_EMPTY_LOAD_BUTTON:
+                    loadCareer(*state);
+                    return 0;
+                case IDC_EMPTY_VALIDATE_BUTTON:
+                    validateSystem(*state);
+                    return 0;
                 case IDC_PAGE_DASHBOARD_BUTTON:
                 case IDC_PAGE_SQUAD_BUTTON:
                 case IDC_PAGE_TACTICS_BUTTON:

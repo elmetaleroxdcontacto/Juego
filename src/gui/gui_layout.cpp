@@ -203,18 +203,18 @@ void layoutWindow(AppState& state) {
     const int footerHeight = std::max(dashboardLayout ? 152 : 140,
                                       static_cast<int>(client.bottom - (contentTop + topPanelHeight + midPanelHeight + 136)));
 
-    MoveWindow(state.divisionLabel, 18, 18, 82, 22, TRUE);
-    MoveWindow(state.divisionCombo, 106, 14, 232, 400, TRUE);
-    MoveWindow(state.teamLabel, 354, 18, 72, 22, TRUE);
-    MoveWindow(state.teamCombo, 430, 14, 258, 400, TRUE);
-    MoveWindow(state.managerLabel, 702, 18, 82, 22, TRUE);
-    MoveWindow(state.managerEdit, 790, 14, 210, 28, TRUE);
+    MoveWindow(state.divisionLabel, 18, 18, 70, 22, TRUE);
+    MoveWindow(state.divisionCombo, 92, 14, 290, 400, TRUE);
+    MoveWindow(state.teamLabel, 398, 18, 50, 22, TRUE);
+    MoveWindow(state.teamCombo, 452, 14, 332, 400, TRUE);
+    MoveWindow(state.managerLabel, 800, 18, 70, 22, TRUE);
+    MoveWindow(state.managerEdit, 874, 14, 176, 28, TRUE);
 
     const int primaryButtonHeight = 30;
-    MoveWindow(state.newCareerButton, client.right - 608, 13, 142, primaryButtonHeight, TRUE);
-    MoveWindow(state.loadButton, client.right - 456, 13, 102, primaryButtonHeight, TRUE);
-    MoveWindow(state.saveButton, client.right - 346, 13, 102, primaryButtonHeight, TRUE);
-    MoveWindow(state.simulateButton, client.right - 234, 13, 128, primaryButtonHeight, TRUE);
+    MoveWindow(state.newCareerButton, client.right - 608, 13, 152, primaryButtonHeight, TRUE);
+    MoveWindow(state.loadButton, client.right - 446, 13, 106, primaryButtonHeight, TRUE);
+    MoveWindow(state.saveButton, client.right - 330, 13, 106, primaryButtonHeight, TRUE);
+    MoveWindow(state.simulateButton, client.right - 214, 13, 118, primaryButtonHeight, TRUE);
     MoveWindow(state.validateButton, client.right - 96, 13, 88, primaryButtonHeight, TRUE);
 
     const int sideX = padding;
@@ -230,7 +230,7 @@ void layoutWindow(AppState& state) {
 
     MoveWindow(state.breadcrumbLabel, contentLeft, topBarHeight + 8, contentWidth, 20, TRUE);
     MoveWindow(state.pageTitleLabel, contentLeft, topBarHeight + 30, contentWidth, 30, TRUE);
-    MoveWindow(state.infoLabel, contentLeft, topBarHeight + 62, contentWidth, 24, TRUE);
+    MoveWindow(state.infoLabel, contentLeft, topBarHeight + 64, contentWidth, 22, TRUE);
     MoveWindow(state.filterLabel, infoLeft + 6, topBarHeight + 32, 56, 18, TRUE);
     MoveWindow(state.filterCombo, infoLeft + 66, topBarHeight + 28, infoWidth - 66, 320, TRUE);
 
@@ -260,6 +260,8 @@ void layoutWindow(AppState& state) {
     if (dashboardEmptyState) {
         int summaryHeight = std::max(360, static_cast<int>(client.bottom) - panelsTop - 74);
         int sideHeight = std::max(160, (summaryHeight - 30) / 2);
+        int buttonTop = panelsTop + summaryHeight - 58;
+        int buttonWidth = 176;
 
         MoveWindow(state.summaryLabel, contentLeft, panelsTop, contentWidth, 18, TRUE);
         MoveWindow(state.summaryEdit, contentLeft, panelsTop + 18, contentWidth, summaryHeight, TRUE);
@@ -270,10 +272,20 @@ void layoutWindow(AppState& state) {
         int newsTop = panelsTop + sideHeight + 42;
         MoveWindow(state.newsLabel, infoLeft, newsTop, infoWidth, 18, TRUE);
         MoveWindow(state.newsList, infoLeft, newsTop + 18, infoWidth, summaryHeight - sideHeight - 24, TRUE);
+        MoveWindow(state.emptyNewButton, contentLeft + 24, buttonTop, buttonWidth, 32, TRUE);
+        MoveWindow(state.emptyLoadButton, contentLeft + 24 + buttonWidth + 12, buttonTop, buttonWidth, 32, TRUE);
+        MoveWindow(state.emptyValidateButton, contentLeft + 24 + (buttonWidth + 12) * 2, buttonTop, buttonWidth, 32, TRUE);
+        ShowWindow(state.emptyNewButton, SW_SHOW);
+        ShowWindow(state.emptyLoadButton, SW_SHOW);
+        ShowWindow(state.emptyValidateButton, SW_SHOW);
 
         MoveWindow(state.statusLabel, padding, client.bottom - 26, client.right - padding * 2, 18, TRUE);
         return;
     }
+
+    ShowWindow(state.emptyNewButton, SW_HIDE);
+    ShowWindow(state.emptyLoadButton, SW_HIDE);
+    ShowWindow(state.emptyValidateButton, SW_HIDE);
 
     MoveWindow(state.summaryLabel, contentLeft, panelsTop, summaryWidth, 18, TRUE);
     MoveWindow(state.summaryEdit, contentLeft, panelsTop + 18, summaryWidth, topPanelHeight, TRUE);
@@ -290,9 +302,9 @@ void layoutWindow(AppState& state) {
 
     if (dashboardLayout) {
         MoveWindow(state.detailLabel, infoLeft, secondTop, infoWidth, 18, TRUE);
-        MoveWindow(state.detailEdit, infoLeft, secondTop + 18, infoWidth, midPanelHeight, TRUE);
-        MoveWindow(state.newsLabel, infoLeft, footerTop, infoWidth, 18, TRUE);
-        MoveWindow(state.newsList, infoLeft, footerTop + 18, infoWidth, footerHeight, TRUE);
+        MoveWindow(state.detailEdit, infoLeft, secondTop + 18, infoWidth, 132, TRUE);
+        MoveWindow(state.newsLabel, infoLeft, secondTop + 18 + 132 + 24, infoWidth, 18, TRUE);
+        MoveWindow(state.newsList, infoLeft, secondTop + 18 + 132 + 42, infoWidth, client.bottom - (secondTop + 18 + 132 + 42) - 56, TRUE);
     } else {
         MoveWindow(state.detailLabel, infoLeft, panelsTop, infoWidth, 18, TRUE);
         MoveWindow(state.detailEdit, infoLeft, panelsTop + 18, infoWidth, topPanelHeight + 120, TRUE);
@@ -325,7 +337,7 @@ void initializeInterface(AppState& state) {
     const DWORD buttonStyle = WS_CHILD | WS_VISIBLE | BS_OWNERDRAW;
 
     state.divisionLabel = createControl(state, 0, L"STATIC", L"Division", WS_CHILD | WS_VISIBLE, 18, 18, 82, 20, state.window, 0);
-    state.teamLabel = createControl(state, 0, L"STATIC", L"Equipo", WS_CHILD | WS_VISIBLE, 354, 18, 72, 20, state.window, 0);
+    state.teamLabel = createControl(state, 0, L"STATIC", L"Club", WS_CHILD | WS_VISIBLE, 354, 18, 72, 20, state.window, 0);
     state.managerLabel = createControl(state, 0, L"STATIC", L"Manager", WS_CHILD | WS_VISIBLE, 702, 18, 82, 20, state.window, 0);
     state.filterLabel = createControl(state, 0, L"STATIC", L"Filtro", WS_CHILD | WS_VISIBLE, 0, 0, 50, 20, state.window, 0);
 
@@ -334,11 +346,17 @@ void initializeInterface(AppState& state) {
     state.managerEdit = createControl(state, WS_EX_CLIENTEDGE, L"EDIT", L"Manager", WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL, 676, 14, 188, 24, state.window, IDC_MANAGER_EDIT);
     state.filterCombo = createControl(state, 0, L"COMBOBOX", L"", WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL, 0, 0, 180, 260, state.window, IDC_FILTER_COMBO);
 
-    state.newCareerButton = createControl(state, 0, L"BUTTON", L"Nueva carrera", buttonStyle, 0, 0, 100, 28, state.window, IDC_NEW_CAREER_BUTTON);
+    state.newCareerButton = createControl(state, 0, L"BUTTON", L"Nueva partida", buttonStyle, 0, 0, 100, 28, state.window, IDC_NEW_CAREER_BUTTON);
     state.loadButton = createControl(state, 0, L"BUTTON", L"Cargar", buttonStyle, 0, 0, 86, 28, state.window, IDC_LOAD_BUTTON);
     state.saveButton = createControl(state, 0, L"BUTTON", L"Guardar", buttonStyle, 0, 0, 86, 28, state.window, IDC_SAVE_BUTTON);
     state.simulateButton = createControl(state, 0, L"BUTTON", L"Simular", buttonStyle, 0, 0, 126, 28, state.window, IDC_SIMULATE_BUTTON);
     state.validateButton = createControl(state, 0, L"BUTTON", L"Validar", buttonStyle, 0, 0, 92, 28, state.window, IDC_VALIDATE_BUTTON);
+    state.emptyNewButton = createControl(state, 0, L"BUTTON", L"Nueva partida", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_NEW_BUTTON);
+    state.emptyLoadButton = createControl(state, 0, L"BUTTON", L"Cargar guardado", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_LOAD_BUTTON);
+    state.emptyValidateButton = createControl(state, 0, L"BUTTON", L"Validar datos", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_VALIDATE_BUTTON);
+    ShowWindow(state.emptyNewButton, SW_HIDE);
+    ShowWindow(state.emptyLoadButton, SW_HIDE);
+    ShowWindow(state.emptyValidateButton, SW_HIDE);
 
     state.dashboardButton = createControl(state, 0, L"BUTTON", L"Inicio", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_DASHBOARD_BUTTON);
     state.squadButton = createControl(state, 0, L"BUTTON", L"Plantilla", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_SQUAD_BUTTON);
@@ -397,10 +415,10 @@ void initializeInterface(AppState& state) {
     setLabelFont(state.teamLabel, state.font);
     setLabelFont(state.managerLabel, state.font);
 
-    if (state.monoFont) {
-        SendMessageW(state.summaryEdit, WM_SETFONT, reinterpret_cast<WPARAM>(state.monoFont), TRUE);
-        SendMessageW(state.detailEdit, WM_SETFONT, reinterpret_cast<WPARAM>(state.monoFont), TRUE);
-        SendMessageW(state.newsList, WM_SETFONT, reinterpret_cast<WPARAM>(state.monoFont), TRUE);
+    if (state.font) {
+        SendMessageW(state.summaryEdit, WM_SETFONT, reinterpret_cast<WPARAM>(state.font), TRUE);
+        SendMessageW(state.detailEdit, WM_SETFONT, reinterpret_cast<WPARAM>(state.font), TRUE);
+        SendMessageW(state.newsList, WM_SETFONT, reinterpret_cast<WPARAM>(state.font), TRUE);
     }
 
     DWORD styles = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_DOUBLEBUFFER;

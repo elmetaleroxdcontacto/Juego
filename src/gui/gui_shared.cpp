@@ -283,7 +283,8 @@ bool isPageButtonId(int id) {
 
 bool isPrimaryButtonId(int id) {
     return id == IDC_NEW_CAREER_BUTTON || id == IDC_SIMULATE_BUTTON || id == IDC_BUY_BUTTON ||
-           id == IDC_RENEW_BUTTON || id == IDC_SCOUT_BUTTON || id == IDC_PAGE_DASHBOARD_BUTTON;
+           id == IDC_RENEW_BUTTON || id == IDC_SCOUT_BUTTON || id == IDC_PAGE_DASHBOARD_BUTTON ||
+           id == IDC_EMPTY_NEW_BUTTON || id == IDC_EMPTY_LOAD_BUTTON || id == IDC_EMPTY_VALIDATE_BUTTON;
 }
 
 bool isUpgradeButtonId(int id) {

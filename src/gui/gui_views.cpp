@@ -133,10 +133,10 @@ std::vector<DashboardMetric> buildMetrics(const Career& career, const std::vecto
     if (!career.myTeam) {
         return {
             {"Club", "Sin carrera", kThemeAccentBlue},
-            {"Fecha", "Temporada 0 / Semana 0", kThemeAccent},
-            {"Presupuesto", "$0", kThemeAccentGreen},
-            {"Reputacion", "0", kThemeAccentBlue},
-            {"Alertas", "0", kThemeWarning}
+            {"Estado", "Listo para empezar", kThemeAccentGreen},
+            {"Presupuesto", "--", kThemeAccent},
+            {"Reputacion", "Manager nuevo", kThemeAccentBlue},
+            {"Alertas", "Base lista", alerts.empty() ? kThemeAccentGreen : kThemeWarning}
         };
     }
 
@@ -728,18 +728,17 @@ GuiPageModel buildDashboardModel(AppState& state) {
         model.summary.content =
             "No hay carrera activa.\r\n\r\n"
             "Crea una nueva partida o carga un guardado para abrir el centro del club.\r\n\r\n"
-            "Desde aqui podras:\r\n"
-            "- revisar tu proximo partido\r\n"
-            "- controlar la moral y la fatiga del plantel\r\n"
-            "- seguir la tabla y las noticias del campeonato\r\n"
-            "- gestionar fichajes, finanzas y cantera";
+            "Cuando empieces tendras acceso inmediato a:\r\n"
+            "- proximo partido\r\n"
+            "- estado del equipo\r\n"
+            "- tabla y noticias\r\n"
+            "- mercado, finanzas y cantera";
         model.detail.content =
             "Empieza aqui\r\n\r\n"
             "1. Elige una division.\r\n"
             "2. Selecciona un club.\r\n"
             "3. Escribe el nombre del manager.\r\n"
-            "4. Pulsa Nueva carrera o Cargar.\r\n\r\n"
-            "Cuando abras una partida, este panel mostrara el ultimo resultado y su analisis.";
+            "4. Usa una de las acciones inferiores.";
         model.feed.lines.clear();
         model.feed.lines.push_back("Sin noticias por ahora. Inicia una carrera para activar el mundo de juego.");
         model.feed.lines.push_back("Consejo: empieza en un club pequeno para ver mejor el impacto de cantera y finanzas.");
