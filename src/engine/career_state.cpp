@@ -269,6 +269,9 @@ void Career::resetSeason() {
     initializeSeasonCup();
     initializeDynamicObjective();
     lastMatchAnalysis.clear();
+    lastMatchReportLines.clear();
+    lastMatchEvents.clear();
+    lastMatchPlayerOfTheMatch.clear();
     scoutInbox.clear();
 }
 

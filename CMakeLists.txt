@@ -13,6 +13,7 @@ set(FM_CAREER_SOURCES
     src/career/career_runtime.cpp
     src/career/career_reports.cpp
     src/career/career_manager.cpp
+    src/career/match_analysis_store.cpp
     src/career/season_flow_controller.cpp
     src/career/season_service.cpp
     src/career/season_transition.cpp
@@ -52,6 +53,7 @@ set(FM_IO_SOURCES
 set(FM_SIMULATION_SOURCES
     src/simulation/fatigue_engine.cpp
     src/simulation/match_event_generator.cpp
+    src/simulation/match_event_resolver.cpp
     src/simulation/match_events.cpp
     src/simulation/match_context.cpp
     src/simulation/match_engine.cpp

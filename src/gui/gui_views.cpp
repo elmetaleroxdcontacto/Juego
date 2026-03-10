@@ -2,6 +2,7 @@
 
 #ifdef _WIN32
 
+#include "career/match_analysis_store.h"
 #include "career/career_support.h"
 #include "utils/utils.h"
 
@@ -196,6 +197,10 @@ bool newsMatchesFilter(const std::string& line, const std::string& filter) {
     if (filter == "Lesiones") return lower.find("lesion") != std::string::npos;
     if (filter == "Contratos") return lower.find("contrato") != std::string::npos || lower.find("renov") != std::string::npos;
     return true;
+}
+
+std::string lastMatchPanelText(const Career& career, size_t maxReportLines, size_t maxEvents) {
+    return career_match_analysis::buildLastMatchInsightText(career, maxReportLines, maxEvents);
 }
 
 std::vector<std::string> buildFeedLines(const Career& career, const std::string& filter, size_t limit = 18) {
@@ -630,9 +635,7 @@ GuiPageModel buildDashboardModel(AppState& state) {
     out << "Moral del equipo " << team.morale << " | Jugadores con moral baja " << lowMorale << "\r\n";
     out << "Bajas actuales " << injured << " | Objetivo directiva " << state.career.boardMonthlyObjective << "\r\n";
     out << "\r\nInforme rival\r\n" << buildOpponentReport(state.career);
-    if (!state.career.lastMatchAnalysis.empty()) {
-        out << "\r\nUltimos resultados\r\n" << state.career.lastMatchAnalysis;
-    }
+    out << "\r\nUltimo partido\r\n" << lastMatchPanelText(state.career, 3, 3);
     model.summary.content = out.str();
 
     std::ostringstream detail;
@@ -641,6 +644,7 @@ GuiPageModel buildDashboardModel(AppState& state) {
     detail << "Progreso " << state.career.boardMonthlyProgress << "/" << state.career.boardMonthlyTarget
            << " | Confianza " << state.career.boardConfidence << "/100\r\n\r\n";
     detail << "Informe rival\r\n" << buildOpponentReport(state.career) << "\r\n\r\n";
+    detail << "Ultimo partido\r\n" << lastMatchPanelText(state.career, 5, 6) << "\r\n";
     detail << "Noticias recientes\r\n";
     for (size_t i = 0; i < model.feed.lines.size() && i < 4; ++i) {
         detail << "- " << model.feed.lines[i] << "\r\n";
@@ -774,8 +778,8 @@ GuiPageModel buildTacticsModel(AppState& state) {
     detail << "Presion alta aumenta recuperaciones, pero castiga a jugadores con fisico bajo.\r\n";
     detail << "Ritmo alto acelera la llegada, aunque empeora la precision en equipos con forma baja.\r\n";
     detail << "Bloque bajo reduce espacio interior y aumenta probabilidad de centros rivales.\r\n";
-    detail << "Informe rival: " << buildOpponentReport(state.career) << "\r\n";
-    detail << "Ultimo analisis: " << (state.career.lastMatchAnalysis.empty() ? "sin partido reciente" : state.career.lastMatchAnalysis);
+    detail << "Informe rival: " << buildOpponentReport(state.career) << "\r\n\r\n";
+    detail << lastMatchPanelText(state.career, 4, 5);
     model.detail.content = detail.str();
     return model;
 }
@@ -1077,7 +1081,7 @@ GuiPageModel buildNewsModel(AppState& state) {
     }
     model.summary.content = "NewsFeedPanel\r\nEntradas visibles: " + std::to_string(model.feed.lines.size()) +
                             "\r\nFiltro actual: " + state.currentFilter;
-    model.detail.content = state.career.lastMatchAnalysis.empty() ? "No hay ultimo analisis de partido." : state.career.lastMatchAnalysis;
+    model.detail.content = lastMatchPanelText(state.career, 5, 8);
     return model;
 }
 

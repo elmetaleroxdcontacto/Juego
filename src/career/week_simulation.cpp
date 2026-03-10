@@ -1,6 +1,7 @@
 #include "career/week_simulation.h"
 
 #include "ai/team_ai.h"
+#include "career/match_analysis_store.h"
 #include "career/career_reports.h"
 #include "career/career_runtime.h"
 #include "career/season_transition.h"
@@ -256,72 +257,7 @@ void storeMatchAnalysis(Career& career,
                         const Team& away,
                         const MatchResult& result,
                         bool cupMatch) {
-    if (!career.myTeam) return;
-    bool myHome = (&home == career.myTeam);
-    bool myAway = (&away == career.myTeam);
-    if (!myHome && !myAway) return;
-
-    int myGoals = myHome ? result.homeGoals : result.awayGoals;
-    int oppGoals = myHome ? result.awayGoals : result.homeGoals;
-    int myShots = myHome ? result.homeShots : result.awayShots;
-    int oppShots = myHome ? result.awayShots : result.homeShots;
-    int myPoss = myHome ? result.homePossession : result.awayPossession;
-    int oppPoss = myHome ? result.awayPossession : result.homePossession;
-    int mySubs = myHome ? result.homeSubstitutions : result.awaySubstitutions;
-    int oppSubs = myHome ? result.awaySubstitutions : result.homeSubstitutions;
-    int myCorners = myHome ? result.homeCorners : result.awayCorners;
-    int oppCorners = myHome ? result.awayCorners : result.homeCorners;
-    double myXg = max(0.2, myShots * 0.11 + myCorners * 0.05 + max(0, myPoss - 50) * 0.015);
-    double oppXg = max(0.2, oppShots * 0.11 + oppCorners * 0.05 + max(0, oppPoss - 50) * 0.015);
-    string opponent = myHome ? away.name : home.name;
-    const Team& myTeam = myHome ? home : away;
-    const Team& oppTeam = myHome ? away : home;
-    string verdict = (myGoals > oppGoals) ? "Partido controlado" :
-                     (myGoals < oppGoals ? "Derrota con ajustes pendientes" : "Empate cerrado");
-    string recommendation = "Mantener base y ajustar rotacion segun forma individual";
-    string reason = (myTeam.matchInstruction == "Juego directo" && oppTeam.defensiveLine >= 4) ? "se encontro espacio a la espalda" :
-                    (myTeam.pressingIntensity >= 4 && oppPoss <= 46) ? "la presion sostuvo recuperaciones altas" :
-                    (oppTeam.pressingIntensity >= 4 && myPoss <= 45) ? "costo salir ante la presion rival" :
-                    "el partido se definio por detalles";
-
-    if (myShots < oppShots && myPoss < 50) verdict += ", falto presencia ofensiva";
-    else if (myShots > oppShots && myGoals <= oppGoals) verdict += ", falto eficacia";
-    else if (myPoss >= 55 && myGoals >= oppGoals) verdict += ", buen control del ritmo";
-    if (myCorners > oppCorners + 2) verdict += ", se cargo el area rival";
-    if (myPoss < 45 && myGoals > oppGoals) verdict += ", transiciones muy efectivas";
-    if (myShots + 2 < oppShots && myPoss < 48) {
-        recommendation = "Subir un punto la altura de linea o el tempo para recuperar iniciativa";
-    } else if (myGoals < oppGoals && myShots >= oppShots) {
-        recommendation = "Trabajar finalizacion y pelota parada en la semana";
-    } else if (myCorners + 2 < oppCorners) {
-        recommendation = "Explorar 'Por bandas' o laterales mas altos para cargar el area";
-    } else if (myPoss >= 55 && myGoals == 0) {
-        recommendation = "Mantener posesion pero acelerar ultimo tercio con juego mas directo";
-    }
-    if (!result.report.explanation.likelyReason.empty()) {
-        reason = result.report.explanation.likelyReason;
-    }
-    if (!result.report.explanation.tacticalStory.empty()) {
-        recommendation = result.report.explanation.tacticalStory;
-    }
-
-    career.lastMatchAnalysis =
-        string(cupMatch ? "Copa" : "Liga") + ": " + career.myTeam->name + " " +
-        to_string(myGoals) + "-" + to_string(oppGoals) + " " + opponent +
-        " | Tiros " + to_string(myShots) + "-" + to_string(oppShots) +
-        " | Posesion " + to_string(myPoss) + "-" + to_string(oppPoss) +
-        " | Corners " + to_string(myCorners) + "-" + to_string(oppCorners) +
-        " | xG " + to_string(static_cast<int>(myXg * 10 + 0.5)) + "/" +
-        to_string(static_cast<int>(oppXg * 10 + 0.5)) +
-        " | Cambios " + to_string(mySubs) + "-" + to_string(oppSubs) +
-        " | Clima " + result.weather +
-        " | " + lineMap(myTeam) +
-        " | " + verdict +
-        " | Clave: " + reason +
-        " | Recomendacion: " + recommendation +
-        (result.report.explanation.fatigueStory.empty() ? "" : " | Fatiga: " + result.report.explanation.fatigueStory) +
-        (result.report.playerOfTheMatch.empty() ? "" : " | Figura: " + result.report.playerOfTheMatch) +
-        (result.report.postMatchImpact.empty() ? "" : " | Post: " + result.report.postMatchImpact);
+    career_match_analysis::storeMatchAnalysis(career, home, away, result, cupMatch);
 }
 
 void simulateSeasonCupRound(Career& career) {

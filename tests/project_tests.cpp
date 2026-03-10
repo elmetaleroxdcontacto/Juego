@@ -1,5 +1,6 @@
 #include "ai/ai_transfer_manager.h"
 #include "career/career_reports.h"
+#include "career/match_analysis_store.h"
 #include "career/career_support.h"
 #include "career/season_service.h"
 #include "career/season_transition.h"
@@ -422,6 +423,27 @@ void testOpponentReportExplainsNextFixture() {
     expect(report.find("alerta") != string::npos, "El informe rival debe incluir una vulnerabilidad o alerta.");
 }
 
+void testMatchAnalysisStoreProducesStructuredCareerData() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 4;
+    career.allTeams.push_back(makeTeam("Analisis Local", "primera division", 72, 4, 4, "Pressing", "Contra-presion", 700000));
+    career.allTeams.push_back(makeTeam("Analisis Rival", "primera division", 68, 2, 3, "Counter", "Juego directo", 620000));
+    career.myTeam = &career.allTeams[0];
+
+    const MatchResult result = match_engine::simulate(career.allTeams[0], career.allTeams[1], true, false).result;
+    career_match_analysis::storeMatchAnalysis(career, career.allTeams[0], career.allTeams[1], result, false);
+
+    expect(!career.lastMatchAnalysis.empty(), "El servicio de analisis debe guardar un resumen del ultimo partido.");
+    expect(!career.lastMatchReportLines.empty(), "El servicio de analisis debe guardar lineas estructuradas del reporte.");
+    expect(!career.lastMatchEvents.empty(), "El servicio de analisis debe guardar eventos del partido.");
+    expect(!career.lastMatchPlayerOfTheMatch.empty(), "El servicio de analisis debe conservar la figura del partido.");
+
+    const string detail = career_match_analysis::buildLastMatchInsightText(career, 3, 4);
+    expect(detail.find("MatchReport") != string::npos, "La vista detallada debe incluir el bloque MatchReport.");
+    expect(detail.find("MatchTimeline") != string::npos, "La vista detallada debe incluir el bloque MatchTimeline.");
+}
+
 void testSaveLoadRoundTripPreservesCareerState() {
     const string savePath = "saves/test_roundtrip_save.txt";
 
@@ -440,6 +462,9 @@ void testSaveLoadRoundTripPreservesCareerState() {
     original.boardMonthlyProgress = 4;
     original.boardMonthlyDeadlineWeek = 8;
     original.lastMatchAnalysis = "Control total del mediocampo.";
+    original.lastMatchReportLines = {"Claves: se domino el mediocampo", "Fatiga: el rival llego roto", "Disciplina: sin expulsiones"};
+    original.lastMatchEvents = {"12' Gol de prueba", "64' Ajuste tactico", "88' Atajada clave"};
+    original.lastMatchPlayerOfTheMatch = "Jugador Persistente";
     original.newsFeed.push_back("T8-F5: Noticia de prueba");
     original.scoutInbox.push_back("Informe de ojeo");
     original.scoutingShortlist.push_back("Promesa del norte");
@@ -462,6 +487,12 @@ void testSaveLoadRoundTripPreservesCareerState() {
     expect(loaded.managerReputation == original.managerReputation, "La carga debe preservar la reputacion del manager.");
     expect(loaded.boardConfidence == original.boardConfidence, "La carga debe preservar confianza de directiva.");
     expect(loaded.lastMatchAnalysis == original.lastMatchAnalysis, "La carga debe preservar el ultimo analisis de partido.");
+    expect(loaded.lastMatchReportLines.size() == original.lastMatchReportLines.size(),
+           "La carga debe preservar el reporte estructurado del ultimo partido.");
+    expect(loaded.lastMatchEvents.size() == original.lastMatchEvents.size(),
+           "La carga debe preservar la timeline del ultimo partido.");
+    expect(loaded.lastMatchPlayerOfTheMatch == original.lastMatchPlayerOfTheMatch,
+           "La carga debe preservar la figura del ultimo partido.");
     expect(loaded.history.size() == 1 && loaded.history.front().champion == "Club Persistencia",
            "La carga debe preservar historial de temporada.");
     expect(loaded.myTeam != nullptr && loaded.myTeam->name == "Club Persistencia",
@@ -512,6 +543,7 @@ int main() {
         {"season_transition", testSeasonTransitionAdvancesCareerWithoutUiDependencies},
         {"season_service", testSeasonServiceReturnsStructuredWeekResult},
         {"opponent_report", testOpponentReportExplainsNextFixture},
+        {"match_analysis_store", testMatchAnalysisStoreProducesStructuredCareerData},
         {"simulate_match_state", testSimulateMatchAppliesPostProcessState},
         {"save_load_roundtrip", testSaveLoadRoundTripPreservesCareerState},
     };

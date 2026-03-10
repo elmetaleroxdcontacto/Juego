@@ -9,7 +9,7 @@ using namespace std;
 
 namespace {
 
-static constexpr int kCareerSaveVersion = 5;
+static constexpr int kCareerSaveVersion = 6;
 
 string encodeHeadToHead(const vector<HeadToHeadRecord>& records) {
     string out;
@@ -267,6 +267,9 @@ bool serializeCareer(ostream& file, const Career& career) {
     const vector<string>& cupRemainingTeams = career.cupRemainingTeams;
     const string& cupChampion = career.cupChampion;
     const string& lastMatchAnalysis = career.lastMatchAnalysis;
+    const vector<string>& lastMatchReportLines = career.lastMatchReportLines;
+    const vector<string>& lastMatchEvents = career.lastMatchEvents;
+    const string& lastMatchPlayerOfTheMatch = career.lastMatchPlayerOfTheMatch;
     const deque<Team>& allTeams = career.allTeams;
 
     file << "VERSION " << kCareerSaveVersion << "\n";
@@ -288,6 +291,9 @@ bool serializeCareer(ostream& file, const Career& career) {
     file << "CUP " << (cupActive ? 1 : 0) << "|" << cupRound << "|" << encodeStringList(cupRemainingTeams) << "|"
          << cupChampion << "\n";
     file << "LASTMATCH " << lastMatchAnalysis << "\n";
+    file << "LASTMATCH_REPORT " << encodeStringList(lastMatchReportLines) << "\n";
+    file << "LASTMATCH_EVENTS " << encodeStringList(lastMatchEvents) << "\n";
+    file << "LASTMATCH_POTM " << lastMatchPlayerOfTheMatch << "\n";
     file << "TEAMS " << allTeams.size() << "\n";
 
     for (const auto& team : allTeams) {
@@ -344,6 +350,9 @@ bool deserializeCareer(istream& file, Career& career) {
     auto& cupRemainingTeams = career.cupRemainingTeams;
     auto& cupChampion = career.cupChampion;
     auto& lastMatchAnalysis = career.lastMatchAnalysis;
+    auto& lastMatchReportLines = career.lastMatchReportLines;
+    auto& lastMatchEvents = career.lastMatchEvents;
+    auto& lastMatchPlayerOfTheMatch = career.lastMatchPlayerOfTheMatch;
     auto& allTeams = career.allTeams;
     auto& divisions = career.divisions;
     auto& initialized = career.initialized;
@@ -457,8 +466,23 @@ bool deserializeCareer(istream& file, Career& career) {
             if (!getline(file, teamsLine)) return false;
         }
         lastMatchAnalysis.clear();
+        lastMatchReportLines.clear();
+        lastMatchEvents.clear();
+        lastMatchPlayerOfTheMatch.clear();
         if (teamsLine.rfind("LASTMATCH ", 0) == 0) {
             lastMatchAnalysis = trim(teamsLine.substr(10));
+            if (!getline(file, teamsLine)) return false;
+        }
+        if (teamsLine.rfind("LASTMATCH_REPORT ", 0) == 0) {
+            lastMatchReportLines = decodeStringList(trim(teamsLine.substr(17)));
+            if (!getline(file, teamsLine)) return false;
+        }
+        if (teamsLine.rfind("LASTMATCH_EVENTS ", 0) == 0) {
+            lastMatchEvents = decodeStringList(trim(teamsLine.substr(17)));
+            if (!getline(file, teamsLine)) return false;
+        }
+        if (teamsLine.rfind("LASTMATCH_POTM ", 0) == 0) {
+            lastMatchPlayerOfTheMatch = trim(teamsLine.substr(15));
             if (!getline(file, teamsLine)) return false;
         }
         if (teamsLine.rfind("TEAMS ", 0) != 0) return false;
@@ -605,6 +629,9 @@ bool deserializeCareer(istream& file, Career& career) {
     cupRemainingTeams.clear();
     cupChampion.clear();
     lastMatchAnalysis.clear();
+    lastMatchReportLines.clear();
+    lastMatchEvents.clear();
+    lastMatchPlayerOfTheMatch.clear();
     string teamName;
     getline(file, teamName);
     getline(file, teamName);

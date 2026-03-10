@@ -1522,3 +1522,126 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - `simulation.cpp` mucho mas controlable para futuras extracciones
   - mejor frontera entre motor de partido, postproceso y estado fisico
   - base mas limpia para seguir rompiendo el motor en modulos pequenos
+
+2026-03-10
+
+- Se completo otro paso importante del refactor del motor de partidos:
+  - se separo la resolucion de ocasiones del generador de eventos
+  - ahora existe un modulo dedicado:
+    - `include/simulation/match_event_resolver.h`
+    - `src/simulation/match_event_resolver.cpp`
+
+- Nuevo reparto de responsabilidades en simulacion:
+  - `match_event_generator`
+    - decide progresion, llegada y creacion de ocasion
+  - `match_event_resolver`
+    - resuelve remate, gol, parada, fallo y corner
+  - `match_resolution`
+    - queda enfocado en probabilidad base de ocasion
+
+- Esto mejora la arquitectura del motor:
+  - menor mezcla entre generacion y resolucion
+  - mejor base para seguir afinando:
+    - calidad de remate
+    - lectura del portero
+    - corners
+    - conversion de ocasiones
+
+- Se extrajo la logica de analisis del ultimo partido fuera de UI y simulacion semanal:
+  - nuevo servicio:
+    - `include/career/match_analysis_store.h`
+    - `src/career/match_analysis_store.cpp`
+
+- El servicio nuevo centraliza:
+  - construccion del resumen pospartido del club usuario
+  - almacenamiento del ultimo analisis
+  - almacenamiento de lineas detalladas del reporte
+  - almacenamiento de eventos clave
+  - almacenamiento de la figura del partido
+
+- Se limpio duplicacion de logica en:
+  - `src/career/week_simulation.cpp`
+  - `src/ui/ui.cpp`
+
+- Ambas rutas ahora reutilizan:
+  - `career_match_analysis::storeMatchAnalysis(...)`
+
+- El dominio de carrera ahora conserva mas informacion del ultimo partido:
+  - `include/engine/models.h`
+  - nuevos campos:
+    - `lastMatchReportLines`
+    - `lastMatchEvents`
+    - `lastMatchPlayerOfTheMatch`
+
+- Se actualizo persistencia para estos nuevos datos:
+  - `src/io/save_serialization.cpp`
+  - tambien se ajusto la ruta legacy en:
+    - `src/engine/models.cpp`
+
+- Nuevo contenido persistido en save/load:
+  - `LASTMATCH_REPORT`
+  - `LASTMATCH_EVENTS`
+  - `LASTMATCH_POTM`
+
+- Version de save actualizada:
+  - de `5` a `6`
+
+- Limpieza adicional en reseteo de carrera/temporada:
+  - `src/engine/career_state.cpp`
+  - `src/engine/models.cpp`
+  - ahora tambien se limpian los nuevos datos estructurados del ultimo partido
+
+- Mejora visible en GUI:
+  - `src/gui/gui_views.cpp`
+
+- La interfaz ahora muestra mejor el ultimo partido:
+  - resumen largo reutilizable
+  - bloque `MatchReport`
+  - bloque `MatchTimeline`
+  - mas detalle en:
+    - dashboard
+    - pantalla tactica
+    - paneles de reporte
+
+- Mejora de reportes de carrera:
+  - `src/career/career_reports.cpp`
+  - el bloque `Ultimo analisis` ya no depende solo de un string corto
+  - ahora incorpora parte del reporte estructurado del partido
+
+- Build actualizado:
+  - `CMakeLists.txt` ahora incluye:
+    - `src/simulation/match_event_resolver.cpp`
+    - `src/career/match_analysis_store.cpp`
+
+- Tests ampliados:
+  - `tests/project_tests.cpp`
+  - nuevo test:
+    - `match_analysis_store`
+  - `save_load_roundtrip` ahora tambien valida:
+    - reporte estructurado del ultimo partido
+    - eventos guardados del ultimo partido
+    - figura del partido guardada
+
+- Validacion realizada:
+  - `build.bat --validate`
+  - compilacion principal exitosa por CMake
+  - compilacion manual de `build/FootballManagerTests.exe` con `g++`
+  - suite completa de tests pasando:
+    - `validation_suite`
+    - `match_engine_structure`
+    - `tactical_fatigue`
+    - `competition_group_table`
+    - `transfer_affordability`
+    - `transfer_negotiation`
+    - `season_transition`
+    - `season_service`
+    - `opponent_report`
+    - `match_analysis_store`
+    - `simulate_match_state`
+    - `save_load_roundtrip`
+
+- Impacto arquitectonico:
+  - menos logica repetida entre UI y carrera
+  - mejor frontera entre motor, analisis y presentacion
+  - mejor soporte para GUI rica y reportes mas profundos
+  - el ultimo partido ya se trata como dato estructurado, no solo como texto plano

@@ -30,10 +30,5 @@ double opportunityProbability(double effectiveAttack,
                               double possessionFactor,
                               double mentalityFactor,
                               double matchMomentFactor);
-ChanceResolutionOutput resolveChance(const Team& attacking,
-                                     const Team& defending,
-                                     const std::vector<int>& attackingXI,
-                                     const std::vector<int>& defendingXI,
-                                     const ChanceResolutionInput& input);
 
 }  // namespace match_resolution

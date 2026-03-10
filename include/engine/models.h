@@ -232,6 +232,9 @@ struct Career {
     std::vector<std::string> cupRemainingTeams;
     std::string cupChampion;
     std::string lastMatchAnalysis;
+    std::vector<std::string> lastMatchReportLines;
+    std::vector<std::string> lastMatchEvents;
+    std::string lastMatchPlayerOfTheMatch;
     bool initialized;
 
     Career();

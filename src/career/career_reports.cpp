@@ -1,5 +1,6 @@
 #include "career/career_reports.h"
 
+#include "career/match_analysis_store.h"
 #include "career/career_support.h"
 #include "career/team_management.h"
 #include "competition/competition.h"
@@ -199,7 +200,11 @@ CareerReport buildCompetitionReport(const Career& career) {
         addBlock(report, "Ultimas noticias", std::move(news));
     }
     if (!career.lastMatchAnalysis.empty()) {
-        addBlock(report, "Ultimo analisis", {career.lastMatchAnalysis});
+        vector<string> lastMatchBlock = {career.lastMatchAnalysis};
+        for (size_t i = 0; i < career.lastMatchReportLines.size() && i < 3; ++i) {
+            lastMatchBlock.push_back(career.lastMatchReportLines[i]);
+        }
+        addBlock(report, "Ultimo analisis", std::move(lastMatchBlock));
     }
     if (!career.cupChampion.empty()) {
         addBlock(report, "Copa", {"Campeon: " + career.cupChampion});

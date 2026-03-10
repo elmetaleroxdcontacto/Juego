@@ -1,5 +1,6 @@
 #include "simulation/match_event_generator.h"
 
+#include "simulation/match_event_resolver.h"
 #include "simulation/match_resolution.h"
 #include "simulation/tactics_engine.h"
 #include "utils/utils.h"
@@ -122,7 +123,7 @@ void playPhaseSequences(Team& attacking,
         input.defensivePressure = max(0.10, defendingSnapshot.defensePower / 210.0);
 
         ChanceResolutionOutput output =
-            match_resolution::resolveChance(attacking, defending, attackingXI, defendingXI, input);
+            match_event_resolver::resolveChance(attacking, defending, attackingXI, defendingXI, input);
         match_stats::pushEvent(timeline, stats, output.attemptEvent);
         for (const MatchEvent& event : output.outcomeEvents) {
             match_stats::pushEvent(timeline, stats, event);

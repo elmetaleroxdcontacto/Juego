@@ -13,7 +13,7 @@
 
 using namespace std;
 
-static constexpr int kCareerSaveVersion = 5;
+static constexpr int kCareerSaveVersion = 6;
 
 void applyPositionStats(Player& p) {
     string norm = normalizePosition(p.position);
@@ -1201,6 +1201,9 @@ void Career::resetSeason() {
     initializeSeasonCup();
     initializeDynamicObjective();
     lastMatchAnalysis.clear();
+    lastMatchReportLines.clear();
+    lastMatchEvents.clear();
+    lastMatchPlayerOfTheMatch.clear();
     scoutInbox.clear();
 }
 
@@ -1588,6 +1591,9 @@ bool Career::saveCareer() {
     file << "CUP " << (cupActive ? 1 : 0) << "|" << cupRound << "|" << encodeStringList(cupRemainingTeams)
          << "|" << cupChampion << "\n";
     file << "LASTMATCH " << lastMatchAnalysis << "\n";
+    file << "LASTMATCH_REPORT " << encodeStringList(lastMatchReportLines) << "\n";
+    file << "LASTMATCH_EVENTS " << encodeStringList(lastMatchEvents) << "\n";
+    file << "LASTMATCH_POTM " << lastMatchPlayerOfTheMatch << "\n";
     file << "TEAMS " << allTeams.size() << "\n";
 
     for (auto& team : allTeams) {
@@ -1733,8 +1739,23 @@ bool Career::loadCareer() {
             if (!getline(file, teamsLine)) return false;
         }
         lastMatchAnalysis.clear();
+        lastMatchReportLines.clear();
+        lastMatchEvents.clear();
+        lastMatchPlayerOfTheMatch.clear();
         if (teamsLine.rfind("LASTMATCH ", 0) == 0) {
             lastMatchAnalysis = trim(teamsLine.substr(10));
+            if (!getline(file, teamsLine)) return false;
+        }
+        if (teamsLine.rfind("LASTMATCH_REPORT ", 0) == 0) {
+            lastMatchReportLines = decodeStringList(trim(teamsLine.substr(17)));
+            if (!getline(file, teamsLine)) return false;
+        }
+        if (teamsLine.rfind("LASTMATCH_EVENTS ", 0) == 0) {
+            lastMatchEvents = decodeStringList(trim(teamsLine.substr(17)));
+            if (!getline(file, teamsLine)) return false;
+        }
+        if (teamsLine.rfind("LASTMATCH_POTM ", 0) == 0) {
+            lastMatchPlayerOfTheMatch = trim(teamsLine.substr(15));
             if (!getline(file, teamsLine)) return false;
         }
         if (teamsLine.rfind("TEAMS ", 0) != 0) return false;
