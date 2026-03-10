@@ -2,7 +2,9 @@
 
 #ifdef _WIN32
 
+#include "career/dressing_room_service.h"
 #include "career/match_analysis_store.h"
+#include "career/match_center_service.h"
 #include "career/career_support.h"
 #include "utils/utils.h"
 
@@ -200,7 +202,11 @@ bool newsMatchesFilter(const std::string& line, const std::string& filter) {
 }
 
 std::string lastMatchPanelText(const Career& career, size_t maxReportLines, size_t maxEvents) {
-    return career_match_analysis::buildLastMatchInsightText(career, maxReportLines, maxEvents);
+    return match_center_service::formatLastMatchCenter(career, maxReportLines, maxEvents);
+}
+
+std::string dressingRoomPanelText(const Career& career, size_t maxAlerts) {
+    return dressing_room_service::formatSnapshot(career, maxAlerts);
 }
 
 std::vector<std::string> buildFeedLines(const Career& career, const std::string& filter, size_t limit = 18) {
@@ -634,6 +640,7 @@ GuiPageModel buildDashboardModel(AppState& state) {
     out << "TeamMoraleWidget\r\n";
     out << "Moral del equipo " << team.morale << " | Jugadores con moral baja " << lowMorale << "\r\n";
     out << "Bajas actuales " << injured << " | Objetivo directiva " << state.career.boardMonthlyObjective << "\r\n";
+    out << "\r\nVestuario\r\n" << dressingRoomPanelText(state.career, 3);
     out << "\r\nInforme rival\r\n" << buildOpponentReport(state.career);
     out << "\r\nUltimo partido\r\n" << lastMatchPanelText(state.career, 3, 3);
     model.summary.content = out.str();
@@ -643,6 +650,7 @@ GuiPageModel buildDashboardModel(AppState& state) {
     detail << (state.career.boardMonthlyObjective.empty() ? "Sin objetivo mensual activo" : state.career.boardMonthlyObjective) << "\r\n";
     detail << "Progreso " << state.career.boardMonthlyProgress << "/" << state.career.boardMonthlyTarget
            << " | Confianza " << state.career.boardConfidence << "/100\r\n\r\n";
+    detail << "Vestuario\r\n" << dressingRoomPanelText(state.career, 5) << "\r\n";
     detail << "Informe rival\r\n" << buildOpponentReport(state.career) << "\r\n\r\n";
     detail << "Ultimo partido\r\n" << lastMatchPanelText(state.career, 5, 6) << "\r\n";
     detail << "Noticias recientes\r\n";
@@ -779,6 +787,7 @@ GuiPageModel buildTacticsModel(AppState& state) {
     detail << "Ritmo alto acelera la llegada, aunque empeora la precision en equipos con forma baja.\r\n";
     detail << "Bloque bajo reduce espacio interior y aumenta probabilidad de centros rivales.\r\n";
     detail << "Informe rival: " << buildOpponentReport(state.career) << "\r\n\r\n";
+    detail << dressingRoomPanelText(state.career, 4) << "\r\n";
     detail << lastMatchPanelText(state.career, 4, 5);
     model.detail.content = detail.str();
     return model;
@@ -1081,7 +1090,7 @@ GuiPageModel buildNewsModel(AppState& state) {
     }
     model.summary.content = "NewsFeedPanel\r\nEntradas visibles: " + std::to_string(model.feed.lines.size()) +
                             "\r\nFiltro actual: " + state.currentFilter;
-    model.detail.content = lastMatchPanelText(state.career, 5, 8);
+    model.detail.content = lastMatchPanelText(state.career, 5, 8) + "\r\n" + dressingRoomPanelText(state.career, 4);
     return model;
 }
 

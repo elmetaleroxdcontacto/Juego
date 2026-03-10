@@ -1,6 +1,7 @@
 #include "validators.h"
 
 #include "competition.h"
+#include "io/io.h"
 #include "models.h"
 #include "utils.h"
 
@@ -19,6 +20,242 @@ struct ValidationResult {
     bool ok;
     string detail;
 };
+
+struct RawPlayerRecord {
+    string name;
+    string position;
+    string positionRaw;
+    int age = 0;
+    bool hasAge = false;
+    string ageRaw;
+    long long marketValue = 0;
+    bool hasMarketValue = false;
+    string sourceFile;
+};
+
+struct RawTeamRecord {
+    string displayName;
+    string folderName;
+    string folderPath;
+    string sourceFile;
+    vector<RawPlayerRecord> players;
+};
+
+static bool hasSuspiciousEncoding(const string& text) {
+    return text.find("Ã") != string::npos || text.find("Â") != string::npos ||
+           text.find("â") != string::npos || text.find("�") != string::npos;
+}
+
+static pair<bool, int> parseRawAge(const string& raw) {
+    string value = trim(raw);
+    if (value.empty() || value == "N/A" || value == "-") return {false, 0};
+    try {
+        return {true, stoi(value)};
+    } catch (...) {
+        return {false, 0};
+    }
+}
+
+static bool parseRawRosterCsv(const string& path, RawTeamRecord& team) {
+    vector<string> lines;
+    if (!readTextFileLines(path, lines) || lines.empty()) return false;
+    team.sourceFile = path;
+    for (size_t i = 1; i < lines.size(); ++i) {
+        string line = trim(lines[i]);
+        if (line.empty()) continue;
+        vector<string> cols = splitCsvLine(line);
+        if (cols.size() < 6) continue;
+        RawPlayerRecord player;
+        player.name = trim(cols[0]);
+        player.position = trim(cols[1]);
+        player.positionRaw = trim(cols[2]);
+        player.ageRaw = trim(cols[3]);
+        pair<bool, int> age = parseRawAge(player.ageRaw);
+        player.hasAge = age.first;
+        player.age = age.second;
+        player.marketValue = parseMarketValue(cols[5]);
+        player.hasMarketValue = trim(cols[5]) != "" && trim(cols[5]) != "-" && trim(cols[5]) != "N/A";
+        player.sourceFile = path;
+        team.players.push_back(player);
+    }
+    return true;
+}
+
+static bool parseRawRosterTxt(const string& path, RawTeamRecord& team) {
+    vector<string> lines;
+    if (!readTextFileLines(path, lines)) return false;
+    team.sourceFile = path;
+    for (string line : lines) {
+        line = trim(line);
+        if (line.empty()) continue;
+        if (line[0] == '-') line = trim(line.substr(1));
+        vector<string> parts = splitByDelimiter(line, '|');
+        if (parts.size() < 2) continue;
+
+        RawPlayerRecord player;
+        player.name = trim(parts[0]);
+        player.position = trim(parts[1]);
+        size_t open = player.position.find('(');
+        size_t close = player.position.rfind(')');
+        if (open != string::npos && close != string::npos && close > open) {
+            player.positionRaw = trim(player.position.substr(open + 1, close - open - 1));
+            player.position = trim(player.position.substr(0, open));
+        }
+        for (const string& part : parts) {
+            if (part.find("Edad:") != string::npos) {
+                player.ageRaw = trim(part.substr(part.find("Edad:") + 5));
+            }
+            if (part.find("Valor:") != string::npos) {
+                string value = trim(part.substr(part.find("Valor:") + 6));
+                player.marketValue = parseMarketValue(value);
+                player.hasMarketValue = !value.empty() && value != "-" && value != "N/A";
+            }
+        }
+        pair<bool, int> age = parseRawAge(player.ageRaw);
+        player.hasAge = age.first;
+        player.age = age.second;
+        player.sourceFile = path;
+        team.players.push_back(player);
+    }
+    return true;
+}
+
+static bool parseRawRosterJson(const string& path, RawTeamRecord& team) {
+    vector<string> lines;
+    if (!readTextFileLines(path, lines)) return false;
+    team.sourceFile = path;
+    RawPlayerRecord current;
+    bool inObject = false;
+    auto flush = [&]() {
+        if (!current.name.empty()) {
+            pair<bool, int> age = parseRawAge(current.ageRaw);
+            current.hasAge = age.first;
+            current.age = age.second;
+            current.sourceFile = path;
+            team.players.push_back(current);
+        }
+        current = RawPlayerRecord{};
+        inObject = false;
+    };
+    for (string line : lines) {
+        line = trim(line);
+        if (line == "{") {
+            inObject = true;
+            current = RawPlayerRecord{};
+            continue;
+        }
+        if (!inObject) continue;
+        if (line == "}," || line == "}") {
+            flush();
+            continue;
+        }
+        auto readJsonValue = [&](const string& key) -> string {
+            string marker = "\"" + key + "\"";
+            size_t pos = line.find(marker);
+            if (pos == string::npos) return "";
+            pos = line.find(':', pos);
+            if (pos == string::npos) return "";
+            string value = trim(line.substr(pos + 1));
+            if (!value.empty() && value.back() == ',') value.pop_back();
+            value = trim(value);
+            if (value.size() >= 2 && value.front() == '"' && value.back() == '"') {
+                value = value.substr(1, value.size() - 2);
+            }
+            return value;
+        };
+        string value;
+        value = readJsonValue("name");
+        if (!value.empty()) current.name = value;
+        value = readJsonValue("position");
+        if (!value.empty()) current.position = value;
+        value = readJsonValue("position_raw");
+        if (!value.empty()) current.positionRaw = value;
+        value = readJsonValue("age");
+        if (!value.empty()) current.ageRaw = value;
+        value = readJsonValue("market_value");
+        if (!value.empty()) {
+            current.marketValue = parseMarketValue(value);
+            current.hasMarketValue = value != "-" && value != "N/A";
+        }
+    }
+    if (inObject) flush();
+    return !team.players.empty();
+}
+
+static bool loadRawTeamRoster(const string& folderPath, const string& displayName, const string& folderName, RawTeamRecord& team) {
+    team.displayName = displayName;
+    team.folderName = folderName;
+    team.folderPath = folderPath;
+    string csv = joinPath(folderPath, "players.csv");
+    if (pathExists(csv) && parseRawRosterCsv(csv, team)) return true;
+    string txt = joinPath(folderPath, "players.txt");
+    if (pathExists(txt) && parseRawRosterTxt(txt, team)) return true;
+    string json = joinPath(folderPath, "players.json");
+    if (pathExists(json) && parseRawRosterJson(json, team)) return true;
+    return false;
+}
+
+static string combinedPositionText(const RawPlayerRecord& player) {
+    return toLower(trim(player.position + " " + player.positionRaw));
+}
+
+static string rawNormalizedPosition(const RawPlayerRecord& player) {
+    string position = normalizePosition(player.position);
+    if (position != "N/A") return position;
+    return normalizePosition(player.positionRaw);
+}
+
+static bool isGoalkeeperRole(const RawPlayerRecord& player) {
+    return rawNormalizedPosition(player) == "ARQ";
+}
+
+static bool isCenterBackRole(const RawPlayerRecord& player) {
+    string text = combinedPositionText(player);
+    return text.find("centre-back") != string::npos || text.find("center-back") != string::npos ||
+           text.find("defensa central") != string::npos || text.find(" zaguero ") != string::npos ||
+           text == "cb" || text.find(" cb") != string::npos;
+}
+
+static bool isFullBackRole(const RawPlayerRecord& player) {
+    string text = combinedPositionText(player);
+    return text.find("left-back") != string::npos || text.find("right-back") != string::npos ||
+           text.find("full-back") != string::npos || text.find("fullback") != string::npos ||
+           text.find("wing-back") != string::npos || text.find("lateral") != string::npos ||
+           text.find("carrilero") != string::npos || text.find(" lb") != string::npos ||
+           text.find(" rb") != string::npos || text.find("lwb") != string::npos ||
+           text.find("rwb") != string::npos;
+}
+
+static bool isMidfieldRole(const RawPlayerRecord& player) {
+    return rawNormalizedPosition(player) == "MED";
+}
+
+static bool isForwardRole(const RawPlayerRecord& player) {
+    return rawNormalizedPosition(player) == "DEL";
+}
+
+static void addDataIssue(DataValidationReport& report,
+                         const string& severity,
+                         const string& category,
+                         const string& division,
+                         const string& team,
+                         const string& player,
+                         const string& detail,
+                         const string& suggestion) {
+    DataValidationIssue issue{severity, category, division, team, player, detail, suggestion};
+    report.issues.push_back(issue);
+    if (severity == "ERROR") report.errorCount++;
+    else report.warningCount++;
+}
+
+static string formatIssueLine(const DataValidationIssue& issue) {
+    string line = "[" + issue.severity + "] " + issue.category + " | " + issue.division;
+    if (!issue.team.empty()) line += " | " + issue.team;
+    if (!issue.player.empty()) line += " | " + issue.player;
+    line += " | " + issue.detail;
+    if (!issue.suggestion.empty()) line += " | Sugerencia: " + issue.suggestion;
+    return line;
+}
 
 static string pairKey(const string& a, const string& b) {
     return (a < b) ? (a + "||" + b) : (b + "||" + a);
@@ -272,6 +509,396 @@ static ValidationResult validateTableSorting() {
     return {"Desempates", true, "Orden de tabla base validado."};
 }
 
+DataValidationReport buildRosterDataValidationReport() {
+    DataValidationReport report{};
+    report.ok = true;
+    report.divisionsScanned = 0;
+    report.teamsScanned = 0;
+    report.playersScanned = 0;
+    report.errorCount = 0;
+    report.warningCount = 0;
+
+    map<string, vector<string> > playerTeams;
+
+    for (const DivisionInfo& div : kDivisions) {
+        if (!isDirectory(div.folder)) continue;
+        report.divisionsScanned++;
+
+        vector<pair<string, string> > listedTeams;
+        if (!loadTeamsList(div.folder, listedTeams)) {
+            vector<string> dirs = listDirectories(div.folder);
+            sort(dirs.begin(), dirs.end(), [](const string& a, const string& b) {
+                return toLower(pathFilename(a)) < toLower(pathFilename(b));
+            });
+            for (const string& dir : dirs) {
+                listedTeams.push_back({pathFilename(dir), pathFilename(dir)});
+            }
+        }
+
+        const CompetitionConfig& config = getCompetitionConfig(div.id);
+        if (config.expectedTeamCount > 0 && static_cast<int>(listedTeams.size()) != config.expectedTeamCount) {
+            addDataIssue(report,
+                         "ERROR",
+                         "Integridad liga",
+                         div.id,
+                         "",
+                         "",
+                         "La division declara " + to_string(listedTeams.size()) + " equipos en teams.txt y se esperan " +
+                             to_string(config.expectedTeamCount) + ".",
+                         "Corregir teams.txt o completar/eliminar equipos hasta alcanzar el formato oficial.");
+        }
+
+        set<string> listedIds;
+        for (const auto& entry : listedTeams) {
+            listedIds.insert(normalizeTeamId(entry.first.empty() ? entry.second : entry.first));
+        }
+        vector<string> actualDirs = listDirectories(div.folder);
+        for (const string& dir : actualDirs) {
+            string folderName = pathFilename(dir);
+            string folderId = normalizeTeamId(folderName);
+            if (!folderId.empty() && listedIds.find(folderId) == listedIds.end()) {
+                addDataIssue(report,
+                             "WARNING",
+                             "Integridad liga",
+                             div.id,
+                             folderName,
+                             "",
+                             "Existe una carpeta de equipo no referenciada en teams.txt.",
+                             "Agregarla a teams.txt o retirarla si ya no forma parte de la base.");
+            }
+        }
+
+        for (const auto& entry : listedTeams) {
+            const string displayName = entry.first;
+            const string folderName = entry.second.empty() ? entry.first : entry.second;
+            const string folderPath = joinPath(div.folder, folderName);
+            report.teamsScanned++;
+
+            if (!isDirectory(folderPath)) {
+                addDataIssue(report,
+                             "ERROR",
+                             "Integridad liga",
+                             div.id,
+                             displayName,
+                             "",
+                             "La carpeta del equipo no existe.",
+                             "Crear la carpeta del club o corregir el nombre en teams.txt.");
+                continue;
+            }
+
+            RawTeamRecord team;
+            if (!loadRawTeamRoster(folderPath, displayName, folderName, team)) {
+                addDataIssue(report,
+                             "ERROR",
+                             "Plantilla",
+                             div.id,
+                             displayName,
+                             "",
+                             "No existe un archivo de plantilla valido (players.csv / players.txt / players.json) o la plantilla quedo vacia.",
+                             "Agregar un roster valido antes de intentar simular la division.");
+                continue;
+            }
+
+            const int squadSize = static_cast<int>(team.players.size());
+            report.playersScanned += squadSize;
+            if (squadSize < 18) {
+                addDataIssue(report,
+                             squadSize < 15 ? "ERROR" : "WARNING",
+                             "Tamano plantilla",
+                             div.id,
+                             displayName,
+                             "",
+                             "Plantilla corta con " + to_string(squadSize) + " jugadores.",
+                             "Subir el roster al menos a 18 y preferir un rango de 22 a 25.");
+            } else if (squadSize > 30) {
+                addDataIssue(report,
+                             "WARNING",
+                             "Tamano plantilla",
+                             div.id,
+                             displayName,
+                             "",
+                             "Plantilla sobredimensionada con " + to_string(squadSize) + " jugadores.",
+                             "Reducir duplicados o excedentes por posicion.");
+            }
+
+            int goalkeepers = 0;
+            int centerBacks = 0;
+            int fullBacks = 0;
+            int midfielders = 0;
+            int forwards = 0;
+            map<string, int> normalizedPositionCount;
+            set<string> localPlayers;
+
+            for (const RawPlayerRecord& player : team.players) {
+                string playerName = trim(player.name);
+                string playerKey = toLower(playerName);
+                string normalizedPosition = rawNormalizedPosition(player);
+                string sourcePosition = trim(player.position);
+                string rawPosition = trim(player.positionRaw);
+
+                if (playerName.empty() || toLower(playerName) == "n/a") {
+                    addDataIssue(report,
+                                 "ERROR",
+                                 "Datos invalidos",
+                                 div.id,
+                                 displayName,
+                                 "",
+                                 "Se encontro un jugador sin nombre valido en " + pathFilename(team.sourceFile) + ".",
+                                 "Completar el nombre o eliminar la fila corrupta.");
+                    continue;
+                }
+                if (!localPlayers.insert(playerKey).second) {
+                    addDataIssue(report,
+                                 "ERROR",
+                                 "Jugador duplicado",
+                                 div.id,
+                                 displayName,
+                                 playerName,
+                                 "El jugador aparece repetido dentro del mismo equipo.",
+                                 "Eliminar la fila duplicada o corregir el nombre.");
+                }
+                playerTeams[playerKey].push_back(displayName + " [" + div.id + "]");
+
+                if (hasSuspiciousEncoding(playerName) || hasSuspiciousEncoding(sourcePosition) || hasSuspiciousEncoding(rawPosition)) {
+                    addDataIssue(report,
+                                 "WARNING",
+                                 "Codificacion",
+                                 div.id,
+                                 displayName,
+                                 playerName,
+                                 "Se detectan caracteres mal codificados en nombre o posicion.",
+                                 "Reguardar el archivo en UTF-8 real y corregir textos con mojibake.");
+                }
+
+                if (!player.hasAge) {
+                    addDataIssue(report,
+                                 "ERROR",
+                                 "Datos invalidos",
+                                 div.id,
+                                 displayName,
+                                 playerName,
+                                 "Edad faltante o ilegible.",
+                                 "Asignar una edad entre 15 y 45.");
+                } else if (player.age < 15 || player.age > 45) {
+                    addDataIssue(report,
+                                 "ERROR",
+                                 "Datos invalidos",
+                                 div.id,
+                                 displayName,
+                                 playerName,
+                                 "Edad fuera de rango: " + to_string(player.age) + ".",
+                                 "Ajustar la edad al rango 15-45.");
+                }
+
+                string rawOnlyPosition = normalizePosition(player.positionRaw);
+                string directPosition = normalizePosition(player.position);
+                if (normalizedPosition == "N/A") {
+                    addDataIssue(report,
+                                 "ERROR",
+                                 "Posicion",
+                                 div.id,
+                                 displayName,
+                                 playerName,
+                                 "No tiene posicion valida.",
+                                 "Completar la posicion principal con ARQ/DEF/MED/DEL o una posicion reconocible.");
+                } else if ((sourcePosition.empty() || directPosition == "N/A") && rawOnlyPosition != "N/A") {
+                    addDataIssue(report,
+                                 "WARNING",
+                                 "Posicion",
+                                 div.id,
+                                 displayName,
+                                 playerName,
+                                 "La posicion principal no es valida y solo se puede inferir desde position_raw.",
+                                 "Completar el campo position para no depender del parser.");
+                } else if (directPosition != "N/A" && rawOnlyPosition != "N/A" && directPosition != rawOnlyPosition) {
+                    addDataIssue(report,
+                                 "WARNING",
+                                 "Posicion",
+                                 div.id,
+                                 displayName,
+                                 playerName,
+                                 "position y position_raw no coinciden (" + directPosition + " vs " + rawOnlyPosition + ").",
+                                 "Corregir la fila para que ambos campos representen el mismo rol.");
+                }
+
+                if (isGoalkeeperRole(player)) goalkeepers++;
+                if (isCenterBackRole(player)) centerBacks++;
+                if (isFullBackRole(player)) fullBacks++;
+                if (isMidfieldRole(player)) midfielders++;
+                if (isForwardRole(player)) forwards++;
+                normalizedPositionCount[normalizedPosition]++;
+            }
+
+            if (goalkeepers < 2) {
+                addDataIssue(report, "ERROR", "Posiciones obligatorias", div.id, displayName, "",
+                             "Solo tiene " + to_string(goalkeepers) + " portero(s).",
+                             "Agregar al menos 2 arqueros.");
+            }
+            if (centerBacks < 3) {
+                addDataIssue(report, "ERROR", "Posiciones obligatorias", div.id, displayName, "",
+                             "Solo tiene " + to_string(centerBacks) + " central(es).",
+                             "Agregar o reclasificar defensas centrales hasta llegar a 3.");
+            }
+            if (fullBacks < 2) {
+                addDataIssue(report, "ERROR", "Posiciones obligatorias", div.id, displayName, "",
+                             "Solo tiene " + to_string(fullBacks) + " lateral(es)/carrilero(s).",
+                             "Agregar laterales naturales o corregir position_raw.");
+            }
+            if (midfielders < 3) {
+                addDataIssue(report, "ERROR", "Posiciones obligatorias", div.id, displayName, "",
+                             "Solo tiene " + to_string(midfielders) + " mediocampista(s).",
+                             "Agregar mediocampistas para sostener la simulacion.");
+            }
+            if (forwards < 2) {
+                addDataIssue(report, "ERROR", "Posiciones obligatorias", div.id, displayName, "",
+                             "Solo tiene " + to_string(forwards) + " delantero(s).",
+                             "Agregar al menos dos atacantes.");
+            }
+
+            for (const auto& entryPos : normalizedPositionCount) {
+                if (entryPos.first == "N/A") continue;
+                if (entryPos.second >= max(8, squadSize * 6 / 10)) {
+                    addDataIssue(report,
+                                 "WARNING",
+                                 "Balance plantilla",
+                                 div.id,
+                                 displayName,
+                                 "",
+                                 "Demasiados jugadores en " + entryPos.first + ": " + to_string(entryPos.second) + "/" +
+                                     to_string(squadSize) + ".",
+                                 "Redistribuir posiciones o completar lineas vacias.");
+                }
+            }
+        }
+    }
+
+    for (const auto& entry : playerTeams) {
+        set<string> uniqueTeams(entry.second.begin(), entry.second.end());
+        if (uniqueTeams.size() > 1) {
+            vector<string> teams(uniqueTeams.begin(), uniqueTeams.end());
+            addDataIssue(report,
+                         "WARNING",
+                         "Jugador duplicado",
+                         "",
+                         "",
+                         entry.first,
+                         "El mismo nombre aparece en varios equipos: " + joinStringValues(teams, ", "),
+                         "Verificar si es el mismo jugador repetido o un caso legitimo de homonimia.");
+        }
+    }
+
+    vector<string> playerDirs = listDirectories("data/players");
+    if (!playerDirs.empty()) {
+        addDataIssue(report,
+                     "WARNING",
+                     "Jugadores sin equipo",
+                     "",
+                     "",
+                     "",
+                     "Hay contenido adicional en data/players que no se vincula automaticamente a clubes.",
+                     "Revisar si esos jugadores deben asignarse a un equipo o eliminarse.");
+    }
+
+    Career loadedCareer;
+    loadedCareer.initializeLeague(true);
+    for (const Team& team : loadedCareer.allTeams) {
+        if (team.players.empty()) {
+            addDataIssue(report,
+                         "ERROR",
+                         "Integridad liga",
+                         team.division,
+                         team.name,
+                         "",
+                         "El equipo queda vacio incluso despues de cargar la base.",
+                         "Corregir o crear una plantilla base para el club.");
+            continue;
+        }
+        for (const Player& player : team.players) {
+            auto checkRange = [&](int value, const string& label, int lo, int hi) {
+                if (value < lo || value > hi) {
+                    addDataIssue(report,
+                                 "ERROR",
+                                 "Atributos derivados",
+                                 team.division,
+                                 team.name,
+                                 player.name,
+                                 label + " fuera de rango: " + to_string(value) + ".",
+                                 "Revisar el parser o el dato crudo que origina este jugador.");
+                }
+            };
+            checkRange(player.age, "Edad", 15, 45);
+            checkRange(player.attack, "Ataque", 1, 100);
+            checkRange(player.defense, "Defensa", 1, 100);
+            checkRange(player.stamina, "Stamina", 1, 100);
+            checkRange(player.fitness, "Fitness", 1, 100);
+            checkRange(player.skill, "Media", 1, 100);
+            checkRange(player.potential, "Potencial", 1, 100);
+            if (player.potential < player.skill) {
+                addDataIssue(report,
+                             "ERROR",
+                             "Atributos derivados",
+                             team.division,
+                             team.name,
+                             player.name,
+                             "Potencial menor que media (" + to_string(player.potential) + " < " + to_string(player.skill) + ").",
+                             "Ajustar el calculo o la fuente de datos.");
+            }
+            if (normalizePosition(player.position) == "N/A") {
+                addDataIssue(report,
+                             "ERROR",
+                             "Atributos derivados",
+                             team.division,
+                             team.name,
+                             player.name,
+                             "El jugador cargado quedo sin posicion valida.",
+                             "Corregir el archivo fuente o el parser de posiciones.");
+            }
+        }
+    }
+
+    report.ok = (report.errorCount == 0);
+    report.lines.push_back("");
+    report.lines.push_back("=== Auditoria de Plantillas ===");
+    report.lines.push_back("Divisiones: " + to_string(report.divisionsScanned) +
+                           " | Equipos revisados: " + to_string(report.teamsScanned) +
+                           " | Jugadores crudos: " + to_string(report.playersScanned));
+    report.lines.push_back("Errores: " + to_string(report.errorCount) +
+                           " | Advertencias: " + to_string(report.warningCount));
+    const size_t maxLines = min<size_t>(60, report.issues.size());
+    for (size_t i = 0; i < maxLines; ++i) {
+        report.lines.push_back(formatIssueLine(report.issues[i]));
+    }
+    if (report.issues.size() > maxLines) {
+        report.lines.push_back("... " + to_string(report.issues.size() - maxLines) + " incidencia(s) adicionales omitidas.");
+    }
+    return report;
+}
+
+bool writeRosterDataValidationReport(const string& path) {
+    DataValidationReport report = buildRosterDataValidationReport();
+    string parent = path;
+    size_t slash = parent.find_last_of("/\\");
+    if (slash != string::npos) {
+        parent = parent.substr(0, slash);
+        if (!parent.empty()) ensureDirectory(parent);
+    }
+
+    ofstream file(path.c_str());
+    if (!file.is_open()) return false;
+
+    file << "=== Auditoria de Plantillas ===\n";
+    file << "Divisiones: " << report.divisionsScanned
+         << " | Equipos revisados: " << report.teamsScanned
+         << " | Jugadores crudos: " << report.playersScanned << "\n";
+    file << "Errores: " << report.errorCount
+         << " | Advertencias: " << report.warningCount << "\n\n";
+
+    for (const DataValidationIssue& issue : report.issues) {
+        file << formatIssueLine(issue) << "\n";
+    }
+    return file.good();
+}
+
 ValidationSuiteSummary buildValidationSuiteSummary() {
     vector<ValidationResult> results;
     Career career;
@@ -284,6 +911,8 @@ ValidationSuiteSummary buildValidationSuiteSummary() {
     results.push_back(validateSchedules(career));
     results.push_back(validateSaveLoad());
     results.push_back(validateTableSorting());
+    DataValidationReport rosterReport = buildRosterDataValidationReport();
+    writeRosterDataValidationReport("saves/roster_validation_report.txt");
 
     int failures = 0;
     ValidationSuiteSummary summary;
@@ -293,6 +922,7 @@ ValidationSuiteSummary buildValidationSuiteSummary() {
         if (!result.ok) failures++;
         summary.lines.push_back(string(result.ok ? "[OK] " : "[FAIL] ") + result.name + ": " + result.detail);
     }
+    summary.lines.insert(summary.lines.end(), rosterReport.lines.begin(), rosterReport.lines.end());
     summary.ok = (failures == 0);
     summary.lines.push_back("");
     summary.lines.push_back("Resultado: " + (summary.ok ? string("sin fallas") : to_string(failures) + " falla(s)"));

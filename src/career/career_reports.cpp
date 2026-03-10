@@ -1,5 +1,7 @@
 #include "career/career_reports.h"
 
+#include "career/dressing_room_service.h"
+#include "career/match_center_service.h"
 #include "career/match_analysis_store.h"
 #include "career/career_support.h"
 #include "career/team_management.h"
@@ -199,11 +201,13 @@ CareerReport buildCompetitionReport(const Career& career) {
         }
         addBlock(report, "Ultimas noticias", std::move(news));
     }
-    if (!career.lastMatchAnalysis.empty()) {
-        vector<string> lastMatchBlock = {career.lastMatchAnalysis};
-        for (size_t i = 0; i < career.lastMatchReportLines.size() && i < 3; ++i) {
-            lastMatchBlock.push_back(career.lastMatchReportLines[i]);
-        }
+    MatchCenterView matchCenter = match_center_service::buildLastMatchCenter(career, 3, 4);
+    if (matchCenter.available) {
+        vector<string> lastMatchBlock;
+        if (!matchCenter.scoreboard.empty()) lastMatchBlock.push_back(matchCenter.scoreboard);
+        if (!matchCenter.tacticalSummary.empty()) lastMatchBlock.push_back(matchCenter.tacticalSummary);
+        if (!matchCenter.fatigueSummary.empty()) lastMatchBlock.push_back(matchCenter.fatigueSummary);
+        if (!matchCenter.playerOfTheMatch.empty()) lastMatchBlock.push_back("Figura: " + matchCenter.playerOfTheMatch);
         addBlock(report, "Ultimo analisis", std::move(lastMatchBlock));
     }
     if (!career.cupChampion.empty()) {
@@ -228,6 +232,7 @@ CareerReport buildBoardReport(const Career& career) {
         if (player.age <= 20 && player.matchesPlayed > 0) youthUsed++;
     }
     vector<Team*> jobs = buildJobMarket(career);
+    DressingRoomSnapshot dressing = dressing_room_service::buildSnapshot(*career.myTeam, career.currentWeek);
 
     addFact(report, "Confianza", boardStatusLabel(career.boardConfidence) + " (" + to_string(career.boardConfidence) + "/100)");
     addFact(report, "Reputacion manager", to_string(career.managerReputation) + "/100");
@@ -260,6 +265,8 @@ CareerReport buildBoardReport(const Career& career) {
     else if (career.boardConfidence < 35) addBlock(report, "Estado", {"El cargo esta bajo presion."});
     else addBlock(report, "Estado", {"Situacion controlada."});
 
+    addBlock(report, "Vestuario", dressing.alerts);
+
     vector<string> offers;
     for (Team* job : jobs) {
         offers.push_back(job->name + " (" + divisionDisplay(job->division) + ")");
@@ -283,6 +290,7 @@ CareerReport buildClubReport(const Career& career) {
     }
     vector<const Player*> leaders = dressingRoomLeaders(team);
     WeeklyFinanceReport finance = finance_system::projectWeeklyReport(team);
+    DressingRoomSnapshot dressing = dressing_room_service::buildSnapshot(team, career.currentWeek);
 
     addFact(report, "Presupuesto", formatMoneyValue(team.budget));
     addFact(report, "Deuda", formatMoneyValue(team.debt));
@@ -307,6 +315,7 @@ CareerReport buildClubReport(const Career& career) {
         }
         addBlock(report, "Nucleo de lideres", {joinStringValues(leaderNames, ", ")});
     }
+    addBlock(report, "Vestuario", dressing.alerts);
 
     addBlock(report,
              "Infraestructura",
@@ -321,6 +330,31 @@ CareerReport buildClubReport(const Career& career) {
                  "Jefe juveniles " + to_string(team.youthCoach),
                  "Region juvenil: " + team.youthRegion,
              });
+    return report;
+}
+
+CareerReport buildMatchCenterReport(const Career& career) {
+    CareerReport report;
+    report.title = "Match Center";
+    MatchCenterView center = match_center_service::buildLastMatchCenter(career, 5, 8);
+    if (!center.available) {
+        addFact(report, "Estado", "No hay ultimo partido almacenado.");
+        return report;
+    }
+
+    addFact(report, "Partido", center.scoreboard.empty() ? "Ultimo partido" : center.scoreboard);
+    addFact(report, "Figura", center.playerOfTheMatch.empty() ? "Sin figura" : center.playerOfTheMatch);
+
+    vector<string> metricLines;
+    for (const MatchCenterMetric& metric : center.metrics) {
+        metricLines.push_back(metric.label + ": " + metric.myValue + " / " + metric.oppValue);
+    }
+    addBlock(report, "Metricas", std::move(metricLines));
+    addBlock(report, "Tactica", {center.tacticalSummary});
+    addBlock(report, "Fatiga", {center.fatigueSummary});
+    addBlock(report, "Impacto", {center.postMatchImpact});
+    addBlock(report, "Fases", center.phaseLines);
+    addBlock(report, "Timeline", center.eventLines);
     return report;
 }
 

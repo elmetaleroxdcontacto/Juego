@@ -2,6 +2,7 @@
 
 #include "ai/team_ai.h"
 #include "career/match_analysis_store.h"
+#include "career/dressing_room_service.h"
 #include "career/career_reports.h"
 #include "career/player_development.h"
 #include "career/team_management.h"
@@ -1032,68 +1033,12 @@ static void simulateSeasonCupRound(Career& career) {
 }
 
 static void updateSquadDynamics(Career& career, int pointsDelta) {
-    if (!career.myTeam) return;
-    int captainLeadership = 0;
-    int captainIdx = playerIndexByName(*career.myTeam, career.myTeam->captain);
-    if (captainIdx >= 0 && captainIdx < static_cast<int>(career.myTeam->players.size())) {
-        captainLeadership = career.myTeam->players[captainIdx].leadership;
+    DressingRoomSnapshot snapshot = dressing_room_service::applyWeeklyUpdate(career, pointsDelta);
+    if (!snapshot.summary.empty()) {
+        cout << "[Vestuario] " << snapshot.summary << '\n';
     }
-
-    auto expectedStartsForPromise = [&](const Player& player) {
-        if (player.promisedRole == "Titular") return max(2, career.currentWeek * 2 / 3);
-        if (player.promisedRole == "Rotacion") return max(1, career.currentWeek / 3);
-        if (player.promisedRole == "Proyecto") return (player.age <= 22) ? max(1, career.currentWeek / 4) : max(0, career.currentWeek / 6);
-        return max(0, career.currentWeek / 2 + player.desiredStarts - 1);
-    };
-
-    for (auto& player : career.myTeam->players) {
-        bool wasUnhappy = player.wantsToLeave;
-        int expectedStarts = expectedStartsForPromise(player);
-        int unmetStarts = max(0, expectedStarts - player.startsThisSeason);
-        if (unmetStarts > 0) {
-            player.happiness = clampInt(player.happiness - min(4, 1 + unmetStarts), 1, 99);
-            if (player.skill >= career.myTeam->getAverageSkill() && unmetStarts >= 2) {
-                player.chemistry = clampInt(player.chemistry - 1, 1, 99);
-            }
-            if (player.promisedRole != "Sin promesa" && unmetStarts >= 2) {
-                player.happiness = clampInt(player.happiness - 2, 1, 99);
-            }
-        } else {
-            player.happiness = clampInt(player.happiness + 1, 1, 99);
-            if (player.promisedRole != "Sin promesa") {
-                player.happiness = clampInt(player.happiness + 1, 1, 99);
-            }
-        }
-
-        if (pointsDelta == 3) {
-            player.happiness = clampInt(player.happiness + 1, 1, 99);
-            player.chemistry = clampInt(player.chemistry + 1, 1, 99);
-        } else if (pointsDelta == 0 && player.ambition >= 65) {
-            player.happiness = clampInt(player.happiness - 1, 1, 99);
-        }
-        if (player.injured) player.happiness = clampInt(player.happiness - 1, 1, 99);
-        if (player.wage < wageDemandFor(player) * 80 / 100) player.happiness = clampInt(player.happiness - 1, 1, 99);
-        if (captainLeadership >= 75) player.chemistry = clampInt(player.chemistry + 1, 1, 99);
-        if (career.myTeam->morale >= 65) player.happiness = clampInt(player.happiness + 1, 1, 99);
-        if (playerHasTrait(player, "Lider") && career.myTeam->morale >= 55) {
-            player.chemistry = clampInt(player.chemistry + 1, 1, 99);
-        }
-        if (playerHasTrait(player, "Caliente") && pointsDelta == 0) {
-            player.happiness = clampInt(player.happiness - 1, 1, 99);
-        }
-        if (player.leadership >= 75 && player.happiness >= 60) {
-            player.chemistry = clampInt(player.chemistry + 1, 1, 99);
-        }
-        if (player.professionalism >= 75 && player.startsThisSeason >= expectedStarts) {
-            player.happiness = clampInt(player.happiness + 1, 1, 99);
-        }
-
-        int unrestThreshold = (player.skill >= career.myTeam->getAverageSkill() + 3) ? 38 : 32;
-        player.wantsToLeave = player.happiness <= unrestThreshold &&
-                              (player.ambition >= 60 || player.professionalism <= 45 || unmetStarts >= 3 || player.promisedRole != "Sin promesa");
-        if (!wasUnhappy && player.wantsToLeave) {
-            career.addNews(player.name + " queda disconforme con su situacion en " + career.myTeam->name + ".");
-        }
+    for (size_t i = 0; i < snapshot.alerts.size() && i < 2; ++i) {
+        cout << "[Vestuario] " << snapshot.alerts[i] << '\n';
     }
 }
 

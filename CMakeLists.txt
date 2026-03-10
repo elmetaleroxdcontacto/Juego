@@ -13,7 +13,9 @@ set(FM_CAREER_SOURCES
     src/career/career_runtime.cpp
     src/career/career_reports.cpp
     src/career/career_manager.cpp
+    src/career/dressing_room_service.cpp
     src/career/match_analysis_store.cpp
+    src/career/match_center_service.cpp
     src/career/season_flow_controller.cpp
     src/career/season_service.cpp
     src/career/season_transition.cpp

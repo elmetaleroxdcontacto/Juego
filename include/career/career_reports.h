@@ -31,5 +31,6 @@ CareerReport buildCompetitionReport(const Career& career);
 CareerReport buildBoardReport(const Career& career);
 CareerReport buildClubReport(const Career& career);
 CareerReport buildScoutingReport(const Career& career);
+CareerReport buildMatchCenterReport(const Career& career);
 
 std::string formatCareerReport(const CareerReport& report);

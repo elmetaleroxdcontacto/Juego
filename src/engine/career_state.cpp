@@ -272,6 +272,7 @@ void Career::resetSeason() {
     lastMatchReportLines.clear();
     lastMatchEvents.clear();
     lastMatchPlayerOfTheMatch.clear();
+    lastMatchCenter = MatchCenterSnapshot{};
     scoutInbox.clear();
 }
 

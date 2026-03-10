@@ -9,7 +9,7 @@ using namespace std;
 
 namespace {
 
-static constexpr int kCareerSaveVersion = 6;
+static constexpr int kCareerSaveVersion = 7;
 
 string encodeHeadToHead(const vector<HeadToHeadRecord>& records) {
     string out;
@@ -57,6 +57,62 @@ vector<string> decodeStringList(const string& encoded) {
         if (!token.empty()) items.push_back(token);
     }
     return items;
+}
+
+string encodeMatchCenterSnapshot(const MatchCenterSnapshot& snapshot) {
+    return encodeStringList({
+        snapshot.competitionLabel,
+        snapshot.opponentName,
+        snapshot.venueLabel,
+        to_string(snapshot.myGoals),
+        to_string(snapshot.oppGoals),
+        to_string(snapshot.myShots),
+        to_string(snapshot.oppShots),
+        to_string(snapshot.myShotsOnTarget),
+        to_string(snapshot.oppShotsOnTarget),
+        to_string(snapshot.myPossession),
+        to_string(snapshot.oppPossession),
+        to_string(snapshot.myCorners),
+        to_string(snapshot.oppCorners),
+        to_string(snapshot.mySubstitutions),
+        to_string(snapshot.oppSubstitutions),
+        to_string(snapshot.myExpectedGoalsTenths),
+        to_string(snapshot.oppExpectedGoalsTenths),
+        snapshot.weather,
+        snapshot.dominanceSummary,
+        snapshot.tacticalSummary,
+        snapshot.fatigueSummary,
+        snapshot.postMatchImpact
+    });
+}
+
+MatchCenterSnapshot decodeMatchCenterSnapshot(const string& encoded) {
+    MatchCenterSnapshot snapshot;
+    vector<string> fields = decodeStringList(encoded);
+    size_t idx = 0;
+    if (idx < fields.size()) snapshot.competitionLabel = fields[idx++]; else return snapshot;
+    if (idx < fields.size()) snapshot.opponentName = fields[idx++];
+    if (idx < fields.size()) snapshot.venueLabel = fields[idx++];
+    if (idx < fields.size()) snapshot.myGoals = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.oppGoals = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.myShots = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.oppShots = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.myShotsOnTarget = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.oppShotsOnTarget = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.myPossession = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.oppPossession = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.myCorners = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.oppCorners = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.mySubstitutions = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.oppSubstitutions = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.myExpectedGoalsTenths = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.oppExpectedGoalsTenths = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.weather = fields[idx++];
+    if (idx < fields.size()) snapshot.dominanceSummary = fields[idx++];
+    if (idx < fields.size()) snapshot.tacticalSummary = fields[idx++];
+    if (idx < fields.size()) snapshot.fatigueSummary = fields[idx++];
+    if (idx < fields.size()) snapshot.postMatchImpact = fields[idx++];
+    return snapshot;
 }
 
 string encodeHistory(const vector<SeasonHistoryEntry>& entries) {
@@ -270,6 +326,7 @@ bool serializeCareer(ostream& file, const Career& career) {
     const vector<string>& lastMatchReportLines = career.lastMatchReportLines;
     const vector<string>& lastMatchEvents = career.lastMatchEvents;
     const string& lastMatchPlayerOfTheMatch = career.lastMatchPlayerOfTheMatch;
+    const MatchCenterSnapshot& lastMatchCenter = career.lastMatchCenter;
     const deque<Team>& allTeams = career.allTeams;
 
     file << "VERSION " << kCareerSaveVersion << "\n";
@@ -294,6 +351,8 @@ bool serializeCareer(ostream& file, const Career& career) {
     file << "LASTMATCH_REPORT " << encodeStringList(lastMatchReportLines) << "\n";
     file << "LASTMATCH_EVENTS " << encodeStringList(lastMatchEvents) << "\n";
     file << "LASTMATCH_POTM " << lastMatchPlayerOfTheMatch << "\n";
+    file << "LASTMATCH_CENTER " << encodeMatchCenterSnapshot(lastMatchCenter) << "\n";
+    file << "LASTMATCH_PHASES " << encodeStringList(lastMatchCenter.phaseSummaries) << "\n";
     file << "TEAMS " << allTeams.size() << "\n";
 
     for (const auto& team : allTeams) {
@@ -353,6 +412,7 @@ bool deserializeCareer(istream& file, Career& career) {
     auto& lastMatchReportLines = career.lastMatchReportLines;
     auto& lastMatchEvents = career.lastMatchEvents;
     auto& lastMatchPlayerOfTheMatch = career.lastMatchPlayerOfTheMatch;
+    auto& lastMatchCenter = career.lastMatchCenter;
     auto& allTeams = career.allTeams;
     auto& divisions = career.divisions;
     auto& initialized = career.initialized;
@@ -469,6 +529,7 @@ bool deserializeCareer(istream& file, Career& career) {
         lastMatchReportLines.clear();
         lastMatchEvents.clear();
         lastMatchPlayerOfTheMatch.clear();
+        lastMatchCenter = MatchCenterSnapshot{};
         if (teamsLine.rfind("LASTMATCH ", 0) == 0) {
             lastMatchAnalysis = trim(teamsLine.substr(10));
             if (!getline(file, teamsLine)) return false;
@@ -483,6 +544,14 @@ bool deserializeCareer(istream& file, Career& career) {
         }
         if (teamsLine.rfind("LASTMATCH_POTM ", 0) == 0) {
             lastMatchPlayerOfTheMatch = trim(teamsLine.substr(15));
+            if (!getline(file, teamsLine)) return false;
+        }
+        if (teamsLine.rfind("LASTMATCH_CENTER ", 0) == 0) {
+            lastMatchCenter = decodeMatchCenterSnapshot(trim(teamsLine.substr(17)));
+            if (!getline(file, teamsLine)) return false;
+        }
+        if (teamsLine.rfind("LASTMATCH_PHASES ", 0) == 0) {
+            lastMatchCenter.phaseSummaries = decodeStringList(trim(teamsLine.substr(16)));
             if (!getline(file, teamsLine)) return false;
         }
         if (teamsLine.rfind("TEAMS ", 0) != 0) return false;
@@ -632,6 +701,7 @@ bool deserializeCareer(istream& file, Career& career) {
     lastMatchReportLines.clear();
     lastMatchEvents.clear();
     lastMatchPlayerOfTheMatch.clear();
+    lastMatchCenter = MatchCenterSnapshot{};
     string teamName;
     getline(file, teamName);
     getline(file, teamName);

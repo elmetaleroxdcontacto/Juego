@@ -1,5 +1,6 @@
 #include "career/match_analysis_store.h"
 
+#include "career/match_center_service.h"
 #include "career/career_support.h"
 
 #include <algorithm>
@@ -108,6 +109,7 @@ void storeMatchAnalysis(Career& career,
     career.lastMatchReportLines = result.reportLines;
     career.lastMatchEvents = result.events;
     career.lastMatchPlayerOfTheMatch = result.report.playerOfTheMatch;
+    match_center_service::captureLastMatchCenter(career, home, away, result, cupMatch);
 }
 
 string buildLastMatchInsightText(const Career& career,
@@ -118,13 +120,8 @@ string buildLastMatchInsightText(const Career& career,
     }
 
     ostringstream out;
+    out << match_center_service::formatLastMatchCenter(career, min(maxReportLines, static_cast<size_t>(4)), maxEvents) << "\r\n";
     if (!career.lastMatchAnalysis.empty()) {
-        out << career.lastMatchAnalysis << "\r\n";
-    }
-    if (!career.lastMatchPlayerOfTheMatch.empty()) {
-        out << "Figura destacada: " << career.lastMatchPlayerOfTheMatch << "\r\n";
-    }
-    if (!career.lastMatchReportLines.empty()) {
         out << "\r\nMatchReport\r\n";
         const size_t count = min(maxReportLines, career.lastMatchReportLines.size());
         for (size_t i = 0; i < count; ++i) {

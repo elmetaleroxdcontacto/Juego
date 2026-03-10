@@ -1645,3 +1645,208 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - mejor frontera entre motor, analisis y presentacion
   - mejor soporte para GUI rica y reportes mas profundos
   - el ultimo partido ya se trata como dato estructurado, no solo como texto plano
+
+2026-03-10
+
+- Se agrego un `match center` estructurado para el ultimo partido:
+  - `include/career/match_center_service.h`
+  - `src/career/match_center_service.cpp`
+
+- Nuevo snapshot persistente del ultimo partido en dominio:
+  - `include/engine/models.h`
+  - nuevo campo:
+    - `lastMatchCenter`
+
+- El snapshot ahora conserva:
+  - competicion
+  - rival
+  - localia
+  - marcador
+  - tiros
+  - tiros al arco
+  - posesion
+  - corners
+  - cambios
+  - xG aproximado
+  - clima
+  - resumen tactico
+  - resumen de fatiga
+  - impacto posterior
+  - fases resumidas
+
+- Se extrajo la dinamica semanal de vestuario y promesas:
+  - `include/career/dressing_room_service.h`
+  - `src/career/dressing_room_service.cpp`
+
+- El nuevo servicio de vestuario ahora evalua:
+  - promesas en riesgo
+  - moral baja
+  - fatiga alta
+  - deseo de salida
+  - lideres del vestuario
+  - alertas resumidas para GUI y CLI
+
+- Limpieza de logica duplicada:
+  - `src/career/week_simulation.cpp`
+  - `src/ui/ui.cpp`
+  - ambos flujos ahora delegan en:
+    - `dressing_room_service`
+    - `match_center_service`
+
+- Mejora visible en GUI:
+  - `src/gui/gui_views.cpp`
+  - ahora muestra:
+    - `MatchCenter`
+    - `DressingRoomPanel`
+  - se integraron en:
+    - dashboard
+    - panel tactico
+    - vista de noticias/reportes
+
+- Mejora de reportes estructurados:
+  - `src/career/career_reports.cpp`
+  - nuevo reporte:
+    - `buildMatchCenterReport(...)`
+  - los reportes de competicion, club y directiva ahora aprovechan:
+    - match center
+    - alertas de vestuario
+
+- Persistencia ampliada:
+  - `src/io/save_serialization.cpp`
+  - `src/engine/models.cpp`
+
+- Nuevos bloques de save/load:
+  - `LASTMATCH_CENTER`
+  - `LASTMATCH_PHASES`
+
+- Version de save actualizada:
+  - de `6` a `7`
+
+- Limpieza de reseteo estacional:
+  - `src/engine/career_state.cpp`
+  - `src/engine/models.cpp`
+  - ahora tambien se limpia:
+    - `lastMatchCenter`
+
+- Build actualizado:
+  - `CMakeLists.txt` ahora incluye:
+    - `src/career/match_center_service.cpp`
+    - `src/career/dressing_room_service.cpp`
+
+- Tests ampliados:
+  - `tests/project_tests.cpp`
+  - nuevos tests:
+    - `match_center_service`
+    - `dressing_room_service`
+  - `save_load_roundtrip` ahora tambien valida:
+    - snapshot del match center
+    - fases persistidas del ultimo partido
+
+- Validacion realizada:
+  - `build.bat --validate`
+  - compilacion principal exitosa por CMake
+  - compilacion manual de `build/FootballManagerTests.exe` con `g++`
+  - suite completa de tests pasando:
+    - `validation_suite`
+    - `match_engine_structure`
+    - `tactical_fatigue`
+    - `competition_group_table`
+    - `transfer_affordability`
+    - `transfer_negotiation`
+    - `season_transition`
+    - `season_service`
+    - `opponent_report`
+    - `match_analysis_store`
+    - `match_center_service`
+    - `dressing_room_service`
+    - `simulate_match_state`
+    - `save_load_roundtrip`
+
+- Impacto arquitectonico:
+  - el ultimo partido deja de depender de un string plano y pasa a ser un dato estructurado reutilizable
+  - el vestuario deja de vivir incrustado en `week_simulation` y queda como sistema propio
+  - GUI, CLI, carrera y persistencia consumen la misma fuente de verdad
+  - mejora la base para un `match center` mas profundo y para dinamicas humanas mas ricas
+
+## 2026-03-10 - Auditoria de plantillas y validacion de datos externos
+
+- Se agrego una auditoria real de plantillas sobre datos crudos en:
+  - `include/validators/validators.h`
+  - `src/validators/validators.cpp`
+
+- Nuevas estructuras de validacion:
+  - `DataValidationIssue`
+  - `DataValidationReport`
+
+- Nuevas funciones publicas:
+  - `buildRosterDataValidationReport()`
+  - `writeRosterDataValidationReport(const std::string& path)`
+
+- La auditoria ahora revisa directamente `data/LigaChilena` y detecta:
+  - plantillas demasiado pequenas o demasiado grandes
+  - posiciones obligatorias faltantes
+  - jugadores duplicados dentro de un club
+  - jugadores duplicados entre clubes
+  - edades faltantes o fuera de rango
+  - posiciones vacias o invalidas
+  - inconsistencias entre `position` y `position_raw`
+  - equipos sin archivo de plantilla valido
+  - divisiones con conteo incorrecto de equipos
+  - atributos cargados fuera de rango
+  - casos con `potential < skill`
+
+- `--validate` ahora imprime una nueva seccion:
+  - `Auditoria de Plantillas`
+
+- Se genera un reporte completo en disco:
+  - `saves/roster_validation_report.txt`
+
+- Resultado real de la auditoria sobre la base actual:
+  - divisiones revisadas: `5`
+  - equipos revisados: `90`
+  - jugadores crudos revisados: `7111`
+  - errores detectados: `9249`
+  - advertencias detectadas: `1286`
+
+- Problemas dominantes encontrados:
+  - `Datos invalidos`
+  - `Posicion`
+  - `Integridad liga`
+  - `Posiciones obligatorias`
+  - `Tamano plantilla`
+
+- Ejemplos concretos detectados:
+  - clubes con posiciones obligatorias insuficientes en Primera Division:
+    - `Audax Italiano`
+    - `CD Cobresal`
+    - `CD Palestino`
+    - `CSD Colo-Colo`
+    - `Deportes La Serena`
+    - `Deportes Limache`
+  - equipos sin plantilla valida en divisiones bajas:
+    - `Atletico Oriente`
+    - `Deportes Rancagua`
+    - `Futuro FC`
+    - `Rodelindo Roman`
+    - `EFC Conchali`
+    - `Gasparin FC`
+    - `Jardin del Eden`
+  - errores de codificacion visibles en nombres/valores:
+    - `MartA-n`
+    - `BenjamA-n`
+    - `a,!300k`
+
+- Decision tecnica actual:
+  - la auditoria es informativa y no rompe `summary.ok` todavia
+  - esto permite seguir usando `--validate` y la suite automatica mientras se corrige la base externa
+
+- Validacion realizada:
+  - compilacion por fallback con `build.bat --validate`
+  - generacion exitosa de `saves/roster_validation_report.txt`
+  - recompilacion manual de `build/FootballManagerTests.exe`
+  - suite automatica completa pasando
+
+- Impacto arquitectonico:
+  - el juego ya no depende solo del `loader` para descubrir errores de datos
+  - existe una barrera real de calidad para auditar la base externa antes de jugar
+  - queda preparada la base para endurecer la validacion y bloquear arranque cuando la base este saneada

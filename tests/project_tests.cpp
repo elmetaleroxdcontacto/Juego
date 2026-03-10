@@ -1,6 +1,8 @@
 #include "ai/ai_transfer_manager.h"
 #include "career/career_reports.h"
+#include "career/dressing_room_service.h"
 #include "career/match_analysis_store.h"
+#include "career/match_center_service.h"
 #include "career/career_support.h"
 #include "career/season_service.h"
 #include "career/season_transition.h"
@@ -444,6 +446,57 @@ void testMatchAnalysisStoreProducesStructuredCareerData() {
     expect(detail.find("MatchTimeline") != string::npos, "La vista detallada debe incluir el bloque MatchTimeline.");
 }
 
+void testMatchCenterServiceBuildsStructuredView() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 7;
+    career.allTeams.push_back(makeTeam("Centro Local", "primera division", 73, 4, 4, "Pressing", "Contra-presion", 760000));
+    career.allTeams.push_back(makeTeam("Centro Rival", "primera division", 69, 2, 3, "Counter", "Juego directo", 630000));
+    career.myTeam = &career.allTeams[0];
+
+    const MatchResult result = match_engine::simulate(career.allTeams[0], career.allTeams[1], true, false).result;
+    career_match_analysis::storeMatchAnalysis(career, career.allTeams[0], career.allTeams[1], result, false);
+
+    const MatchCenterView center = match_center_service::buildLastMatchCenter(career, 3, 4);
+    expect(center.available, "El match center debe marcarse disponible tras almacenar un partido.");
+    expect(!center.scoreboard.empty(), "El match center debe construir un marcador legible.");
+    expect(center.metrics.size() >= 4, "El match center debe exponer metricas comparables.");
+    expect(!center.phaseLines.empty(), "El match center debe conservar lectura por fases.");
+    expect(!center.eventLines.empty(), "El match center debe conservar una timeline resumida.");
+    expect(!career.lastMatchCenter.opponentName.empty(), "El snapshot persistente del ultimo partido debe llenarse.");
+}
+
+void testDressingRoomServiceFlagsPromiseAndFatigueRisk() {
+    Career career;
+    career.currentSeason = 4;
+    career.currentWeek = 8;
+    career.allTeams.push_back(makeTeam("Vestuario Unido", "primera division", 70, 4, 4, "Pressing", "Contra-presion", 720000));
+    career.myTeam = &career.allTeams[0];
+
+    Player& starter = career.myTeam->players[1];
+    starter.promisedRole = "Titular";
+    starter.startsThisSeason = 1;
+    starter.happiness = 44;
+    starter.fitness = 53;
+    starter.contractWeeks = 10;
+
+    Player& rotation = career.myTeam->players[2];
+    rotation.promisedRole = "Rotacion";
+    rotation.startsThisSeason = 0;
+    rotation.happiness = 42;
+    rotation.fitness = 56;
+
+    const DressingRoomSnapshot snapshotBefore =
+        dressing_room_service::buildSnapshot(*career.myTeam, career.currentWeek);
+    expect(snapshotBefore.promiseRiskCount >= 2, "El snapshot debe detectar promesas en riesgo.");
+    expect(snapshotBefore.fatigueRiskCount >= 2, "El snapshot debe detectar jugadores fundidos.");
+
+    const DressingRoomSnapshot snapshotAfter = dressing_room_service::applyWeeklyUpdate(career, 0);
+    expect(snapshotAfter.lowMoraleCount >= 2, "La actualizacion semanal debe reflejar mal clima.");
+    expect(!snapshotAfter.summary.empty(), "La actualizacion semanal debe devolver un resumen de vestuario.");
+    expect(career.newsFeed.size() > 0, "Una semana conflictiva debe dejar noticia de vestuario.");
+}
+
 void testSaveLoadRoundTripPreservesCareerState() {
     const string savePath = "saves/test_roundtrip_save.txt";
 
@@ -465,6 +518,29 @@ void testSaveLoadRoundTripPreservesCareerState() {
     original.lastMatchReportLines = {"Claves: se domino el mediocampo", "Fatiga: el rival llego roto", "Disciplina: sin expulsiones"};
     original.lastMatchEvents = {"12' Gol de prueba", "64' Ajuste tactico", "88' Atajada clave"};
     original.lastMatchPlayerOfTheMatch = "Jugador Persistente";
+    original.lastMatchCenter.competitionLabel = "Liga";
+    original.lastMatchCenter.opponentName = "Club Destino";
+    original.lastMatchCenter.venueLabel = "Local";
+    original.lastMatchCenter.myGoals = 2;
+    original.lastMatchCenter.oppGoals = 1;
+    original.lastMatchCenter.myShots = 11;
+    original.lastMatchCenter.oppShots = 8;
+    original.lastMatchCenter.myShotsOnTarget = 5;
+    original.lastMatchCenter.oppShotsOnTarget = 3;
+    original.lastMatchCenter.myPossession = 56;
+    original.lastMatchCenter.oppPossession = 44;
+    original.lastMatchCenter.myCorners = 6;
+    original.lastMatchCenter.oppCorners = 2;
+    original.lastMatchCenter.mySubstitutions = 4;
+    original.lastMatchCenter.oppSubstitutions = 5;
+    original.lastMatchCenter.myExpectedGoalsTenths = 17;
+    original.lastMatchCenter.oppExpectedGoalsTenths = 9;
+    original.lastMatchCenter.weather = "Despejado";
+    original.lastMatchCenter.dominanceSummary = "El local controlo la zona media.";
+    original.lastMatchCenter.tacticalSummary = "La presion alta sostuvo recuperaciones altas.";
+    original.lastMatchCenter.fatigueSummary = "El rival llego fundido al cierre.";
+    original.lastMatchCenter.postMatchImpact = "Moral +3 / -2";
+    original.lastMatchCenter.phaseSummaries = {"1-15: domina Club Persistencia", "16-30: domina Club Persistencia"};
     original.newsFeed.push_back("T8-F5: Noticia de prueba");
     original.scoutInbox.push_back("Informe de ojeo");
     original.scoutingShortlist.push_back("Promesa del norte");
@@ -493,6 +569,10 @@ void testSaveLoadRoundTripPreservesCareerState() {
            "La carga debe preservar la timeline del ultimo partido.");
     expect(loaded.lastMatchPlayerOfTheMatch == original.lastMatchPlayerOfTheMatch,
            "La carga debe preservar la figura del ultimo partido.");
+    expect(loaded.lastMatchCenter.opponentName == original.lastMatchCenter.opponentName,
+           "La carga debe preservar el snapshot del match center.");
+    expect(loaded.lastMatchCenter.phaseSummaries.size() == original.lastMatchCenter.phaseSummaries.size(),
+           "La carga debe preservar las fases resumidas del match center.");
     expect(loaded.history.size() == 1 && loaded.history.front().champion == "Club Persistencia",
            "La carga debe preservar historial de temporada.");
     expect(loaded.myTeam != nullptr && loaded.myTeam->name == "Club Persistencia",
@@ -544,6 +624,8 @@ int main() {
         {"season_service", testSeasonServiceReturnsStructuredWeekResult},
         {"opponent_report", testOpponentReportExplainsNextFixture},
         {"match_analysis_store", testMatchAnalysisStoreProducesStructuredCareerData},
+        {"match_center_service", testMatchCenterServiceBuildsStructuredView},
+        {"dressing_room_service", testDressingRoomServiceFlagsPromiseAndFatigueRisk},
         {"simulate_match_state", testSimulateMatchAppliesPostProcessState},
         {"save_load_roundtrip", testSaveLoadRoundTripPreservesCareerState},
     };

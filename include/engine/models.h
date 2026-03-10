@@ -89,6 +89,32 @@ struct PendingTransfer {
     std::string promisedRole;
 };
 
+struct MatchCenterSnapshot {
+    std::string competitionLabel;
+    std::string opponentName;
+    std::string venueLabel;
+    int myGoals = 0;
+    int oppGoals = 0;
+    int myShots = 0;
+    int oppShots = 0;
+    int myShotsOnTarget = 0;
+    int oppShotsOnTarget = 0;
+    int myPossession = 50;
+    int oppPossession = 50;
+    int myCorners = 0;
+    int oppCorners = 0;
+    int mySubstitutions = 0;
+    int oppSubstitutions = 0;
+    int myExpectedGoalsTenths = 0;
+    int oppExpectedGoalsTenths = 0;
+    std::string weather;
+    std::string dominanceSummary;
+    std::string tacticalSummary;
+    std::string fatigueSummary;
+    std::string postMatchImpact;
+    std::vector<std::string> phaseSummaries;
+};
+
 class Team;
 
 void applyPositionStats(Player& p);
@@ -235,6 +261,7 @@ struct Career {
     std::vector<std::string> lastMatchReportLines;
     std::vector<std::string> lastMatchEvents;
     std::string lastMatchPlayerOfTheMatch;
+    MatchCenterSnapshot lastMatchCenter;
     bool initialized;
 
     Career();
