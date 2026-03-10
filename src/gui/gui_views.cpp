@@ -725,9 +725,25 @@ GuiPageModel buildDashboardModel(AppState& state) {
     model.feed.lines = state.currentFilter == "Alertas" ? alerts : buildFeedLines(state.career, state.currentFilter == "Todo" ? "" : state.currentFilter);
 
     if (!state.career.myTeam) {
-        model.summary.content = "No hay carrera activa.\r\n\r\nCrea una nueva partida o carga un guardado para abrir el centro del club.";
-        model.detail.content = "Aun no hay ultimo resultado disponible.\r\n\r\nCuando inicies una carrera aqui veras el analisis del partido mas reciente.";
-        if (model.primary.rows.empty()) model.primary.rows.push_back({"-", "No hay tabla disponible", "-", "-", "-", "-", "-", "-", "-", "-", "-"});
+        model.summary.content =
+            "No hay carrera activa.\r\n\r\n"
+            "Crea una nueva partida o carga un guardado para abrir el centro del club.\r\n\r\n"
+            "Desde aqui podras:\r\n"
+            "- revisar tu proximo partido\r\n"
+            "- controlar la moral y la fatiga del plantel\r\n"
+            "- seguir la tabla y las noticias del campeonato\r\n"
+            "- gestionar fichajes, finanzas y cantera";
+        model.detail.content =
+            "Empieza aqui\r\n\r\n"
+            "1. Elige una division.\r\n"
+            "2. Selecciona un club.\r\n"
+            "3. Escribe el nombre del manager.\r\n"
+            "4. Pulsa Nueva carrera o Cargar.\r\n\r\n"
+            "Cuando abras una partida, este panel mostrara el ultimo resultado y su analisis.";
+        model.feed.lines.clear();
+        model.feed.lines.push_back("Sin noticias por ahora. Inicia una carrera para activar el mundo de juego.");
+        model.feed.lines.push_back("Consejo: empieza en un club pequeno para ver mejor el impacto de cantera y finanzas.");
+        model.feed.lines.push_back("Consejo: usa Validar antes de jugar si cambiaste datos externos.");
         return model;
     }
 
@@ -1294,6 +1310,7 @@ void setStatus(AppState& state, const std::string& text) {
 void refreshCurrentPage(AppState& state) {
     refreshFilterComboOptions(state);
     state.currentModel = buildModel(state);
+    bool dashboardEmptyState = state.currentPage == GuiPage::Dashboard && !state.career.myTeam;
 
     setWindowTextUtf8(state.pageTitleLabel, state.currentModel.title);
     setWindowTextUtf8(state.breadcrumbLabel, state.currentModel.breadcrumb);
@@ -1309,8 +1326,21 @@ void refreshCurrentPage(AppState& state) {
     renderListPanel(state.transferLabel, state.transferList, state.currentModel.footer);
     renderFeed(state.newsList, state.currentModel.feed.lines);
 
-    bool showTable = state.currentPage != GuiPage::Tactics;
+    bool showTable = state.currentPage != GuiPage::Tactics && !dashboardEmptyState;
+    bool showTableLabel = showTable;
+    bool showSquad = !dashboardEmptyState;
+    bool showSquadLabel = showSquad;
+    bool showFooter = !dashboardEmptyState;
+    bool showFooterLabel = showFooter;
+    bool showFilter = !dashboardEmptyState;
     ShowWindow(state.tableList, showTable ? SW_SHOW : SW_HIDE);
+    ShowWindow(state.tableLabel, showTableLabel ? SW_SHOW : SW_HIDE);
+    ShowWindow(state.squadList, showSquad ? SW_SHOW : SW_HIDE);
+    ShowWindow(state.squadLabel, showSquadLabel ? SW_SHOW : SW_HIDE);
+    ShowWindow(state.transferList, showFooter ? SW_SHOW : SW_HIDE);
+    ShowWindow(state.transferLabel, showFooterLabel ? SW_SHOW : SW_HIDE);
+    ShowWindow(state.filterLabel, showFilter ? SW_SHOW : SW_HIDE);
+    ShowWindow(state.filterCombo, showFilter ? SW_SHOW : SW_HIDE);
 
     layoutWindow(state);
     if (state.window) InvalidateRect(state.window, nullptr, FALSE);

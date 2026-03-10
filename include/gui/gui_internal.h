@@ -143,6 +143,9 @@ struct AppState {
     HWND divisionCombo = nullptr;
     HWND teamCombo = nullptr;
     HWND managerEdit = nullptr;
+    HWND divisionLabel = nullptr;
+    HWND teamLabel = nullptr;
+    HWND managerLabel = nullptr;
     HWND filterLabel = nullptr;
     HWND filterCombo = nullptr;
     HWND newCareerButton = nullptr;

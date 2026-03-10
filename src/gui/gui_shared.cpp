@@ -307,6 +307,22 @@ static bool titleMatches(const std::string& value, const char* expected) {
     return value == expected;
 }
 
+static wchar_t pageButtonGlyph(int id) {
+    switch (id) {
+        case IDC_PAGE_DASHBOARD_BUTTON: return L'H';
+        case IDC_PAGE_SQUAD_BUTTON: return L'P';
+        case IDC_PAGE_TACTICS_BUTTON: return L'T';
+        case IDC_PAGE_CALENDAR_BUTTON: return L'C';
+        case IDC_PAGE_LEAGUE_BUTTON: return L'L';
+        case IDC_PAGE_TRANSFERS_BUTTON: return L'$';
+        case IDC_PAGE_FINANCES_BUTTON: return L'F';
+        case IDC_PAGE_YOUTH_BUTTON: return L'Y';
+        case IDC_PAGE_BOARD_BUTTON: return L'D';
+        case IDC_PAGE_NEWS_BUTTON: return L'N';
+        default: return L' ';
+    }
+}
+
 void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     if (!drawItem) return;
     HDC hdc = drawItem->hDC;
@@ -360,7 +376,27 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     wchar_t textBuffer[128]{};
     GetWindowTextW(drawItem->hwndItem, textBuffer, static_cast<int>(sizeof(textBuffer) / sizeof(textBuffer[0])));
     RECT textRect = rect;
-    textRect.left += isPageButtonId(id) ? 18 : 6;
+    if (isPageButtonId(id)) {
+        RECT badgeRect{rect.left + 14, rect.top + 8, rect.left + 38, rect.bottom - 8};
+        HBRUSH badgeBrush = CreateSolidBrush(activePage ? kThemeAccent : RGB(28, 46, 58));
+        HGDIOBJ oldBrush = SelectObject(hdc, badgeBrush);
+        HGDIOBJ oldPen = SelectObject(hdc, GetStockObject(NULL_PEN));
+        Ellipse(hdc, badgeRect.left, badgeRect.top, badgeRect.right, badgeRect.bottom);
+        SelectObject(hdc, oldBrush);
+        SelectObject(hdc, oldPen);
+        DeleteObject(badgeBrush);
+
+        RECT badgeText = badgeRect;
+        SetTextColor(hdc, activePage ? RGB(34, 27, 8) : RGB(225, 234, 239));
+        HGDIOBJ oldBadgeFont = SelectObject(hdc, state.sectionFont ? state.sectionFont : state.font);
+        wchar_t iconText[2]{pageButtonGlyph(id), L'\0'};
+        DrawTextW(hdc, iconText, -1, &badgeText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+        SelectObject(hdc, oldBadgeFont);
+
+        textRect.left += 46;
+    } else {
+        textRect.left += 6;
+    }
     if (pressed) OffsetRect(&textRect, 0, 1);
     SetBkMode(hdc, TRANSPARENT);
     SetTextColor(hdc, text);
@@ -375,6 +411,50 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
 
 LRESULT handleListCustomDraw(AppState& state, LPNMHDR header) {
     if (!header || header->code != NM_CUSTOMDRAW) return CDRF_DODEFAULT;
+    HWND tableHeader = state.tableList ? ListView_GetHeader(state.tableList) : nullptr;
+    HWND squadHeader = state.squadList ? ListView_GetHeader(state.squadList) : nullptr;
+    HWND transferHeader = state.transferList ? ListView_GetHeader(state.transferList) : nullptr;
+
+    if (header->hwndFrom == tableHeader || header->hwndFrom == squadHeader || header->hwndFrom == transferHeader) {
+        NMCUSTOMDRAW* draw = reinterpret_cast<NMCUSTOMDRAW*>(header);
+        if (draw->dwDrawStage == CDDS_PREPAINT) {
+            return CDRF_NOTIFYITEMDRAW;
+        }
+        if (draw->dwDrawStage == CDDS_ITEMPREPAINT) {
+            int item = static_cast<int>(draw->dwItemSpec);
+            RECT rect{};
+            Header_GetItemRect(header->hwndFrom, item, &rect);
+            HBRUSH fillBrush = CreateSolidBrush(RGB(21, 35, 46));
+            FillRect(draw->hdc, &rect, fillBrush);
+            DeleteObject(fillBrush);
+
+            HPEN pen = CreatePen(PS_SOLID, 1, RGB(56, 79, 96));
+            HGDIOBJ oldPen = SelectObject(draw->hdc, pen);
+            MoveToEx(draw->hdc, rect.left, rect.bottom - 1, nullptr);
+            LineTo(draw->hdc, rect.right, rect.bottom - 1);
+            SelectObject(draw->hdc, oldPen);
+            DeleteObject(pen);
+
+            wchar_t buffer[160]{};
+            HDITEMW itemData{};
+            itemData.mask = HDI_TEXT;
+            itemData.pszText = buffer;
+            itemData.cchTextMax = static_cast<int>(sizeof(buffer) / sizeof(buffer[0]));
+            SendMessageW(header->hwndFrom, HDM_GETITEMW, static_cast<WPARAM>(item), reinterpret_cast<LPARAM>(&itemData));
+
+            RECT textRect = rect;
+            textRect.left += 10;
+            textRect.right -= 8;
+            SetBkMode(draw->hdc, TRANSPARENT);
+            SetTextColor(draw->hdc, RGB(232, 238, 242));
+            HGDIOBJ oldFont = SelectObject(draw->hdc, state.font ? state.font : static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT)));
+            DrawTextW(draw->hdc, buffer, -1, &textRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+            SelectObject(draw->hdc, oldFont);
+            return CDRF_SKIPDEFAULT;
+        }
+        return CDRF_DODEFAULT;
+    }
+
     if (header->idFrom != IDC_TABLE_LIST && header->idFrom != IDC_SQUAD_LIST && header->idFrom != IDC_TRANSFER_LIST) {
         return CDRF_DODEFAULT;
     }

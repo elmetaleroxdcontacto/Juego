@@ -195,6 +195,7 @@ void layoutWindow(AppState& state) {
     const int contentWidth = std::max(560, static_cast<int>(client.right - contentLeft - infoWidth - padding * 3));
     const int infoLeft = contentLeft + contentWidth + padding;
     const bool dashboardLayout = state.currentPage == GuiPage::Dashboard;
+    const bool dashboardEmptyState = dashboardLayout && !state.career.myTeam;
     const int summaryWidth = std::max(360, dashboardLayout ? contentWidth * 58 / 100 : contentWidth * 36 / 100);
     const int tableWidth = contentWidth - summaryWidth - padding;
     const int topPanelHeight = dashboardLayout ? 214 : 182;
@@ -202,14 +203,19 @@ void layoutWindow(AppState& state) {
     const int footerHeight = std::max(dashboardLayout ? 152 : 140,
                                       static_cast<int>(client.bottom - (contentTop + topPanelHeight + midPanelHeight + 136)));
 
-    MoveWindow(state.divisionCombo, 92, 14, 184, 400, TRUE);
-    MoveWindow(state.teamCombo, 360, 14, 224, 400, TRUE);
-    MoveWindow(state.managerEdit, 676, 14, 188, 24, TRUE);
-    MoveWindow(state.newCareerButton, client.right - 546, 14, 104, 28, TRUE);
-    MoveWindow(state.loadButton, client.right - 434, 14, 86, 28, TRUE);
-    MoveWindow(state.saveButton, client.right - 340, 14, 86, 28, TRUE);
-    MoveWindow(state.simulateButton, client.right - 246, 14, 128, 28, TRUE);
-    MoveWindow(state.validateButton, client.right - 110, 14, 92, 28, TRUE);
+    MoveWindow(state.divisionLabel, 18, 18, 82, 22, TRUE);
+    MoveWindow(state.divisionCombo, 106, 14, 232, 400, TRUE);
+    MoveWindow(state.teamLabel, 354, 18, 72, 22, TRUE);
+    MoveWindow(state.teamCombo, 430, 14, 258, 400, TRUE);
+    MoveWindow(state.managerLabel, 702, 18, 82, 22, TRUE);
+    MoveWindow(state.managerEdit, 790, 14, 210, 28, TRUE);
+
+    const int primaryButtonHeight = 30;
+    MoveWindow(state.newCareerButton, client.right - 608, 13, 142, primaryButtonHeight, TRUE);
+    MoveWindow(state.loadButton, client.right - 456, 13, 102, primaryButtonHeight, TRUE);
+    MoveWindow(state.saveButton, client.right - 346, 13, 102, primaryButtonHeight, TRUE);
+    MoveWindow(state.simulateButton, client.right - 234, 13, 128, primaryButtonHeight, TRUE);
+    MoveWindow(state.validateButton, client.right - 96, 13, 88, primaryButtonHeight, TRUE);
 
     const int sideX = padding;
     int navY = topBarHeight + 8;
@@ -218,15 +224,15 @@ void layoutWindow(AppState& state) {
         state.transfersButton, state.financesButton, state.youthButton, state.boardButton, state.newsButton
     };
     for (HWND button : pages) {
-        MoveWindow(button, sideX, navY, sideWidth, 34, TRUE);
-        navY += 40;
+        MoveWindow(button, sideX, navY, sideWidth, 38, TRUE);
+        navY += 44;
     }
 
-    MoveWindow(state.breadcrumbLabel, contentLeft, topBarHeight + 8, contentWidth + infoWidth + padding, 18, TRUE);
-    MoveWindow(state.pageTitleLabel, contentLeft, topBarHeight + 28, contentWidth, 24, TRUE);
-    MoveWindow(state.infoLabel, contentLeft, topBarHeight + 54, contentWidth, 22, TRUE);
-    MoveWindow(state.filterLabel, infoLeft + 70, topBarHeight + 28, 56, 18, TRUE);
-    MoveWindow(state.filterCombo, infoLeft + 132, topBarHeight + 26, infoWidth - 132, 320, TRUE);
+    MoveWindow(state.breadcrumbLabel, contentLeft, topBarHeight + 8, contentWidth, 20, TRUE);
+    MoveWindow(state.pageTitleLabel, contentLeft, topBarHeight + 30, contentWidth, 30, TRUE);
+    MoveWindow(state.infoLabel, contentLeft, topBarHeight + 62, contentWidth, 24, TRUE);
+    MoveWindow(state.filterLabel, infoLeft + 6, topBarHeight + 32, 56, 18, TRUE);
+    MoveWindow(state.filterCombo, infoLeft + 66, topBarHeight + 28, infoWidth - 66, 320, TRUE);
 
     showActionButtonsForPage(state);
     std::vector<ActionButtonRef> visibleButtons = {
@@ -249,7 +255,25 @@ void layoutWindow(AppState& state) {
         actionX += action.width + 8;
     }
 
-    int panelsTop = contentTop + 26;
+    int panelsTop = contentTop + 30;
+
+    if (dashboardEmptyState) {
+        int summaryHeight = std::max(360, static_cast<int>(client.bottom) - panelsTop - 74);
+        int sideHeight = std::max(160, (summaryHeight - 30) / 2);
+
+        MoveWindow(state.summaryLabel, contentLeft, panelsTop, contentWidth, 18, TRUE);
+        MoveWindow(state.summaryEdit, contentLeft, panelsTop + 18, contentWidth, summaryHeight, TRUE);
+
+        MoveWindow(state.detailLabel, infoLeft, panelsTop, infoWidth, 18, TRUE);
+        MoveWindow(state.detailEdit, infoLeft, panelsTop + 18, infoWidth, sideHeight, TRUE);
+
+        int newsTop = panelsTop + sideHeight + 42;
+        MoveWindow(state.newsLabel, infoLeft, newsTop, infoWidth, 18, TRUE);
+        MoveWindow(state.newsList, infoLeft, newsTop + 18, infoWidth, summaryHeight - sideHeight - 24, TRUE);
+
+        MoveWindow(state.statusLabel, padding, client.bottom - 26, client.right - padding * 2, 18, TRUE);
+        return;
+    }
 
     MoveWindow(state.summaryLabel, contentLeft, panelsTop, summaryWidth, 18, TRUE);
     MoveWindow(state.summaryEdit, contentLeft, panelsTop + 18, summaryWidth, topPanelHeight, TRUE);
@@ -300,9 +324,9 @@ void initializeInterface(AppState& state) {
 
     const DWORD buttonStyle = WS_CHILD | WS_VISIBLE | BS_OWNERDRAW;
 
-    createControl(state, 0, L"STATIC", L"Division", WS_CHILD | WS_VISIBLE, 18, 18, 60, 20, state.window, 0);
-    createControl(state, 0, L"STATIC", L"Equipo", WS_CHILD | WS_VISIBLE, 292, 18, 50, 20, state.window, 0);
-    createControl(state, 0, L"STATIC", L"Manager", WS_CHILD | WS_VISIBLE, 598, 18, 60, 20, state.window, 0);
+    state.divisionLabel = createControl(state, 0, L"STATIC", L"Division", WS_CHILD | WS_VISIBLE, 18, 18, 82, 20, state.window, 0);
+    state.teamLabel = createControl(state, 0, L"STATIC", L"Equipo", WS_CHILD | WS_VISIBLE, 354, 18, 72, 20, state.window, 0);
+    state.managerLabel = createControl(state, 0, L"STATIC", L"Manager", WS_CHILD | WS_VISIBLE, 702, 18, 82, 20, state.window, 0);
     state.filterLabel = createControl(state, 0, L"STATIC", L"Filtro", WS_CHILD | WS_VISIBLE, 0, 0, 50, 20, state.window, 0);
 
     state.divisionCombo = createControl(state, 0, L"COMBOBOX", L"", WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL, 92, 14, 184, 300, state.window, IDC_DIVISION_COMBO);
@@ -316,16 +340,16 @@ void initializeInterface(AppState& state) {
     state.simulateButton = createControl(state, 0, L"BUTTON", L"Simular", buttonStyle, 0, 0, 126, 28, state.window, IDC_SIMULATE_BUTTON);
     state.validateButton = createControl(state, 0, L"BUTTON", L"Validar", buttonStyle, 0, 0, 92, 28, state.window, IDC_VALIDATE_BUTTON);
 
-    state.dashboardButton = createControl(state, 0, L"BUTTON", L"[H] Inicio", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_DASHBOARD_BUTTON);
-    state.squadButton = createControl(state, 0, L"BUTTON", L"[P] Plantilla", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_SQUAD_BUTTON);
-    state.tacticsButton = createControl(state, 0, L"BUTTON", L"[T] Tacticas", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_TACTICS_BUTTON);
-    state.calendarButton = createControl(state, 0, L"BUTTON", L"[C] Calendario", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_CALENDAR_BUTTON);
-    state.leagueButton = createControl(state, 0, L"BUTTON", L"[L] Liga", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_LEAGUE_BUTTON);
-    state.transfersButton = createControl(state, 0, L"BUTTON", L"[$] Fichajes", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_TRANSFERS_BUTTON);
-    state.financesButton = createControl(state, 0, L"BUTTON", L"[F] Finanzas", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_FINANCES_BUTTON);
-    state.youthButton = createControl(state, 0, L"BUTTON", L"[Y] Cantera", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_YOUTH_BUTTON);
-    state.boardButton = createControl(state, 0, L"BUTTON", L"[D] Directiva", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_BOARD_BUTTON);
-    state.newsButton = createControl(state, 0, L"BUTTON", L"[N] Noticias", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_NEWS_BUTTON);
+    state.dashboardButton = createControl(state, 0, L"BUTTON", L"Inicio", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_DASHBOARD_BUTTON);
+    state.squadButton = createControl(state, 0, L"BUTTON", L"Plantilla", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_SQUAD_BUTTON);
+    state.tacticsButton = createControl(state, 0, L"BUTTON", L"Tacticas", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_TACTICS_BUTTON);
+    state.calendarButton = createControl(state, 0, L"BUTTON", L"Calendario", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_CALENDAR_BUTTON);
+    state.leagueButton = createControl(state, 0, L"BUTTON", L"Liga", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_LEAGUE_BUTTON);
+    state.transfersButton = createControl(state, 0, L"BUTTON", L"Fichajes", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_TRANSFERS_BUTTON);
+    state.financesButton = createControl(state, 0, L"BUTTON", L"Finanzas", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_FINANCES_BUTTON);
+    state.youthButton = createControl(state, 0, L"BUTTON", L"Cantera", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_YOUTH_BUTTON);
+    state.boardButton = createControl(state, 0, L"BUTTON", L"Directiva", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_BOARD_BUTTON);
+    state.newsButton = createControl(state, 0, L"BUTTON", L"Noticias", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_NEWS_BUTTON);
 
     state.scoutActionButton = createControl(state, 0, L"BUTTON", L"Otear", buttonStyle, 0, 0, 92, 26, state.window, IDC_SCOUT_BUTTON);
     state.shortlistButton = createControl(state, 0, L"BUTTON", L"Shortlist", buttonStyle, 0, 0, 92, 26, state.window, IDC_SHORTLIST_BUTTON);
@@ -369,6 +393,9 @@ void initializeInterface(AppState& state) {
     setLabelFont(state.infoLabel, state.font);
     setLabelFont(state.statusLabel, state.font);
     setLabelFont(state.filterLabel, state.font);
+    setLabelFont(state.divisionLabel, state.font);
+    setLabelFont(state.teamLabel, state.font);
+    setLabelFont(state.managerLabel, state.font);
 
     if (state.monoFont) {
         SendMessageW(state.summaryEdit, WM_SETFONT, reinterpret_cast<WPARAM>(state.monoFont), TRUE);
@@ -423,21 +450,19 @@ void paintWindowChrome(AppState& state, HDC hdc) {
     RECT detailCard = expandedRect(childRectOnParent(state.detailEdit, state.window), 8, 24);
     RECT newsCard = expandedRect(childRectOnParent(state.newsList, state.window), 8, 24);
     RECT statusCard = expandedRect(childRectOnParent(state.statusLabel, state.window), 6, 8);
-    drawRoundedPanel(hdc, summaryCard, kThemePanel, RGB(40, 64, 79), 16);
-    drawRoundedPanel(hdc, tableCard, kThemePanel, RGB(40, 64, 79), 16);
-    drawRoundedPanel(hdc, squadCard, kThemePanel, RGB(40, 64, 79), 16);
-    drawRoundedPanel(hdc, transferCard, kThemePanel, RGB(40, 64, 79), 16);
-    drawRoundedPanel(hdc, detailCard, RGB(15, 27, 37), RGB(44, 72, 90), 16);
-    drawRoundedPanel(hdc, newsCard, RGB(15, 27, 37), RGB(44, 72, 90), 16);
+    if (IsWindowVisible(state.summaryEdit)) drawRoundedPanel(hdc, summaryCard, kThemePanel, RGB(40, 64, 79), 16);
+    if (IsWindowVisible(state.tableList)) drawRoundedPanel(hdc, tableCard, kThemePanel, RGB(40, 64, 79), 16);
+    if (IsWindowVisible(state.squadList)) drawRoundedPanel(hdc, squadCard, kThemePanel, RGB(40, 64, 79), 16);
+    if (IsWindowVisible(state.transferList)) drawRoundedPanel(hdc, transferCard, kThemePanel, RGB(40, 64, 79), 16);
+    if (IsWindowVisible(state.detailEdit)) drawRoundedPanel(hdc, detailCard, RGB(15, 27, 37), RGB(44, 72, 90), 16);
+    if (IsWindowVisible(state.newsList)) drawRoundedPanel(hdc, newsCard, RGB(15, 27, 37), RGB(44, 72, 90), 16);
     drawRoundedPanel(hdc, statusCard, RGB(11, 23, 31), RGB(39, 65, 79), 12);
 
-    RECT menuTitle{20, 126, 158, 150};
-    RECT pageTitle{194, 124, client.right - 24, 150};
+    RECT menuTitle{20, 124, 158, 148};
     SetBkMode(hdc, TRANSPARENT);
     SetTextColor(hdc, kThemeMuted);
     HGDIOBJ oldFont = SelectObject(hdc, state.sectionFont ? state.sectionFont : state.font);
-    DrawTextW(hdc, L"Navigation", -1, &menuTitle, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
-    DrawTextW(hdc, L"Career Workbench", -1, &pageTitle, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+    DrawTextW(hdc, L"Secciones", -1, &menuTitle, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
     SelectObject(hdc, oldFont);
 
     if (state.currentPage == GuiPage::Tactics) {
