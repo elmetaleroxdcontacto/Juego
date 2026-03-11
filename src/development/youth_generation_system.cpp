@@ -58,14 +58,16 @@ void generateYouthIntake(Team& team, int count) {
     getDivisionSkillRange(team.division, minSkill, maxSkill);
     const vector<string> pool = youthPositionPool(team);
     const int maxSquad = getCompetitionConfig(team.division).maxSquadSize;
-    const int youthBonus = max(0, team.youthFacilityLevel - 1) + max(0, team.youthCoach - 55) / 12;
+    const int youthBonus = max(0, team.youthFacilityLevel - 1) + max(0, team.youthCoach - 55) / 12 +
+                           max(0, team.clubPrestige - 55) / 20;
 
     for (int i = 0; i < count; ++i) {
         if (maxSquad > 0 && static_cast<int>(team.players.size()) >= maxSquad) return;
         const string pos = pool[static_cast<size_t>(randInt(0, static_cast<int>(pool.size()) - 1))];
         Player youth = makeRandomPlayer(pos, minSkill + youthBonus, maxSkill + youthBonus, 16, 18);
         const bool eliteProspect = randInt(1, 100) <= clampInt(6 + team.youthFacilityLevel * 3 +
-                                                                    max(0, team.youthCoach - 60) / 5,
+                                                                    max(0, team.youthCoach - 60) / 5 +
+                                                                    max(0, team.assistantCoach - 60) / 8,
                                                                 4, 30);
         const int identityBonus = (team.youthIdentity == "Cantera estructurada") ? 4
                                   : (team.youthIdentity == "Desarrollo mixto") ? 2
@@ -76,6 +78,7 @@ void generateYouthIntake(Team& team, int count) {
         youth.chemistry = clampInt(youth.chemistry + max(0, team.youthCoach - 55) / 10, 1, 99);
         youth.professionalism = clampInt(youth.professionalism + max(0, team.youthCoach - 55) / 12 + identityBonus / 2, 1, 99);
         youth.happiness = clampInt(youth.happiness + identityBonus / 2, 1, 99);
+        youth.moraleMomentum = clampInt(youth.moraleMomentum + identityBonus + max(0, team.assistantCoach - 55) / 20, -25, 25);
         if (eliteProspect) {
             youth.value = max(youth.value, static_cast<long long>(youth.potential) * 12000LL);
             youth.role = (pos == "DEL") ? "Poacher" : (pos == "MED" ? "BoxToBox" : defaultRoleForPosition(pos));

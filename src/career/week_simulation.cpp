@@ -9,6 +9,7 @@
 #include "career/career_support.h"
 #include "career/player_development.h"
 #include "career/team_management.h"
+#include "career/world_state_service.h"
 #include "competition.h"
 #include "simulation.h"
 #include "transfers/negotiation_system.h"
@@ -157,7 +158,8 @@ void weeklyDashboard(const Career& career) {
         out << "Lesionados: " << injured
             << " | Suspendidos: " << suspended
             << " | Contratos por vencer (<=4 sem): " << expiring
-            << " | Shortlist: " << career.scoutingShortlist.size();
+            << " | Shortlist: " << career.scoutingShortlist.size()
+            << " | Promesas: " << career.activePromises.size();
         emitUiMessage(out.str());
     }
     emitUiMessage("Identidad: " + career.myTeam->clubStyle +
@@ -975,6 +977,10 @@ void simulateCareerWeek(Career& career) {
             career.boardMonthlyProgress += myTeamPointsDelta;
         }
         updateSquadDynamics(career, myTeamPointsDelta);
+        WorldPulseSummary worldPulse = world_state_service::processWeeklyWorldState(career);
+        for (size_t i = 0; i < worldPulse.headlines.size() && i < 2; ++i) {
+            emitUiMessage("[Mundo] " + worldPulse.headlines[i]);
+        }
     }
 
     runMonthlyDevelopment(career);

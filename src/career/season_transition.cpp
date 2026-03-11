@@ -3,6 +3,7 @@
 #include "ai/team_ai.h"
 #include "career/career_reports.h"
 #include "career/player_development.h"
+#include "career/world_state_service.h"
 #include "competition/competition.h"
 #include "simulation/simulation.h"
 #include "utils/utils.h"
@@ -91,6 +92,7 @@ void advanceToNextSeason(Career& career, SeasonTransitionSummary& summary) {
     for (Team* team : career.activeTeams) {
         player_dev::addYouthPlayers(*team, 1);
     }
+    world_state_service::seedSeasonPromises(career);
     addLine(summary, "Nueva temporada: " + to_string(career.currentSeason) +
                          " | Division activa: " + divisionDisplay(career.activeDivision));
 }
@@ -634,6 +636,7 @@ SeasonTransitionSummary endSeasonSegundaDivision(Career& career) {
     addMovementLines(summary, "Ascensos", promote, "Descensos", relegate);
     summary.note = "Temporada con playoff de ascenso y grupo de descenso.";
     awardSeasonPrizeMoney(career, buildRelevantCompetitionTable(career), summary);
+    world_state_service::updateSeasonRecords(career, career.leagueTable);
     recordSeasonHistory(career, summary.champion, promote, relegate, summary.note);
     advanceToNextSeason(career, summary);
     return summary;
@@ -747,6 +750,7 @@ SeasonTransitionSummary endSeasonPrimeraB(Career& career) {
     addMovementLines(summary, "Ascensos", promote, "Descenso", relegate);
     summary.note = "Campeon regular y liguilla de ascenso.";
     awardSeasonPrizeMoney(career, career.leagueTable, summary);
+    world_state_service::updateSeasonRecords(career, career.leagueTable);
     recordSeasonHistory(career, summary.champion, promote, relegate, summary.note);
     advanceToNextSeason(career, summary);
     return summary;
@@ -861,6 +865,7 @@ SeasonTransitionSummary endSeasonTerceraA(Career& career) {
 
     summary.note = "Ascenso directo, playoff y promocion interdivisional.";
     awardSeasonPrizeMoney(career, career.leagueTable, summary);
+    world_state_service::updateSeasonRecords(career, career.leagueTable);
     recordSeasonHistory(career, summary.champion, allPromoted, allRelegated, summary.note);
     advanceToNextSeason(career, summary);
     return summary;
@@ -926,6 +931,7 @@ SeasonTransitionSummary endSeasonTerceraB(Career& career) {
 
     summary.note = "Campeones zonales, final y promocion por playoff.";
     awardSeasonPrizeMoney(career, buildRelevantCompetitionTable(career), summary);
+    world_state_service::updateSeasonRecords(career, career.leagueTable);
     recordSeasonHistory(career, summary.champion, allPromoted, {}, summary.note);
     advanceToNextSeason(career, summary);
     return summary;
@@ -1020,6 +1026,7 @@ SeasonTransitionSummary endSeason(Career& career) {
     addMovementLines(summary, "Ascensos", promote, "Descensos", relegate);
     summary.note = "Cierre de temporada regular.";
     awardSeasonPrizeMoney(career, career.leagueTable, summary);
+    world_state_service::updateSeasonRecords(career, career.leagueTable);
     recordSeasonHistory(career, summary.champion, promote, relegate, summary.note);
     advanceToNextSeason(career, summary);
     return summary;

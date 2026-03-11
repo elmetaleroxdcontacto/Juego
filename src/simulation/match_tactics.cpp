@@ -96,6 +96,10 @@ void applyTraitModifier(const Player& p, int& attack, int& defense) {
 void applyPlayerStateModifier(const Player& p, const Team& team, int& attack, int& defense) {
     attack = attack * clampInt(92 + p.currentForm / 4 + p.consistency / 8, 72, 128) / 100;
     defense = defense * clampInt(92 + p.currentForm / 5 + p.tacticalDiscipline / 5, 74, 130) / 100;
+    attack += p.moraleMomentum / 4;
+    defense += p.moraleMomentum / 5;
+    attack -= p.fatigueLoad / 12;
+    defense -= p.fatigueLoad / 14;
     if (p.preferredFoot == "Ambos") {
         if (normalizePosition(p.position) == "MED" || normalizePosition(p.position) == "DEL") attack += 2;
         else defense += 1;
@@ -112,6 +116,12 @@ void applyPlayerStateModifier(const Player& p, const Team& team, int& attack, in
     if (p.tacticalDiscipline >= 75 && (team.tactics == "Defensive" || team.matchInstruction == "Bloque bajo")) {
         defense += 2;
     }
+    if (!p.promisedPosition.empty() && normalizePosition(p.promisedPosition) == normalizePosition(p.position)) {
+        attack += 1;
+        defense += 1;
+    }
+    if (p.socialGroup == "Lideres" && team.morale >= 60) defense += 1;
+    if (p.socialGroup == "Juveniles" && p.currentForm >= 65) attack += 1;
     attack = clampInt(attack, 1, 130);
     defense = clampInt(defense, 1, 130);
 }

@@ -17,10 +17,13 @@ void applyMatchExperience(Team& team, const vector<int>& participants, vector<st
         growthChance += max(0, 23 - player.age);
         growthChance += max(0, player.professionalism - 55) / 10;
         growthChance += max(0, player.currentForm - 50) / 12;
+        growthChance += max(0, player.happiness - 50) / 14;
         growthChance += max(0, team.trainingFacilityLevel - 1) * 2;
         growthChance += max(0, team.assistantCoach - 55) / 12;
+        growthChance += max(0, team.youthCoach - 55) / 14;
         growthChance += (player.matchesPlayed > player.startsThisSeason) ? 1 : 0;
         if (player.age <= 21) growthChance += 2;
+        growthChance -= player.fatigueLoad / 16;
         growthChance = clampInt(growthChance, 2, 32);
 
         if (player.skill < player.potential && randInt(1, 100) <= growthChance) {
@@ -35,12 +38,26 @@ void applyMatchExperience(Team& team, const vector<int>& participants, vector<st
                 player.attack = min(100, player.attack + 1);
             }
             player.currentForm = clampInt(player.currentForm + 1, 1, 99);
+            player.moraleMomentum = clampInt(player.moraleMomentum + 1, -25, 25);
             if (events) {
                 events->push_back("[Desarrollo] " + player.name + " eleva su nivel a " + to_string(player.skill) + ".");
             }
-        } else if (player.age >= 31 && randInt(1, 100) <= clampInt(player.age - 28 + max(0, 62 - player.fitness) / 4, 2, 18)) {
+        } else if (player.age >= 31 && randInt(1, 100) <= clampInt(player.age - 28 + max(0, 62 - player.fitness) / 4 + player.fatigueLoad / 20, 2, 18)) {
             player.stamina = max(35, player.stamina - 1);
             if (player.age >= 33 && player.attack > 35) player.attack = max(35, player.attack - 1);
+        }
+
+        if (player.age <= 22) {
+            int potentialDelta = 0;
+            if (player.matchesPlayed >= 6) potentialDelta++;
+            if (player.startsThisSeason >= 4) potentialDelta++;
+            if (player.happiness >= 60 && player.currentForm >= 58) potentialDelta++;
+            if (player.happiness <= 42 || player.fatigueLoad >= 72) potentialDelta--;
+            if (potentialDelta >= 2 && randInt(1, 100) <= 10) {
+                player.potential = min(99, player.potential + 1);
+            } else if (potentialDelta <= -1 && player.potential > player.skill && randInt(1, 100) <= 8) {
+                player.potential = max(player.skill, player.potential - 1);
+            }
         }
     }
 }

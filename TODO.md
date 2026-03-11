@@ -2235,3 +2235,139 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Verificacion realizada:
   - `FootballManager.exe --validate`: `Resultado: sin fallas`
   - `FootballManagerTests.exe`: todos los tests pasan
+
+## Cambios recientes (2026-03-11) - Promesas, mundo persistente, vestuario y desarrollo
+
+- Se amplio el modelo base del juego para soportar sistemas sociales y de progresion persistentes:
+  - `include/engine/models.h`
+  - nuevos campos en `Player`:
+    - `moraleMomentum`
+    - `fatigueLoad`
+    - `unhappinessWeeks`
+    - `promisedPosition`
+    - `socialGroup`
+  - nuevas estructuras en `Career`:
+    - `SquadPromise`
+    - `HistoricalRecord`
+    - `activePromises`
+    - `historicalRecords`
+
+- Se creo un nuevo modulo de estado del mundo:
+  - `include/career/world_state_service.h`
+  - `src/career/world_state_service.cpp`
+
+- El nuevo `world_state_service` ahora maneja:
+  - siembra automatica de promesas de temporada
+  - promesas de minutos
+  - promesas de fichaje por necesidad de plantilla
+  - promesas competitivas
+  - resolucion semanal de promesas cumplidas o rotas
+  - noticias del mundo ligadas a presion institucional
+  - deteccion y guardado de records historicos
+
+- Se reforzo la dinamica de vestuario:
+  - `src/career/dressing_room_service.cpp`
+  - ahora el snapshot contempla:
+    - `conflictCount`
+    - `positionPromiseRiskCount`
+    - grupos sociales
+    - acumulacion de semanas de malestar
+    - choques por jugar fuera de la posicion prometida
+
+- La moral ya no depende solo del resultado:
+  - `src/simulation/morale_engine.cpp`
+  - `src/simulation/match_tactics.cpp`
+  - `moraleMomentum` y `socialGroup` ahora impactan:
+    - factor colectivo previo al partido
+    - rendimiento individual
+    - variacion moral post partido
+
+- Se mejoro el sistema fisico y de lesiones:
+  - `src/simulation/player_condition.cpp`
+  - `src/simulation/match_postprocess.cpp`
+  - `fatigueLoad` ahora persiste entre semanas
+  - nuevos tipos de lesion:
+    - `Sobrecarga`
+    - `Muscular`
+    - `Ligamentos`
+    - `Fractura`
+  - la carga acumulada ahora afecta:
+    - riesgo de lesion
+    - recuperacion
+    - rendimiento
+
+- Se profundizo el entrenamiento y el desarrollo:
+  - `src/development/training_impact_system.cpp`
+  - `src/development/player_progression_system.cpp`
+  - `src/development/youth_generation_system.cpp`
+  - nuevos focos/planes soportados:
+    - `Ataque`
+    - `Defensa`
+    - `Resistencia`
+  - el staff ahora influye con mas claridad:
+    - `assistantCoach`
+    - `fitnessCoach`
+    - `medicalTeam`
+    - `youthCoach`
+  - el potencial del jugador ahora puede subir o bajar segun:
+    - minutos
+    - moral
+    - profesionalismo
+    - carga fisica
+    - edad
+
+- Se ajusto el flujo semanal y las transiciones de temporada:
+  - `src/career/week_simulation.cpp`
+  - `src/career/season_transition.cpp`
+  - ahora:
+    - se procesa el pulso semanal del mundo
+    - se muestran titulares breves de mundo en la simulacion
+    - se recalculan y guardan records historicos al cierre de temporada
+    - se re-siembra el set de promesas al iniciar una temporada nueva
+
+- Se mejoro scouting y negociacion para conectarlos con estos sistemas:
+  - `src/career/app_services.cpp`
+  - `src/transfers/negotiation_system.cpp`
+  - el scouting ahora agrega:
+    - `recommendation`
+    - `upsideBand`
+    - `confidence`
+  - las promesas contractuales ahora fijan tambien:
+    - `promisedPosition`
+
+- Se actualizaron reportes e interfaz para hacer visibles los sistemas nuevos:
+  - `src/career/career_reports.cpp`
+  - `src/gui/gui_views.cpp`
+  - ahora se exponen:
+    - promesas activas
+    - records historicos
+    - carga acumulada del plantel
+    - detalle social del jugador
+    - staff tecnico en reportes de club
+
+- Se actualizo la persistencia:
+  - `src/io/save_serialization.cpp`
+  - nueva version de save:
+    - `VERSION 9`
+  - ahora se guardan y cargan:
+    - promesas activas
+    - records historicos
+    - `moraleMomentum`
+    - `fatigueLoad`
+    - `unhappinessWeeks`
+    - `promisedPosition`
+    - `socialGroup`
+
+- Se actualizo la compilacion para el nuevo modulo:
+  - `CMakeLists.txt`
+
+- Tests nuevos/agregados:
+  - `world_state_seed`
+  - `world_state_promises`
+  - extension de `save_load_roundtrip` para validar nuevos campos persistidos
+
+- Verificacion realizada:
+  - `build.bat --validate`
+  - `cmake --build build-cmake --config Release --target FootballManagerTests`
+  - `FootballManagerTests.exe`: todos los tests pasan
+  - `FootballManager.exe --validate`: `Resultado: sin fallas`

@@ -24,12 +24,15 @@ struct ScoutingCandidate {
     std::string personalityLabel;
     std::vector<std::string> secondaryPositions;
     std::vector<std::string> traits;
+    std::string recommendation;
+    std::string upsideBand;
     int estimatedSkillMin = 0;
     int estimatedSkillMax = 0;
     int estimatedPotentialMin = 0;
     int estimatedPotentialMax = 0;
     int fitScore = 0;
     int bigMatches = 0;
+    int confidence = 0;
     long long marketValue = 0;
 };
 

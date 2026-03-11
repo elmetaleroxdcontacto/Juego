@@ -2,6 +2,8 @@
 
 #include "utils/utils.h"
 
+#include <map>
+
 using namespace std;
 
 namespace morale_engine {
@@ -9,17 +11,24 @@ namespace morale_engine {
 double collectiveMoraleFactor(const Team& team, const vector<int>& xi, bool keyMatch) {
     int total = team.morale * 2;
     int count = 2;
+    map<string, int> socialMix;
     for (int idx : xi) {
         if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
         const Player& player = team.players[idx];
         total += player.happiness + player.currentForm / 2 + player.chemistry / 2;
+        total += player.moraleMomentum / 2;
         if (playerHasTrait(player, "Lider")) total += 6;
         if (playerHasTrait(player, "Cita grande") && keyMatch) total += 8;
         if (playerHasTrait(player, "Caliente") && keyMatch) total -= 3;
+        if (!player.socialGroup.empty()) socialMix[player.socialGroup]++;
         count += 2;
     }
     int collective = count > 0 ? total / count : team.morale;
     double factor = 0.88 + collective / 230.0;
+    int largestGroup = 0;
+    for (const auto& entry : socialMix) largestGroup = max(largestGroup, entry.second);
+    if (largestGroup >= 4) factor += 0.02;
+    if (socialMix.size() >= 4) factor -= 0.01;
     if (keyMatch) factor += 0.02;
     return clampValue(factor, 0.86, 1.18);
 }
@@ -33,6 +42,14 @@ int postMatchMoraleDelta(const Team& team, int goalsFor, int goalsAgainst, bool 
     const int expectation = teamPrestigeScore(team);
     if (goalsFor > goalsAgainst && expectation <= 48) delta += 1;
     if (goalsFor < goalsAgainst && expectation >= 68) delta -= 1;
+    int positiveMomentum = 0;
+    int negativeMomentum = 0;
+    for (const auto& player : team.players) {
+        if (player.moraleMomentum >= 8) positiveMomentum++;
+        if (player.moraleMomentum <= -8) negativeMomentum++;
+    }
+    if (goalsFor > goalsAgainst && positiveMomentum >= 4) delta += 1;
+    if (goalsFor < goalsAgainst && negativeMomentum >= 4) delta -= 1;
     if (keyMatch) delta += (delta >= 0) ? 1 : -1;
     return delta;
 }

@@ -7,6 +7,7 @@
 #include "career/career_support.h"
 #include "career/season_service.h"
 #include "career/season_transition.h"
+#include "career/world_state_service.h"
 #include "competition/competition.h"
 #include "engine/models.h"
 #include "io/io.h"
@@ -675,6 +676,8 @@ void testSaveLoadRoundTripPreservesCareerState() {
     original.scoutInbox.push_back("Informe^ de ojeo");
     original.scoutingShortlist.push_back("Promesa| del norte; central");
     original.history.push_back({7, "primera division", "Club Persistencia", 2, "Club Persistencia", "Ascenso| Norte", "Descenso; Sur", "Nota ^ historica"});
+    original.activePromises.push_back({"Proyecto Norte", "Minutos", "Proyecto", 5, 10, 2, false, false});
+    original.historicalRecords.push_back({"Primera Division - Mas puntos", "Club Persistencia", "Club Persistencia", 7, 71, "Puntos en una temporada"});
     original.pendingTransfers.push_back({"Jugador| Pendiente", "Club Persistencia", "Club Destino", 9, 0, 120000, 9000, 104, false, false, "Titular^"});
 
     original.allTeams.push_back(makeTeam("Club Persistencia", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
@@ -682,6 +685,11 @@ void testSaveLoadRoundTripPreservesCareerState() {
     original.setActiveDivision("primera division");
     original.myTeam = original.findTeamByName("Club Persistencia");
     expect(original.myTeam != nullptr, "El fixture de persistencia debe tener club de usuario.");
+    original.myTeam->players[0].moraleMomentum = 7;
+    original.myTeam->players[0].fatigueLoad = 31;
+    original.myTeam->players[0].unhappinessWeeks = 2;
+    original.myTeam->players[0].promisedPosition = "DEF";
+    original.myTeam->players[0].socialGroup = "Lideres";
     original.saveFile = savePath;
 
     expect(original.saveCareer(), "El guardado roundtrip debe completarse.");
@@ -705,8 +713,16 @@ void testSaveLoadRoundTripPreservesCareerState() {
            "La carga debe preservar las fases resumidas del match center.");
     expect(loaded.history.size() == 1 && loaded.history.front().champion == "Club Persistencia",
            "La carga debe preservar historial de temporada.");
+    expect(!loaded.activePromises.empty() && loaded.activePromises.front().category == "Minutos",
+           "La carga debe preservar promesas activas.");
+    expect(!loaded.historicalRecords.empty() && loaded.historicalRecords.front().value == 71,
+           "La carga debe preservar records historicos.");
     expect(loaded.myTeam != nullptr && loaded.myTeam->name == "Club Persistencia",
            "La carga debe restaurar el club controlado.");
+    expect(loaded.myTeam->players[0].moraleMomentum == 7 &&
+               loaded.myTeam->players[0].fatigueLoad == 31 &&
+               loaded.myTeam->players[0].promisedPosition == "DEF",
+           "La carga debe preservar momento, carga y promesa de posicion del jugador.");
     expect(!loaded.pendingTransfers.empty() && loaded.pendingTransfers.front().toTeam == "Club Destino",
            "La carga debe preservar fichajes pendientes.");
 
@@ -786,6 +802,60 @@ void testSimulateMatchAppliesPostProcessState() {
            "La aplicacion postpartido debe registrar minutos para los participantes.");
 }
 
+void testWorldStateSeedsPromisesAndRecords() {
+    Career career;
+    career.currentSeason = 3;
+    career.currentWeek = 2;
+    career.boardExpectedFinish = 2;
+
+    career.allTeams.push_back(makeTeam("Pulso Club", "primera division", 72, 4, 4, "Pressing", "Contra-presion", 700000));
+    career.allTeams.push_back(makeTeam("Pulso Rival", "primera division", 68, 2, 3, "Balanced", "Equilibrado", 620000));
+    career.allTeams.push_back(makeTeam("Pulso Norte", "primera division", 66, 2, 2, "Defensive", "Bloque bajo", 560000));
+    career.allTeams.push_back(makeTeam("Pulso Sur", "primera division", 65, 2, 2, "Defensive", "Pausar juego", 550000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Pulso Club");
+    expect(career.myTeam != nullptr, "La prueba de mundo necesita club usuario.");
+
+    world_state_service::seedSeasonPromises(career);
+    expect(career.activePromises.size() >= 2,
+           "El estado del mundo debe sembrar promesas activas de competicion y gestion de plantilla.");
+
+    career.leagueTable.sortTable();
+    career.myTeam->points = 73;
+    career.myTeam->goalsFor = 44;
+    career.myTeam->goalsAgainst = 16;
+    career.myTeam->players[8].goals = 17;
+    career.leagueTable.sortTable();
+
+    const int updates = world_state_service::updateSeasonRecords(career, career.leagueTable);
+    expect(updates >= 1, "El estado del mundo debe registrar al menos un record historico cuando se supera una marca.");
+    expect(!career.historicalRecords.empty(), "Los records historicos deben persistirse en la carrera.");
+}
+
+void testWeeklyWorldStateResolvesMinutesPromise() {
+    Career career;
+    career.currentSeason = 4;
+    career.currentWeek = 8;
+
+    career.allTeams.push_back(makeTeam("Promesa Activa", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
+    career.allTeams.push_back(makeTeam("Rival Uno", "primera division", 67, 2, 2, "Defensive", "Bloque bajo", 620000));
+    career.allTeams.push_back(makeTeam("Rival Dos", "primera division", 66, 3, 3, "Balanced", "Equilibrado", 610000));
+    career.allTeams.push_back(makeTeam("Rival Tres", "primera division", 65, 2, 2, "Defensive", "Pausar juego", 600000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Promesa Activa");
+    expect(career.myTeam != nullptr, "La prueba de promesas necesita club usuario.");
+
+    Player& youngster = career.myTeam->players[0];
+    youngster.promisedRole = "Proyecto";
+    youngster.startsThisSeason = 2;
+    career.activePromises.push_back({youngster.name, "Minutos", "Proyecto", 4, 8, 2, false, false});
+
+    const WorldPulseSummary summary = world_state_service::processWeeklyWorldState(career);
+    expect(summary.resolvedPromises >= 1, "Una promesa de minutos cumplida debe resolverse en el pulso semanal.");
+    expect(career.activePromises.empty(), "Las promesas resueltas deben salir del backlog activo.");
+    expect(youngster.happiness >= 64, "Cumplir una promesa debe mejorar el estado del jugador.");
+}
+
 }  // namespace
 
 int main() {
@@ -808,6 +878,8 @@ int main() {
         {"match_analysis_store", testMatchAnalysisStoreProducesStructuredCareerData},
         {"match_center_service", testMatchCenterServiceBuildsStructuredView},
         {"dressing_room_service", testDressingRoomServiceFlagsPromiseAndFatigueRisk},
+        {"world_state_seed", testWorldStateSeedsPromisesAndRecords},
+        {"world_state_promises", testWeeklyWorldStateResolvesMinutesPromise},
         {"simulate_match_state", testSimulateMatchAppliesPostProcessState},
         {"save_load_roundtrip", testSaveLoadRoundTripPreservesCareerState},
         {"loader_fallback", testLoadTeamFromDirectoryFallsBackAndResolvesRawPositions},

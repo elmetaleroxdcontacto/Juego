@@ -259,6 +259,7 @@ void Career::setActiveDivision(const string& id) {
 }
 
 void Career::resetSeason() {
+    activePromises.clear();
     for (auto& team : allTeams) {
         team.resetSeasonStats();
         team.morale = 50;
@@ -276,6 +277,9 @@ void Career::resetSeason() {
             player.matchesPlayed = 0;
             player.startsThisSeason = 0;
             player.wantsToLeave = false;
+            player.moraleMomentum = 0;
+            player.fatigueLoad = 0;
+            player.unhappinessWeeks = 0;
             player.happiness = clampInt(player.happiness + 5, 1, 99);
             player.currentForm = clampInt(44 + player.professionalism / 4 + randInt(-8, 8), 20, 88);
             ensurePlayerProfile(player, false);
@@ -303,6 +307,9 @@ void Career::agePlayers() {
             }
             if (player.fitness > player.stamina) player.fitness = player.stamina;
             if (player.potential < player.skill) player.potential = player.skill;
+            player.moraleMomentum = clampInt(player.moraleMomentum / 2, -25, 25);
+            player.fatigueLoad = max(0, player.fatigueLoad - 8);
+            player.unhappinessWeeks = 0;
             player.currentForm = clampInt((player.currentForm + 50) / 2 + randInt(-4, 4), 15, 90);
             ensurePlayerProfile(player, false);
         }
@@ -366,6 +373,7 @@ void Career::executePendingTransfers() {
             player.releaseClause = max(player.value * 2, player.wage * 45);
             if (!move.promisedRole.empty()) {
                 player.promisedRole = move.promisedRole;
+                player.promisedPosition = player.position;
                 if (move.promisedRole == "Titular") player.desiredStarts = max(player.desiredStarts, 4);
                 else if (move.promisedRole == "Rotacion") player.desiredStarts = max(player.desiredStarts, 2);
                 else if (move.promisedRole == "Proyecto") player.desiredStarts = max(player.desiredStarts, 2);

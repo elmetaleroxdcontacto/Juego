@@ -4,6 +4,7 @@
 #include "career/career_reports.h"
 #include "career/career_runtime.h"
 #include "career/career_support.h"
+#include "career/world_state_service.h"
 #include "career/week_simulation.h"
 #include "career/team_management.h"
 #include "competition.h"
@@ -127,6 +128,21 @@ void appendNegotiationMessages(ServiceResult& result, const NegotiationState& st
     result.messages.insert(result.messages.end(), state.roundSummaries.begin(), state.roundSummaries.end());
 }
 
+void registerNegotiatedPromise(Career& career, const Player& player, NegotiationPromise promise) {
+    if (!career.myTeam || promise == NegotiationPromise::None) return;
+    const int seasonDeadline = max(career.currentWeek + 4, static_cast<int>(career.schedule.size()));
+    career.activePromises.push_back({
+        player.name,
+        "Minutos",
+        promiseLabel(promise),
+        career.currentWeek,
+        min(seasonDeadline, career.currentWeek + 8),
+        player.startsThisSeason,
+        false,
+        false,
+    });
+}
+
 }  // namespace
 
 ServiceResult startCareerService(Career& career,
@@ -158,11 +174,14 @@ ServiceResult startCareerService(Career& career,
     career.scoutInbox.clear();
     career.scoutingShortlist.clear();
     career.history.clear();
+    career.activePromises.clear();
+    career.historicalRecords.clear();
     career.pendingTransfers.clear();
     career.achievements.clear();
     career.currentSeason = 1;
     career.currentWeek = 1;
     career.resetSeason();
+    world_state_service::seedSeasonPromises(career);
     result.ok = true;
     result.messages.push_back("Nueva carrera iniciada con " + career.myTeam->name + ".");
     result.messages.insert(result.messages.end(), career.loadWarnings.begin(), career.loadWarnings.end());
@@ -173,6 +192,9 @@ ServiceResult loadCareerService(Career& career) {
     ServiceResult result;
     career.initializeLeague(true);
     result.ok = career.loadCareer();
+    if (result.ok && career.activePromises.empty()) {
+        world_state_service::seedSeasonPromises(career);
+    }
     result.messages.push_back(result.ok
                                   ? "Carrera cargada: " + (career.myTeam ? career.myTeam->name : string("Sin club")) + "."
                                   : "No se encontro una carrera guardada.");
@@ -258,6 +280,16 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         int estPotHi = clampInt(player.potential + error, player.skill, 99);
         int fitScore = positionFitScore(player, session.resolvedFocusPosition);
         string fitLabel = fitScore >= 90 ? "ajuste alto" : (fitScore >= 75 ? "ajuste medio" : "ajuste parcial");
+        const int confidence = clampInt(45 + team.scoutingChief / 2 + max(0, 70 - error * 4), 35, 95);
+        const string recommendation =
+            (player.potential >= team.getAverageSkill() + 8 && fitScore >= 85)
+                ? "Objetivo prioritario"
+                : (player.age <= 21 && player.potential - player.skill >= 10)
+                      ? "Proyecto a seguir"
+                      : (player.contractWeeks <= 16 ? "Oportunidad de mercado" : "Seguimiento");
+        const string upsideBand =
+            (player.potential - player.skill >= 12) ? "Techo alto"
+                                                    : (player.potential - player.skill >= 6 ? "Margen medio" : "Techo corto");
 
         ScoutingCandidate candidate;
         candidate.playerName = player.name;
@@ -269,6 +301,8 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         candidate.formLabel = playerFormLabel(player);
         candidate.reliabilityLabel = playerReliabilityLabel(player);
         candidate.personalityLabel = personalityLabel(player);
+        candidate.recommendation = recommendation;
+        candidate.upsideBand = upsideBand;
         candidate.secondaryPositions = player.secondaryPositions;
         candidate.traits = player.traits;
         candidate.estimatedSkillMin = estSkillLo;
@@ -277,6 +311,7 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         candidate.estimatedPotentialMax = estPotHi;
         candidate.fitScore = fitScore;
         candidate.bigMatches = player.bigMatches;
+        candidate.confidence = confidence;
         candidate.marketValue = player.value;
         session.candidates.push_back(candidate);
 
@@ -287,6 +322,9 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
                       " | Sec " + (player.secondaryPositions.empty() ? string("-") : joinStringValues(player.secondaryPositions, "/")) +
                       " | Forma " + playerFormLabel(player) +
                       " | Fiabilidad " + playerReliabilityLabel(player) +
+                      " | Conf " + to_string(confidence) +
+                      " | " + recommendation +
+                      " | " + upsideBand +
                       " | Rasgos " + joinStringValues(player.traits, ", ") +
                       " | Perfil " + personalityLabel(player);
         session.service.messages.push_back("- " + note);
@@ -425,8 +463,10 @@ ServiceResult buyTransferTargetService(Career& career,
     player.wantsToLeave = false;
     player.happiness = clampInt(player.happiness + 4, 1, 99);
     applyNegotiatedPromise(player, promise);
+    player.promisedPosition = player.position;
     career.myTeam->budget -= (negotiation.agreedFee + negotiation.agreedBonus);
     career.myTeam->addPlayer(player);
+    registerNegotiatedPromise(career, player, promise);
     seller->budget += negotiation.agreedFee;
     team_mgmt::detachPlayerFromSelections(*seller, player.name);
     eraseNamedSelection(career.scoutingShortlist, seller->name + "|" + player.name);
@@ -484,9 +524,11 @@ ServiceResult triggerReleaseClauseService(Career& career,
     player.wantsToLeave = false;
     player.happiness = clampInt(player.happiness + 4, 1, 99);
     applyNegotiatedPromise(player, promise);
+    player.promisedPosition = player.position;
 
     career.myTeam->budget -= (negotiation.agreedFee + negotiation.agreedBonus);
     career.myTeam->addPlayer(player);
+    registerNegotiatedPromise(career, player, promise);
     seller->budget += negotiation.agreedFee;
     team_mgmt::detachPlayerFromSelections(*seller, player.name);
     eraseNamedSelection(career.scoutingShortlist, seller->name + "|" + player.name);
@@ -580,6 +622,8 @@ ServiceResult renewPlayerContractService(Career& career,
     player.wantsToLeave = false;
     player.happiness = clampInt(player.happiness + 6, 1, 99);
     applyNegotiatedPromise(player, promise);
+    player.promisedPosition = player.position;
+    registerNegotiatedPromise(career, player, promise);
     ensureTeamIdentity(team);
     career.addNews(player.name + " renueva con " + team.name + ".");
     ServiceResult result;

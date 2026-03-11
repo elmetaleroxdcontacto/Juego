@@ -23,6 +23,7 @@ set(FM_CAREER_SOURCES
     src/career/player_development.cpp
     src/career/team_management.cpp
     src/career/week_simulation.cpp
+    src/career/world_state_service.cpp
 )
 
 set(FM_AI_SOURCES

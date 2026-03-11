@@ -405,6 +405,7 @@ std::string buildPlayerProfile(const Team& team, const Player* player) {
         << " | Potencial " << player->potential << "\r\n";
     out << "Rol " << player->role
         << " | Promesa " << player->promisedRole
+        << " | Posicion prometida " << player->promisedPosition
         << " | Pie " << player->preferredFoot << "\r\n\r\n";
     out << "Atributos\r\n";
     out << "Ataque " << player->attack
@@ -430,10 +431,13 @@ std::string buildPlayerProfile(const Team& team, const Player* player) {
     out << "Forma " << player->currentForm
         << " (" << playerFormLabel(*player) << ")"
         << " | Moral " << player->happiness
+        << " | Momento " << player->moraleMomentum
         << " | Quimica " << player->chemistry
-        << " | Fisico " << player->fitness << "\r\n\r\n";
+        << " | Fisico " << player->fitness
+        << " | Carga " << player->fatigueLoad << "\r\n\r\n";
     out << "Desarrollo\r\n";
     out << "Plan " << player->developmentPlan
+        << " | Grupo " << player->socialGroup
         << " | Posiciones secundarias " << (player->secondaryPositions.empty() ? "-" : joinStringValues(player->secondaryPositions, ", ")) << "\r\n";
     out << "Rasgos " << (player->traits.empty() ? "-" : joinStringValues(player->traits, ", ")) << "\r\n\r\n";
     out << "Historial\r\n";
@@ -454,20 +458,24 @@ ListPanelModel buildTeamStatusModel(const Career& career) {
     }
 
     const Team& team = *career.myTeam;
+    const DressingRoomSnapshot dressing = dressing_room_service::buildSnapshot(team, career.currentWeek);
     int injured = 0;
     int suspended = 0;
     int lowMorale = 0;
     int lowFitness = 0;
     int fitnessTotal = 0;
+    int fatigueLoad = 0;
     for (const auto& player : team.players) {
         fitnessTotal += player.fitness;
+        fatigueLoad += player.fatigueLoad;
         if (player.injured) ++injured;
         if (player.matchesSuspended > 0) ++suspended;
         if (player.happiness < 45) ++lowMorale;
-        if (player.fitness < 62) ++lowFitness;
+        if (player.fitness < 62 || player.fatigueLoad >= 60) ++lowFitness;
     }
     int squadSize = std::max(1, static_cast<int>(team.players.size()));
     int averageFitness = fitnessTotal / squadSize;
+    int averageLoad = fatigueLoad / squadSize;
 
     model.rows.push_back({"Fatiga", teamConditionLabel(averageFitness), "Promedio fisico " + std::to_string(averageFitness) + " / 100"});
     model.rows.push_back({"Moral", teamMoraleLabel(team.morale), "Moral colectiva " + std::to_string(team.morale) + " / 100"});
@@ -475,6 +483,9 @@ ListPanelModel buildTeamStatusModel(const Career& career) {
     model.rows.push_back({"Suspendidos", severityLabel(suspended, 2, 1), std::to_string(suspended) + " jugadores sancionados"});
     model.rows.push_back({"Carga alta", severityLabel(lowFitness, 4, 2), std::to_string(lowFitness) + " jugadores con fisico bajo"});
     model.rows.push_back({"Vestuario", severityLabel(lowMorale, 4, 2), std::to_string(lowMorale) + " jugadores con moral baja"});
+    model.rows.push_back({"Carga acumulada", severityLabel(averageLoad, 65, 40), "Promedio de carga " + std::to_string(averageLoad) + " / 100"});
+    model.rows.push_back({"Promesas", severityLabel(static_cast<int>(career.activePromises.size()), 3, 1), std::to_string(career.activePromises.size()) + " compromisos activos"});
+    model.rows.push_back({"Conflictos", severityLabel(dressing.conflictCount, 3, 1), std::to_string(dressing.conflictCount) + " focos de tension interna"});
     return model;
 }
 

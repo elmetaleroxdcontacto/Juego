@@ -33,6 +33,9 @@ struct Player {
     int versatility;
     int happiness;
     int chemistry;
+    int moraleMomentum;
+    int fatigueLoad;
+    int unhappinessWeeks;
     int desiredStarts;
     int startsThisSeason;
     bool wantsToLeave;
@@ -56,6 +59,8 @@ struct Player {
     std::string role;
     std::string developmentPlan;
     std::string promisedRole;
+    std::string promisedPosition;
+    std::string socialGroup;
     std::vector<std::string> traits;
 };
 
@@ -87,6 +92,26 @@ struct PendingTransfer {
     bool preContract;
     bool loan;
     std::string promisedRole;
+};
+
+struct SquadPromise {
+    std::string subjectName;
+    std::string category;
+    std::string target;
+    int issuedWeek = 0;
+    int deadlineWeek = 0;
+    int progress = 0;
+    bool fulfilled = false;
+    bool failed = false;
+};
+
+struct HistoricalRecord {
+    std::string category;
+    std::string holderName;
+    std::string teamName;
+    int season = 0;
+    int value = 0;
+    std::string note;
 };
 
 struct MatchCenterSnapshot {
@@ -252,6 +277,8 @@ struct Career {
     std::vector<std::string> scoutInbox;
     std::vector<std::string> scoutingShortlist;
     std::vector<SeasonHistoryEntry> history;
+    std::vector<SquadPromise> activePromises;
+    std::vector<HistoricalRecord> historicalRecords;
     std::vector<PendingTransfer> pendingTransfers;
     bool cupActive;
     int cupRound;

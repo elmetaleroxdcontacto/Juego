@@ -518,19 +518,23 @@ void manageLineup(Team& team) {
 void setTrainingPlan(Team& team) {
     cout << "\nPlan de entrenamiento actual: " << team.trainingFocus << endl;
     cout << "1. Balanceado" << endl;
-    cout << "2. Fisico" << endl;
-    cout << "3. Tecnico" << endl;
-    cout << "4. Tactico" << endl;
-    cout << "5. Preparacion partido" << endl;
-    cout << "6. Recuperacion" << endl;
-    int choice = readInt("Elige plan: ", 1, 6);
+    cout << "2. Resistencia" << endl;
+    cout << "3. Ataque" << endl;
+    cout << "4. Defensa" << endl;
+    cout << "5. Tecnico" << endl;
+    cout << "6. Tactico" << endl;
+    cout << "7. Preparacion partido" << endl;
+    cout << "8. Recuperacion" << endl;
+    int choice = readInt("Elige plan: ", 1, 8);
     switch (choice) {
         case 1: team.trainingFocus = "Balanceado"; break;
-        case 2: team.trainingFocus = "Fisico"; break;
-        case 3: team.trainingFocus = "Tecnico"; break;
-        case 4: team.trainingFocus = "Tactico"; break;
-        case 5: team.trainingFocus = "Preparacion partido"; break;
-        case 6: team.trainingFocus = "Recuperacion"; break;
+        case 2: team.trainingFocus = "Resistencia"; break;
+        case 3: team.trainingFocus = "Ataque"; break;
+        case 4: team.trainingFocus = "Defensa"; break;
+        case 5: team.trainingFocus = "Tecnico"; break;
+        case 6: team.trainingFocus = "Tactico"; break;
+        case 7: team.trainingFocus = "Preparacion partido"; break;
+        case 8: team.trainingFocus = "Recuperacion"; break;
         default: break;
     }
     cout << "Plan actualizado a " << team.trainingFocus << endl;

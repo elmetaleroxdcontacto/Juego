@@ -81,16 +81,20 @@ void applyNamedInjuries(Team& team, const vector<string>& injuredNames) {
             if (player.name != name || player.injured) continue;
             player.injured = true;
             player.injuryHistory++;
+            player.fatigueLoad = clampInt(player.fatigueLoad + 12, 0, 100);
             int roll = randInt(1, 100);
-            if (roll <= 65) {
-                player.injuryType = "Leve";
+            if (roll <= 45) {
+                player.injuryType = "Sobrecarga";
                 player.injuryWeeks = randInt(1, 2);
+            } else if (roll <= 72) {
+                player.injuryType = "Muscular";
+                player.injuryWeeks = randInt(2, 5);
             } else if (roll <= 90) {
-                player.injuryType = "Media";
-                player.injuryWeeks = randInt(3, 6);
+                player.injuryType = "Ligamentos";
+                player.injuryWeeks = randInt(5, 10);
             } else {
-                player.injuryType = "Grave";
-                player.injuryWeeks = randInt(7, 12);
+                player.injuryType = "Fractura";
+                player.injuryWeeks = randInt(8, 14);
             }
             break;
         }
@@ -122,6 +126,26 @@ void updateMatchForm(Team& team,
         if (keyMatch && playerHasTrait(player, "Cita grande")) delta += 1;
         if (keyMatch && player.bigMatches <= 40) delta -= 1;
         player.currentForm = clampInt(player.currentForm + delta, 1, 99);
+        player.moraleMomentum = clampInt(player.moraleMomentum + delta, -25, 25);
+    }
+}
+
+void applyParticipantLoad(Team& team, const vector<int>& participants, bool won, bool keyMatch) {
+    for (int idx : participants) {
+        if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
+        Player& player = team.players[static_cast<size_t>(idx)];
+        int load = 8 + max(0, 100 - player.fitness) / 8;
+        if (team.tactics == "Pressing") load += 4;
+        if (team.tempo >= 4) load += 2;
+        if (keyMatch) load += 2;
+        if (player.position == player.promisedPosition) player.happiness = clampInt(player.happiness + 1, 1, 99);
+        else if (!player.promisedPosition.empty() && player.promisedPosition != "N/A") {
+            player.happiness = clampInt(player.happiness - 1, 1, 99);
+        }
+        player.fatigueLoad = clampInt(player.fatigueLoad + load, 0, 100);
+        if (won && player.leadership >= 70) {
+            player.chemistry = clampInt(player.chemistry + 1, 1, 99);
+        }
     }
 }
 
@@ -201,6 +225,8 @@ void applySimulationOutcome(Team& home,
     applyDevelopment(away, awayParticipants, nullptr);
     updateMatchForm(home, homeParticipants, result.homeGoals, result.awayGoals, keyMatch);
     updateMatchForm(away, awayParticipants, result.awayGoals, result.homeGoals, keyMatch);
+    applyParticipantLoad(home, homeParticipants, result.homeGoals > result.awayGoals, keyMatch);
+    applyParticipantLoad(away, awayParticipants, result.awayGoals > result.homeGoals, keyMatch);
     match_internal::applyMatchFatigue(home, homeParticipants, home.tactics);
     match_internal::applyMatchFatigue(away, awayParticipants, away.tactics);
 }

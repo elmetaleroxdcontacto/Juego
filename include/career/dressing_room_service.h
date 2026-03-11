@@ -10,10 +10,13 @@ struct DressingRoomSnapshot {
     std::string climate;
     std::string summary;
     int leaderCount = 0;
+    int conflictCount = 0;
     int promiseRiskCount = 0;
+    int positionPromiseRiskCount = 0;
     int lowMoraleCount = 0;
     int fatigueRiskCount = 0;
     int wantsOutCount = 0;
+    std::vector<std::string> groups;
     std::vector<std::string> alerts;
 };
 

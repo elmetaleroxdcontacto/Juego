@@ -5,6 +5,7 @@
 #include "career/match_analysis_store.h"
 #include "career/career_support.h"
 #include "career/team_management.h"
+#include "career/world_state_service.h"
 #include "competition/competition.h"
 #include "finance/finance_system.h"
 #include "transfers/negotiation_system.h"
@@ -51,6 +52,30 @@ void addFact(CareerReport& report, const string& label, const string& value) {
 void addBlock(CareerReport& report, const string& title, vector<string> lines) {
     if (lines.empty()) return;
     report.blocks.push_back({title, std::move(lines)});
+}
+
+vector<string> activePromiseLines(const Career& career, size_t limit = 5) {
+    vector<string> lines;
+    const size_t count = min(limit, career.activePromises.size());
+    for (size_t i = 0; i < count; ++i) {
+        const SquadPromise& promise = career.activePromises[i];
+        lines.push_back(promise.category + " | " + promise.subjectName + " | " + promise.target +
+                        " | progreso " + to_string(promise.progress) +
+                        " | vence F" + to_string(promise.deadlineWeek));
+    }
+    return lines;
+}
+
+vector<string> historicalRecordLines(const Career& career, size_t limit = 4) {
+    vector<string> lines;
+    if (career.historicalRecords.empty()) return lines;
+    const size_t start = career.historicalRecords.size() > limit ? career.historicalRecords.size() - limit : 0;
+    for (size_t i = start; i < career.historicalRecords.size(); ++i) {
+        const HistoricalRecord& record = career.historicalRecords[i];
+        lines.push_back(record.category + " | " + record.holderName + " (" + record.teamName + ")" +
+                        " | " + to_string(record.value) + " | T" + to_string(record.season));
+    }
+    return lines;
 }
 
 }  // namespace
@@ -201,6 +226,7 @@ CareerReport buildCompetitionReport(const Career& career) {
         }
         addBlock(report, "Ultimas noticias", std::move(news));
     }
+    addBlock(report, "Records historicos", historicalRecordLines(career));
     MatchCenterView matchCenter = match_center_service::buildLastMatchCenter(career, 3, 4);
     if (matchCenter.available) {
         vector<string> lastMatchBlock;
@@ -240,6 +266,7 @@ CareerReport buildBoardReport(const Career& career) {
     addFact(report, "Advertencias", to_string(career.boardWarningWeeks));
     addFact(report, "Vestuario", dressingRoomClimate(*career.myTeam));
     addFact(report, "Promesas en riesgo", to_string(promisesAtRisk(*career.myTeam, career.currentWeek)));
+    addFact(report, "Promesas activas", to_string(career.activePromises.size()));
     addFact(report, "Expectativa del club", teamExpectationLabel(*career.myTeam));
     addFact(report, "Prestigio", to_string(teamPrestigeScore(*career.myTeam)));
 
@@ -266,6 +293,7 @@ CareerReport buildBoardReport(const Career& career) {
     else addBlock(report, "Estado", {"Situacion controlada."});
 
     addBlock(report, "Vestuario", dressing.alerts);
+    addBlock(report, "Promesas activas", activePromiseLines(career));
 
     vector<string> offers;
     for (Team* job : jobs) {
@@ -291,6 +319,9 @@ CareerReport buildClubReport(const Career& career) {
     vector<const Player*> leaders = dressingRoomLeaders(team);
     WeeklyFinanceReport finance = finance_system::projectWeeklyReport(team);
     DressingRoomSnapshot dressing = dressing_room_service::buildSnapshot(team, career.currentWeek);
+    int fatigueLoad = 0;
+    for (const auto& player : team.players) fatigueLoad += player.fatigueLoad;
+    const int avgFatigueLoad = team.players.empty() ? 0 : fatigueLoad / static_cast<int>(team.players.size());
 
     addFact(report, "Presupuesto", formatMoneyValue(team.budget));
     addFact(report, "Deuda", formatMoneyValue(team.debt));
@@ -307,6 +338,8 @@ CareerReport buildClubReport(const Career& career) {
     addFact(report, "Vestuario", dressingRoomClimate(team));
     addFact(report, "Instruccion", team.matchInstruction);
     addFact(report, "Proyectos juveniles", to_string(youthProjects));
+    addFact(report, "Carga acumulada", to_string(avgFatigueLoad) + "/100");
+    addFact(report, "Plan semanal", team.trainingFocus);
 
     if (!leaders.empty()) {
         vector<string> leaderNames;
@@ -316,6 +349,7 @@ CareerReport buildClubReport(const Career& career) {
         addBlock(report, "Nucleo de lideres", {joinStringValues(leaderNames, ", ")});
     }
     addBlock(report, "Vestuario", dressing.alerts);
+    addBlock(report, "Promesas activas", activePromiseLines(career));
 
     addBlock(report,
              "Infraestructura",
@@ -329,6 +363,15 @@ CareerReport buildClubReport(const Career& career) {
                  "Preparador fisico " + to_string(team.fitnessCoach),
                  "Jefe juveniles " + to_string(team.youthCoach),
                  "Region juvenil: " + team.youthRegion,
+             });
+    addBlock(report,
+             "Staff tecnico",
+             {
+                 "Asistente " + to_string(team.assistantCoach) + " | organiza automatismos y moral competitiva",
+                 "Preparador fisico " + to_string(team.fitnessCoach) + " | recuperacion y resistencia",
+                 "Medico " + to_string(team.medicalTeam) + " | baja riesgo y acorta lesiones",
+                 "Scouting " + to_string(team.scoutingChief) + " | precision de informes y shortlist",
+                 "Juveniles " + to_string(team.youthCoach) + " | eleva potencial e intake",
              });
     return report;
 }
@@ -372,6 +415,7 @@ CareerReport buildScoutingReport(const Career& career) {
     addFact(report, "Necesidad detectada", detectScoutingNeed(team));
     addFact(report, "Informes guardados", to_string(career.scoutInbox.size()));
     addFact(report, "Shortlist activa", to_string(career.scoutingShortlist.size()));
+    addFact(report, "Red juvenil", team.youthRegion + " | coach " + to_string(team.youthCoach));
 
     if (!career.scoutingShortlist.empty()) {
         vector<string> shortlistLines;
@@ -403,6 +447,7 @@ CareerReport buildScoutingReport(const Career& career) {
         }
         addBlock(report, "Ultimos informes", std::move(notes));
     }
+    addBlock(report, "Records historicos", historicalRecordLines(career, 3));
     return report;
 }
 

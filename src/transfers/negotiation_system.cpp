@@ -148,9 +148,11 @@ int promisesAtRisk(const Team& team, int currentWeek) {
 void applyNegotiatedPromise(Player& player, NegotiationPromise promise) {
     if (promise == NegotiationPromise::None) return;
     player.promisedRole = promiseLabel(promise);
+    player.promisedPosition = normalizePosition(player.position);
     player.desiredStarts = max(player.desiredStarts, desiredStartsForPromise(promise, player));
     player.wantsToLeave = false;
     player.happiness = clampInt(player.happiness + (promise == NegotiationPromise::Starter ? 5 : 3), 1, 99);
+    player.moraleMomentum = clampInt(player.moraleMomentum + (promise == NegotiationPromise::Starter ? 3 : 2), -25, 25);
 }
 
 long long estimatedAgentFee(const Player& player, long long transferFee) {

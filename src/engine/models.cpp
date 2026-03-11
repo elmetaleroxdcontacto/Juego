@@ -87,6 +87,14 @@ static vector<string> inferSecondaryPositions(const Player& p) {
     return positions;
 }
 
+static string inferSocialGroup(const Player& p) {
+    if (p.leadership >= 72 || playerHasTrait(p, "Lider")) return "Lideres";
+    if (p.age <= 20 || playerHasTrait(p, "Proyecto")) return "Juveniles";
+    if (p.age >= 31 || playerHasTrait(p, "Fragil")) return "Veteranos";
+    if (p.ambition >= 70 && p.professionalism >= 60) return "Competitivos";
+    return "Nucleo";
+}
+
 void ensurePlayerProfile(Player& p, bool regenerateTraits) {
     string normalizedPos = normalizePosition(p.position);
     if (normalizedPos == "N/A") normalizedPos = "MED";
@@ -116,6 +124,11 @@ void ensurePlayerProfile(Player& p, bool regenerateTraits) {
     if (p.role.empty()) p.role = defaultRoleForPosition(p.position);
     if (p.developmentPlan.empty()) p.developmentPlan = defaultDevelopmentPlanForPosition(p.position);
     if (p.promisedRole.empty()) p.promisedRole = "Sin promesa";
+    if (p.promisedPosition.empty()) p.promisedPosition = p.position;
+    if (p.socialGroup.empty()) p.socialGroup = inferSocialGroup(p);
+    p.moraleMomentum = clampInt(p.moraleMomentum, -25, 25);
+    p.fatigueLoad = clampInt(p.fatigueLoad, 0, 100);
+    p.unhappinessWeeks = clampInt(p.unhappinessWeeks, 0, 52);
     if (regenerateTraits || p.traits.empty()) p.traits = generatePlayerTraits(p, p.age <= 19);
     if (p.traits.empty()) p.traits = generatePlayerTraits(p, p.age <= 19);
 }
@@ -317,6 +330,9 @@ Player makeRandomPlayer(const string& position, int skillMin, int skillMax, int 
     p.ambition = clampInt(35 + randInt(0, 50), 1, 99);
     p.happiness = clampInt(55 + randInt(-10, 20), 1, 99);
     p.chemistry = clampInt(45 + randInt(0, 35), 1, 99);
+    p.moraleMomentum = randInt(-2, 4);
+    p.fatigueLoad = randInt(0, 8);
+    p.unhappinessWeeks = 0;
     p.desiredStarts = (p.skill >= skillMax - 5) ? 3 : 1;
     p.startsThisSeason = 0;
     p.wantsToLeave = false;
@@ -338,6 +354,7 @@ Player makeRandomPlayer(const string& position, int skillMin, int skillMax, int 
     p.lastTrainedSeason = -1;
     p.lastTrainedWeek = -1;
     p.role = defaultRoleForPosition(position);
+    p.promisedPosition = position;
     ensurePlayerProfile(p, true);
     return p;
 }

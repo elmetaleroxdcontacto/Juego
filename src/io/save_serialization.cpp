@@ -9,7 +9,7 @@ using namespace std;
 
 namespace {
 
-static constexpr int kCareerSaveVersion = 8;
+static constexpr int kCareerSaveVersion = 9;
 
 string escapeSaveField(const string& value) {
     string out;
@@ -275,6 +275,78 @@ vector<PendingTransfer> decodePendingTransfers(const string& encoded) {
     return entries;
 }
 
+string encodePromises(const vector<SquadPromise>& promises) {
+    vector<string> encodedEntries;
+    encodedEntries.reserve(promises.size());
+    for (const auto& promise : promises) {
+        encodedEntries.push_back(joinEscapedFields({
+            promise.subjectName,
+            promise.category,
+            promise.target,
+            to_string(promise.issuedWeek),
+            to_string(promise.deadlineWeek),
+            to_string(promise.progress),
+            to_string(promise.fulfilled ? 1 : 0),
+            to_string(promise.failed ? 1 : 0)
+        }, '^'));
+    }
+    return joinEscapedFields(encodedEntries, '~');
+}
+
+vector<SquadPromise> decodePromises(const string& encoded) {
+    vector<SquadPromise> promises;
+    if (encoded.empty()) return promises;
+    for (const string& token : splitEscapedFields(encoded, '~')) {
+        auto parts = splitEscapedFields(token, '^');
+        if (parts.size() < 6) continue;
+        SquadPromise promise;
+        promise.subjectName = parts[0];
+        promise.category = parts[1];
+        promise.target = parts[2];
+        promise.issuedWeek = parseIntField(parts[3]);
+        promise.deadlineWeek = parseIntField(parts[4]);
+        promise.progress = parseIntField(parts[5]);
+        promise.fulfilled = parts.size() > 6 ? parseBoolField(parts[6]) : false;
+        promise.failed = parts.size() > 7 ? parseBoolField(parts[7]) : false;
+        promises.push_back(promise);
+    }
+    return promises;
+}
+
+string encodeHistoricalRecords(const vector<HistoricalRecord>& records) {
+    vector<string> encodedEntries;
+    encodedEntries.reserve(records.size());
+    for (const auto& record : records) {
+        encodedEntries.push_back(joinEscapedFields({
+            record.category,
+            record.holderName,
+            record.teamName,
+            to_string(record.season),
+            to_string(record.value),
+            record.note
+        }, '^'));
+    }
+    return joinEscapedFields(encodedEntries, '~');
+}
+
+vector<HistoricalRecord> decodeHistoricalRecords(const string& encoded) {
+    vector<HistoricalRecord> records;
+    if (encoded.empty()) return records;
+    for (const string& token : splitEscapedFields(encoded, '~')) {
+        auto parts = splitEscapedFields(token, '^');
+        if (parts.size() < 6) continue;
+        HistoricalRecord record;
+        record.category = parts[0];
+        record.holderName = parts[1];
+        record.teamName = parts[2];
+        record.season = parseIntField(parts[3], 1);
+        record.value = parseIntField(parts[4]);
+        record.note = parts[5];
+        records.push_back(record);
+    }
+    return records;
+}
+
 string encodePlayerFields(const Player& player) {
     return joinEscapedFields({
         player.name,
@@ -325,7 +397,12 @@ string encodePlayerFields(const Player& player) {
         to_string(player.bigMatches),
         to_string(player.currentForm),
         to_string(player.tacticalDiscipline),
-        to_string(player.versatility)
+        to_string(player.versatility),
+        to_string(player.moraleMomentum),
+        to_string(player.fatigueLoad),
+        to_string(player.unhappinessWeeks),
+        player.promisedPosition,
+        player.socialGroup
     }, '|');
 }
 
@@ -402,6 +479,11 @@ Player decodePlayerFields(const vector<string>& fields) {
     if (idx < fields.size()) player.currentForm = parseIntField(fields[idx++]); else player.currentForm = 0;
     if (idx < fields.size()) player.tacticalDiscipline = parseIntField(fields[idx++]); else player.tacticalDiscipline = 0;
     if (idx < fields.size()) player.versatility = parseIntField(fields[idx++]); else player.versatility = 0;
+    if (idx < fields.size()) player.moraleMomentum = parseIntField(fields[idx++]); else player.moraleMomentum = 0;
+    if (idx < fields.size()) player.fatigueLoad = parseIntField(fields[idx++]); else player.fatigueLoad = 0;
+    if (idx < fields.size()) player.unhappinessWeeks = parseIntField(fields[idx++]); else player.unhappinessWeeks = 0;
+    if (idx < fields.size()) player.promisedPosition = fields[idx++]; else player.promisedPosition = player.position;
+    if (idx < fields.size()) player.socialGroup = fields[idx++]; else player.socialGroup.clear();
     ensurePlayerProfile(player, player.traits.empty());
     return player;
 }
@@ -435,6 +517,8 @@ bool serializeCareer(ostream& file, const Career& career) {
     const vector<string>& scoutInbox = career.scoutInbox;
     const vector<string>& scoutingShortlist = career.scoutingShortlist;
     const vector<SeasonHistoryEntry>& history = career.history;
+    const vector<SquadPromise>& activePromises = career.activePromises;
+    const vector<HistoricalRecord>& historicalRecords = career.historicalRecords;
     const vector<PendingTransfer>& pendingTransfers = career.pendingTransfers;
     const bool& cupActive = career.cupActive;
     const int& cupRound = career.cupRound;
@@ -471,6 +555,8 @@ bool serializeCareer(ostream& file, const Career& career) {
     file << "SCOUT " << encodeStringList(scoutInbox) << "\n";
     file << "SHORTLIST " << encodeStringList(scoutingShortlist) << "\n";
     file << "HISTORY " << encodeHistory(history) << "\n";
+    file << "PROMISES " << encodePromises(activePromises) << "\n";
+    file << "RECORDS " << encodeHistoricalRecords(historicalRecords) << "\n";
     file << "PENDING " << encodePendingTransfers(pendingTransfers) << "\n";
     file << "CUP "
          << joinEscapedFields({to_string(cupActive ? 1 : 0),
@@ -571,6 +657,8 @@ bool deserializeCareer(istream& file, Career& career) {
     auto& scoutInbox = career.scoutInbox;
     auto& scoutingShortlist = career.scoutingShortlist;
     auto& history = career.history;
+    auto& activePromises = career.activePromises;
+    auto& historicalRecords = career.historicalRecords;
     auto& pendingTransfers = career.pendingTransfers;
     auto& cupActive = career.cupActive;
     auto& cupRound = career.cupRound;
@@ -675,6 +763,16 @@ bool deserializeCareer(istream& file, Career& career) {
         history.clear();
         if (teamsLine.rfind("HISTORY ", 0) == 0) {
             history = decodeHistory(teamsLine.substr(8));
+            if (!getline(file, teamsLine)) return false;
+        }
+        activePromises.clear();
+        if (teamsLine.rfind("PROMISES ", 0) == 0) {
+            activePromises = decodePromises(teamsLine.substr(9));
+            if (!getline(file, teamsLine)) return false;
+        }
+        historicalRecords.clear();
+        if (teamsLine.rfind("RECORDS ", 0) == 0) {
+            historicalRecords = decodeHistoricalRecords(teamsLine.substr(8));
             if (!getline(file, teamsLine)) return false;
         }
         pendingTransfers.clear();
