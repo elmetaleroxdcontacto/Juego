@@ -12,6 +12,200 @@
 
 using namespace std;
 
+namespace {
+
+string resolveRosterPosition(const string& position, const string& positionRaw) {
+    const string normalizedPosition = normalizePosition(position);
+    const string normalizedRaw = normalizePosition(positionRaw);
+    if (normalizedPosition != "N/A" && normalizedRaw != "N/A") {
+        return normalizedPosition == normalizedRaw ? normalizedPosition : normalizedRaw;
+    }
+    if (normalizedRaw != "N/A") return normalizedRaw;
+    if (normalizedPosition != "N/A") return normalizedPosition;
+    return "N/A";
+}
+
+Player buildLoadedPlayer(const string& name,
+                         const string& position,
+                         int age,
+                         long long value,
+                         const string& division) {
+    const string normalizedPosition = normalizePosition(position) == "N/A" ? "MED" : normalizePosition(position);
+
+    int skill = computeSkillFromValue(value, age, division);
+    long long effectiveValue = value;
+    if (effectiveValue == 0) {
+        int minSkill = 40;
+        int maxSkill = 65;
+        getDivisionSkillRange(division, minSkill, maxSkill);
+        skill = randInt(minSkill, maxSkill);
+        effectiveValue = static_cast<long long>(skill) * 10000;
+    }
+
+    int attack = 0;
+    int defense = 0;
+    if (normalizedPosition == "ARQ") {
+        attack = clampInt(skill - 30, 10, 70);
+        defense = clampInt(skill + 10, 30, 99);
+    } else if (normalizedPosition == "DEF") {
+        attack = clampInt(skill - 10, 20, 90);
+        defense = clampInt(skill + 10, 30, 99);
+    } else if (normalizedPosition == "MED") {
+        attack = clampInt(skill, 25, 99);
+        defense = clampInt(skill, 25, 99);
+    } else {
+        attack = clampInt(skill + 10, 30, 99);
+        defense = clampInt(skill - 10, 20, 90);
+    }
+
+    int stamina = clampInt(skill + randInt(-6, 6), 30, 99);
+    if (age > 30) stamina = clampInt(stamina - (age - 30), 25, 99);
+
+    Player player;
+    player.name = name;
+    player.position = normalizedPosition;
+    player.attack = attack;
+    player.defense = defense;
+    player.stamina = stamina;
+    player.fitness = stamina;
+    player.skill = skill;
+    player.potential = clampInt(player.skill + randInt(0, 10), player.skill, 95);
+    player.age = age;
+    player.value = effectiveValue;
+    player.wage = static_cast<long long>(player.skill) * 150 + randInt(0, 600);
+    player.releaseClause = max(50000LL, player.value * (18 + randInt(0, 8)) / 10);
+    player.setPieceSkill = clampInt(player.skill + randInt(-8, 8), 25, 99);
+    player.leadership = clampInt(35 + randInt(0, 45), 1, 99);
+    player.professionalism = clampInt(40 + randInt(0, 45), 1, 99);
+    player.ambition = clampInt(35 + randInt(0, 50), 1, 99);
+    player.happiness = clampInt(55 + randInt(-10, 20), 1, 99);
+    player.chemistry = clampInt(45 + randInt(0, 35), 1, 99);
+    player.desiredStarts = 1;
+    player.startsThisSeason = 0;
+    player.wantsToLeave = false;
+    player.onLoan = false;
+    player.parentClub.clear();
+    player.loanWeeksRemaining = 0;
+    player.contractWeeks = randInt(52, 156);
+    player.injured = false;
+    player.injuryType = "";
+    player.injuryWeeks = 0;
+    player.injuryHistory = 0;
+    player.yellowAccumulation = 0;
+    player.seasonYellowCards = 0;
+    player.seasonRedCards = 0;
+    player.matchesSuspended = 0;
+    player.goals = 0;
+    player.assists = 0;
+    player.matchesPlayed = 0;
+    player.lastTrainedSeason = -1;
+    player.lastTrainedWeek = -1;
+    ensurePlayerProfile(player, true);
+    return player;
+}
+
+struct RoleCoverage {
+    int goalkeepers = 0;
+    int defenders = 0;
+    int midfielders = 0;
+    int forwards = 0;
+};
+
+int maxSquadForDivision(const string& division) {
+    return getCompetitionConfig(division).maxSquadSize;
+}
+
+int roleMinimumForPosition(const string& position) {
+    if (position == "ARQ") return 2;
+    if (position == "DEF") return 3;
+    if (position == "MED") return 3;
+    if (position == "DEL") return 2;
+    return 0;
+}
+
+int& coverageForPosition(RoleCoverage& coverage, const string& position) {
+    if (position == "ARQ") return coverage.goalkeepers;
+    if (position == "DEF") return coverage.defenders;
+    if (position == "MED") return coverage.midfielders;
+    return coverage.forwards;
+}
+
+RoleCoverage countRoleCoverage(const Team& team) {
+    RoleCoverage coverage;
+    for (const auto& player : team.players) {
+        const string position = normalizePosition(player.position);
+        if (position == "ARQ") coverage.goalkeepers++;
+        else if (position == "DEF") coverage.defenders++;
+        else if (position == "MED") coverage.midfielders++;
+        else if (position == "DEL") coverage.forwards++;
+    }
+    return coverage;
+}
+
+bool rebalanceWeakestSurplusPlayer(Team& team, RoleCoverage& coverage, const string& targetPosition) {
+    int bestIndex = -1;
+    int bestSkill = 1000;
+    string donorPosition;
+
+    for (size_t i = 0; i < team.players.size(); ++i) {
+        const string currentPosition = normalizePosition(team.players[i].position);
+        if (currentPosition == "N/A" || currentPosition == targetPosition) continue;
+        if (coverageForPosition(coverage, currentPosition) <= roleMinimumForPosition(currentPosition)) continue;
+        if (team.players[i].skill < bestSkill) {
+            bestIndex = static_cast<int>(i);
+            bestSkill = team.players[i].skill;
+            donorPosition = currentPosition;
+        }
+    }
+
+    if (bestIndex < 0) return false;
+    team.players[bestIndex].position = targetPosition;
+    applyPositionStats(team.players[bestIndex]);
+    coverageForPosition(coverage, donorPosition)--;
+    coverageForPosition(coverage, targetPosition)++;
+    return true;
+}
+
+void ensureCompetitiveRoleCoverage(Team& team) {
+    RoleCoverage coverage = countRoleCoverage(team);
+    const int maxSquad = maxSquadForDivision(team.division);
+
+    auto topUpRole = [&](const string& position, int& currentCount, int minimumCount) {
+        if (minimumCount <= 0) return;
+        int minSkill = 40;
+        int maxSkill = 65;
+        getDivisionSkillRange(team.division, minSkill, maxSkill);
+        while (currentCount < minimumCount) {
+            if (rebalanceWeakestSurplusPlayer(team, coverage, position)) {
+                currentCount = coverageForPosition(coverage, position);
+                continue;
+            }
+            if (maxSquad > 0 && static_cast<int>(team.players.size()) >= maxSquad) {
+                break;
+            }
+            team.addPlayer(makeRandomPlayer(position, minSkill, maxSkill, 18, 34));
+            currentCount++;
+        }
+    };
+
+    topUpRole("ARQ", coverage.goalkeepers, 2);
+    topUpRole("DEF", coverage.defenders, 3);
+    topUpRole("MED", coverage.midfielders, 3);
+    topUpRole("DEL", coverage.forwards, 2);
+}
+
+void finalizeLoadedTeam(Team& team, int minimumPlayers = 18) {
+    trimSquadForDivision(team);
+    assignMissingPositions(team);
+    int effectiveMinimum = minimumPlayers;
+    const int maxSquad = maxSquadForDivision(team.division);
+    if (maxSquad > 0) effectiveMinimum = min(effectiveMinimum, maxSquad);
+    ensureMinimumSquad(team, effectiveMinimum);
+    ensureCompetitiveRoleCoverage(team);
+}
+
+}  // namespace
+
 void assignMissingPositions(Team& team) {
     vector<int> unknown;
     int countARQ = 0;
@@ -76,10 +270,6 @@ void assignMissingPositions(Team& team) {
     }
 }
 
-static int maxSquadForDivision(const string& division) {
-    return getCompetitionConfig(division).maxSquadSize;
-}
-
 void trimSquadForDivision(Team& team) {
     int cap = maxSquadForDivision(team.division);
     if (cap <= 0) return;
@@ -122,97 +312,107 @@ bool loadTeamFromCsv(const string& filename, Team& team) {
         string ageStr = cols[3];
         string valueStr = cols[5];
 
-        string normPos = normalizePosition(pos);
-        string normRaw = normalizePosition(posRaw);
-        string norm = "N/A";
-        if (normPos != "N/A" && normRaw != "N/A") {
-            norm = (normPos == normRaw) ? normPos : normRaw;
-        } else if (normRaw != "N/A") {
-            norm = normRaw;
-        } else if (normPos != "N/A") {
-            norm = normPos;
-        }
-        string statPos = (norm == "N/A") ? "MED" : norm;
+        const string norm = resolveRosterPosition(pos, posRaw);
 
         string key = toLower(name);
         if (seen.find(key) != seen.end()) continue;
 
         if (norm == "N/A" && ageStr == "N/A" && valueStr == "N/A") continue;
 
-        int age = parseAge(ageStr);
-        long long value = parseMarketValue(valueStr);
-        int skill = computeSkillFromValue(value, age, team.division);
-        if (value == 0) {
-            int minSkill, maxSkill;
-            getDivisionSkillRange(team.division, minSkill, maxSkill);
-            skill = randInt(minSkill, maxSkill);
-            value = static_cast<long long>(skill) * 10000;
-        }
-
-        int attack = 0;
-        int defense = 0;
-        if (statPos == "ARQ") {
-            attack = clampInt(skill - 30, 10, 70);
-            defense = clampInt(skill + 10, 30, 99);
-        } else if (statPos == "DEF") {
-            attack = clampInt(skill - 10, 20, 90);
-            defense = clampInt(skill + 10, 30, 99);
-        } else if (statPos == "MED") {
-            attack = clampInt(skill, 25, 99);
-            defense = clampInt(skill, 25, 99);
-        } else {
-            attack = clampInt(skill + 10, 30, 99);
-            defense = clampInt(skill - 10, 20, 90);
-        }
-
-        int stamina = clampInt(skill + randInt(-6, 6), 30, 99);
-        if (age > 30) stamina = clampInt(stamina - (age - 30), 25, 99);
-
-        Player p;
-        p.name = name;
-        p.position = norm;
-        p.attack = attack;
-        p.defense = defense;
-        p.stamina = stamina;
-        p.fitness = stamina;
-        p.skill = skill;
-        p.potential = clampInt(p.skill + randInt(0, 10), p.skill, 95);
-        p.age = age;
-        p.value = value;
-        p.wage = static_cast<long long>(p.skill) * 150 + randInt(0, 600);
-        p.releaseClause = max(50000LL, p.value * (18 + randInt(0, 8)) / 10);
-        p.setPieceSkill = clampInt(p.skill + randInt(-8, 8), 25, 99);
-        p.leadership = clampInt(35 + randInt(0, 45), 1, 99);
-        p.professionalism = clampInt(40 + randInt(0, 45), 1, 99);
-        p.ambition = clampInt(35 + randInt(0, 50), 1, 99);
-        p.happiness = clampInt(55 + randInt(-10, 20), 1, 99);
-        p.chemistry = clampInt(45 + randInt(0, 35), 1, 99);
-        p.desiredStarts = 1;
-        p.startsThisSeason = 0;
-        p.wantsToLeave = false;
-        p.onLoan = false;
-        p.parentClub.clear();
-        p.loanWeeksRemaining = 0;
-        p.contractWeeks = randInt(52, 156);
-        p.injured = false;
-        p.injuryType = "";
-        p.injuryWeeks = 0;
-        p.injuryHistory = 0;
-        p.yellowAccumulation = 0;
-        p.seasonYellowCards = 0;
-        p.seasonRedCards = 0;
-        p.matchesSuspended = 0;
-        p.goals = 0;
-        p.assists = 0;
-        p.matchesPlayed = 0;
-        p.lastTrainedSeason = -1;
-        p.lastTrainedWeek = -1;
-        ensurePlayerProfile(p, true);
-        team.addPlayer(p);
+        team.addPlayer(buildLoadedPlayer(name, norm, parseAge(ageStr), parseMarketValue(valueStr), team.division));
         seen.insert(key);
     }
-    trimSquadForDivision(team);
-    assignMissingPositions(team);
+    finalizeLoadedTeam(team);
+    return !team.players.empty();
+}
+
+bool loadTeamFromJson(const string& filename, Team& team) {
+    vector<string> lines;
+    if (!readTextFileLines(filename, lines)) return false;
+
+    team.players.clear();
+    unordered_set<string> seen;
+
+    string currentName;
+    string currentPosition;
+    string currentPositionRaw;
+    string currentAge;
+    string currentValue;
+    bool inObject = false;
+
+    auto readJsonValue = [](const string& line, const string& key) -> string {
+        const string marker = "\"" + key + "\"";
+        size_t pos = line.find(marker);
+        if (pos == string::npos) return "";
+        pos = line.find(':', pos);
+        if (pos == string::npos) return "";
+        string value = trim(line.substr(pos + 1));
+        if (!value.empty() && value.back() == ',') value.pop_back();
+        value = trim(value);
+        if (value.size() >= 2 && value.front() == '"' && value.back() == '"') {
+            value = value.substr(1, value.size() - 2);
+        }
+        return value;
+    };
+
+    auto flushCurrent = [&]() {
+        if (currentName.empty() || toLower(currentName) == "n/a") {
+            currentName.clear();
+            currentPosition.clear();
+            currentPositionRaw.clear();
+            currentAge.clear();
+            currentValue.clear();
+            inObject = false;
+            return;
+        }
+
+        const string key = toLower(currentName);
+        if (seen.find(key) == seen.end()) {
+            const string resolvedPosition = resolveRosterPosition(currentPosition, currentPositionRaw);
+            if (!(resolvedPosition == "N/A" && trim(currentAge) == "N/A" && trim(currentValue) == "N/A")) {
+                team.addPlayer(buildLoadedPlayer(currentName,
+                                                 resolvedPosition,
+                                                 parseAge(currentAge),
+                                                 parseMarketValue(currentValue),
+                                                 team.division));
+                seen.insert(key);
+            }
+        }
+
+        currentName.clear();
+        currentPosition.clear();
+        currentPositionRaw.clear();
+        currentAge.clear();
+        currentValue.clear();
+        inObject = false;
+    };
+
+    for (string line : lines) {
+        line = trim(line);
+        if (line == "{") {
+            inObject = true;
+            continue;
+        }
+        if (!inObject) continue;
+        if (line == "}," || line == "}") {
+            flushCurrent();
+            continue;
+        }
+
+        string value = readJsonValue(line, "name");
+        if (!value.empty()) currentName = value;
+        value = readJsonValue(line, "position");
+        if (!value.empty()) currentPosition = value;
+        value = readJsonValue(line, "position_raw");
+        if (!value.empty()) currentPositionRaw = value;
+        value = readJsonValue(line, "age");
+        if (!value.empty()) currentAge = value;
+        value = readJsonValue(line, "market_value");
+        if (!value.empty()) currentValue = value;
+    }
+    if (inObject) flushCurrent();
+
+    finalizeLoadedTeam(team);
     return !team.players.empty();
 }
 
@@ -232,12 +432,18 @@ bool loadTeamFromPlayersTxt(const string& filename, Team& team) {
         string name = trim(parts[0]);
         if (name.empty() || toLower(name) == "n/a") continue;
 
-        string posPart = parts[1];
-        string posToken = posPart;
-        size_t sp = posPart.find(' ');
-        if (sp != string::npos) posToken = posPart.substr(0, sp);
-        string norm = normalizePosition(posToken);
-        string statPos = (norm == "N/A") ? "MED" : norm;
+        string posPart = trim(parts[1]);
+        string positionRaw;
+        string position = posPart;
+        size_t open = posPart.find('(');
+        size_t close = posPart.rfind(')');
+        if (open != string::npos && close != string::npos && close > open) {
+            positionRaw = trim(posPart.substr(open + 1, close - open - 1));
+            position = trim(posPart.substr(0, open));
+        }
+        size_t sp = position.find(' ');
+        if (sp != string::npos) position = position.substr(0, sp);
+        const string norm = resolveRosterPosition(position, positionRaw);
 
         int age = 24;
         long long value = 0;
@@ -255,77 +461,10 @@ bool loadTeamFromPlayersTxt(const string& filename, Team& team) {
         string key = toLower(name);
         if (seen.find(key) != seen.end()) continue;
 
-        int skill = computeSkillFromValue(value, age, team.division);
-        if (value == 0) {
-            int minSkill, maxSkill;
-            getDivisionSkillRange(team.division, minSkill, maxSkill);
-            skill = randInt(minSkill, maxSkill);
-            value = static_cast<long long>(skill) * 10000;
-        }
-
-        int attack = 0;
-        int defense = 0;
-        if (statPos == "ARQ") {
-            attack = clampInt(skill - 30, 10, 70);
-            defense = clampInt(skill + 10, 30, 99);
-        } else if (statPos == "DEF") {
-            attack = clampInt(skill - 10, 20, 90);
-            defense = clampInt(skill + 10, 30, 99);
-        } else if (statPos == "MED") {
-            attack = clampInt(skill, 25, 99);
-            defense = clampInt(skill, 25, 99);
-        } else {
-            attack = clampInt(skill + 10, 30, 99);
-            defense = clampInt(skill - 10, 20, 90);
-        }
-        int stamina = clampInt(skill + randInt(-6, 6), 30, 99);
-        if (age > 30) stamina = clampInt(stamina - (age - 30), 25, 99);
-
-        Player p;
-        p.name = name;
-        p.position = norm;
-        p.attack = attack;
-        p.defense = defense;
-        p.stamina = stamina;
-        p.fitness = stamina;
-        p.skill = skill;
-        p.potential = clampInt(p.skill + randInt(0, 10), p.skill, 95);
-        p.age = age;
-        p.value = value;
-        p.wage = static_cast<long long>(p.skill) * 150 + randInt(0, 600);
-        p.releaseClause = max(50000LL, p.value * (18 + randInt(0, 8)) / 10);
-        p.setPieceSkill = clampInt(p.skill + randInt(-8, 8), 25, 99);
-        p.leadership = clampInt(35 + randInt(0, 45), 1, 99);
-        p.professionalism = clampInt(40 + randInt(0, 45), 1, 99);
-        p.ambition = clampInt(35 + randInt(0, 50), 1, 99);
-        p.happiness = clampInt(55 + randInt(-10, 20), 1, 99);
-        p.chemistry = clampInt(45 + randInt(0, 35), 1, 99);
-        p.desiredStarts = 1;
-        p.startsThisSeason = 0;
-        p.wantsToLeave = false;
-        p.onLoan = false;
-        p.parentClub.clear();
-        p.loanWeeksRemaining = 0;
-        p.contractWeeks = randInt(52, 156);
-        p.injured = false;
-        p.injuryType = "";
-        p.injuryWeeks = 0;
-        p.injuryHistory = 0;
-        p.yellowAccumulation = 0;
-        p.seasonYellowCards = 0;
-        p.seasonRedCards = 0;
-        p.matchesSuspended = 0;
-        p.goals = 0;
-        p.assists = 0;
-        p.matchesPlayed = 0;
-        p.lastTrainedSeason = -1;
-        p.lastTrainedWeek = -1;
-        ensurePlayerProfile(p, true);
-        team.addPlayer(p);
+        team.addPlayer(buildLoadedPlayer(name, norm, age, value, team.division));
         seen.insert(key);
     }
-    trimSquadForDivision(team);
-    assignMissingPositions(team);
+    finalizeLoadedTeam(team);
     return !team.players.empty();
 }
 
@@ -397,18 +536,24 @@ bool loadTeamFromLegacyTxt(const string& filename, Team& team) {
             team.addPlayer(p);
         }
     }
-    assignMissingPositions(team);
+    finalizeLoadedTeam(team, 11);
     return !team.players.empty();
 }
 
 bool loadTeamFromFile(const string& filename, Team& team) {
     if (isDirectory(filename)) {
         string csv = joinPath(filename, "players.csv");
-        if (pathExists(csv)) return loadTeamFromCsv(csv, team);
+        if (pathExists(csv) && loadTeamFromCsv(csv, team)) return true;
+        string txt = joinPath(filename, "players.txt");
+        if (pathExists(txt) && loadTeamFromPlayersTxt(txt, team)) return true;
+        if (pathExists(txt) && loadTeamFromLegacyTxt(txt, team)) return true;
+        string json = joinPath(filename, "players.json");
+        if (pathExists(json) && loadTeamFromJson(json, team)) return true;
         return false;
     }
     string ext = toLower(pathExtension(filename));
     if (ext == ".csv") return loadTeamFromCsv(filename, team);
+    if (ext == ".json") return loadTeamFromJson(filename, team);
     if (ext == ".txt") {
         if (loadTeamFromPlayersTxt(filename, team)) return true;
         return loadTeamFromLegacyTxt(filename, team);
@@ -417,6 +562,8 @@ bool loadTeamFromFile(const string& filename, Team& team) {
 }
 
 void ensureMinimumSquad(Team& team, int minPlayers) {
+    const int maxSquad = maxSquadForDivision(team.division);
+    if (maxSquad > 0) minPlayers = min(minPlayers, maxSquad);
     if (static_cast<int>(team.players.size()) >= minPlayers) return;
     int minSkill, maxSkill;
     getDivisionSkillRange(team.division, minSkill, maxSkill);
@@ -467,11 +614,18 @@ DivisionLoadResult loadDivisionFromFolder(const string& folder, const string& di
 
         bool loaded = false;
         string csv = joinPath(dir, "players.csv");
-        if (pathExists(csv)) {
-            loaded = loadTeamFromCsv(csv, team);
-        }
+        if (pathExists(csv) && loadTeamFromCsv(csv, team)) loaded = true;
+
+        string txt = joinPath(dir, "players.txt");
+        if (!loaded && pathExists(txt) && loadTeamFromPlayersTxt(txt, team)) loaded = true;
+        if (!loaded && pathExists(txt) && loadTeamFromLegacyTxt(txt, team)) loaded = true;
+
+        string json = joinPath(dir, "players.json");
+        if (!loaded && pathExists(json) && loadTeamFromJson(json, team)) loaded = true;
 
         if (!loaded) {
+            result.warnings.push_back("Plantilla invalida o incompleta, se genera una base temporal para " + teamName +
+                                      " (" + divisionDisplay(divisionId) + ").");
             int minSkill, maxSkill;
             getDivisionSkillRange(divisionId, minSkill, maxSkill);
             vector<string> positions = {
@@ -485,7 +639,7 @@ DivisionLoadResult loadDivisionFromFolder(const string& folder, const string& di
             }
         }
 
-        ensureMinimumSquad(team, 18);
+        finalizeLoadedTeam(team);
 
         int divisor = getCompetitionConfig(divisionId).budgetDivisor;
         if (divisor <= 0) divisor = 6;

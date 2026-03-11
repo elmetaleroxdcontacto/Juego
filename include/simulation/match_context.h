@@ -11,6 +11,13 @@ struct TeamMatchSnapshot {
     int defensePower = 0;
     int midfieldControl = 0;
     int goalkeeperPower = 0;
+    int chanceCreation = 0;
+    int finishingQuality = 0;
+    int pressResistance = 0;
+    int defensiveShape = 0;
+    int lineBreakThreat = 0;
+    int pressingLoad = 0;
+    int setPieceThreat = 0;
     int averageSkill = 0;
     int averageStamina = 0;
     int collectiveForm = 0;

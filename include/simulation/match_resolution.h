@@ -10,6 +10,8 @@ struct ChanceResolutionInput {
     double chanceQuality = 0.0;
     double attackingEdge = 0.0;
     double defensivePressure = 0.0;
+    double finishingSupport = 0.0;
+    double goalkeeperQuality = 0.0;
 };
 
 struct ChanceResolutionOutput {
@@ -30,5 +32,21 @@ double opportunityProbability(double effectiveAttack,
                               double possessionFactor,
                               double mentalityFactor,
                               double matchMomentFactor);
+double progressionProbability(double buildUpQuality,
+                              double pressResistance,
+                              double opponentPressingLoad,
+                              double possessionFactor,
+                              double matchMomentFactor);
+double attackConversionProbability(double lineBreakThreat,
+                                   double opponentDefensiveShape,
+                                   double tacticalRisk,
+                                   double mentalityFactor,
+                                   double fatigueFactor);
+double shotCreationProbability(double chanceCreation,
+                               double finishingQuality,
+                               double opponentDefense,
+                               double defensiveRisk,
+                               double setPieceThreat,
+                               double fatigueFactor);
 
 }  // namespace match_resolution

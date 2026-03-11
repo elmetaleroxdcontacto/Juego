@@ -543,6 +543,13 @@ static int selectionScore(const Team& team, int idx) {
     } else if (team.rotationPolicy == "Rotacion") {
         score = player.skill * 8 + player.fitness * 6 + player.currentForm * 2 + player.versatility -
                 player.matchesPlayed * 2;
+        if (player.age <= 21) score += max(0, player.potential - player.skill) * 3;
+    }
+    if (player.age <= 20 && player.potential >= player.skill + 8 && team.youthCoach >= 65) {
+        score += 10 + max(0, player.potential - player.skill) * 2;
+    }
+    if (player.age <= 21 && player.fitness >= 72 && team.rotationPolicy != "Titulares") {
+        score += 6;
     }
     if (player.wantsToLeave) score -= 12;
     if (!team.captain.empty() && player.name == team.captain) score += 10;

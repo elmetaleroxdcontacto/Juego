@@ -2,10 +2,12 @@
 
 #include "competition.h"
 #include "io/io.h"
+#include "io/save_serialization.h"
 #include "models.h"
 #include "utils.h"
 
 #include <algorithm>
+#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -199,10 +201,19 @@ static string combinedPositionText(const RawPlayerRecord& player) {
     return toLower(trim(player.position + " " + player.positionRaw));
 }
 
+static string resolvedRawPosition(const RawPlayerRecord& player) {
+    const string directPosition = normalizePosition(player.position);
+    const string rawPosition = normalizePosition(player.positionRaw);
+    if (directPosition != "N/A" && rawPosition != "N/A") {
+        return directPosition == rawPosition ? directPosition : rawPosition;
+    }
+    if (rawPosition != "N/A") return rawPosition;
+    if (directPosition != "N/A") return directPosition;
+    return "N/A";
+}
+
 static string rawNormalizedPosition(const RawPlayerRecord& player) {
-    string position = normalizePosition(player.position);
-    if (position != "N/A") return position;
-    return normalizePosition(player.positionRaw);
+    return resolvedRawPosition(player);
 }
 
 static bool isGoalkeeperRole(const RawPlayerRecord& player) {
@@ -394,7 +405,9 @@ static ValidationResult validateSaveLoad() {
         return {"Guardado/carga", false, "No hay equipos en la division inicial."};
     }
     career.myTeam = career.activeTeams.front();
-    career.saveFile = "saves/validation_career_save.txt";
+    career.saveFile = "saves/validation_career_save_runtime.txt";
+    std::remove(career.saveFile.c_str());
+    std::remove((career.saveFile + ".tmp").c_str());
     career.currentSeason = 2;
     career.currentWeek = 3;
     career.resetSeason();
@@ -432,16 +445,19 @@ static ValidationResult validateSaveLoad() {
     }
     career.addNews("Prueba de guardado.");
     career.scoutingShortlist.push_back("Club Prueba|Jugador Prueba");
-    career.saveCareer();
+    if (!career.saveCareer()) {
+        return {"Guardado/carga", false, "No se pudo escribir el archivo de validacion."};
+    }
 
     ifstream rawSave(career.saveFile);
     string firstLine;
-    if (!rawSave.is_open() || !getline(rawSave, firstLine) || firstLine.rfind("VERSION ", 0) != 0) {
+    const string expectedVersionLine = "VERSION " + to_string(save_serialization::currentCareerSaveVersion());
+    if (!rawSave.is_open() || !getline(rawSave, firstLine) || trim(firstLine) != expectedVersionLine) {
         return {"Guardado/carga", false, "El archivo guardado no incluye version de save."};
     }
 
     Career loaded;
-    loaded.saveFile = "saves/validation_career_save.txt";
+    loaded.saveFile = career.saveFile;
     loaded.initializeLeague(true);
     if (!loaded.loadCareer()) {
         return {"Guardado/carga", false, "No pudo recargar el archivo de validacion."};
@@ -507,6 +523,101 @@ static ValidationResult validateTableSorting() {
         return {"Desempates", false, "El orden de tabla esperado no coincide."};
     }
     return {"Desempates", true, "Orden de tabla base validado."};
+}
+
+RuntimeValidationSummary validateLoadedCareerData(const Career& career, size_t maxLines) {
+    RuntimeValidationSummary summary{};
+    summary.ok = true;
+    summary.errorCount = 0;
+    summary.warningCount = 0;
+    summary.lines.push_back("Validacion automatica de carga");
+
+    auto pushLine = [&](bool error, const string& line) {
+        if (error) summary.errorCount++;
+        else summary.warningCount++;
+        if (summary.lines.size() <= maxLines) {
+            summary.lines.push_back(string(error ? "[ERROR] " : "[WARN] ") + line);
+        }
+    };
+
+    for (const string& warning : competitionConfigWarnings()) {
+        pushLine(false, warning);
+    }
+
+    for (const DivisionInfo& division : career.divisions) {
+        int teamCount = 0;
+        for (const Team& team : career.allTeams) {
+            if (team.division == division.id) teamCount++;
+        }
+        const CompetitionConfig& config = getCompetitionConfig(division.id);
+        if (config.expectedTeamCount > 0 && teamCount != config.expectedTeamCount) {
+            pushLine(true,
+                     division.id + ": cantidad de equipos cargados " + to_string(teamCount) +
+                         " no coincide con la regla " + to_string(config.expectedTeamCount) + ".");
+        }
+    }
+
+    set<string> globalTeamKeys;
+    for (const Team& team : career.allTeams) {
+        const string teamKey = toLower(trim(team.division + "|" + team.name));
+        if (!globalTeamKeys.insert(teamKey).second) {
+            pushLine(true, team.division + ": equipo duplicado en memoria -> " + team.name + ".");
+        }
+
+        const int maxSquad = getCompetitionConfig(team.division).maxSquadSize;
+        if (static_cast<int>(team.players.size()) < 11) {
+            pushLine(true, team.name + ": plantilla insuficiente para simular.");
+        }
+        if (maxSquad > 0 && static_cast<int>(team.players.size()) > maxSquad) {
+            pushLine(true, team.name + ": excede el maximo de plantel de la division.");
+        }
+
+        int goalkeepers = 0;
+        int defenders = 0;
+        int midfielders = 0;
+        int forwards = 0;
+        set<string> names;
+        for (const Player& player : team.players) {
+            const string playerKey = toLower(trim(player.name));
+            if (!names.insert(playerKey).second) {
+                pushLine(true, team.name + ": jugador duplicado -> " + player.name + ".");
+            }
+            const string pos = normalizePosition(player.position);
+            if (pos == "ARQ") goalkeepers++;
+            else if (pos == "DEF") defenders++;
+            else if (pos == "MED") midfielders++;
+            else if (pos == "DEL") forwards++;
+            else pushLine(true, team.name + ": jugador sin posicion valida -> " + player.name + ".");
+        }
+
+        if (goalkeepers < 1) pushLine(true, team.name + ": no tiene arquero disponible.");
+        if (defenders < 2) pushLine(false, team.name + ": defensa demasiado corta (" + to_string(defenders) + ").");
+        if (midfielders < 2) pushLine(false, team.name + ": mediocampo demasiado corto (" + to_string(midfielders) + ").");
+        if (forwards < 1) pushLine(false, team.name + ": falta profundidad ofensiva.");
+
+        for (const string& preferred : team.preferredXI) {
+            bool exists = false;
+            for (const Player& player : team.players) {
+                if (player.name == preferred) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                pushLine(false, team.name + ": preferredXI referencia un jugador ausente -> " + preferred + ".");
+            }
+        }
+    }
+
+    if (summary.errorCount == 0 && summary.warningCount == 0) {
+        summary.lines.push_back("[OK] La carga no detecto inconsistencias estructurales.");
+    } else if (summary.lines.size() > maxLines + 1) {
+        const int omitted = static_cast<int>(summary.lines.size() - (maxLines + 1));
+        summary.lines.resize(maxLines + 1);
+        summary.lines.push_back("... " + to_string(omitted) + " incidencia(s) adicionales omitidas.");
+    }
+    summary.ok = (summary.errorCount == 0);
+    return summary;
 }
 
 DataValidationReport buildRosterDataValidationReport() {
@@ -923,9 +1034,14 @@ ValidationSuiteSummary buildValidationSuiteSummary() {
         summary.lines.push_back(string(result.ok ? "[OK] " : "[FAIL] ") + result.name + ": " + result.detail);
     }
     summary.lines.insert(summary.lines.end(), rosterReport.lines.begin(), rosterReport.lines.end());
-    summary.ok = (failures == 0);
+    summary.ok = (failures == 0 && rosterReport.errorCount == 0);
     summary.lines.push_back("");
-    summary.lines.push_back("Resultado: " + (summary.ok ? string("sin fallas") : to_string(failures) + " falla(s)"));
+    if (summary.ok) {
+        summary.lines.push_back("Resultado: sin fallas");
+    } else {
+        summary.lines.push_back("Resultado: " + to_string(failures) + " falla(s) logica(s), " +
+                                to_string(rosterReport.errorCount) + " error(es) de datos.");
+    }
     return summary;
 }
 

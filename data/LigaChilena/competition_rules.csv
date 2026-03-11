@@ -1,0 +1,6 @@
+id,table_profile,season_handler,groups_enabled,group_size,double_round_robin,north_title,south_title,base_income,wage_factor,budget_divisor,max_squad_size,expected_team_count
+primera division,PrimeraLike,PrimeraDivision,false,0,true,Grupo Norte,Grupo Sur,60000,85,3,0,16
+primera b,PrimeraLike,PrimeraB,false,0,true,Grupo Norte,Grupo Sur,45000,70,4,0,16
+segunda division,Default,SegundaGroups,true,7,true,Grupo Norte,Grupo Sur,35000,60,5,0,14
+tercera division a,TerceraA,TerceraA,false,0,true,Grupo Norte,Grupo Sur,25000,50,6,30,16
+tercera division b,TerceraB,TerceraB,true,14,false,Zona Norte,Zona Sur,20000,45,6,30,28

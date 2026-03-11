@@ -68,6 +68,7 @@ MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch, 
                                                                                  minuteEnd,
                                                                                  stats.homeGoals,
                                                                                  stats.awayGoals,
+                                                                                 static_cast<int>(awayState.xi.size()),
                                                                                  timeline);
         const bool awayTacticalChange = ai_match_manager::applyInMatchManagement(awayState.team,
                                                                                  homeState.team,
@@ -77,6 +78,7 @@ MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch, 
                                                                                  minuteEnd,
                                                                                  stats.awayGoals,
                                                                                  stats.homeGoals,
+                                                                                 static_cast<int>(homeState.xi.size()),
                                                                                  timeline);
 
         const TeamMatchSnapshot homeSnapshot = match_context::rebuildSnapshot(homeState.team, awayState.team, homeState.xi, keyMatch);

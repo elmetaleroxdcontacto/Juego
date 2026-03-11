@@ -3,6 +3,7 @@
 #include "competition/competition.h"
 #include "io/io.h"
 #include "utils/utils.h"
+#include "validators/validators.h"
 
 #include <algorithm>
 #include <sstream>
@@ -177,6 +178,10 @@ void Career::initializeLeague(bool forceReload) {
     activeDivision.clear();
     loadWarnings.clear();
 
+    reloadCompetitionConfigs();
+    const vector<string>& configWarnings = competitionConfigWarnings();
+    loadWarnings.insert(loadWarnings.end(), configWarnings.begin(), configWarnings.end());
+
     for (const auto& div : kDivisions) {
         if (!isDirectory(div.folder)) continue;
         DivisionLoadResult divisionLoad = loadDivisionFromFolder(div.folder, div.id, allTeams);
@@ -186,6 +191,12 @@ void Career::initializeLeague(bool forceReload) {
         }
     }
     for (auto& team : allTeams) ensureTeamIdentity(team);
+
+    const RuntimeValidationSummary validation = validateLoadedCareerData(*this, 10);
+    for (const string& line : validation.lines) {
+        if (line == "Validacion automatica de carga") continue;
+        loadWarnings.push_back(line);
+    }
     initialized = true;
 }
 

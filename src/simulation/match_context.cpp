@@ -42,6 +42,13 @@ TeamMatchSnapshot buildSnapshot(const Team& team,
     int form = 0;
     int morale = team.morale;
     int fatigue = 0;
+    int chanceCreation = 0;
+    int finishingQuality = 0;
+    int pressResistance = 0;
+    int defensiveShape = 0;
+    int lineBreakThreat = 0;
+    int pressingLoad = 0;
+    int setPieceThreat = 0;
 
     for (int idx : snapshot.xi) {
         if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
@@ -60,18 +67,40 @@ TeamMatchSnapshot buildSnapshot(const Team& team,
         form += player.currentForm;
         morale += player.happiness / 2 + player.chemistry / 3;
         fatigue += max(0, 100 - player.fitness);
+        chanceCreation += player.attack / 2 + player.currentForm / 2 + player.chemistry / 3;
+        pressResistance += player.tacticalDiscipline + player.consistency / 2 + player.chemistry / 2;
+        defensiveShape += player.defense + player.tacticalDiscipline + player.chemistry / 2;
+        lineBreakThreat += player.attack + player.currentForm / 2 + player.versatility / 3;
+        setPieceThreat = max(setPieceThreat, player.setPieceSkill);
+        pressingLoad += player.professionalism / 2 + player.stamina / 2 + player.currentForm / 3;
 
         if (pos == "ARQ") {
             snapshot.goalkeeperPower = max(snapshot.goalkeeperPower,
                                            playerDefense + player.skill / 2 + player.consistency / 3);
             midfield += player.tacticalDiscipline / 2;
+            defensiveShape += player.defense / 2 + player.leadership / 3;
         } else if (pos == "DEF") {
             midfield += playerDefense / 3 + player.tacticalDiscipline / 2;
+            defensiveShape += player.defense / 2 + player.tacticalDiscipline / 2;
+            if (playerHasTrait(player, "Muralla")) defensiveShape += 8;
         } else if (pos == "MED") {
             midfield += (playerAttack + playerDefense) / 2 + player.tacticalDiscipline / 2 + player.chemistry / 3;
+            chanceCreation += player.attack / 2 + player.skill / 3 + player.chemistry / 2;
+            pressResistance += player.professionalism / 2 + player.chemistry / 2;
+            if (playerHasTrait(player, "Pase riesgoso")) chanceCreation += 8;
+            if (playerHasTrait(player, "Dos perfiles")) pressResistance += 4;
         } else if (pos == "DEL") {
             midfield += playerAttack / 4 + player.currentForm / 2;
+            finishingQuality += player.attack + player.currentForm / 2 + player.bigMatches / 2 + player.consistency / 2;
+            lineBreakThreat += player.attack / 2 + player.currentForm / 2;
+            if (playerHasTrait(player, "Competidor")) finishingQuality += 8;
+            if (playerHasTrait(player, "Llega al area")) lineBreakThreat += 6;
         }
+
+        const string compactRole = match_internal::compactToken(player.role);
+        if (compactRole == "poacher" || compactRole == "objetivo") finishingQuality += 5;
+        if (compactRole == "organizador" || compactRole == "enganche") chanceCreation += 6;
+        if (compactRole == "carrilero") lineBreakThreat += 5;
     }
 
     match_internal::applyFormationBias(team, snapshot.xi, attack, defense);
@@ -102,6 +131,60 @@ TeamMatchSnapshot buildSnapshot(const Team& team,
     snapshot.moraleFactor = morale_engine::collectiveMoraleFactor(team, snapshot.xi, keyMatch);
     snapshot.fatigueFactor = fatigue_engine::collectiveFatigueFactor(team, snapshot.xi);
     snapshot.tacticalCompatibility = tactics_engine::tacticalCompatibility(team, snapshot.xi);
+    snapshot.chanceCreation =
+        chanceCreation / max(1, static_cast<int>(snapshot.xi.size())) + snapshot.midfieldControl / 3 + snapshot.collectiveForm / 4;
+    snapshot.finishingQuality =
+        max(42, finishingQuality / max(1, max(1, static_cast<int>(snapshot.xi.size()) / 3)) + snapshot.averageSkill / 4);
+    snapshot.pressResistance =
+        pressResistance / max(1, static_cast<int>(snapshot.xi.size())) + snapshot.midfieldControl / 4 + snapshot.collectiveMorale / 5;
+    snapshot.defensiveShape =
+        defensiveShape / max(1, static_cast<int>(snapshot.xi.size())) + snapshot.defensePower / 4 + snapshot.goalkeeperPower / 5;
+    snapshot.lineBreakThreat =
+        lineBreakThreat / max(1, static_cast<int>(snapshot.xi.size())) + snapshot.attackPower / 4 + snapshot.collectiveForm / 5;
+    snapshot.pressingLoad =
+        pressingLoad / max(1, static_cast<int>(snapshot.xi.size())) + team.pressingIntensity * 4 + team.tempo * 2;
+    snapshot.setPieceThreat = max(setPieceThreat, 35) + team.width * 2;
+
+    if (team.matchInstruction == "Por bandas") {
+        snapshot.lineBreakThreat += 5;
+        snapshot.chanceCreation += 4;
+    } else if (team.matchInstruction == "Juego directo") {
+        snapshot.lineBreakThreat += 8;
+        snapshot.pressResistance -= 3;
+    } else if (team.matchInstruction == "Balon parado") {
+        snapshot.setPieceThreat += 10;
+        snapshot.chanceCreation += 2;
+    } else if (team.matchInstruction == "Bloque bajo") {
+        snapshot.defensiveShape += 8;
+        snapshot.pressingLoad -= 4;
+    } else if (team.matchInstruction == "Pausar juego") {
+        snapshot.pressResistance += 5;
+        snapshot.pressingLoad -= 5;
+    }
+
+    if (team.tactics == "Pressing") {
+        snapshot.pressingLoad += 8;
+        snapshot.chanceCreation += 3;
+        snapshot.defensiveShape -= 2;
+    } else if (team.tactics == "Counter") {
+        snapshot.lineBreakThreat += 7;
+        snapshot.pressResistance += 2;
+    } else if (team.tactics == "Defensive") {
+        snapshot.defensiveShape += 7;
+        snapshot.chanceCreation -= 3;
+    } else if (team.tactics == "Offensive") {
+        snapshot.chanceCreation += 6;
+        snapshot.finishingQuality += 4;
+        snapshot.defensiveShape -= 3;
+    }
+
+    snapshot.chanceCreation = clampInt(snapshot.chanceCreation, 35, 130);
+    snapshot.finishingQuality = clampInt(snapshot.finishingQuality, 38, 130);
+    snapshot.pressResistance = clampInt(snapshot.pressResistance, 35, 125);
+    snapshot.defensiveShape = clampInt(snapshot.defensiveShape, 35, 130);
+    snapshot.lineBreakThreat = clampInt(snapshot.lineBreakThreat, 35, 130);
+    snapshot.pressingLoad = clampInt(snapshot.pressingLoad, 28, 125);
+    snapshot.setPieceThreat = clampInt(snapshot.setPieceThreat, 30, 125);
 
     if (team.tactics == "Counter" && opponent.defensiveLine >= 4) snapshot.attackPower += 5;
     if (team.tactics == "Defensive" && opponent.tactics == "Offensive") snapshot.defensePower += 4;

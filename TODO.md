@@ -95,6 +95,28 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - [x] Roles por jugador, salarios/contratos, historial de lesiones y plan de entrenamiento semanal.
 - [x] Scouting con incertidumbre, desarrollo juvenil, eventos de club y dashboard semanal.
 - [x] IA tactica adaptativa, partidos clave y modo Copa (eliminacion directa).
+
+## Cambios recientes (2026-03-11) - Validacion, carga de planteles y saves
+- La suite de validacion ahora falla correctamente si la auditoria de plantillas detecta errores de datos.
+- La auditoria sigue generando `saves/roster_validation_report.txt` y ya no puede dar falso verde.
+- Se unifico la resolucion de posiciones entre cargador y validador, priorizando `position_raw` cuando corresponde.
+- La carga por carpeta ahora usa fallback real: `players.csv -> players.txt -> legacy txt -> players.json`.
+- Se agrego soporte directo para `players.json`.
+- La normalizacion final del plantel ahora respeta el maximo por division y rebalancea cobertura minima de roles sin exceder el cupo.
+- Se endurecio el sistema de guardado/carga:
+  - version de save subida a `VERSION 8`
+  - escape de delimitadores y parseo seguro
+  - escritura a `.tmp` con reemplazo atomico y fallback de copia si Windows no permite el rename
+- La validacion de save/load ahora usa un archivo runtime dedicado y comprueba la version real escrita en disco.
+- Tests reforzados/agregados:
+  - `validation_suite`
+  - `save_load_roundtrip`
+  - `loader_fallback`
+- Verificacion realizada:
+  - `FootballManager.exe --validate`: 0 fallas logicas
+  - `FootballManagerTests.exe`: todos los tests pasan
+- Pendiente de datos:
+  - la base de plantillas sigue reportando `9236` errores y `1283` advertencias en la auditoria; eso requiere limpiar archivos en `data/`, no mas cambios de runtime.
  
 ## Cambios recientes (2026-03-05)
 - Implementado formato de Segunda División (14 equipos) con grupos Norte/Sur, calendario intra-grupo ida/vuelta (14 fechas), tablas por grupo y clasificación automática a playoff/descenso.

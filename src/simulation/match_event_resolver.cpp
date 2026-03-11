@@ -63,7 +63,7 @@ int goalkeeperIndex(const Team& team, const vector<int>& xi) {
 }
 
 double clampProbability(double value) {
-    return clampValue(value, 0.03, 0.78);
+    return clampValue(value, 0.02, 0.66);
 }
 
 }  // namespace
@@ -92,7 +92,7 @@ ChanceResolutionOutput resolveChance(const Team& attacking,
                                : nullptr;
 
     const string attackerName = shooter ? shooter->name : attacking.name;
-    const double quality = clampValue(input.chanceQuality, 0.06, input.bigChance ? 0.68 : 0.45);
+    const double quality = clampValue(input.chanceQuality, 0.05, input.bigChance ? 0.54 : 0.34);
     output.expectedGoals = quality;
 
     const double finishing = shooter ? (shooter->attack * 0.44 + shooter->skill * 0.18 + shooter->currentForm * 0.16 +
@@ -103,10 +103,12 @@ ChanceResolutionOutput resolveChance(const Team& attacking,
                                      : 48.0;
     const double fatiguePenalty = shooter ? max(0, 60 - shooter->fitness) / 150.0 : 0.0;
     const double onTargetProbability =
-        clampProbability(0.28 + quality * 0.68 + finishing / 280.0 - input.defensivePressure * 0.08 - fatiguePenalty);
+        clampProbability(0.20 + quality * 0.52 + finishing / 360.0 + input.finishingSupport * 0.10 -
+                         input.defensivePressure * 0.10 - input.goalkeeperQuality * 0.05 - fatiguePenalty);
     const double goalProbability =
-        clampProbability(0.06 + quality * 0.58 + finishing / 320.0 - goalkeeper / 290.0 -
-                         input.defensivePressure * 0.10 - fatiguePenalty);
+        clampProbability(0.02 + quality * 0.40 + finishing / 410.0 + input.finishingSupport * 0.08 -
+                         goalkeeper / 255.0 - input.defensivePressure * 0.12 -
+                         input.goalkeeperQuality * 0.05 - fatiguePenalty + (input.bigChance ? 0.06 : 0.0));
 
     output.attemptEvent.minute = input.minute;
     output.attemptEvent.teamName = attacking.name;
@@ -143,7 +145,7 @@ ChanceResolutionOutput resolveChance(const Team& attacking,
         resolution.description = keeper ? keeper->name + " responde y evita el gol" : "el portero contiene el remate";
     } else {
         resolution.type = MatchEventType::Miss;
-        resolution.description = attackerName + " no encuentra porteria";
+        resolution.description = attackerName + " no logra direccionar bien el remate";
     }
     output.outcomeEvents.push_back(resolution);
 

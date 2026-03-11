@@ -58,15 +58,18 @@ void playPhaseSequences(Team& attacking,
 
     const double transitionThreat = tactics_engine::transitionThreatWeight(attackingSnapshot.tacticalProfile);
     const double attackingSecurity = tactics_engine::defensiveSecurityWeight(attackingSnapshot.tacticalProfile);
-    const double progressionSuccess = clampValue(0.40 + attackingSnapshot.tacticalProfile.width * 0.08 +
-                                                     attackingSnapshot.tacticalProfile.tempo * 0.07 +
-                                                     possessionChains * 0.015 + attackingEdge * 0.002 +
-                                                     defensiveRisk * 0.10,
-                                                 0.18, 0.92);
+    const double progressionSuccess = clampValue(0.28 + attackingSnapshot.pressResistance / 210.0 +
+                                                     attackingSnapshot.chanceCreation / 260.0 +
+                                                     attackingSnapshot.tacticalProfile.width * 0.06 +
+                                                     possessionChains * 0.010 + attackingEdge * 0.0015 -
+                                                     defendingSnapshot.pressingLoad / 420.0 +
+                                                     defensiveRisk * 0.08,
+                                                 0.16, 0.82);
     const double chanceReachProbability = clampValue(
-        0.12 + static_cast<double>(chanceCount + 1) / static_cast<double>(max(1, attackCount + 2)) +
-            attackingEdge * 0.003 + transitionThreat * 0.12 + defensiveRisk * 0.10 + attackingSecurity * 0.04,
-        0.08, 0.82);
+        0.08 + static_cast<double>(chanceCount + 1) / static_cast<double>(max(1, attackCount + 3)) +
+            attackingEdge * 0.0025 + transitionThreat * 0.10 + defensiveRisk * 0.08 + attackingSecurity * 0.03 +
+            attackingSnapshot.finishingQuality / 420.0 - defendingSnapshot.defensiveShape / 620.0,
+        0.06, 0.66);
 
     for (int i = 0; i < attackCount; ++i) {
         const int minute = randInt(minuteStart, minuteEnd);
@@ -93,16 +96,21 @@ void playPhaseSequences(Team& attacking,
         match_stats::pushEvent(timeline, stats, buildUp);
 
         if (rand01() > chanceReachProbability) {
-            if (rand01() <= clampValue(0.10 + max(0.0, 0.45 - defensiveRisk) * 0.24, 0.05, 0.28)) {
-                MatchEvent interruption;
-                interruption.minute = minute;
-                interruption.teamName = attacking.name;
-                interruption.type = rand01() <= 0.60 ? MatchEventType::Offside : MatchEventType::Foul;
-                interruption.description = interruption.type == MatchEventType::Offside
-                                               ? attacking.name + " rompe mal la linea y cae en offside"
-                                               : defending.name + " corta la jugada antes del remate";
-                match_stats::pushEvent(timeline, stats, interruption);
+            MatchEvent interruption;
+            interruption.minute = minute;
+            interruption.teamName = rand01() <= 0.55 ? defending.name : attacking.name;
+            const double interruptionRoll = rand01();
+            if (interruptionRoll <= 0.38) {
+                interruption.type = MatchEventType::Offside;
+                interruption.description = attacking.name + " rompe mal la linea y queda adelantado";
+            } else if (interruptionRoll <= 0.72) {
+                interruption.type = MatchEventType::Foul;
+                interruption.description = defending.name + " frena la jugada antes de que llegue al area";
+            } else {
+                interruption.type = MatchEventType::Progression;
+                interruption.description = defending.name + " recupera y obliga a reiniciar la posesion";
             }
+            match_stats::pushEvent(timeline, stats, interruption);
             continue;
         }
 
@@ -117,10 +125,14 @@ void playPhaseSequences(Team& attacking,
         input.attackingTeamIsHome = attackingIsHome;
         input.chanceQuality = clampValue(0.06 + attackingEdge * 0.010 + bigChance * 0.18 +
                                              transitionThreat * 0.12 -
-                                             tactics_engine::defensiveSecurityWeight(defendingSnapshot.tacticalProfile) * 0.05,
-                                         0.06, 0.70);
+                                             tactics_engine::defensiveSecurityWeight(defendingSnapshot.tacticalProfile) * 0.05 +
+                                             attackingSnapshot.finishingQuality / 500.0 -
+                                             defendingSnapshot.goalkeeperPower / 950.0,
+                                         0.05, 0.52);
         input.attackingEdge = attackingEdge;
-        input.defensivePressure = max(0.10, defendingSnapshot.defensePower / 210.0);
+        input.defensivePressure = max(0.14, defendingSnapshot.defensePower / 185.0 + defendingSnapshot.pressingLoad / 520.0);
+        input.finishingSupport = attackingSnapshot.finishingQuality / 100.0;
+        input.goalkeeperQuality = defendingSnapshot.goalkeeperPower / 100.0;
 
         ChanceResolutionOutput output =
             match_event_resolver::resolveChance(attacking, defending, attackingXI, defendingXI, input);

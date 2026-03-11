@@ -51,15 +51,15 @@ std::string breadcrumbFor(GuiPage page) {
 }
 
 std::string friendlyPanelTitle(const std::string& title) {
-    if (title == "DashboardPanel") return "Resumen del club";
-    if (title == "LeagueTableView") return "Tabla de liga";
-    if (title == "MatchSummaryPanel") return "Proximo partido";
+    if (title == "DashboardPanel") return "Centro del club";
+    if (title == "LeagueTableView") return "Clasificacion";
+    if (title == "MatchSummaryPanel") return "Proximo encuentro";
     if (title == "InjuryListWidget") return "Lesiones";
     if (title == "FixtureListView") return "Calendario";
-    if (title == "UpcomingMatchWidget") return "Proximo partido";
-    if (title == "LastResultPanel") return "Ultimo resultado";
-    if (title == "TeamStatusPanel") return "Estado del equipo";
-    if (title == "LeaguePositionWidget") return "Posicion en liga";
+    if (title == "UpcomingMatchWidget") return "Proximo encuentro";
+    if (title == "LastResultPanel") return "Ultimo partido";
+    if (title == "TeamStatusPanel") return "Estado del plantel";
+    if (title == "LeaguePositionWidget") return "Posicion competitiva";
     if (title == "TeamMoraleWidget") return "Estado del vestuario";
     if (title == "PlayerTableView") return "Plantilla";
     if (title == "YouthPlayerTableView") return "Cantera";
@@ -82,10 +82,10 @@ std::string friendlyPanelTitle(const std::string& title) {
     if (title == "RaceContext") return "Contexto de la tabla";
     if (title == "SeasonRecords") return "Historial reciente";
     if (title == "CompetitionReport") return "Informe de liga";
-    if (title == "TransferSearchPanel") return "Buscador de mercado";
+    if (title == "TransferSearchPanel") return "Radar de mercado";
     if (title == "TransferMarketView") return "Mercado de fichajes";
-    if (title == "TransferTargetCard") return "Objetivo seleccionado";
-    if (title == "TransferPipeline") return "Operaciones en curso";
+    if (title == "TransferTargetCard") return "Objetivo observado";
+    if (title == "TransferPipeline") return "Negociaciones y movimientos";
     if (title == "FinanceSummary") return "Resumen financiero";
     if (title == "FinanceBreakdown") return "Balance economico";
     if (title == "SalaryTable") return "Masa salarial";
@@ -714,8 +714,8 @@ GuiPageModel buildDashboardModel(AppState& state) {
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state.career, alerts);
     model.infoLine = state.career.myTeam
-        ? "Vista rapida del club con partido, tabla, estado y noticias."
-        : "No hay carrera activa. Crea una nueva partida para comenzar.";
+        ? "Panorama inmediato del club: proximo rival, forma del plantel, clasificacion y focos de gestion."
+        : "No hay carrera activa. Crea una nueva partida para abrir el centro del club.";
     model.summary.title = "UpcomingMatchWidget";
     model.primary = buildLeagueTableModel(state.career, "Grupo actual");
     model.secondary = buildTeamStatusModel(state.career);
@@ -740,9 +740,9 @@ GuiPageModel buildDashboardModel(AppState& state) {
             "3. Escribe el nombre del manager.\r\n"
             "4. Usa una de las acciones inferiores.";
         model.feed.lines.clear();
-        model.feed.lines.push_back("Sin noticias por ahora. Inicia una carrera para activar el mundo de juego.");
-        model.feed.lines.push_back("Consejo: empieza en un club pequeno para ver mejor el impacto de cantera y finanzas.");
-        model.feed.lines.push_back("Consejo: usa Validar antes de jugar si cambiaste datos externos.");
+        model.feed.lines.push_back("Sin noticias por ahora. Inicia una carrera para activar el mundo del club.");
+        model.feed.lines.push_back("Sugerencia: un club pequeno deja ver mejor cantera, sueldos y rotacion.");
+        model.feed.lines.push_back("Sugerencia: usa Validar si cambiaste datos externos o reglas de competicion.");
         return model;
     }
 
@@ -758,9 +758,9 @@ GuiPageModel buildDashboardModel(AppState& state) {
     out << findNextMatchLine(state.career) << "\r\n\r\n";
     out << "Posicion " << state.career.currentCompetitiveRank() << "/" << state.career.currentCompetitiveFieldSize()
         << " | Puntos " << team.points << " | DG " << (team.goalsFor - team.goalsAgainst) << "\r\n";
-    out << "Moral " << team.morale << " | Lesionados " << injured << " | Riesgos de vestuario " << lowMorale << "\r\n";
+    out << "Moral " << team.morale << " | Lesionados " << injured << " | Alertas de vestuario " << lowMorale << "\r\n";
     out << "Objetivo: " << (state.career.boardMonthlyObjective.empty() ? "Sin objetivo mensual activo" : state.career.boardMonthlyObjective) << "\r\n\r\n";
-    out << "Informe rival\r\n" << buildOpponentReport(state.career);
+    out << "Lectura del rival\r\n" << buildOpponentReport(state.career);
     model.summary.content = out.str();
 
     std::ostringstream detail;

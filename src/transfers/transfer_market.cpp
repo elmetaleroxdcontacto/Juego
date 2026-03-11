@@ -20,6 +20,21 @@ int playerIndexByName(const Team& team, const string& name) {
     return -1;
 }
 
+const TransferTarget* selectPreferredTarget(const vector<TransferTarget>& shortlist) {
+    if (shortlist.empty()) return nullptr;
+    const size_t limit = min<size_t>(3, shortlist.size());
+    double total = 0.0;
+    for (size_t i = 0; i < limit; ++i) {
+        total += max(1.0, shortlist[i].totalScore);
+    }
+    double pick = rand01() * total;
+    for (size_t i = 0; i < limit; ++i) {
+        pick -= max(1.0, shortlist[i].totalScore);
+        if (pick <= 0.0) return &shortlist[i];
+    }
+    return &shortlist.front();
+}
+
 }  // namespace
 
 namespace transfer_market {
@@ -48,6 +63,8 @@ vector<TransferTarget> buildTransferShortlist(const Career& career, const Team& 
     }
 
     sort(shortlist.begin(), shortlist.end(), [](const TransferTarget& left, const TransferTarget& right) {
+        if (left.onShortlist != right.onShortlist) return left.onShortlist > right.onShortlist;
+        if (left.urgentNeed != right.urgentNeed) return left.urgentNeed > right.urgentNeed;
         if (left.totalScore != right.totalScore) return left.totalScore > right.totalScore;
         if (left.expectedFee != right.expectedFee) return left.expectedFee < right.expectedFee;
         return left.playerName < right.playerName;
@@ -93,7 +110,9 @@ void processCpuTransfers(Career& career) {
 
         const vector<TransferTarget> shortlist = buildTransferShortlist(career, *team, static_cast<size_t>(strategy.maxTargets));
         if (!shortlist.empty()) {
-            const TransferTarget& top = shortlist.front();
+            const TransferTarget* preferred = selectPreferredTarget(shortlist);
+            if (!preferred) continue;
+            const TransferTarget& top = *preferred;
             Team* seller = career.findTeamByName(top.clubName);
             if (!seller) continue;
             int sellerIdx = playerIndexByName(*seller, top.playerName);
@@ -140,8 +159,18 @@ void processCpuTransfers(Career& career) {
         } else if (!strategy.needsLiquidity) {
             int minSkill, maxSkill;
             getDivisionSkillRange(team->division, minSkill, maxSkill);
-            Player generated = makeRandomPlayer(strategy.weakestPosition.empty() ? squad.weakestPosition : strategy.weakestPosition,
-                                                minSkill, maxSkill, 18, 29);
+            const string targetPosition = strategy.weakestPosition.empty() ? squad.weakestPosition : strategy.weakestPosition;
+            if (strategy.youthFocus || strategy.trustYouthCover || squad.rotationRisk >= 5) {
+                Player promoted = makeRandomPlayer(targetPosition, max(minSkill - 2, 38), maxSkill, 17, 20);
+                promoted.potential = clampInt(promoted.skill + randInt(6, 14), promoted.skill, 95);
+                promoted.contractWeeks = 156;
+                promoted.wage = max(2500LL, promoted.wage / 2);
+                promoted.releaseClause = max(promoted.value * 3, 120000LL);
+                team->addPlayer(promoted);
+                continue;
+            }
+
+            Player generated = makeRandomPlayer(targetPosition, minSkill, maxSkill, 18, 29);
             const long long fee = max(generated.value, generated.releaseClause * 55 / 100);
             if (team->budget >= fee) {
                 team->budget -= fee;

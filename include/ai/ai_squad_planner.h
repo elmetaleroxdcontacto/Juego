@@ -12,7 +12,10 @@ struct SquadNeedReport {
     int averageFitness = 0;
     int weakestScore = 0;
     int surplusScore = 0;
+    int rotationRisk = 0;
     std::vector<std::string> priorityPositions;
+    std::vector<std::string> thinPositions;
+    std::vector<std::string> youthCoverPositions;
 };
 
 namespace ai_squad_planner {

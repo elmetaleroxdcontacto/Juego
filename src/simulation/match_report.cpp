@@ -46,6 +46,12 @@ string buildLikelyReason(const MatchSetup& setup, const MatchStats& stats, const
     if (stats.homeRedCards != stats.awayRedCards) {
         return "La inferioridad numerica condiciono el desarrollo del encuentro.";
     }
+    if (stats.homeShots + 3 < stats.awayShots && stats.homeGoals >= stats.awayGoals) {
+        return home.name + " resistio mas de lo esperado y aprovecho mejor sus remates utiles.";
+    }
+    if (stats.awayShots + 3 < stats.homeShots && stats.awayGoals >= stats.homeGoals) {
+        return away.name + " fue mas eficiente en las pocas llegadas realmente claras.";
+    }
     return "El resultado se definio por detalles en un partido de margenes cortos.";
 }
 
@@ -188,6 +194,7 @@ MatchReport buildReport(const MatchSetup& setup,
         "xG " + formatDouble2(stats.homeExpectedGoals) + "-" + formatDouble2(stats.awayExpectedGoals) +
         " | ocasiones claras " + to_string(stats.homeBigChances) + "-" + to_string(stats.awayBigChances) +
         " | ataques " + to_string(homeTotalAttacks) + "-" + to_string(awayTotalAttacks) +
+        " | tiros " + to_string(stats.homeShots) + "-" + to_string(stats.awayShots) +
         " | cambios tacticos " + to_string(tacticalChanges);
     if (!playerScores.empty()) {
         auto best = max_element(playerScores.begin(), playerScores.end(),

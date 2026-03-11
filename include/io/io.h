@@ -9,6 +9,7 @@
 void assignMissingPositions(Team& team);
 void trimSquadForDivision(Team& team);
 bool loadTeamFromCsv(const std::string& filename, Team& team);
+bool loadTeamFromJson(const std::string& filename, Team& team);
 bool loadTeamFromPlayersTxt(const std::string& filename, Team& team);
 bool loadTeamFromLegacyTxt(const std::string& filename, Team& team);
 bool loadTeamFromFile(const std::string& filename, Team& team);

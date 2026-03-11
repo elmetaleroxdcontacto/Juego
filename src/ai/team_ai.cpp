@@ -143,7 +143,8 @@ bool applyInMatchCpuAdjustment(Team& team,
                                int goalsAgainst,
                                vector<string>* events,
                                int availablePlayers,
-                               int cautionedPlayers) {
+                               int cautionedPlayers,
+                               int opponentAvailablePlayers) {
     bool changed = false;
     int scoreDiff = goalsFor - goalsAgainst;
     int avgFitness = averageAvailableFitness(team);
@@ -178,13 +179,40 @@ bool applyInMatchCpuAdjustment(Team& team,
         note = team.name + " busca romper el empate con mas amplitud";
     }
 
+    if (scoreDiff == 0 && minute >= 60 && opponentAvailablePlayers <= 10) {
+        bool redAdvantageChanged = false;
+        redAdvantageChanged |= applySetting(team.tactics, "Offensive");
+        redAdvantageChanged |= applySetting(team.matchInstruction, team.width >= 4 ? "Por bandas" : "Juego directo");
+        redAdvantageChanged |= applySetting(team.tempo, team.tempo + 1, 1, 5);
+        redAdvantageChanged |= applySetting(team.defensiveLine, team.defensiveLine + 1, 1, 5);
+        if (redAdvantageChanged) {
+            changed = true;
+            note = note.empty() ? team.name + " acelera al detectar superioridad numerica"
+                                : note + "; " + team.name + " explota el hombre de mas";
+        }
+    }
+
     if (avgFitness < 54 && minute >= 65) {
         bool fatigueChanged = false;
         fatigueChanged |= applySetting(team.pressingIntensity, team.pressingIntensity - 1, 1, 5);
         fatigueChanged |= applySetting(team.tempo, team.tempo - 1, 1, 5);
+        fatigueChanged |= applySetting(team.width, max(2, team.width - 1), 1, 5);
         if (fatigueChanged) {
             changed = true;
             if (note.empty()) note = team.name + " baja revoluciones por desgaste";
+        }
+    }
+
+    if (avgFitness < 48 && minute >= 72) {
+        bool survivalChanged = false;
+        survivalChanged |= applySetting(team.tactics, scoreDiff >= 0 ? "Defensive" : "Counter");
+        survivalChanged |= applySetting(team.matchInstruction, scoreDiff >= 0 ? "Pausar juego" : "Juego directo");
+        survivalChanged |= applySetting(team.defensiveLine, team.defensiveLine - 1, 1, 5);
+        survivalChanged |= applySetting(team.pressingIntensity, team.pressingIntensity - 1, 1, 5);
+        if (survivalChanged) {
+            changed = true;
+            note = note.empty() ? team.name + " protege energia para el cierre"
+                                : note + "; " + team.name + " administra el desgaste extremo";
         }
     }
 
@@ -216,6 +244,20 @@ bool applyInMatchCpuAdjustment(Team& team,
             changed = true;
             note = note.empty() ? team.name + " baja agresividad para proteger a los amonestados"
                                 : note + "; " + team.name + " reduce riesgos disciplinarios";
+        }
+    }
+
+    if (minute >= 80 && scoreDiff <= -1 && avgFitness >= 58) {
+        bool finalPush = false;
+        finalPush |= applySetting(team.tactics, "Offensive");
+        finalPush |= applySetting(team.matchInstruction, "Presion final");
+        finalPush |= applySetting(team.pressingIntensity, 5, 1, 5);
+        finalPush |= applySetting(team.tempo, 5, 1, 5);
+        finalPush |= applySetting(team.width, 5, 1, 5);
+        if (finalPush) {
+            changed = true;
+            note = note.empty() ? team.name + " va con todo en el tramo final"
+                                : note + "; " + team.name + " activa un asedio final";
         }
     }
 

@@ -8,15 +8,19 @@
 #include "career/season_transition.h"
 #include "competition/competition.h"
 #include "engine/models.h"
+#include "io/io.h"
 #include "simulation/match_context.h"
 #include "simulation/match_engine.h"
 #include "simulation/match_phase.h"
 #include "simulation/simulation.h"
 #include "transfers/negotiation_system.h"
+#include "transfers/transfer_market.h"
+#include "utils/utils.h"
 #include "validators/validators.h"
 
 #include <exception>
 #include <cstdio>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -147,9 +151,14 @@ Team makeTeam(const string& name,
     return team;
 }
 
-void testValidationSuitePasses() {
+void testValidationSuiteReflectsRosterAudit() {
+    const DataValidationReport report = buildRosterDataValidationReport();
     const ValidationSuiteSummary summary = buildValidationSuiteSummary();
-    expect(summary.ok, "La suite de validacion base fallo:\n" + joinLines(summary.lines));
+    if (report.errorCount > 0) {
+        expect(!summary.ok, "La suite debe fallar si la auditoria de datos detecta errores.");
+        expect(joinLines(summary.lines).find("error(es) de datos") != string::npos,
+               "El resumen de validacion debe informar errores de datos.");
+    }
 }
 
 void testMatchSimulationProducesStructuredPhases() {
@@ -213,6 +222,53 @@ void testHighPressRaisesPhaseFatigue() {
            "La presion alta debe aumentar el desgaste de fase.");
     expect(highEval.report.intensity > lowEval.report.intensity,
            "La presion alta debe elevar la intensidad del tramo.");
+}
+
+void testLowBlockSuppressesChanceQuality() {
+    Team home = makeTeam("Control Interior", "primera division", 72, 3, 3, "Balanced", "Equilibrado", 700000);
+    Team lowBlock = makeTeam("Muralla", "primera division", 68, 1, 2, "Defensive", "Bloque bajo", 680000);
+    Team openGame = makeTeam("Abierto", "primera division", 68, 4, 4, "Offensive", "Por bandas", 680000);
+
+    const MatchSetup lowBlockSetup = match_context::buildMatchSetup(home, lowBlock, false, false);
+    const MatchSetup openSetup = match_context::buildMatchSetup(home, openGame, false, false);
+
+    const MatchPhaseEvaluation lowBlockEval =
+        match_phase::evaluatePhase(lowBlockSetup, home, lowBlock, lowBlockSetup.home, lowBlockSetup.away, 1, 16, 30);
+    const MatchPhaseEvaluation openEval =
+        match_phase::evaluatePhase(openSetup, home, openGame, openSetup.home, openSetup.away, 1, 16, 30);
+
+    expect(lowBlockEval.report.homeChanceProbability < openEval.report.homeChanceProbability,
+           "Un bloque bajo debe recortar la calidad media de las llegadas rivales.");
+    expect(lowBlockEval.report.homeDefensiveRisk < openEval.report.homeDefensiveRisk,
+           "El local no deberia quedar mas expuesto ante un rival de bloque bajo que ante uno abierto.");
+}
+
+void testCompetitionRulesLoadFromCsv() {
+    expect(reloadCompetitionConfigs(), "Las reglas de competicion deben poder cargarse desde competition_rules.csv.");
+    const CompetitionConfig& primera = getCompetitionConfig("primera division");
+    const CompetitionConfig& terceraB = getCompetitionConfig("tercera division b");
+
+    expect(primera.baseIncome == 60000, "La Primera Division debe leer ingresos base desde el CSV externo.");
+    expect(terceraB.groups.enabled && terceraB.groups.groupSize == 14,
+           "La Tercera B debe conservar su configuracion zonal desde el CSV.");
+    expect(competitionConfigWarnings().empty(),
+           "El archivo de reglas externas no deberia generar advertencias en el escenario base.");
+}
+
+void testRuntimeValidationFlagsBrokenLoadedSquad() {
+    Career career;
+    career.divisions.push_back({"primera division", "data/LigaChilena/primera division", "Primera Division"});
+
+    Team broken("Plantel Roto");
+    broken.division = "primera division";
+    broken.players.push_back(makePlayer("Duplicado", "DEF", 61, 65, 27, 66, 66));
+    broken.players.push_back(makePlayer("Duplicado", "N/A", 60, 64, 28, 64, 64));
+    broken.players.push_back(makePlayer("Sin Arquero", "MED", 62, 68, 23, 71, 71));
+    career.allTeams.push_back(broken);
+
+    const RuntimeValidationSummary summary = validateLoadedCareerData(career, 8);
+    expect(!summary.ok, "La validacion en carga debe fallar con planteles estructuralmente invalidos.");
+    expect(summary.errorCount >= 2, "La validacion en carga debe contar errores de duplicados y posiciones invalidas.");
 }
 
 void testCompetitionGroupTableScopesActiveGroup() {
@@ -328,6 +384,37 @@ void testTransferNegotiationBuildsStructuredDeal() {
            "El fee acordado debe aproximarse a la expectativa del vendedor.");
     expect(state.agreedWage >= target.wage, "El salario acordado no puede empeorar el contrato actual del jugador.");
     expect(!state.roundSummaries.empty(), "La negociacion debe devolver trazabilidad de sus rondas.");
+}
+
+void testTransferShortlistRewardsScoutedNeed() {
+    Career career;
+    career.currentSeason = 3;
+    career.managerReputation = 75;
+
+    career.allTeams.push_back(makeTeam("Comprador Scout", "primera division", 64, 3, 3, "Balanced", "Equilibrado", 1800000));
+    career.allTeams.push_back(makeTeam("Vendedor A", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 900000));
+    career.allTeams.push_back(makeTeam("Vendedor B", "primera division", 69, 3, 3, "Balanced", "Equilibrado", 900000));
+    Team& buyer = career.allTeams[0];
+    Team& sellerA = career.allTeams[1];
+    Team& sellerB = career.allTeams[2];
+    buyer.players.erase(buyer.players.begin() + 5, buyer.players.begin() + 8);
+
+    Player targetA = makePlayer("Objetivo Scouteado", "MED", 76, 84, 22, 77, 78);
+    targetA.value = 420000;
+    targetA.releaseClause = 780000;
+    targetA.wage = 14000;
+    sellerA.addPlayer(targetA);
+    career.scoutingShortlist.push_back(sellerA.name + "|" + targetA.name);
+
+    Player targetB = makePlayer("Alternativa", "MED", 75, 80, 25, 74, 75);
+    targetB.value = 410000;
+    targetB.releaseClause = 760000;
+    targetB.wage = 14500;
+    sellerB.addPlayer(targetB);
+
+    const vector<TransferTarget> shortlist = transfer_market::buildTransferShortlist(career, buyer, 5);
+    expect(!shortlist.empty(), "El mercado debe construir una shortlist para el club comprador.");
+    expect(shortlist.front().onShortlist, "Un objetivo ya scouteado debe subir en la prioridad de fichaje.");
 }
 
 void testSeasonTransitionAdvancesCareerWithoutUiDependencies() {
@@ -503,21 +590,21 @@ void testSaveLoadRoundTripPreservesCareerState() {
     Career original;
     original.currentSeason = 8;
     original.currentWeek = 5;
-    original.managerName = "Arquitecto";
+    original.managerName = "Arquitecto|Senior";
     original.managerReputation = 77;
     original.boardConfidence = 66;
     original.boardExpectedFinish = 3;
     original.boardBudgetTarget = 250000;
     original.boardYouthTarget = 2;
     original.boardWarningWeeks = 1;
-    original.boardMonthlyObjective = "Sumar al menos 6 puntos en 4 semanas";
+    original.boardMonthlyObjective = "Sumar; al menos ^6 puntos | en 4 semanas";
     original.boardMonthlyTarget = 6;
     original.boardMonthlyProgress = 4;
     original.boardMonthlyDeadlineWeek = 8;
-    original.lastMatchAnalysis = "Control total del mediocampo.";
-    original.lastMatchReportLines = {"Claves: se domino el mediocampo", "Fatiga: el rival llego roto", "Disciplina: sin expulsiones"};
-    original.lastMatchEvents = {"12' Gol de prueba", "64' Ajuste tactico", "88' Atajada clave"};
-    original.lastMatchPlayerOfTheMatch = "Jugador Persistente";
+    original.lastMatchAnalysis = "Control total | del mediocampo; con ajuste^final";
+    original.lastMatchReportLines = {"Claves| se domino el mediocampo", "Fatiga; el rival llego roto", "Disciplina^ sin expulsiones"};
+    original.lastMatchEvents = {"12' Gol | de prueba", "64' Ajuste; tactico", "88' Atajada ^ clave"};
+    original.lastMatchPlayerOfTheMatch = "Jugador|Persistente";
     original.lastMatchCenter.competitionLabel = "Liga";
     original.lastMatchCenter.opponentName = "Club Destino";
     original.lastMatchCenter.venueLabel = "Local";
@@ -535,17 +622,17 @@ void testSaveLoadRoundTripPreservesCareerState() {
     original.lastMatchCenter.oppSubstitutions = 5;
     original.lastMatchCenter.myExpectedGoalsTenths = 17;
     original.lastMatchCenter.oppExpectedGoalsTenths = 9;
-    original.lastMatchCenter.weather = "Despejado";
-    original.lastMatchCenter.dominanceSummary = "El local controlo la zona media.";
-    original.lastMatchCenter.tacticalSummary = "La presion alta sostuvo recuperaciones altas.";
-    original.lastMatchCenter.fatigueSummary = "El rival llego fundido al cierre.";
-    original.lastMatchCenter.postMatchImpact = "Moral +3 / -2";
-    original.lastMatchCenter.phaseSummaries = {"1-15: domina Club Persistencia", "16-30: domina Club Persistencia"};
-    original.newsFeed.push_back("T8-F5: Noticia de prueba");
-    original.scoutInbox.push_back("Informe de ojeo");
-    original.scoutingShortlist.push_back("Promesa del norte");
-    original.history.push_back({7, "primera division", "Club Persistencia", 2, "Club Persistencia", "Ascenso Norte", "Descenso Sur", "Nota historica"});
-    original.pendingTransfers.push_back({"Jugador Pendiente", "Club Persistencia", "Club Destino", 9, 0, 120000, 9000, 104, false, false, "Titular"});
+    original.lastMatchCenter.weather = "Despejado; viento";
+    original.lastMatchCenter.dominanceSummary = "El local controlo | la zona media.";
+    original.lastMatchCenter.tacticalSummary = "La presion alta sostuvo recuperaciones ^altas.";
+    original.lastMatchCenter.fatigueSummary = "El rival llego; fundido al cierre.";
+    original.lastMatchCenter.postMatchImpact = "Moral +3 | / -2";
+    original.lastMatchCenter.phaseSummaries = {"1-15: domina | Club Persistencia", "16-30: domina ^ Club Persistencia"};
+    original.newsFeed.push_back("T8-F5: Noticia| de prueba;");
+    original.scoutInbox.push_back("Informe^ de ojeo");
+    original.scoutingShortlist.push_back("Promesa| del norte; central");
+    original.history.push_back({7, "primera division", "Club Persistencia", 2, "Club Persistencia", "Ascenso| Norte", "Descenso; Sur", "Nota ^ historica"});
+    original.pendingTransfers.push_back({"Jugador| Pendiente", "Club Persistencia", "Club Destino", 9, 0, 120000, 9000, 104, false, false, "Titular^"});
 
     original.allTeams.push_back(makeTeam("Club Persistencia", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
     original.allTeams.push_back(makeTeam("Club Destino", "primera division", 68, 3, 3, "Balanced", "Equilibrado", 650000));
@@ -583,6 +670,52 @@ void testSaveLoadRoundTripPreservesCareerState() {
     std::remove(savePath.c_str());
 }
 
+void testLoadTeamFromDirectoryFallsBackAndResolvesRawPositions() {
+    const string folderPath = "saves/test_loader_team";
+    const string playersPath = joinPath(folderPath, "players.txt");
+
+    expect(ensureDirectory(folderPath), "No se pudo crear la carpeta temporal del loader.");
+    ofstream file(playersPath);
+    expect(file.is_open(), "No se pudo crear el players.txt temporal.");
+    file
+        << "- Uno | DEF (Uno Goalkeeper) | Edad: 25 | Valor: 120k\n"
+        << "- Dos | N/A (Dos Goalkeeper) | Edad: 22 | Valor: 90k\n"
+        << "- Tres | DEL (Tres Central Midfield) | Edad: 24 | Valor: 180k\n"
+        << "- Cuatro | DEF (Cuatro Central Midfield) | Edad: 21 | Valor: 150k\n"
+        << "- Cinco | MED (Cinco Attacking Midfield) | Edad: 20 | Valor: 140k\n"
+        << "- Seis | DEL (Seis Centre-Forward) | Edad: 26 | Valor: 200k\n";
+    file.close();
+
+    Team loaded("Temporal FC");
+    loaded.division = "primera b";
+    expect(loadTeamFromFile(folderPath, loaded), "El loader debe caer a players.txt cuando no existe CSV.");
+    expect(static_cast<int>(loaded.players.size()) >= 18, "El loader debe completar un plantel jugable.");
+
+    Team* teamPtr = &loaded;
+    int goalkeepers = 0;
+    int midfielders = 0;
+    for (const auto& player : teamPtr->players) {
+        if (normalizePosition(player.position) == "ARQ") goalkeepers++;
+        if (normalizePosition(player.position) == "MED") midfielders++;
+    }
+    expect(goalkeepers >= 2, "El loader debe garantizar cobertura minima de arqueros.");
+    expect(midfielders >= 3, "El loader debe garantizar cobertura minima de mediocampo.");
+
+    auto findPlayer = [&](const string& name) -> const Player* {
+        for (const auto& player : teamPtr->players) {
+            if (player.name == name) return &player;
+        }
+        return nullptr;
+    };
+
+    const Player* one = findPlayer("Uno");
+    const Player* three = findPlayer("Tres");
+    expect(one && one->position == "ARQ", "El loader debe resolver Goalkeeper desde la posicion cruda.");
+    expect(three && three->position == "MED", "El loader debe priorizar la posicion cruda cuando la principal es inconsistente.");
+
+    std::remove(playersPath.c_str());
+}
+
 void testSimulateMatchAppliesPostProcessState() {
     Team home = makeTeam("Aplicacion Local", "primera division", 71, 4, 4, "Pressing", "Contra-presion", 700000);
     Team away = makeTeam("Aplicacion Visita", "primera division", 68, 2, 3, "Balanced", "Equilibrado", 620000);
@@ -614,11 +747,15 @@ void testSimulateMatchAppliesPostProcessState() {
 
 int main() {
     const vector<pair<string, void (*)()>> tests = {
-        {"validation_suite", testValidationSuitePasses},
+        {"validation_suite", testValidationSuiteReflectsRosterAudit},
         {"match_engine_structure", testMatchSimulationProducesStructuredPhases},
         {"tactical_fatigue", testHighPressRaisesPhaseFatigue},
+        {"low_block_chance_quality", testLowBlockSuppressesChanceQuality},
+        {"competition_rules_csv", testCompetitionRulesLoadFromCsv},
+        {"runtime_load_validation", testRuntimeValidationFlagsBrokenLoadedSquad},
         {"competition_group_table", testCompetitionGroupTableScopesActiveGroup},
         {"transfer_affordability", testTransferEvaluationPenalizesUnaffordableDeals},
+        {"transfer_shortlist", testTransferShortlistRewardsScoutedNeed},
         {"transfer_negotiation", testTransferNegotiationBuildsStructuredDeal},
         {"season_transition", testSeasonTransitionAdvancesCareerWithoutUiDependencies},
         {"season_service", testSeasonServiceReturnsStructuredWeekResult},
@@ -628,6 +765,7 @@ int main() {
         {"dressing_room_service", testDressingRoomServiceFlagsPromiseAndFatigueRisk},
         {"simulate_match_state", testSimulateMatchAppliesPostProcessState},
         {"save_load_roundtrip", testSaveLoadRoundTripPreservesCareerState},
+        {"loader_fallback", testLoadTeamFromDirectoryFallsBackAndResolvesRawPositions},
     };
 
     int failures = 0;

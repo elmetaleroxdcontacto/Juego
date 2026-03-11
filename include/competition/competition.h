@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 enum class CompetitionTableProfile {
     Default,
@@ -38,6 +39,9 @@ struct CompetitionConfig {
     int expectedTeamCount = 0;
 };
 
+bool reloadCompetitionConfigs();
+const std::vector<CompetitionConfig>& listCompetitionConfigs();
+const std::vector<std::string>& competitionConfigWarnings();
 const CompetitionConfig& getCompetitionConfig(const std::string& id);
 bool competitionUsesGroupStage(const std::string& id, int teamCount);
 std::string competitionGroupTitle(const std::string& id, bool north);

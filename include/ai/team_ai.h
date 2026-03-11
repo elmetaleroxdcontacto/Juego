@@ -14,6 +14,7 @@ bool applyInMatchCpuAdjustment(Team& team,
                                int goalsAgainst,
                                std::vector<std::string>* events = nullptr,
                                int availablePlayers = 11,
-                               int cautionedPlayers = 0);
+                               int cautionedPlayers = 0,
+                               int opponentAvailablePlayers = 11);
 
 }  // namespace team_ai

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -29,7 +30,15 @@ struct ValidationSuiteSummary {
     std::vector<std::string> lines;
 };
 
+struct RuntimeValidationSummary {
+    bool ok;
+    int errorCount;
+    int warningCount;
+    std::vector<std::string> lines;
+};
+
 DataValidationReport buildRosterDataValidationReport();
 bool writeRosterDataValidationReport(const std::string& path);
+RuntimeValidationSummary validateLoadedCareerData(const struct Career& career, std::size_t maxLines = 12);
 ValidationSuiteSummary buildValidationSuiteSummary();
 int runValidationSuite(bool verbose = true);
