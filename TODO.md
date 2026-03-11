@@ -1952,3 +1952,164 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - la interfaz deja de exponer nombres internos al jugador
   - mejora lectura rapida de estado, riesgo y contexto competitivo
   - el dashboard se acerca mas a una experiencia tipo manager moderno
+
+## Cambios recientes (2026-03-11) - Motor, IA, mercado, GUI y reglas externas
+
+- Se profundizo otra iteracion del motor de partidos para que la secuencia:
+  - posesion
+  - progresion
+  - llegada
+  - ocasion
+  - remate
+  - gol / fallo
+  dependa mas del contexto futbolistico y menos de conversiones demasiado directas.
+
+- Archivos principales tocados en simulacion:
+  - `include/simulation/match_context.h`
+  - `include/simulation/match_resolution.h`
+  - `src/simulation/match_context.cpp`
+  - `src/simulation/match_phase.cpp`
+  - `src/simulation/match_resolution.cpp`
+  - `src/simulation/match_event_generator.cpp`
+  - `src/simulation/match_event_resolver.cpp`
+  - `src/simulation/match_report.cpp`
+
+- Nuevos factores integrados al snapshot del partido:
+  - `chanceCreation`
+  - `finishingQuality`
+  - `pressResistance`
+  - `defensiveShape`
+  - `lineBreakThreat`
+  - `pressingLoad`
+  - `setPieceThreat`
+
+- Las tacticas ahora pesan mas en:
+  - posesion
+  - frecuencia de ataques
+  - calidad de ocasiones
+  - riesgo defensivo
+  - desgaste fisico
+
+- Se redujo la tendencia a marcadores exagerados:
+  - menos ataques terminan en remate
+  - se estrecho el rango de posesion esperable
+  - se bajo la conversion final de ocasiones
+  - el portero y la presion rival afectan mejor el remate
+
+- Se mejoro la IA durante el partido:
+  - `include/ai/team_ai.h`
+  - `src/ai/team_ai.cpp`
+  - `include/ai/ai_match_manager.h`
+  - `src/ai/ai_match_manager.cpp`
+  - `src/simulation/match_engine.cpp`
+
+- La IA rival ahora puede:
+  - reaccionar si va perdiendo
+  - proteger ventaja
+  - adaptarse a expulsiones
+  - bajar intensidad con fatiga severa
+  - empujar mas fuerte en el tramo final
+  - hacer cambios extra por caida fisica del XI activo
+
+- Se mejoro la IA de plantilla y uso de juveniles:
+  - `include/ai/ai_squad_planner.h`
+  - `src/ai/ai_squad_planner.cpp`
+  - `src/engine/models.cpp`
+
+- Nuevos datos de planificacion de plantel:
+  - `rotationRisk`
+  - `thinPositions`
+  - `youthCoverPositions`
+
+- Efecto practico:
+  - mejor deteccion de puestos debiles
+  - mejor rotacion por fatiga/sanciones
+  - mas uso de juveniles con potencial cuando la politica del club lo permite
+
+- Mercado de fichajes e IA de objetivos reforzados:
+  - `include/transfers/transfer_types.h`
+  - `src/ai/ai_transfer_manager.cpp`
+  - `src/transfers/transfer_market.cpp`
+
+- Se consolidaron estructuras y señales para fichajes:
+  - `TransferTarget`
+  - `TransferOffer`
+  - `ContractOffer`
+  - `NegotiationState`
+  - `ClubTransferStrategy`
+
+- Nuevos campos usados por la IA de mercado:
+  - `onShortlist`
+  - `urgentNeed`
+  - `scoutingConfidence`
+  - `competitionScore`
+  - `scoutingNote`
+
+- Efecto practico en fichajes:
+  - los clubes priorizan mejor necesidad real
+  - la shortlist influye de verdad
+  - hay menos comportamiento CPU demasiado determinista
+  - algunos clubes prefieren promocionar juveniles antes que comprar por inercia
+
+- Reglas de competicion externalizadas:
+  - `include/competition/competition.h`
+  - `src/competition/competition.cpp`
+  - `data/LigaChilena/competition_rules.csv`
+
+- Ahora las reglas base por division se pueden cargar desde CSV con:
+  - perfil de tabla
+  - handler de temporada
+  - grupos
+  - ingresos
+  - factor salarial
+  - tamaño maximo de plantel
+  - cantidad esperada de equipos
+
+- Se reforzo la validacion automatica al cargar datos:
+  - `include/validators/validators.h`
+  - `src/validators/validators.cpp`
+  - `src/engine/career_state.cpp`
+
+- Nuevo control runtime de datos cargados:
+  - equipos duplicados
+  - planteles demasiado cortos/largos
+  - jugadores duplicados
+  - posiciones invalidas
+  - equipos sin arquero
+  - cobertura insuficiente por linea
+  - referencias rotas en `preferredXI`
+
+- Carga de datos externos y planteles:
+  - `src/io/io.cpp`
+  - se mantuvo compatibilidad con el proyecto existente
+  - fallback real de archivos de plantilla
+  - rebalanceo final de roles dentro de los limites por division
+
+- Mejora visible de GUI:
+  - `src/gui/gui_views.cpp`
+  - se reemplazaron titulos tecnicos visibles por nombres mas naturales para el jugador
+  - ejemplos:
+    - `DashboardPanel` -> `Centro del club`
+    - `LeagueTableView` -> `Clasificacion`
+    - `MatchSummaryPanel` -> `Proximo encuentro`
+    - `TeamStatusPanel` -> `Estado del plantel`
+
+- Tests ampliados para cubrir este bloque:
+  - `tests/project_tests.cpp`
+  - nuevos tests:
+    - `low_block_chance_quality`
+    - `competition_rules_csv`
+    - `runtime_load_validation`
+    - `transfer_shortlist`
+
+- Verificacion realizada:
+  - `cmake --build build-cmake --config Release --target FootballManagerTests`
+  - `FootballManagerTests.exe`: todos los tests pasan
+  - `FootballManager.exe --validate`: 0 fallas logicas y la auditoria sigue reportando deuda de datos externos
+
+- Impacto general:
+  - el motor de partidos responde mejor a atributos, tacticas, presion y fatiga
+  - la IA rival y de plantilla toma decisiones mas creibles
+  - el mercado tiene mejor criterio deportivo y de scouting
+  - la carga de reglas y datos externos queda mas flexible
+  - la GUI expone mejor la informacion al jugador
