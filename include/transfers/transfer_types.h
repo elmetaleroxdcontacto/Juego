@@ -70,10 +70,12 @@ struct ClubTransferStrategy {
     bool needsStarter = false;
     bool trustYouthCover = false;
     int rotationRisk = 0;
+    int salePressure = 0;
     int maxTargets = 0;
     long long maxTransferBudget = 0;
     long long maxWageBudget = 0;
     std::vector<std::string> priorityPositions;
     std::vector<std::string> thinPositions;
     std::vector<std::string> youthCoverPositions;
+    std::vector<std::string> saleCandidates;
 };

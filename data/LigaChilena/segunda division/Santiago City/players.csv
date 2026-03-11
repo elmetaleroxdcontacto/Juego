@@ -1,19 +1,21 @@
-name,position,position_raw,age,number,market_value,source
-Mauricio Maslovski,ARQ,Mauricio Maslovski Goalkeeper,25,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Alonso Montecinos,ARQ,Alonso Montecinos Goalkeeper,26,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Diego González Torres,DEF,Diego González Torres Centre-Back,27,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Ítalo Müller,DEF,Ítalo Müller Centre-Back,26,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Diego Muñoz H.,DEF,Diego Muñoz H. Centre-Back,27,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Víctor González Chang,DEF,Víctor González Chang Centre-Back,31,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-David Montoya,DEF,David Montoya Centre-Back,30,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Miguel Arias,N/A,Miguel Arias Left-Back,23,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Eugenio Orellana,N/A,Eugenio Orellana Left-Back,21,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Pablo Cárdenas,N/A,Pablo Cárdenas Right-Back,26,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Andrés Díaz,DEF,Andrés Díaz Defensive Midfield,31,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Nicolás Clavería,DEF,Nicolás Clavería Defensive Midfield,25,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Marco Medel,DEF,Marco Medel Central Midfield,36,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Fabián Núñez,DEL,Fabián Núñez Left Winger,33,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Matías Sáez,DEL,Matías Sáez Left Winger,24,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Bryan Taiva,DEL,Bryan Taiva Centre-Forward,30,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Jayden Vasquez,DEL,Jayden Vasquez Centre-Forward,18,N/A,-,https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025
-Canterano Santiago City 01,MED,MED,18,N/A,?50k,generated
+"name","position","position_raw","age","number","market_value","source"
+"David Montoya","DEF","David Montoya Centre-Back","30","N/A","€90k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Pablo Cárdenas","DEF","Pablo Cárdenas Right-Back","26","N/A","€105k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Marco Medel","MED","Marco Medel Central Midfield","36","N/A","€130k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Santiago City Cantera 19","MED","Central Midfield","25","N/A","€115k","generated://coverage"
+"Nicolás Clavería","MED","Holding Midfield","25","N/A","€115k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Mauricio Maslovski","ARQ","Mauricio Maslovski Goalkeeper","25","N/A","€85k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Jayden Vasquez","DEL","Jayden Vasquez Centre-Forward","18","N/A","€125k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Canterano Santiago City 01","MED","MED","18","N/A","?50k","generated"
+"Andrés Díaz","MED","Holding Midfield","31","N/A","€110k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Víctor González Chang","DEF","Víctor González Chang Centre-Back","31","N/A","€110k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Matías Sáez","DEL","Matías Sáez Left Winger","24","N/A","€125k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Diego Muñoz H.","DEF","Diego Muñoz H. Centre-Back","27","N/A","€115k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Bryan Taiva","DEL","Bryan Taiva Centre-Forward","30","N/A","€115k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Alonso Montecinos","ARQ","Alonso Montecinos Goalkeeper","26","N/A","€95k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Fabián Núñez","DEL","Fabián Núñez Left Winger","33","N/A","€105k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Eugenio Orellana","DEF","Eugenio Orellana Left-Back","21","N/A","€115k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Diego González Torres","DEF","Diego González Torres Centre-Back","27","N/A","€120k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Miguel Arias","DEF","Miguel Arias Left-Back","23","N/A","€100k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"
+"Santiago City Cantera 20","MED","Central Midfield","26","N/A","€120k","generated://coverage"
+"Ítalo Müller","DEF","Ítalo Müller Centre-Back","26","N/A","€115k","https://www.transfermarkt.com/santiago-city-fc/kader/verein/95713/saison_id/2025"

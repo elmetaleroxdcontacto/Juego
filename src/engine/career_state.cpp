@@ -192,6 +192,12 @@ void Career::initializeLeague(bool forceReload) {
     }
     for (auto& team : allTeams) ensureTeamIdentity(team);
 
+    const StartupValidationSummary startupValidation = buildStartupValidationSummary(6);
+    for (const string& line : startupValidation.lines) {
+        if (line == "Auditoria automatica de datos externos") continue;
+        loadWarnings.push_back(line);
+    }
+
     const RuntimeValidationSummary validation = validateLoadedCareerData(*this, 10);
     for (const string& line : validation.lines) {
         if (line == "Validacion automatica de carga") continue;

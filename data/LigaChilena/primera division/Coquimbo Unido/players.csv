@@ -1,30 +1,30 @@
-name,position,position_raw,age,number,market_value,source
-Gonzalo Flores,ARQ,Gonzalo Flores Goalkeeper,25,N/A,€250k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Diego Sánchez,ARQ,Diego Sánchez Goalkeeper,38,N/A,€50k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Cristóbal Dorador,ARQ,Cristóbal Dorador Goalkeeper,19,N/A,-,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Benjamín Gazzolo,DEF,Benjamín Gazzolo Centre-Back,28,N/A,€600k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Elvis Hernández,DEF,Elvis Hernández Centre-Back,26,N/A,€400k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Matías Fracchia,DEF,Matías Fracchia Centre-Back,30,N/A,€250k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Manuel Fernández,DEF,Manuel Fernández Centre-Back,37,N/A,€50k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Joshua Arancibia,DEF,Joshua Arancibia Centre-Back,21,N/A,-,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Sebastián Cabrera,DEL,Sebastián Cabrera Left-Back,27,N/A,€750k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Juan Cornejo,N/A,Juan Cornejo Left-Back,35,N/A,€125k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Francisco Salinas,N/A,Francisco Salinas Right-Back,26,N/A,€1.20m,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Dylan Escobar,N/A,Dylan Escobar Right-Back,25,N/A,€450k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Lukas Soza,N/A,Lukas Soza Right-Back,28,N/A,€200k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Sebastián Galani,DEF,Sebastián Galani Defensive Midfield,28,N/A,€1.00m,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Dylan Glaby,DEF,Dylan Glaby Defensive Midfield,29,N/A,€450k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Salvador Cordero,DEF,Salvador Cordero Defensive Midfield,29,N/A,€350k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Alejandro Camargo,DEF,Alejandro Camargo Defensive Midfield,36,N/A,€100k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Matías Zepeda,DEF,Matías Zepeda Central Midfield,21,N/A,€600k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Guido Vadalá,MED,Guido Vadalá Attacking Midfield,29,N/A,€375k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Pablo Rodríguez,MED,Pablo Rodríguez Attacking Midfield,19,N/A,€100k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Benjamín Chandía,MED,Benjamín Chandía Left Winger,23,N/A,€1.20m,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Martín Mundaca,DEL,Martín Mundaca Left Winger,19,N/A,€650k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Matías Alvarado,DEL,Matías Alvarado Left Winger,22,N/A,€300k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Cristián Zavala,DEL,Cristián Zavala Right Winger,26,N/A,€900k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Alejandro Azócar,DEL,Alejandro Azócar Right Winger,25,N/A,€800k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Luis Riveros,DEL,Luis Riveros Right Winger,27,N/A,€350k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Nicolás Johansen,DEL,Nicolás Johansen Centre-Forward,27,N/A,€700k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Rodrigo Holgado,DEL,Rodrigo Holgado Centre-Forward,30,N/A,€250k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
-Lucas Pratto,DEL,Lucas Pratto Centre-Forward,37,N/A,€100k,https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025
+"name","position","position_raw","age","number","market_value","source"
+"Salvador Cordero","MED","Holding Midfield","29","N/A","€350k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Alejandro Azócar","DEL","Alejandro Azócar Right Winger","25","N/A","€800k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Lukas Soza","DEF","Lukas Soza Right-Back","28","N/A","€200k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Pablo Rodríguez","MED","Pablo Rodríguez Attacking Midfield","19","N/A","€100k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Rodrigo Holgado","DEL","Rodrigo Holgado Centre-Forward","30","N/A","€250k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Dylan Escobar","DEF","Dylan Escobar Right-Back","25","N/A","€450k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Lucas Pratto","DEL","Lucas Pratto Centre-Forward","37","N/A","€100k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Benjamín Gazzolo","DEF","Benjamín Gazzolo Centre-Back","28","N/A","€600k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Dylan Glaby","MED","Holding Midfield","29","N/A","€450k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Nicolás Johansen","DEL","Nicolás Johansen Centre-Forward","27","N/A","€700k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Matías Alvarado","DEL","Matías Alvarado Left Winger","22","N/A","€300k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Elvis Hernández","DEF","Elvis Hernández Centre-Back","26","N/A","€400k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Cristián Zavala","DEL","Cristián Zavala Right Winger","26","N/A","€900k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Guido Vadalá","MED","Guido Vadalá Attacking Midfield","29","N/A","€375k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Gonzalo Flores","ARQ","Gonzalo Flores Goalkeeper","25","N/A","€250k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Alejandro Camargo","MED","Holding Midfield","36","N/A","€100k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Matías Fracchia","DEF","Matías Fracchia Centre-Back","30","N/A","€250k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Juan Cornejo","DEF","Juan Cornejo Left-Back","35","N/A","€125k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Joshua Arancibia","DEF","Joshua Arancibia Centre-Back","21","N/A","€250k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Diego Sánchez","ARQ","Diego Sánchez Goalkeeper","38","N/A","€50k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Matías Zepeda","MED","Matías Zepeda Central Midfield","21","N/A","€600k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Sebastián Galani","MED","Holding Midfield","28","N/A","€1.00m","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Manuel Fernández","DEF","Manuel Fernández Centre-Back","37","N/A","€50k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Sebastián Cabrera","DEF","Sebastián Cabrera Left-Back","27","N/A","€750k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Cristóbal Dorador","ARQ","Cristóbal Dorador Goalkeeper","19","N/A","€225k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Francisco Salinas","DEF","Francisco Salinas Right-Back","26","N/A","€1.20m","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Luis Riveros","DEL","Luis Riveros Right Winger","27","N/A","€350k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Benjamín Chandía","DEL","Benjamín Chandía Left Winger","23","N/A","€1.20m","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"
+"Martín Mundaca","DEL","Martín Mundaca Left Winger","19","N/A","€650k","https://www.transfermarkt.com/coquimbo-unido/kader/verein/11004/saison_id/2025"

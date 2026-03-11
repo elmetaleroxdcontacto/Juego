@@ -1,22 +1,23 @@
-name,position,position_raw,age,number,market_value,source
-Eduardo Miranda,ARQ,Eduardo Miranda Goalkeeper,33,N/A,€300k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Raúl Olivares,ARQ,Raúl Olivares Goalkeeper,37,N/A,€50k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Vicente Castellano,ARQ,Vicente Castellano Goalkeeper,23,N/A,-,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Víctor Espinoza,DEF,Víctor Espinoza Centre-Back,26,N/A,€125k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Sergio Felipe,DEF,Sergio Felipe Centre-Back,35,N/A,€100k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Luis Margas,DEF,Luis Margas Centre-Back,20,N/A,€50k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Pedro Navarro,N/A,Pedro Navarro Left-Back,24,N/A,€275k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Axel Herrera,N/A,Axel Herrera Right-Back,24,N/A,€200k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Cristóbal Cáceres,DEF,Cristóbal Cáceres Defensive Midfield,29,N/A,€250k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Leandro Navarro,DEF,Leandro Navarro Defensive Midfield,33,N/A,€175k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Joaquín Silva,DEF,Joaquín Silva Central Midfield,20,N/A,€400k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Ricardo Parra,DEF,Ricardo Parra Central Midfield,23,N/A,€125k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Martín Villarroel,DEF,Martín Villarroel Central Midfield,24,N/A,€100k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Jorge Luna,MED,Jorge Luna Attacking Midfield,39,N/A,€25k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Franco Lobos,DEL,Franco Lobos Left Winger,27,N/A,€300k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Esteban Luco,DEL,Esteban Luco Left Winger,21,N/A,-,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Diego Opazo,DEL,Diego Opazo Right Winger,19,N/A,€275k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Cristóbal Ponce,DEL,Cristóbal Ponce Right Winger,19,N/A,€100k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Marcos Camarda,MED,Marcos Camarda Centre-Forward,25,N/A,€450k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Javier Parraguez,DEL,Javier Parraguez Centre-Forward,36,N/A,€75k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
-Camilo Astroza,MED,Camilo Astroza Centre-Forward,22,N/A,€50k,https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025
+"name","position","position_raw","age","number","market_value","source"
+"Raúl Olivares","ARQ","Raúl Olivares Goalkeeper","37","N/A","€50k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Franco Lobos","DEL","Franco Lobos Left Winger","27","N/A","€300k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Joaquín Silva","MED","Joaquín Silva Central Midfield","20","N/A","€400k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Sergio Felipe","DEF","Sergio Felipe Centre-Back","35","N/A","€100k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Víctor Espinoza","DEF","Víctor Espinoza Centre-Back","26","N/A","€125k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Javier Parraguez","DEL","Javier Parraguez Centre-Forward","36","N/A","€75k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Leandro Navarro","MED","Holding Midfield","33","N/A","€175k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Luis Margas","DEF","Luis Margas Centre-Back","20","N/A","€50k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Santiago Wanderers Cantera 22","DEF","Centre-Back","26","N/A","€160k","generated://coverage"
+"Ricardo Parra","MED","Ricardo Parra Central Midfield","23","N/A","€125k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Cristóbal Cáceres","MED","Holding Midfield","29","N/A","€250k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Jorge Luna","MED","Jorge Luna Attacking Midfield","39","N/A","€25k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Eduardo Miranda","ARQ","Eduardo Miranda Goalkeeper","33","N/A","€300k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Camilo Astroza","DEL","Camilo Astroza Centre-Forward","22","N/A","€50k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Pedro Navarro","DEF","Pedro Navarro Left-Back","24","N/A","€275k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Martín Villarroel","MED","Martín Villarroel Central Midfield","24","N/A","€100k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Axel Herrera","DEF","Axel Herrera Right-Back","24","N/A","€200k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Cristóbal Ponce","DEL","Cristóbal Ponce Right Winger","19","N/A","€100k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Marcos Camarda","DEL","Marcos Camarda Centre-Forward","25","N/A","€450k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Esteban Luco","DEL","Esteban Luco Left Winger","21","N/A","€165k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Diego Opazo","DEL","Diego Opazo Right Winger","19","N/A","€275k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"
+"Vicente Castellano","ARQ","Vicente Castellano Goalkeeper","23","N/A","€150k","https://www.transfermarkt.com/santiago-wanderers/kader/verein/2723/saison_id/2025"

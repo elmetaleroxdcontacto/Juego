@@ -8,6 +8,10 @@ namespace gui_win32 {
 
 namespace {
 
+bool containsText(const std::string& text, const std::string& needle) {
+    return text.find(needle) != std::string::npos;
+}
+
 void showServiceMessages(AppState& state, const ServiceResult& result, const std::string& title) {
     if (result.messages.empty()) return;
     std::ostringstream out;
@@ -19,6 +23,63 @@ void showServiceMessages(AppState& state, const ServiceResult& result, const std
                 utf8ToWide(out.str()).c_str(),
                 utf8ToWide(title).c_str(),
                 MB_OK | (result.ok ? MB_ICONINFORMATION : MB_ICONWARNING));
+}
+
+void showLoadMessagesCompact(AppState& state, const ServiceResult& result, const std::string& title) {
+    if (result.messages.empty()) return;
+
+    int generatedTemporarySquads = 0;
+    int warningLines = 0;
+    std::string auditLine;
+    std::vector<std::string> highlights;
+
+    for (const auto& message : result.messages) {
+        if (containsText(message, "se genera una base temporal para")) {
+            generatedTemporarySquads++;
+            continue;
+        }
+        if (containsText(message, "Errores: ") && containsText(message, "Advertencias:")) {
+            auditLine = message;
+            continue;
+        }
+        if (containsText(message, "roster_validation_report.txt")) {
+            continue;
+        }
+        if (containsText(message, "[WARNING]") || containsText(message, "[ERROR]")) {
+            warningLines++;
+            if (highlights.size() < 3) highlights.push_back(message);
+        }
+    }
+
+    const bool hasHardAuditErrors = containsText(auditLine, "Errores: ") && !containsText(auditLine, "Errores: 0");
+    const bool hasUsefulSummary = generatedTemporarySquads > 0 || !auditLine.empty() || !highlights.empty();
+    if (!hasUsefulSummary) return;
+    if (generatedTemporarySquads == 0 && !hasHardAuditErrors) return;
+
+    std::ostringstream out;
+    out << result.messages.front();
+
+    if (generatedTemporarySquads > 0) {
+        out << "\n\nPlantillas temporales generadas: " << generatedTemporarySquads << ".";
+    }
+    if (!auditLine.empty()) {
+        out << "\n" << auditLine;
+    }
+    if (!highlights.empty()) {
+        out << "\n\nIncidencias destacadas:";
+        for (const auto& line : highlights) {
+            out << "\n- " << line;
+        }
+    }
+    if (warningLines > static_cast<int>(highlights.size())) {
+        out << "\n- ... y " << (warningLines - static_cast<int>(highlights.size())) << " incidencia(s) adicional(es).";
+    }
+    out << "\n\nDetalle completo disponible en saves/roster_validation_report.txt";
+
+    MessageBoxW(state.window,
+                utf8ToWide(out.str()).c_str(),
+                utf8ToWide(title).c_str(),
+                MB_OK | MB_ICONINFORMATION);
 }
 
 void finalizeAction(AppState& state,
@@ -59,6 +120,9 @@ void startNewCareer(AppState& state) {
     state.selectedTransferPlayer.clear();
     setCurrentPage(state, GuiPage::Dashboard);
     setStatus(state, result.messages.empty() ? "Nueva carrera iniciada." : result.messages.back());
+    if (!result.messages.empty() && result.messages.size() > 1) {
+        showLoadMessagesCompact(state, result, "Nueva carrera");
+    }
 }
 
 void loadCareer(AppState& state) {
@@ -78,6 +142,9 @@ void loadCareer(AppState& state) {
     state.selectedTransferPlayer.clear();
     setCurrentPage(state, GuiPage::Dashboard);
     setStatus(state, result.messages.empty() ? "Carrera cargada." : result.messages.back());
+    if (!result.messages.empty() && result.messages.size() > 1) {
+        showLoadMessagesCompact(state, result, "Carga de carrera");
+    }
 }
 
 void saveCareer(AppState& state) {

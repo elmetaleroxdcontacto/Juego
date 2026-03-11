@@ -1,22 +1,22 @@
-name,position,position_raw,age,number,market_value,source
-Leandro Cañete,ARQ,Leandro Cañete Goalkeeper,30,N/A,€150k,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Andrés Fernández,ARQ,Andrés Fernández Goalkeeper,27,N/A,-,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Valentín Perales,DEF,Valentín Perales Centre-Back,30,N/A,€125k,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Byron Guajardo,DEF,Byron Guajardo Centre-Back,33,N/A,€100k,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Kevin Serrano,DEF,Kevin Serrano Centre-Back,27,N/A,-,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Diego Bravo,N/A,Diego Bravo Left-Back,29,N/A,€250k,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Diego Pereira,N/A,Diego Pereira Left-Back,27,N/A,-,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Martín Ramirez,MED,Martín Ramirez Right-Back,22,N/A,€100k,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Valentín Sánchez,N/A,Valentín Sánchez Right-Back,18,N/A,-,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Luis García,DEF,Luis García Defensive Midfield,30,N/A,€250k,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Axel León,DEF,Axel León Defensive Midfield,22,N/A,€250k,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Norberto Palmieri,DEF,Norberto Palmieri Defensive Midfield,29,N/A,€50k,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Fernando Sanguinetti,DEF,Fernando Sanguinetti Defensive Midfield,20,N/A,-,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Nicolás Brun,MED,Nicolás Brun Left Midfield,26,N/A,€350k,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Ignacio Jara,MED,Ignacio Jara Attacking Midfield,29,N/A,€175k,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Bairo Riveros,DEL,Bairo Riveros Left Winger,27,N/A,€100k,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Gonzalo Jara,DEL,Gonzalo Jara Right Winger,27,N/A,€500k,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Jordan Mella,DEL,Jordan Mella Right Winger,22,N/A,€50k,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Benjamín Aravena,MED,Benjamín Aravena Right Winger,21,N/A,-,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Bruno Vides,DEL,Bruno Vides Centre-Forward,33,N/A,€100k,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
-Patricio Muñoz,DEL,Patricio Muñoz Centre-Forward,24,N/A,-,https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025
+"name","position","position_raw","age","number","market_value","source"
+"Fernando Sanguinetti","MED","Holding Midfield","20","N/A","€140k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Luis García","MED","Holding Midfield","30","N/A","€250k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Byron Guajardo","DEF","Byron Guajardo Centre-Back","33","N/A","€100k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Bruno Vides","DEL","Bruno Vides Centre-Forward","33","N/A","€100k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Patricio Muñoz","DEL","Patricio Muñoz Centre-Forward","24","N/A","€170k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Diego Pereira","DEF","Diego Pereira Left-Back","27","N/A","€150k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Martín Ramirez","DEF","Martín Ramirez Right-Back","22","N/A","€100k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Ignacio Jara","MED","Ignacio Jara Attacking Midfield","29","N/A","€175k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Kevin Serrano","DEF","Kevin Serrano Centre-Back","27","N/A","€135k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Nicolás Brun","MED","Nicolás Brun Left Midfield","26","N/A","€350k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Jordan Mella","DEL","Jordan Mella Right Winger","22","N/A","€50k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Leandro Cañete","ARQ","Leandro Cañete Goalkeeper","30","N/A","€150k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Axel León","MED","Holding Midfield","22","N/A","€250k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Valentín Perales","DEF","Valentín Perales Centre-Back","30","N/A","€125k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Gonzalo Jara","DEL","Gonzalo Jara Right Winger","27","N/A","€500k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Andrés Fernández","ARQ","Andrés Fernández Goalkeeper","27","N/A","€150k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Diego Bravo","DEF","Diego Bravo Left-Back","29","N/A","€250k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Benjamín Aravena","DEL","Benjamín Aravena Right Winger","21","N/A","€150k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Bairo Riveros","DEL","Bairo Riveros Left Winger","27","N/A","€100k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Norberto Palmieri","MED","Holding Midfield","29","N/A","€50k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"
+"Valentín Sánchez","DEF","Valentín Sánchez Right-Back","18","N/A","€150k","https://www.transfermarkt.com/union-san-felipe/kader/verein/15952/saison_id/2025"

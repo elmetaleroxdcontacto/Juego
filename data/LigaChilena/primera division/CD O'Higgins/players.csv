@@ -1,29 +1,29 @@
-name,position,position_raw,age,number,market_value,source
-Jorge Peña,ARQ,Jorge Peña Goalkeeper,25,N/A,€500k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Omar Carabalí,ARQ,Omar Carabalí Goalkeeper,28,N/A,€500k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Diego Carreño,ARQ,Diego Carreño Goalkeeper,23,N/A,€75k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Miguel Brizuela,DEF,Miguel Brizuela Centre-Back,29,N/A,€600k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Alan Robledo,DEF,Alan Robledo Centre-Back,28,N/A,€500k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Nicolás Garrido,DEF,Nicolás Garrido Centre-Back,23,N/A,€350k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-José Tomás Movillo,DEF,José Tomás Movillo Centre-Back,19,N/A,-,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Leandro Díaz,N/A,Leandro Díaz Left-Back,26,N/A,€450k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Luis Pavez Muñoz,N/A,Luis Pavez Muñoz Left-Back,30,N/A,€400k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Felipe Faúndez,N/A,Felipe Faúndez Right-Back,19,N/A,€550k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Benjamín Rojas,MED,Benjamín Rojas Right-Back,24,N/A,€300k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Cristián Morales,DEL,Cristián Morales Right-Back,19,N/A,€125k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Benjamín Schamine,DEF,Benjamín Schamine Defensive Midfield,22,N/A,€275k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Gabriel Pinto,DEF,Gabriel Pinto Defensive Midfield,21,N/A,€200k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Cristóbal Castillo,DEF,Cristóbal Castillo Defensive Midfield,23,N/A,€200k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Juan Leiva,DEF,Juan Leiva Central Midfield,32,N/A,€500k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Felipe Ogaz,DEF,Felipe Ogaz Central Midfield,22,N/A,€200k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Bryan Rabello,MED,Bryan Rabello Attacking Midfield,31,N/A,€500k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Martín Maturana,MED,Martín Maturana Attacking Midfield,22,N/A,€350k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Martín Sarrafiore,DEL,Martín Sarrafiore Left Winger,28,N/A,€800k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Rodrigo Godoy,DEL,Rodrigo Godoy Left Winger,20,N/A,€550k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Bastián Yáñez,DEL,Bastián Yáñez Left Winger,24,N/A,€350k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Francisco González,DEL,Francisco González Right Winger,24,N/A,€1.70m,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Joaquín Tapia,DEL,Joaquín Tapia Right Winger,22,N/A,€250k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Esteban Calderón,DEL,Esteban Calderón Centre-Forward,22,N/A,€700k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Thiago Vecino,DEL,Thiago Vecino Centre-Forward,27,N/A,€500k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Esteban Moreira,DEL,Esteban Moreira Centre-Forward,24,N/A,€300k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
-Arnaldo Castillo,DEL,Arnaldo Castillo Centre-Forward,28,N/A,€250k,https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025
+"name","position","position_raw","age","number","market_value","source"
+"Martín Sarrafiore","DEL","Martín Sarrafiore Left Winger","28","N/A","€800k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Benjamín Rojas","DEF","Benjamín Rojas Right-Back","24","N/A","€300k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Cristóbal Castillo","MED","Holding Midfield","23","N/A","€200k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Bastián Yáñez","DEL","Bastián Yáñez Left Winger","24","N/A","€350k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Omar Carabalí","ARQ","Omar Carabalí Goalkeeper","28","N/A","€500k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Arnaldo Castillo","DEL","Arnaldo Castillo Centre-Forward","28","N/A","€250k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Jorge Peña","ARQ","Jorge Peña Goalkeeper","25","N/A","€500k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Miguel Brizuela","DEF","Miguel Brizuela Centre-Back","29","N/A","€600k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"José Tomás Movillo","DEF","José Tomás Movillo Centre-Back","19","N/A","€240k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Juan Leiva","MED","Juan Leiva Central Midfield","32","N/A","€500k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Joaquín Tapia","DEL","Joaquín Tapia Right Winger","22","N/A","€250k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Cristián Morales","DEF","Cristián Morales Right-Back","19","N/A","€125k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Diego Carreño","ARQ","Diego Carreño Goalkeeper","23","N/A","€75k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Benjamín Schamine","MED","Holding Midfield","22","N/A","€275k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Rodrigo Godoy","DEL","Rodrigo Godoy Left Winger","20","N/A","€550k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Felipe Faúndez","DEF","Felipe Faúndez Right-Back","19","N/A","€550k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Francisco González","DEL","Francisco González Right Winger","24","N/A","€1.70m","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Martín Maturana","MED","Martín Maturana Attacking Midfield","22","N/A","€350k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Esteban Moreira","DEL","Esteban Moreira Centre-Forward","24","N/A","€300k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Thiago Vecino","DEL","Thiago Vecino Centre-Forward","27","N/A","€500k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Felipe Ogaz","MED","Felipe Ogaz Central Midfield","22","N/A","€200k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Alan Robledo","DEF","Alan Robledo Centre-Back","28","N/A","€500k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Gabriel Pinto","MED","Holding Midfield","21","N/A","€200k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Nicolás Garrido","DEF","Nicolás Garrido Centre-Back","23","N/A","€350k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Luis Pavez Muñoz","DEF","Luis Pavez Muñoz Left-Back","30","N/A","€400k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Bryan Rabello","MED","Bryan Rabello Attacking Midfield","31","N/A","€500k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Esteban Calderón","DEL","Esteban Calderón Centre-Forward","22","N/A","€700k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"
+"Leandro Díaz","DEF","Leandro Díaz Left-Back","26","N/A","€450k","https://www.transfermarkt.com/cd-ohiggins/kader/verein/11470/saison_id/2025"

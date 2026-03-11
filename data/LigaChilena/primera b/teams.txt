@@ -1,4 +1,4 @@
-﻿# teams.txt - one team folder name per line
+# teams.txt - one team folder name per line
 # optional format: Display Name|Folder Name
 
 CD Cobreloa

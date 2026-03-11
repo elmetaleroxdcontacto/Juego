@@ -1,3 +1,4 @@
+#include "ai/ai_squad_planner.h"
 #include "ai/ai_transfer_manager.h"
 #include "career/career_reports.h"
 #include "career/dressing_room_service.h"
@@ -18,6 +19,7 @@
 #include "utils/utils.h"
 #include "validators/validators.h"
 
+#include <algorithm>
 #include <exception>
 #include <cstdio>
 #include <fstream>
@@ -271,6 +273,20 @@ void testRuntimeValidationFlagsBrokenLoadedSquad() {
     expect(summary.errorCount >= 2, "La validacion en carga debe contar errores de duplicados y posiciones invalidas.");
 }
 
+void testStartupValidationSummaryExposesExternalAudit() {
+    const StartupValidationSummary summary = buildStartupValidationSummary(3, true);
+    const DataValidationReport report = buildRosterDataValidationReport();
+
+    expect(summary.errorCount == report.errorCount,
+           "La validacion de arranque debe reflejar el mismo conteo de errores que la auditoria profunda.");
+    expect(summary.warningCount == report.warningCount,
+           "La validacion de arranque debe reflejar el mismo conteo de advertencias que la auditoria profunda.");
+    expect(!summary.lines.empty(), "La validacion de arranque debe devolver un resumen legible.");
+    if (report.errorCount > 0) {
+        expect(!summary.ok, "La validacion de arranque no puede marcarse sana si la base externa tiene errores.");
+    }
+}
+
 void testCompetitionGroupTableScopesActiveGroup() {
     Career career;
     career.activeDivision = "segunda division";
@@ -415,6 +431,33 @@ void testTransferShortlistRewardsScoutedNeed() {
     const vector<TransferTarget> shortlist = transfer_market::buildTransferShortlist(career, buyer, 5);
     expect(!shortlist.empty(), "El mercado debe construir una shortlist para el club comprador.");
     expect(shortlist.front().onShortlist, "Un objetivo ya scouteado debe subir en la prioridad de fichaje.");
+}
+
+void testSquadPlannerFlagsUnusedSeniorSaleCandidates() {
+    Team team = makeTeam("Plantel Largo", "primera division", 67, 3, 3, "Balanced", "Equilibrado", 650000);
+
+    Player& expendableA = team.players[12];
+    expendableA.age = 31;
+    expendableA.startsThisSeason = 0;
+    expendableA.matchesPlayed = 0;
+    expendableA.potential = expendableA.skill + 1;
+    expendableA.fitness = 53;
+    expendableA.wantsToLeave = true;
+
+    Player& expendableB = team.players[13];
+    expendableB.age = 29;
+    expendableB.startsThisSeason = 0;
+    expendableB.matchesPlayed = 1;
+    expendableB.potential = expendableB.skill + 2;
+    expendableB.happiness = 42;
+
+    const SquadNeedReport report = ai_squad_planner::analyzeSquad(team);
+    expect(report.unusedSeniorPlayers >= 2,
+           "La IA de plantilla debe contar veteranos casi sin uso para planificar salidas.");
+    expect(report.salePressure >= 1,
+           "La IA de plantilla debe generar presion de venta cuando el plantel acumula piezas marginales.");
+    expect(find(report.saleCandidates.begin(), report.saleCandidates.end(), expendableA.name) != report.saleCandidates.end(),
+           "Un jugador veterano, poco usado y con deseo de salida debe entrar en candidatos de venta.");
 }
 
 void testSeasonTransitionAdvancesCareerWithoutUiDependencies() {
@@ -753,9 +796,11 @@ int main() {
         {"low_block_chance_quality", testLowBlockSuppressesChanceQuality},
         {"competition_rules_csv", testCompetitionRulesLoadFromCsv},
         {"runtime_load_validation", testRuntimeValidationFlagsBrokenLoadedSquad},
+        {"startup_data_validation", testStartupValidationSummaryExposesExternalAudit},
         {"competition_group_table", testCompetitionGroupTableScopesActiveGroup},
         {"transfer_affordability", testTransferEvaluationPenalizesUnaffordableDeals},
         {"transfer_shortlist", testTransferShortlistRewardsScoutedNeed},
+        {"squad_sale_candidates", testSquadPlannerFlagsUnusedSeniorSaleCandidates},
         {"transfer_negotiation", testTransferNegotiationBuildsStructuredDeal},
         {"season_transition", testSeasonTransitionAdvancesCareerWithoutUiDependencies},
         {"season_service", testSeasonServiceReturnsStructuredWeekResult},

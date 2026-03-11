@@ -43,6 +43,16 @@ struct RawTeamRecord {
     vector<RawPlayerRecord> players;
 };
 
+struct CachedRosterAudit {
+    bool ready = false;
+    DataValidationReport report;
+};
+
+static CachedRosterAudit& rosterAuditCache() {
+    static CachedRosterAudit cache;
+    return cache;
+}
+
 static bool hasSuspiciousEncoding(const string& text) {
     return text.find("Ã") != string::npos || text.find("Â") != string::npos ||
            text.find("â") != string::npos || text.find("�") != string::npos;
@@ -985,8 +995,7 @@ DataValidationReport buildRosterDataValidationReport() {
     return report;
 }
 
-bool writeRosterDataValidationReport(const string& path) {
-    DataValidationReport report = buildRosterDataValidationReport();
+static bool writeRosterDataValidationReportInternal(const DataValidationReport& report, const string& path) {
     string parent = path;
     size_t slash = parent.find_last_of("/\\");
     if (slash != string::npos) {
@@ -1008,6 +1017,53 @@ bool writeRosterDataValidationReport(const string& path) {
         file << formatIssueLine(issue) << "\n";
     }
     return file.good();
+}
+
+bool writeRosterDataValidationReport(const string& path) {
+    return writeRosterDataValidationReportInternal(buildRosterDataValidationReport(), path);
+}
+
+StartupValidationSummary buildStartupValidationSummary(size_t maxLines, bool forceRefresh) {
+    static bool buildingSummary = false;
+    if (buildingSummary) {
+        StartupValidationSummary skipped{};
+        skipped.ok = true;
+        skipped.errorCount = 0;
+        skipped.warningCount = 0;
+        return skipped;
+    }
+
+    buildingSummary = true;
+    CachedRosterAudit& cache = rosterAuditCache();
+    if (!cache.ready || forceRefresh) {
+        cache.report = buildRosterDataValidationReport();
+        writeRosterDataValidationReportInternal(cache.report, "saves/roster_validation_report.txt");
+        cache.ready = true;
+    }
+
+    StartupValidationSummary summary{};
+    summary.ok = cache.report.errorCount == 0;
+    summary.errorCount = cache.report.errorCount;
+    summary.warningCount = cache.report.warningCount;
+    summary.lines.push_back("Auditoria automatica de datos externos");
+    summary.lines.push_back("Errores: " + to_string(summary.errorCount) +
+                            " | Advertencias: " + to_string(summary.warningCount));
+
+    if (cache.report.issues.empty()) {
+        summary.lines.push_back("No se detectaron incidencias al revisar la base externa.");
+        buildingSummary = false;
+        return summary;
+    }
+
+    const size_t limit = min(maxLines, cache.report.issues.size());
+    for (size_t i = 0; i < limit; ++i) {
+        summary.lines.push_back(formatIssueLine(cache.report.issues[i]));
+    }
+    if (cache.report.issues.size() > limit) {
+        summary.lines.push_back("Reporte completo disponible en saves/roster_validation_report.txt");
+    }
+    buildingSummary = false;
+    return summary;
 }
 
 ValidationSuiteSummary buildValidationSuiteSummary() {

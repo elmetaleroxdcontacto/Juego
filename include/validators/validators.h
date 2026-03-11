@@ -37,8 +37,16 @@ struct RuntimeValidationSummary {
     std::vector<std::string> lines;
 };
 
+struct StartupValidationSummary {
+    bool ok;
+    int errorCount;
+    int warningCount;
+    std::vector<std::string> lines;
+};
+
 DataValidationReport buildRosterDataValidationReport();
 bool writeRosterDataValidationReport(const std::string& path);
 RuntimeValidationSummary validateLoadedCareerData(const struct Career& career, std::size_t maxLines = 12);
+StartupValidationSummary buildStartupValidationSummary(std::size_t maxLines = 8, bool forceRefresh = false);
 ValidationSuiteSummary buildValidationSuiteSummary();
 int runValidationSuite(bool verbose = true);

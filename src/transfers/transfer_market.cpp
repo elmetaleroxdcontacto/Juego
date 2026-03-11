@@ -35,6 +35,14 @@ const TransferTarget* selectPreferredTarget(const vector<TransferTarget>& shortl
     return &shortlist.front();
 }
 
+int findSaleCandidateIndex(const Team& team, const vector<string>& candidateNames) {
+    for (const string& name : candidateNames) {
+        int idx = playerIndexByName(team, name);
+        if (idx >= 0) return idx;
+    }
+    return -1;
+}
+
 }  // namespace
 
 namespace transfer_market {
@@ -85,14 +93,27 @@ void processCpuTransfers(Career& career) {
         const ClubTransferStrategy strategy = ai_transfer_manager::buildClubTransferStrategy(career, *team);
         const int maxSquad = getCompetitionConfig(team->division).maxSquadSize;
 
-        if ((maxSquad > 0 && static_cast<int>(team->players.size()) > maxSquad) || strategy.needsLiquidity) {
-            int sellIdx = -1;
+        if (team->players.size() > 18 &&
+            ((maxSquad > 0 && static_cast<int>(team->players.size()) > maxSquad) ||
+             strategy.needsLiquidity || strategy.salePressure >= 2)) {
+            int sellIdx = findSaleCandidateIndex(*team, strategy.saleCandidates);
             int sellScore = -100000;
+            if (sellIdx >= 0) {
+                const Player& current = team->players[static_cast<size_t>(sellIdx)];
+                sellScore = static_cast<int>(current.value / 1000) + current.age * 3 + (current.wantsToLeave ? 25 : 0);
+                if (current.age >= 24 && current.startsThisSeason == 0 &&
+                    current.matchesPlayed <= 1 && current.potential <= current.skill + 2) {
+                    sellScore += 18;
+                }
+            }
             for (size_t i = 0; i < team->players.size(); ++i) {
                 const Player& current = team->players[i];
                 const bool wrongProfile = normalizePosition(current.position) == squad.surplusPosition || current.wantsToLeave;
-                if (!wrongProfile) continue;
+                const bool expendableByUsage = current.age >= 24 && current.startsThisSeason == 0 &&
+                                               current.matchesPlayed <= 1 && current.potential <= current.skill + 2;
+                if (!wrongProfile && !expendableByUsage) continue;
                 int score = static_cast<int>(current.value / 1000) + current.age * 3 + (current.wantsToLeave ? 25 : 0);
+                if (expendableByUsage) score += 18;
                 if (score > sellScore) {
                     sellScore = score;
                     sellIdx = static_cast<int>(i);

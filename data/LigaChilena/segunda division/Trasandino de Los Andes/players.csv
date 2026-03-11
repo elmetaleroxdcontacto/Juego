@@ -1,20 +1,22 @@
-name,position,position_raw,age,number,market_value,source
-Matías Reyes,ARQ,Matías Reyes Goalkeeper,21,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Jean Cerda,ARQ,Jean Cerda Goalkeeper,22,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Matías Silva,DEF,Matías Silva Centre-Back,25,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Matías Torres,DEF,Matías Torres Centre-Back,25,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Joshoa Sotomayor,DEF,Joshoa Sotomayor Centre-Back,25,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Alejandro Henríquez,N/A,Alejandro Henríquez Left-Back,24,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Allan Jorquera,DEF,Allan Jorquera Defensive Midfield,22,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Walter Martínez,DEF,Walter Martínez Central Midfield,26,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Dylan Fernández,DEF,Dylan Fernández Central Midfield,22,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Jhoyner Gómez,DEF,Jhoyner Gómez Central Midfield,22,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-José Mauricio Delgado,MED,José Mauricio Delgado Attacking Midfield,24,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Benjamín Rodríguez,MED,Benjamín Rodríguez Attacking Midfield,22,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Bastián Martínez,DEL,Bastián Martínez Left Winger,24,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Santiago Salaberry,DEL,Santiago Salaberry Left Winger,26,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Benjamín Venegas,MED,Benjamín Venegas Left Winger,22,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Brandon Martínez,DEL,Brandon Martínez Left Winger,22,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Sebastián Muñoz,DEL,Sebastián Muñoz Right Winger,18,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Javier Quiñones,DEL,Javier Quiñones Centre-Forward,23,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
-Tomás San Martín,DEL,Tomás San Martín Centre-Forward,-,N/A,-,https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025
+"name","position","position_raw","age","number","market_value","source"
+"Matías Reyes","ARQ","Matías Reyes Goalkeeper","21","N/A","€80k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Trasandino de Los Andes Cantera 20","DEF","Right-Back","28","N/A","€100k","generated://coverage"
+"Sebastián Muñoz","DEL","Sebastián Muñoz Right Winger","18","N/A","€125k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"José Mauricio Delgado","MED","José Mauricio Delgado Attacking Midfield","24","N/A","€120k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Brandon Martínez","DEL","Brandon Martínez Left Winger","22","N/A","€120k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Javier Quiñones","DEL","Javier Quiñones Centre-Forward","23","N/A","€115k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Bastián Martínez","DEL","Bastián Martínez Left Winger","24","N/A","€120k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Tomás San Martín","DEL","Tomás San Martín Centre-Forward","20","N/A","€120k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Joshoa Sotomayor","DEF","Joshoa Sotomayor Centre-Back","25","N/A","€110k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Jhoyner Gómez","MED","Jhoyner Gómez Central Midfield","22","N/A","€115k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Alejandro Henríquez","DEF","Alejandro Henríquez Left-Back","24","N/A","€100k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Allan Jorquera","MED","Holding Midfield","22","N/A","€100k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Matías Torres","DEF","Matías Torres Centre-Back","25","N/A","€90k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Walter Martínez","MED","Walter Martínez Central Midfield","26","N/A","€110k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Benjamín Rodríguez","MED","Benjamín Rodríguez Attacking Midfield","22","N/A","€125k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Jean Cerda","ARQ","Jean Cerda Goalkeeper","22","N/A","€100k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Benjamín Venegas","DEL","Benjamín Venegas Left Winger","22","N/A","€130k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Matías Silva","DEF","Matías Silva Centre-Back","25","N/A","€115k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Dylan Fernández","MED","Dylan Fernández Central Midfield","22","N/A","€120k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Santiago Salaberry","DEL","Santiago Salaberry Left Winger","26","N/A","€135k","https://www.transfermarkt.com/cd-trasandino-de-los-andes/kader/verein/20748/saison_id/2025"
+"Trasandino de Los Andes Cantera 21","DEF","Centre-Back","29","N/A","€105k","generated://coverage"

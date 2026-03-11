@@ -2113,3 +2113,125 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - el mercado tiene mejor criterio deportivo y de scouting
   - la carga de reglas y datos externos queda mas flexible
   - la GUI expone mejor la informacion al jugador
+
+## Cambios recientes (2026-03-11) - Validacion de arranque, ventas IA y radar de fichajes
+
+- Se agrego una validacion automatica explicita de datos externos al iniciar la carga de ligas:
+  - `include/validators/validators.h`
+  - `src/validators/validators.cpp`
+  - `src/engine/career_state.cpp`
+
+- Nuevo resumen de arranque:
+  - `StartupValidationSummary`
+  - reutiliza la auditoria profunda de `data/LigaChilena`
+  - genera/actualiza `saves/roster_validation_report.txt`
+  - expone un resumen corto dentro de `loadWarnings`
+
+- Efecto practico:
+  - la validacion de datos ya no depende solo de ejecutar `--validate`
+  - al iniciar el juego o recargar ligas quedan visibles:
+    - conteo de errores
+    - conteo de advertencias
+    - primeras incidencias relevantes
+    - referencia al reporte completo en disco
+
+- Se ajusto la GUI para no ocultar estos avisos al jugador:
+  - `src/gui/gui_actions.cpp`
+  - al crear o cargar carrera, si hay mensajes relevantes de carga, ahora se muestran en dialogo
+
+- IA de plantilla reforzada para detectar jugadores prescindibles:
+  - `include/ai/ai_squad_planner.h`
+  - `src/ai/ai_squad_planner.cpp`
+  - `include/transfers/transfer_types.h`
+  - `src/ai/ai_transfer_manager.cpp`
+  - `src/transfers/transfer_market.cpp`
+
+- Nuevos datos de planificacion:
+  - `unusedSeniorPlayers`
+  - `salePressure`
+  - `saleCandidates`
+
+- La IA ahora identifica mejor:
+  - veteranos casi sin minutos
+  - jugadores con potencial bajo respecto a su nivel actual
+  - futbolistas que quieren salir
+  - excedentes en posiciones sobrantes
+
+- Efecto practico en mercado CPU:
+  - los clubes IA pueden vender suplentes marginales aunque no esten solo fuera de perfil
+  - la limpieza de plantel es mas creible cuando hay sobrecupo, tension financiera o acumulacion de piezas sin uso
+
+- Radar de fichajes de la GUI conectado con la evaluacion real del mercado:
+  - `src/gui/gui_views.cpp`
+
+- La vista de fichajes ahora usa la evaluacion de `ai_transfer_manager` para mostrar:
+  - costo estimado
+  - salario esperado
+  - etiqueta de radar/scouting
+  - contexto de mercado
+  - shortlist y prioridad por necesidad
+
+- Mejora visible:
+  - el panel de fichajes ya no es solo una lista cruda de jugadores
+  - ahora refleja mejor:
+    - viabilidad economica
+    - urgencia deportiva
+    - seguimiento previo
+
+- Tests nuevos/agregados:
+  - `startup_data_validation`
+  - `squad_sale_candidates`
+
+- Verificacion realizada:
+  - `build.bat --validate`
+  - `cmake --build build-cmake --config Release --target FootballManagerTests`
+  - `FootballManagerTests.exe`: todos los tests pasan
+  - `FootballManager.exe --validate`: sigue marcando `9236` errores y `1283` advertencias de la base externa, ahora tambien preparados para resumirse al arranque
+
+## Cambios recientes (2026-03-11) - Saneamiento masivo de `data/LigaChilena`
+
+- Se agrego una herramienta reusable para limpiar la base externa:
+  - `tools/sanitize_ligachilena_data.ps1`
+
+- El script sanea automaticamente:
+  - `teams.txt` con nombres mojibake
+  - `players.csv` existentes
+  - conversion de `players.txt` / `players.json` a `players.csv` utilizable
+  - generacion de `players.csv` base para clubes sin archivo de plantilla
+  - edades faltantes
+  - posiciones `N/A`
+  - posiciones inferidas desde `position_raw`
+  - nombres con prefijos numericos o sufijos de rol
+  - deduplicacion basica por jugador
+  - cobertura minima de arqueros, defensas, mediocampistas y delanteros
+  - cobertura especifica de centrales y laterales para pasar la auditoria real
+
+- Tambien se alineo el saneamiento con el parser del juego:
+  - se corrigio el caso de `Defensive Midfield`, que el parser estaba leyendo como defensa por la heuristica `def`
+  - ahora se reescribe a etiquetas compatibles como `Holding Midfield` o `Central Midfield`
+
+- Se regeneraron plantillas faltantes para los clubes que antes disparaban:
+  - `Plantilla invalida o incompleta, se genera una base temporal...`
+
+- Resultado real despues del saneamiento:
+  - antes:
+    - `Errores: 9236`
+    - `Advertencias: 1283`
+    - `Jugadores crudos: 7111`
+  - despues:
+    - `Errores: 0`
+    - `Advertencias: 196`
+    - `Jugadores crudos: 2200`
+
+- El popup de arranque en GUI tambien se ajusto:
+  - `src/gui/gui_actions.cpp`
+  - ya no abre un dialogo grande solo por advertencias cuando la auditoria queda en `Errores: 0`
+
+- Advertencias que siguen pendientes:
+  - carpetas historicas/no referenciadas en `teams.txt` de Tercera A/B
+  - un par de discrepancias puntuales `DEL vs MED`
+  - son deuda de curacion fina, ya no rompen el arranque ni la validacion
+
+- Verificacion realizada:
+  - `FootballManager.exe --validate`: `Resultado: sin fallas`
+  - `FootballManagerTests.exe`: todos los tests pasan

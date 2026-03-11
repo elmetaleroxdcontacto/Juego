@@ -1,20 +1,20 @@
-name,position,position_raw,age,number,market_value,source
-Cristóbal Lecaros,ARQ,Cristóbal Lecaros Goalkeeper,26,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Felipe Abarca,ARQ,Felipe Abarca Goalkeeper,32,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Gonzalo Medina,DEF,Gonzalo Medina Centre-Back,28,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Vicente Orrego,DEF,Vicente Orrego Centre-Back,21,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Nicolás Díaz García,N/A,Nicolás Díaz García Left-Back,26,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Diego Salas,N/A,Diego Salas Left-Back,28,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Lucas Leguizamón,MED,Lucas Leguizamón Left-Back,24,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Ignacio Carvajal,N/A,Ignacio Carvajal Right-Back,28,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Michel Quezada,N/A,Michel Quezada Right-Back,27,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Juan Pablo Carrasco,DEF,Juan Pablo Carrasco Defensive Midfield,37,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Ignacio Cataldo,DEF,Ignacio Cataldo Defensive Midfield,26,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Ángel Orellana,DEF,Ángel Orellana Central Midfield,23,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Benjamín Pinto,DEF,Benjamín Pinto Central Midfield,26,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Patricio Troncoso,MED,Patricio Troncoso Attacking Midfield,33,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Hamlet Castillo,MED,Hamlet Castillo Attacking Midfield,25,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Junio Lopes,DEL,Junio Lopes Left Winger,26,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Jaime Droguett,DEL,Jaime Droguett Right Winger,37,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Benjamín Campos,MED,Benjamín Campos Centre-Forward,25,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
-Mateo González Peña,DEL,Mateo González Peña Centre-Forward,20,N/A,-,https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025
+"name","position","position_raw","age","number","market_value","source"
+"Lucas Leguizamón","DEF","Centre-Back","24","N/A","€95k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Ignacio Cataldo","MED","Holding Midfield","26","N/A","€110k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Patricio Troncoso","MED","Patricio Troncoso Attacking Midfield","33","N/A","€115k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Ignacio Carvajal","DEF","Ignacio Carvajal Right-Back","28","N/A","€115k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Vicente Orrego","DEF","Vicente Orrego Centre-Back","21","N/A","€110k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Michel Quezada","DEF","Michel Quezada Right-Back","27","N/A","€95k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Juan Pablo Carrasco","MED","Holding Midfield","37","N/A","€115k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Cristóbal Lecaros","ARQ","Cristóbal Lecaros Goalkeeper","26","N/A","€110k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Hamlet Castillo","MED","Hamlet Castillo Attacking Midfield","25","N/A","€115k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Benjamín Pinto","MED","Benjamín Pinto Central Midfield","26","N/A","€115k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Mateo González Peña","DEL","Mateo González Peña Centre-Forward","20","N/A","€130k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Felipe Abarca","ARQ","Felipe Abarca Goalkeeper","32","N/A","€110k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Diego Salas","DEF","Diego Salas Left-Back","28","N/A","€100k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Nicolás Díaz García","DEF","Nicolás Díaz García Left-Back","26","N/A","€105k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Gonzalo Medina","DEF","Gonzalo Medina Centre-Back","28","N/A","€115k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Jaime Droguett","DEL","Jaime Droguett Right Winger","37","N/A","€120k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Junio Lopes","DEL","Junio Lopes Left Winger","26","N/A","€125k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Benjamín Campos","DEL","Benjamín Campos Centre-Forward","25","N/A","€110k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"
+"Ángel Orellana","MED","Ángel Orellana Central Midfield","23","N/A","€110k","https://www.transfermarkt.com/general-velasquez/kader/verein/64176/saison_id/2025"

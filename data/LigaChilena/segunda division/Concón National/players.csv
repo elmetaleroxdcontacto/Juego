@@ -1,27 +1,28 @@
-name,position,position_raw,age,number,market_value,source
-Pedro Pizarro,ARQ,Pedro Pizarro Goalkeeper,23,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Marcos Velásquez,DEF,Marcos Velásquez Centre-Back,37,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Matías Navarrete,DEF,Matías Navarrete Centre-Back,34,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Luciano Vargas,DEF,Luciano Vargas Centre-Back,27,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Cristián Díaz,DEF,Cristián Díaz Centre-Back,25,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Juan Pablo Andrade,DEF,Juan Pablo Andrade Centre-Back,37,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Brian Torres,DEF,Brian Torres Centre-Back,26,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Cristian Vega,DEL,Cristian Vega Left-Back,26,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Claudio Jopia,N/A,Claudio Jopia Left-Back,34,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Joaquín López,N/A,Joaquín López Left-Back,26,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Sebastián Contreras,DEL,Sebastián Contreras Left-Back,21,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Fernando Quiroz,N/A,Fernando Quiroz Right-Back,26,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Kevin Araya,N/A,Kevin Araya Right-Back,26,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Benjamín Rivera,DEF,Benjamín Rivera Defensive Midfield,26,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Piero Gárate,DEF,Piero Gárate Defensive Midfield,33,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Patricio Flores,DEF,Patricio Flores Defensive Midfield,24,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Valentín Demateis,DEF,Valentín Demateis Central Midfield,24,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Franco Ragusa,DEF,Franco Ragusa Central Midfield,33,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Giovanni Davis,DEF,Giovanni Davis Central Midfield,25,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Bruno Álvarez,DEF,Bruno Álvarez Central Midfield,23,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Joaquín Llanos,MED,Joaquín Llanos Attacking Midfield,25,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-René Zúñiga,DEL,René Zúñiga Left Winger,25,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Jimmy Cisterna,DEL,Jimmy Cisterna Right Winger,32,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Sebastián Ubilla,DEL,Sebastián Ubilla Right Winger,35,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Vicente Vera,DEL,Vicente Vera Right Winger,21,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
-Rodrigo Gattas,DEL,Rodrigo Gattas Centre-Forward,34,N/A,-,https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025
+"name","position","position_raw","age","number","market_value","source"
+"Juan Pablo Andrade","DEF","Juan Pablo Andrade Centre-Back","37","N/A","€100k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Marcos Velásquez","DEF","Marcos Velásquez Centre-Back","37","N/A","€95k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Franco Ragusa","MED","Franco Ragusa Central Midfield","33","N/A","€110k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Luciano Vargas","DEF","Luciano Vargas Centre-Back","27","N/A","€115k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Kevin Araya","DEF","Kevin Araya Right-Back","26","N/A","€105k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Vicente Vera","DEL","Vicente Vera Right Winger","21","N/A","€125k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Brian Torres","DEF","Brian Torres Centre-Back","26","N/A","€115k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Pedro Pizarro","ARQ","Pedro Pizarro Goalkeeper","23","N/A","€100k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Matías Navarrete","DEF","Matías Navarrete Centre-Back","34","N/A","€105k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Joaquín López","DEF","Joaquín López Left-Back","26","N/A","€100k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Sebastián Contreras","DEF","Sebastián Contreras Left-Back","21","N/A","€115k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Sebastián Ubilla","DEL","Sebastián Ubilla Right Winger","35","N/A","€105k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Cristian Vega","DEF","Cristian Vega Left-Back","26","N/A","€120k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Benjamín Rivera","MED","Holding Midfield","26","N/A","€100k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Giovanni Davis","MED","Giovanni Davis Central Midfield","25","N/A","€105k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Claudio Jopia","DEF","Claudio Jopia Left-Back","34","N/A","€95k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Jimmy Cisterna","DEL","Jimmy Cisterna Right Winger","32","N/A","€105k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Rodrigo Gattas","DEL","Rodrigo Gattas Centre-Forward","34","N/A","€115k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"René Zúñiga","DEL","René Zúñiga Left Winger","25","N/A","€135k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Bruno Álvarez","MED","Bruno Álvarez Central Midfield","23","N/A","€100k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Cristián Díaz","DEF","Cristián Díaz Centre-Back","25","N/A","€115k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Valentín Demateis","MED","Valentín Demateis Central Midfield","24","N/A","€100k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Concón National Cantera 27","ARQ","Goalkeeper","29","N/A","€110k","generated://coverage"
+"Joaquín Llanos","MED","Joaquín Llanos Attacking Midfield","25","N/A","€100k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Fernando Quiroz","DEF","Fernando Quiroz Right-Back","26","N/A","€95k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Piero Gárate","MED","Holding Midfield","33","N/A","€120k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"
+"Patricio Flores","MED","Holding Midfield","24","N/A","€125k","https://www.transfermarkt.com/con-con-national/kader/verein/95053/saison_id/2025"

@@ -3,8 +3,39 @@
 #include "utils/utils.h"
 
 #include <algorithm>
+#include <map>
 
 using namespace std;
+
+namespace {
+
+bool isHighUpsideYouth(const Player& player) {
+    return player.age <= 21 && player.potential >= player.skill + 8;
+}
+
+int saleCandidateScore(const SquadNeedReport& report,
+                       const map<string, int>& positionCounts,
+                       const Player& player) {
+    const string position = normalizePosition(player.position);
+    int score = 0;
+    const bool unusedSenior = player.age >= 24 && player.startsThisSeason == 0 && player.matchesPlayed <= 1;
+
+    if (player.wantsToLeave) score += 28;
+    if (player.happiness < 46) score += 12;
+    if (unusedSenior) score += 18;
+    if (player.age >= 30) score += 10;
+    if (player.contractWeeks <= 20 && player.age >= 24) score += 8;
+    if (position == report.surplusPosition) score += 10;
+    if (player.potential <= player.skill + 2) score += 6;
+    if (player.fitness < 55) score += 4;
+    if (player.promisedRole == "Titular" && player.startsThisSeason >= 2) score -= 14;
+    if (player.promisedRole == "Proyecto") score -= 10;
+    if (isHighUpsideYouth(player)) score -= 18;
+    if (position == "ARQ" && positionCounts.count(position) && positionCounts.at(position) <= 2) score -= 25;
+    return score;
+}
+
+}  // namespace
 
 namespace ai_squad_planner {
 
@@ -36,11 +67,16 @@ SquadNeedReport analyzeSquad(const Team& team) {
     int totalAge = 0;
     int totalFitness = 0;
     int rotationRisk = 0;
+    map<string, int> positionCounts;
 
     for (const auto& player : team.players) {
         totalAge += player.age;
         totalFitness += player.fitness;
         if (player.fitness < 60 || player.matchesSuspended > 0 || player.injured) rotationRisk++;
+        positionCounts[normalizePosition(player.position)]++;
+        if (player.age >= 24 && player.startsThisSeason == 0 && player.matchesPlayed <= 1) {
+            report.unusedSeniorPlayers++;
+        }
     }
     if (!team.players.empty()) {
         report.averageAge = totalAge / static_cast<int>(team.players.size());
@@ -87,6 +123,24 @@ SquadNeedReport analyzeSquad(const Team& team) {
             }
         }
     }
+
+    vector<pair<int, string> > saleRanks;
+    for (const auto& player : team.players) {
+        const int score = saleCandidateScore(report, positionCounts, player);
+        if (score >= 18) {
+            saleRanks.push_back({score, player.name});
+        }
+    }
+    sort(saleRanks.begin(), saleRanks.end(), [](const auto& left, const auto& right) {
+        if (left.first != right.first) return left.first > right.first;
+        return left.second < right.second;
+    });
+    for (size_t i = 0; i < saleRanks.size() && i < 5; ++i) {
+        report.saleCandidates.push_back(saleRanks[i].second);
+    }
+    report.salePressure = static_cast<int>(saleRanks.size());
+    if (team.players.size() > 24) report.salePressure += static_cast<int>(team.players.size() - 24);
+    if (report.unusedSeniorPlayers >= 3) report.salePressure++;
     return report;
 }
 

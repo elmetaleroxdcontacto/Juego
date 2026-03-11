@@ -30,12 +30,14 @@ ClubTransferStrategy buildClubTransferStrategy(const Career& career, const Team&
     strategy.needsStarter = squad.rotationRisk >= 5 || !squad.thinPositions.empty();
     strategy.trustYouthCover = strategy.youthFocus && !squad.youthCoverPositions.empty();
     strategy.rotationRisk = squad.rotationRisk;
+    strategy.salePressure = squad.salePressure;
     strategy.maxTargets = strategy.promotionPush ? 6 : 4;
     strategy.maxTransferBudget = finance_system::calculateTransferBuffer(team);
     strategy.maxWageBudget = max(20000LL, finance_system::calculateWeeklyPayroll(team) / 4);
     strategy.priorityPositions = squad.priorityPositions;
     strategy.thinPositions = squad.thinPositions;
     strategy.youthCoverPositions = squad.youthCoverPositions;
+    strategy.saleCandidates = squad.saleCandidates;
     return strategy;
 }
 

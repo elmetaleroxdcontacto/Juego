@@ -2,6 +2,7 @@
 
 #ifdef _WIN32
 
+#include "ai/ai_transfer_manager.h"
 #include "career/dressing_room_service.h"
 #include "career/match_analysis_store.h"
 #include "career/match_center_service.h"
@@ -22,12 +23,18 @@ struct TransferPreviewItem {
     int age = 0;
     int skill = 0;
     int potential = 0;
-    long long value = 0;
-    long long wage = 0;
+    long long expectedFee = 0;
+    long long expectedWage = 0;
     std::string club;
-    std::string playerInterest;
-    std::string clubInterest;
+    std::string scoutingLabel;
+    std::string marketLabel;
     std::string expectedRole;
+    std::string scoutingNote;
+    bool onShortlist = false;
+    bool urgentNeed = false;
+    int scoutingConfidence = 0;
+    int affordabilityScore = 0;
+    double totalScore = 0.0;
 };
 
 std::string pageTitleFor(GuiPage page) {
@@ -368,6 +375,19 @@ std::string sellerInterestLabel(const Team& seller, const Player& player) {
     return "Resistiran";
 }
 
+std::string transferRadarLabel(const TransferTarget& target) {
+    std::string prefix = target.onShortlist ? "Shortlist" : (target.urgentNeed ? "Prioridad" : "Seguimiento");
+    return prefix + " " + std::to_string(target.scoutingConfidence) + "%";
+}
+
+std::string transferMarketLabel(const TransferTarget& target) {
+    if (target.contractRunningOut) return "Contrato corto";
+    if (target.availableForLoan && target.affordabilityScore < 12) return "Cesion viable";
+    if (target.affordabilityScore >= 20) return "Viable";
+    if (target.affordabilityScore >= 8) return "Coste tenso";
+    return "Coste alto";
+}
+
 const Player* findPlayerByName(const Team& team, const std::string& name) {
     for (const auto& player : team.players) {
         if (player.name == name) return &player;
@@ -668,6 +688,8 @@ ListPanelModel buildTransferPipelineModel(const Career& career) {
 std::vector<TransferPreviewItem> buildTransferTargets(const Career& career, const std::string& filter) {
     std::vector<TransferPreviewItem> rows;
     if (!career.myTeam) return rows;
+    const Team& buyer = *career.myTeam;
+    const ClubTransferStrategy strategy = ai_transfer_manager::buildClubTransferStrategy(career, buyer);
 
     for (const auto& seller : career.allTeams) {
         if (&seller == career.myTeam) continue;
@@ -675,32 +697,43 @@ std::vector<TransferPreviewItem> buildTransferTargets(const Career& career, cons
             std::string position = normalizePosition(player.position);
             if (filter == "Sub-23" && player.age > 23) continue;
             if (filter == "Potencial 75+" && player.potential < 75) continue;
-            if (filter == "Precio accesible" && player.value > career.myTeam->budget / 2) continue;
-            if (filter == "Salario bajo" && player.wage > career.myTeam->budget / 90) continue;
             if (filter == "ARQ" || filter == "DEF" || filter == "MED" || filter == "DEL") {
                 if (position != filter) continue;
             }
             if (player.age > 35 || player.onLoan) continue;
+
+            const TransferTarget target = ai_transfer_manager::evaluateTarget(career, buyer, seller, player, strategy);
+            if (filter == "Precio accesible" && target.expectedFee > strategy.maxTransferBudget) continue;
+            if (filter == "Salario bajo" && target.expectedWage > strategy.maxWageBudget) continue;
+
             rows.push_back({
                 player.name,
                 position,
                 player.age,
                 player.skill,
                 player.potential,
-                player.value,
-                player.wage,
+                target.expectedFee,
+                target.expectedWage,
                 seller.name,
-                playerInterestLabel(career, seller, player),
-                sellerInterestLabel(seller, player),
-                expectedRoleLabel(*career.myTeam, player)
+                transferRadarLabel(target),
+                transferMarketLabel(target),
+                expectedRoleLabel(buyer, player),
+                target.scoutingNote,
+                target.onShortlist,
+                target.urgentNeed,
+                target.scoutingConfidence,
+                target.affordabilityScore,
+                target.totalScore
             });
         }
     }
 
     std::sort(rows.begin(), rows.end(), [](const TransferPreviewItem& left, const TransferPreviewItem& right) {
-        if (left.skill != right.skill) return left.skill > right.skill;
+        if (left.onShortlist != right.onShortlist) return left.onShortlist > right.onShortlist;
+        if (left.urgentNeed != right.urgentNeed) return left.urgentNeed > right.urgentNeed;
+        if (left.totalScore != right.totalScore) return left.totalScore > right.totalScore;
         if (left.potential != right.potential) return left.potential > right.potential;
-        if (left.value != right.value) return left.value < right.value;
+        if (left.expectedFee != right.expectedFee) return left.expectedFee < right.expectedFee;
         return left.player < right.player;
     });
     if (rows.size() > 40) rows.resize(40);
@@ -1001,7 +1034,7 @@ GuiPageModel buildTransfersModel(AppState& state) {
     model.secondary.title = "TransferMarketView";
     model.secondary.columns = {
         {L"Jugador", 190}, {L"Pos", 54}, {L"Edad", 54}, {L"Media", 58}, {L"Pot", 58},
-        {L"Valor", 92}, {L"Salario", 92}, {L"Jugador", 70}, {L"Club", 80}, {L"Rol", 120}, {L"Club", 180}
+        {L"Costo", 92}, {L"Salario", 92}, {L"Radar", 92}, {L"Mercado", 100}, {L"Rol", 120}, {L"Club", 180}
     };
     model.footer = buildTransferPipelineModel(state.career);
     model.detail.title = "TransferTargetCard";
@@ -1015,6 +1048,7 @@ GuiPageModel buildTransfersModel(AppState& state) {
     }
 
     Team& team = *state.career.myTeam;
+    const ClubTransferStrategy strategy = ai_transfer_manager::buildClubTransferStrategy(state.career, team);
     model.summary.content = "Presupuesto actual " + formatMoneyValue(team.budget) + "\r\n"
                             "Filtro " + state.currentFilter + "\r\n"
                             "Pendientes " + std::to_string(state.career.pendingTransfers.size()) + "\r\n"
@@ -1024,6 +1058,7 @@ GuiPageModel buildTransfersModel(AppState& state) {
     model.primary.rows.push_back({"Contratos cortos", std::to_string(std::count_if(team.players.begin(), team.players.end(), [](const Player& p) { return p.contractWeeks <= 12; })),
                                   "Renovar antes de fichar profundidad"});
     model.primary.rows.push_back({"Scouting", std::to_string(team.scoutingChief), "Mejora precision de objetivos"});
+    model.primary.rows.push_back({"Venta IA", std::to_string(strategy.salePressure), "Presion para liberar suplentes marginales"});
 
     std::vector<TransferPreviewItem> targets = buildTransferTargets(state.career, state.currentFilter);
     if (state.selectedTransferPlayer.empty() && !targets.empty()) {
@@ -1037,10 +1072,10 @@ GuiPageModel buildTransfersModel(AppState& state) {
             std::to_string(target.age),
             std::to_string(target.skill),
             std::to_string(target.potential),
-            formatMoneyValue(target.value),
-            formatMoneyValue(target.wage),
-            target.playerInterest,
-            target.clubInterest,
+            formatMoneyValue(target.expectedFee),
+            formatMoneyValue(target.expectedWage),
+            target.scoutingLabel,
+            target.marketLabel,
             target.expectedRole,
             target.club
         });
@@ -1051,13 +1086,24 @@ GuiPageModel buildTransfersModel(AppState& state) {
 
     const Team* seller = state.career.findTeamByName(state.selectedTransferClub);
     const Player* player = seller ? findPlayerByName(*seller, state.selectedTransferPlayer) : nullptr;
+    auto selectedPreview = std::find_if(targets.begin(), targets.end(), [&](const TransferPreviewItem& item) {
+        return item.player == state.selectedTransferPlayer && item.club == state.selectedTransferClub;
+    });
     if (!player) {
         model.detail.content = "Selecciona un objetivo para ver detalle.";
     } else {
         std::ostringstream detail;
         detail << player->name << " | " << seller->name << " | " << normalizePosition(player->position) << "\r\n";
         detail << "Media " << player->skill << " | Potencial " << player->potential << " | Edad " << player->age << "\r\n";
-        detail << "Valor " << formatMoneyValue(player->value) << " | Salario " << formatMoneyValue(player->wage) << "\r\n";
+        if (selectedPreview != targets.end()) {
+            detail << "Costo estimado " << formatMoneyValue(selectedPreview->expectedFee)
+                   << " | Salario esperado " << formatMoneyValue(selectedPreview->expectedWage) << "\r\n";
+            detail << "Radar " << selectedPreview->scoutingLabel
+                   << " | Mercado " << selectedPreview->marketLabel << "\r\n";
+            detail << "Lectura scouting: " << selectedPreview->scoutingNote << "\r\n";
+        } else {
+            detail << "Valor " << formatMoneyValue(player->value) << " | Salario " << formatMoneyValue(player->wage) << "\r\n";
+        }
         detail << "Interes jugador " << playerInterestLabel(state.career, *seller, *player)
                << " | Interes vendedor " << sellerInterestLabel(*seller, *player) << "\r\n";
         detail << "Rol esperado " << expectedRoleLabel(*state.career.myTeam, *player) << "\r\n";

@@ -1,28 +1,28 @@
-name,position,position_raw,age,number,market_value,source
-Federico Lanzillotta,ARQ,Federico Lanzillotta Goalkeeper,33,N/A,€225k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Eryin Sanhueza,ARQ,Eryin Sanhueza Goalkeeper,30,N/A,€200k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-José Tapia,ARQ,José Tapia Goalkeeper,23,N/A,€50k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Lucas Alarcón,DEF,Lucas Alarcón Centre-Back,25,N/A,€400k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Andrés Zanini,DEF,Andrés Zanini Centre-Back,29,N/A,€350k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Fernando Dinamarca,MED,Fernando Dinamarca Left-Back,21,N/A,€600k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Yahir Salazar,N/A,Yahir Salazar Left-Back,21,N/A,€150k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Rafael Delgado,DEL,Rafael Delgado Left-Back,36,N/A,€100k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Joaquín Gutiérrez,N/A,Joaquín Gutiérrez Right-Back,23,N/A,€600k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Bruno Gutiérrez,N/A,Bruno Gutiérrez Right-Back,23,N/A,€250k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Matías Pinto,N/A,Matías Pinto Right-Back,21,N/A,€250k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Sebastián Díaz,DEF,Sebastián Díaz Defensive Midfield,29,N/A,€400k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Francis Mac Allister,DEF,Francis Mac Allister Defensive Midfield,30,N/A,€350k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Gonzalo Escalante,DEF,Gonzalo Escalante Central Midfield,32,N/A,€500k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Matías Marín,DEF,Matías Marín Central Midfield,26,N/A,€375k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Milovan Velásquez,DEF,Milovan Velásquez Central Midfield,18,N/A,-,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Felipe Chamorro,MED,Felipe Chamorro Attacking Midfield,24,N/A,€700k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Joan Orellana,MED,Joan Orellana Attacking Midfield,20,N/A,-,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Jeisson Vargas,DEL,Jeisson Vargas Left Winger,28,N/A,€750k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Alexander Oroz,DEL,Alexander Oroz Left Winger,23,N/A,€300k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Rodrigo Dubó,DEL,Rodrigo Dubó Left Winger,22,N/A,-,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Bastián Contreras,DEL,Bastián Contreras Right Winger,20,N/A,-,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Diego Rubio,DEL,Diego Rubio Centre-Forward,32,N/A,€800k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Ángelo Henríquez,DEL,Ángelo Henríquez Centre-Forward,31,N/A,€400k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Nicolás Stefanelli,DEL,Nicolás Stefanelli Centre-Forward,31,N/A,€250k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Fabricio Díaz,DEL,Fabricio Díaz Centre-Forward,19,N/A,€75k,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
-Carlos Vásquez,DEL,Carlos Vásquez Centre-Forward,23,N/A,-,https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025
+"name","position","position_raw","age","number","market_value","source"
+"Ángelo Henríquez","DEL","Ángelo Henríquez Centre-Forward","31","N/A","€400k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Felipe Chamorro","MED","Felipe Chamorro Attacking Midfield","24","N/A","€700k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Gonzalo Escalante","MED","Gonzalo Escalante Central Midfield","32","N/A","€500k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Yahir Salazar","DEF","Centre-Back","21","N/A","€150k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Jeisson Vargas","DEL","Jeisson Vargas Left Winger","28","N/A","€750k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Milovan Velásquez","MED","Milovan Velásquez Central Midfield","18","N/A","€250k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Eryin Sanhueza","ARQ","Eryin Sanhueza Goalkeeper","30","N/A","€200k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Andrés Zanini","DEF","Andrés Zanini Centre-Back","29","N/A","€350k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Matías Pinto","DEF","Matías Pinto Right-Back","21","N/A","€250k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Nicolás Stefanelli","DEL","Nicolás Stefanelli Centre-Forward","31","N/A","€250k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Joan Orellana","MED","Joan Orellana Attacking Midfield","20","N/A","€255k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Fernando Dinamarca","DEF","Fernando Dinamarca Left-Back","21","N/A","€600k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Rodrigo Dubó","DEL","Rodrigo Dubó Left Winger","22","N/A","€245k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Diego Rubio","DEL","Diego Rubio Centre-Forward","32","N/A","€800k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Bastián Contreras","DEL","Bastián Contreras Right Winger","20","N/A","€255k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Bruno Gutiérrez","DEF","Bruno Gutiérrez Right-Back","23","N/A","€250k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Sebastián Díaz","MED","Holding Midfield","29","N/A","€400k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Matías Marín","MED","Matías Marín Central Midfield","26","N/A","€375k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Joaquín Gutiérrez","DEF","Joaquín Gutiérrez Right-Back","23","N/A","€600k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Federico Lanzillotta","ARQ","Federico Lanzillotta Goalkeeper","33","N/A","€225k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Carlos Vásquez","DEL","Carlos Vásquez Centre-Forward","23","N/A","€250k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"José Tapia","ARQ","José Tapia Goalkeeper","23","N/A","€50k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Francis Mac Allister","MED","Holding Midfield","30","N/A","€350k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Lucas Alarcón","DEF","Lucas Alarcón Centre-Back","25","N/A","€400k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Rafael Delgado","DEF","Rafael Delgado Left-Back","36","N/A","€100k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Fabricio Díaz","DEL","Fabricio Díaz Centre-Forward","19","N/A","€75k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
+"Alexander Oroz","DEL","Alexander Oroz Left Winger","23","N/A","€300k","https://www.transfermarkt.com/deportes-la-serena/kader/verein/5747/saison_id/2025"
