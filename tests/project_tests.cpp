@@ -1,5 +1,6 @@
 #include "ai/ai_squad_planner.h"
 #include "ai/ai_transfer_manager.h"
+#include "career/app_services.h"
 #include "career/career_reports.h"
 #include "career/dressing_room_service.h"
 #include "career/match_analysis_store.h"
@@ -9,6 +10,7 @@
 #include "career/season_transition.h"
 #include "career/world_state_service.h"
 #include "competition/competition.h"
+#include "development/training_impact_system.h"
 #include "engine/models.h"
 #include "io/io.h"
 #include "simulation/match_context.h"
@@ -628,6 +630,100 @@ void testDressingRoomServiceFlagsPromiseAndFatigueRisk() {
     expect(career.newsFeed.size() > 0, "Una semana conflictiva debe dejar noticia de vestuario.");
 }
 
+void testDressingRoomSnapshotTracksSocialTension() {
+    Career career;
+    career.currentSeason = 5;
+    career.currentWeek = 9;
+    career.allTeams.push_back(makeTeam("Grupo Quebrado", "primera division", 69, 3, 3, "Balanced", "Equilibrado", 710000));
+    career.myTeam = &career.allTeams[0];
+
+    for (int idx : {1, 2, 3}) {
+        Player& player = career.myTeam->players[static_cast<size_t>(idx)];
+        player.happiness = 39;
+        player.startsThisSeason = 0;
+        player.unhappinessWeeks = 4;
+        player.wantsToLeave = true;
+    }
+    career.myTeam->players[0].leadership = 80;
+    career.myTeam->players[0].happiness = 67;
+
+    const DressingRoomSnapshot snapshot = dressing_room_service::buildSnapshot(*career.myTeam, career.currentWeek);
+    expect(snapshot.socialTension >= 4, "El snapshot debe medir tension social cuando se acumulan focos de conflicto.");
+    expect(snapshot.coreGroupSize >= 2, "El vestuario debe identificar un grupo dominante.");
+    expect(find(snapshot.groups.begin(), snapshot.groups.end(), string("Frustrados: 3")) != snapshot.groups.end(),
+           "Los jugadores conflictivos deben agruparse como foco social visible.");
+}
+
+void testScoutingConfidenceReflectsStaffQuality() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 3;
+    career.allTeams.push_back(makeTeam("Club Scout", "primera division", 67, 3, 3, "Balanced", "Equilibrado", 1500000));
+    career.allTeams.push_back(makeTeam("Club Fuente", "primera division", 72, 3, 3, "Balanced", "Equilibrado", 900000));
+    career.allTeams.push_back(makeTeam("Club Apoyo", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 850000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Club Scout");
+    expect(career.myTeam != nullptr, "La prueba de scouting necesita club usuario.");
+
+    career.myTeam->scoutingChief = 45;
+    career.myTeam->budget = 1500000;
+    const ScoutingSessionResult low = runScoutingSessionService(career, "Todas", "MED");
+    expect(low.service.ok && !low.candidates.empty(), "El scouting debe devolver candidatos en el escenario base.");
+    const int lowConfidence = low.candidates.front().confidence;
+    expect(low.candidates.front().salaryExpectation > 0,
+           "El informe debe exponer una expectativa salarial utilizable.");
+    expect(!low.candidates.front().riskLabel.empty(), "El informe debe etiquetar el riesgo del objetivo.");
+
+    career.myTeam->scoutingChief = 88;
+    career.myTeam->budget = 1500000;
+    const ScoutingSessionResult high = runScoutingSessionService(career, "Todas", "MED");
+    expect(high.service.ok && !high.candidates.empty(), "El scouting de alto nivel debe devolver candidatos.");
+    expect(high.candidates.front().confidence > lowConfidence,
+           "Un mejor jefe de scouting debe elevar la confianza del informe.");
+}
+
+void testSeasonTransitionResolvesCarryoverPromises() {
+    Career career;
+    career.currentSeason = 6;
+    career.currentWeek = 34;
+    career.managerName = "Manager Promesas";
+    career.managerReputation = 66;
+
+    career.allTeams.push_back(makeTeam("Promesa Capital", "primera division", 75, 3, 3, "Balanced", "Equilibrado", 900000));
+    career.allTeams.push_back(makeTeam("Promesa Norte", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 760000));
+    career.allTeams.push_back(makeTeam("Promesa Sur", "primera division", 67, 2, 2, "Defensive", "Bloque bajo", 580000));
+    career.allTeams.push_back(makeTeam("Promesa Costa", "primera division", 66, 2, 2, "Defensive", "Pausar juego", 560000));
+    career.allTeams.push_back(makeTeam("Ascenso A", "primera b", 69, 3, 3, "Balanced", "Equilibrado", 420000));
+    career.allTeams.push_back(makeTeam("Ascenso B", "primera b", 68, 3, 3, "Balanced", "Equilibrado", 400000));
+    career.allTeams.push_back(makeTeam("Ascenso C", "primera b", 64, 2, 2, "Balanced", "Equilibrado", 330000));
+    career.allTeams.push_back(makeTeam("Ascenso D", "primera b", 63, 2, 2, "Balanced", "Equilibrado", 320000));
+
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Promesa Capital");
+    expect(career.myTeam != nullptr, "La prueba de transicion necesita club usuario.");
+
+    career.myTeam->players[1].name = "Promesa Tardia";
+    career.myTeam->players[1].promisedRole = "Titular";
+    career.myTeam->players[1].startsThisSeason = 1;
+    career.activePromises.push_back({"Promesa Tardia", "Minutos", "Titular", 30, 40, 1, false, false});
+
+    const vector<int> points = {70, 61, 29, 24};
+    for (size_t i = 0; i < career.activeTeams.size(); ++i) {
+        career.activeTeams[i]->points = points[i];
+        career.activeTeams[i]->goalsFor = 31 - static_cast<int>(i) * 3;
+        career.activeTeams[i]->goalsAgainst = 12 + static_cast<int>(i) * 4;
+        career.activeTeams[i]->wins = points[i] / 3;
+    }
+    career.leagueTable.sortTable();
+
+    SeasonTransitionSummary summary = endSeason(career);
+    const string lines = joinLines(summary.lines);
+    expect(lines.find("Promesas cerradas al final del curso") != string::npos,
+           "La transicion debe cerrar promesas pendientes antes de resetear la temporada.");
+    expect(lines.find("Promesa rota:") != string::npos || lines.find("Promesa cerrada:") != string::npos,
+           "La transicion debe explicar como se resolvio la promesa arrastrada.");
+}
+
 void testSaveLoadRoundTripPreservesCareerState() {
     const string savePath = "saves/test_roundtrip_save.txt";
 
@@ -856,6 +952,96 @@ void testWeeklyWorldStateResolvesMinutesPromise() {
     expect(youngster.happiness >= 64, "Cumplir una promesa debe mejorar el estado del jugador.");
 }
 
+
+void testWeeklyTrainingScheduleAdaptsToCongestion() {
+    Team team = makeTeam("Microciclo FC", "primera division", 70, 4, 4, "Pressing", "Juego directo", 700000);
+    team.trainingFocus = "Ataque";
+
+    const auto regular = development::buildWeeklyTrainingSchedule(team, false);
+    const auto congested = development::buildWeeklyTrainingSchedule(team, true);
+    expect(regular.size() == 6 && congested.size() == 6,
+           "El microciclo semanal debe construir seis sesiones visibles.");
+
+    int regularLoad = 0;
+    for (const auto& session : regular) regularLoad += session.load;
+    int congestedLoad = 0;
+    for (const auto& session : congested) congestedLoad += session.load;
+    expect(congestedLoad < regularLoad,
+           "La semana congestionada debe bajar la carga total del entrenamiento.");
+    expect(congested.front().focus == "Recuperacion",
+           "La semana congestionada debe abrir con recuperacion.");
+}
+
+void testTeamMeetingImprovesMorale() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 6;
+    career.allTeams.push_back(makeTeam("Union Manager", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
+    career.allTeams.push_back(makeTeam("Rival Uno", "primera division", 67, 3, 3, "Balanced", "Equilibrado", 620000));
+    career.allTeams.push_back(makeTeam("Rival Dos", "primera division", 66, 2, 2, "Defensive", "Bloque bajo", 610000));
+    career.allTeams.push_back(makeTeam("Rival Tres", "primera division", 65, 2, 2, "Defensive", "Pausar juego", 600000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Union Manager");
+    expect(career.myTeam != nullptr, "La prueba de reunion necesita club usuario.");
+
+    career.myTeam->morale = 44;
+    career.myTeam->players[0].happiness = 32;
+    career.myTeam->players[0].wantsToLeave = true;
+    const int previousMorale = career.myTeam->morale;
+    const int previousHappiness = career.myTeam->players[0].happiness;
+
+    const ServiceResult result = holdTeamMeetingService(career);
+    expect(result.ok, "La reunion de plantel debe completar correctamente.");
+    expect(career.myTeam->morale > previousMorale,
+           "La reunion debe mejorar la moral colectiva.");
+    expect(career.myTeam->players[0].happiness > previousHappiness,
+           "La reunion debe mejorar el estado del jugador mas afectado.");
+}
+
+void testNegotiationTracksAgentCosts() {
+    Career career;
+    Team team = makeTeam("Club Grande", "primera division", 74, 4, 4, "Pressing", "Contra-presion", 1500000);
+    Player player = team.players.front();
+    player.contractWeeks = 40;
+    player.value = max(player.value, 200000LL);
+    player.releaseClause = max(player.releaseClause, 450000LL);
+
+    const NegotiationState state = runRenewalNegotiation(career,
+                                                         team,
+                                                         player,
+                                                         NegotiationProfile::Balanced,
+                                                         NegotiationPromise::Starter,
+                                                         12);
+    expect(state.playerAccepted,
+           "La renovacion de prueba debe cerrarse para validar el paquete contractual.");
+    expect(state.agreedAgentFee > 0 && state.agreedLoyaltyBonus > 0,
+           "La negociacion debe capturar fee de agente y bonus de fidelidad.");
+    expect(state.agreedAppearanceBonus > 0,
+           "La negociacion debe incluir bonus por partido.");
+}
+
+void testSaveCareerCreatesBackup() {
+    const string savePath = "saves/test_backup_save.txt";
+    Career career;
+    career.currentSeason = 3;
+    career.currentWeek = 4;
+    career.allTeams.push_back(makeTeam("Backup FC", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
+    career.allTeams.push_back(makeTeam("Backup Rival", "primera division", 66, 2, 2, "Balanced", "Equilibrado", 620000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Backup FC");
+    expect(career.myTeam != nullptr, "La prueba de backup necesita club usuario.");
+    career.saveFile = savePath;
+
+    expect(career.saveCareer(), "El primer guardado debe completarse.");
+    career.currentWeek = 5;
+    expect(career.saveCareer(), "El segundo guardado debe completarse.");
+    expect(pathExists(savePath + ".bak"),
+           "El segundo guardado debe dejar un backup del save previo.");
+
+    std::remove(savePath.c_str());
+    std::remove((savePath + ".bak").c_str());
+}
+
 }  // namespace
 
 int main() {
@@ -878,8 +1064,15 @@ int main() {
         {"match_analysis_store", testMatchAnalysisStoreProducesStructuredCareerData},
         {"match_center_service", testMatchCenterServiceBuildsStructuredView},
         {"dressing_room_service", testDressingRoomServiceFlagsPromiseAndFatigueRisk},
+        {"dressing_room_tension", testDressingRoomSnapshotTracksSocialTension},
+        {"scouting_confidence", testScoutingConfidenceReflectsStaffQuality},
         {"world_state_seed", testWorldStateSeedsPromisesAndRecords},
         {"world_state_promises", testWeeklyWorldStateResolvesMinutesPromise},
+        {"season_promise_carryover", testSeasonTransitionResolvesCarryoverPromises},
+        {"training_microcycle", testWeeklyTrainingScheduleAdaptsToCongestion},
+        {"team_meeting", testTeamMeetingImprovesMorale},
+        {"negotiation_agent_costs", testNegotiationTracksAgentCosts},
+        {"save_backup", testSaveCareerCreatesBackup},
         {"simulate_match_state", testSimulateMatchAppliesPostProcessState},
         {"save_load_roundtrip", testSaveLoadRoundTripPreservesCareerState},
         {"loader_fallback", testLoadTeamFromDirectoryFallsBackAndResolvesRawPositions},

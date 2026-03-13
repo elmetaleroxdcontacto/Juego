@@ -7,6 +7,7 @@
 #include "career/team_management.h"
 #include "career/world_state_service.h"
 #include "competition/competition.h"
+#include "development/training_impact_system.h"
 #include "finance/finance_system.h"
 #include "transfers/negotiation_system.h"
 #include "utils/utils.h"
@@ -267,6 +268,8 @@ CareerReport buildBoardReport(const Career& career) {
     addFact(report, "Vestuario", dressingRoomClimate(*career.myTeam));
     addFact(report, "Promesas en riesgo", to_string(promisesAtRisk(*career.myTeam, career.currentWeek)));
     addFact(report, "Promesas activas", to_string(career.activePromises.size()));
+    addFact(report, "Tension social", to_string(dressing.socialTension));
+    addFact(report, "Apoyo de lideres", to_string(dressing.leadershipSupport));
     addFact(report, "Expectativa del club", teamExpectationLabel(*career.myTeam));
     addFact(report, "Prestigio", to_string(teamPrestigeScore(*career.myTeam)));
 
@@ -293,6 +296,7 @@ CareerReport buildBoardReport(const Career& career) {
     else addBlock(report, "Estado", {"Situacion controlada."});
 
     addBlock(report, "Vestuario", dressing.alerts);
+    addBlock(report, "Grupos del vestuario", dressing.groups);
     addBlock(report, "Promesas activas", activePromiseLines(career));
 
     vector<string> offers;
@@ -327,6 +331,8 @@ CareerReport buildClubReport(const Career& career) {
     addFact(report, "Deuda", formatMoneyValue(team.debt));
     addFact(report, "Sponsor semanal", formatMoneyValue(team.sponsorWeekly));
     addFact(report, "Masa salarial", formatMoneyValue(finance.wageBill));
+    addFact(report, "Merch semanal", formatMoneyValue(finance.merchandisingIncome));
+    addFact(report, "Bonos variables", formatMoneyValue(finance.bonusIncome));
     addFact(report, "Flujo semanal", formatMoneyValue(finance.netCashFlow));
     addFact(report, "Buffer de mercado", formatMoneyValue(finance.transferBuffer));
     addFact(report, "Riesgo", finance.riskLevel);
@@ -336,6 +342,8 @@ CareerReport buildClubReport(const Career& career) {
     addFact(report, "Rival principal", team.primaryRival.empty() ? "Sin clasico definido" : team.primaryRival);
     addFact(report, "Expectativa", teamExpectationLabel(team));
     addFact(report, "Vestuario", dressingRoomClimate(team));
+    addFact(report, "Tension social", to_string(dressing.socialTension));
+    addFact(report, "Apoyo de lideres", to_string(dressing.leadershipSupport));
     addFact(report, "Instruccion", team.matchInstruction);
     addFact(report, "Proyectos juveniles", to_string(youthProjects));
     addFact(report, "Carga acumulada", to_string(avgFatigueLoad) + "/100");
@@ -349,7 +357,19 @@ CareerReport buildClubReport(const Career& career) {
         addBlock(report, "Nucleo de lideres", {joinStringValues(leaderNames, ", ")});
     }
     addBlock(report, "Vestuario", dressing.alerts);
+    addBlock(report, "Grupos sociales", dressing.groups);
     addBlock(report, "Promesas activas", activePromiseLines(career));
+    {
+        const bool congestedWeek = career.cupActive &&
+                                   (career.currentWeek == 1 || career.currentWeek % 4 == 0 ||
+                                    career.currentWeek == static_cast<int>(career.schedule.size()));
+        vector<string> microcycle;
+        for (const auto& session : development::buildWeeklyTrainingSchedule(team, congestedWeek)) {
+            microcycle.push_back(session.day + " | " + session.focus + " | carga " + to_string(session.load) +
+                                 " | " + session.note);
+        }
+        addBlock(report, "Microciclo semanal", std::move(microcycle));
+    }
 
     addBlock(report,
              "Infraestructura",

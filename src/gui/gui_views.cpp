@@ -7,6 +7,8 @@
 #include "career/match_analysis_store.h"
 #include "career/match_center_service.h"
 #include "career/career_support.h"
+#include "development/training_impact_system.h"
+#include "finance/finance_system.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -25,6 +27,7 @@ struct TransferPreviewItem {
     int potential = 0;
     long long expectedFee = 0;
     long long expectedWage = 0;
+    long long expectedAgentFee = 0;
     std::string club;
     std::string scoutingLabel;
     std::string marketLabel;
@@ -126,6 +129,22 @@ std::vector<std::string> filterOptionsForPage(GuiPage page) {
         case GuiPage::News: return {"Todo", "Alertas", "Mercado", "Resultados"};
     }
     return {"Todo"};
+}
+
+bool isCongestedWeek(const Career& career) {
+    return career.cupActive && career.currentWeek >= 1 &&
+           (career.currentWeek == 1 || career.currentWeek % 4 == 0 ||
+            career.currentWeek == static_cast<int>(career.schedule.size()));
+}
+
+std::string trainingSchedulePreview(const Team& team, bool congestedWeek, size_t limit = 3) {
+    std::ostringstream out;
+    const auto schedule = development::buildWeeklyTrainingSchedule(team, congestedWeek);
+    for (size_t i = 0; i < schedule.size() && i < limit; ++i) {
+        if (i) out << "\r\n";
+        out << schedule[i].day << ": " << schedule[i].focus << " | " << schedule[i].note;
+    }
+    return out.str();
 }
 
 std::string boardStatusLabel(int confidence) {
@@ -245,6 +264,14 @@ std::vector<std::string> buildAlertLines(const Career& career) {
     if (!career.boardMonthlyObjective.empty() && career.boardMonthlyProgress < career.boardMonthlyTarget &&
         career.boardMonthlyDeadlineWeek - career.currentWeek <= 2) {
         alerts.push_back("[Objetivo] " + career.boardMonthlyObjective + " queda bajo presion");
+    }
+
+    DressingRoomSnapshot dressing = dressing_room_service::buildSnapshot(*career.myTeam, career.currentWeek);
+    if (dressing.socialTension >= 5) {
+        alerts.push_back("[Vestuario] La tension interna sube a " + std::to_string(dressing.socialTension));
+    }
+    if (dressing.promiseRiskCount > 0) {
+        alerts.push_back("[Promesas] " + std::to_string(dressing.promiseRiskCount) + " promesa(s) bajo presion");
     }
     if (alerts.empty()) {
         alerts.push_back("[Estado] No hay alertas criticas esta semana");
@@ -714,7 +741,8 @@ std::vector<TransferPreviewItem> buildTransferTargets(const Career& career, cons
             if (player.age > 35 || player.onLoan) continue;
 
             const TransferTarget target = ai_transfer_manager::evaluateTarget(career, buyer, seller, player, strategy);
-            if (filter == "Precio accesible" && target.expectedFee > strategy.maxTransferBudget) continue;
+            const long long upfrontPackage = target.expectedFee + target.expectedAgentFee;
+            if (filter == "Precio accesible" && upfrontPackage > strategy.maxTransferBudget) continue;
             if (filter == "Salario bajo" && target.expectedWage > strategy.maxWageBudget) continue;
 
             rows.push_back({
@@ -725,6 +753,7 @@ std::vector<TransferPreviewItem> buildTransferTargets(const Career& career, cons
                 player.potential,
                 target.expectedFee,
                 target.expectedWage,
+                target.expectedAgentFee,
                 seller.name,
                 transferRadarLabel(target),
                 transferMarketLabel(target),
@@ -743,11 +772,9 @@ std::vector<TransferPreviewItem> buildTransferTargets(const Career& career, cons
         if (left.onShortlist != right.onShortlist) return left.onShortlist > right.onShortlist;
         if (left.urgentNeed != right.urgentNeed) return left.urgentNeed > right.urgentNeed;
         if (left.totalScore != right.totalScore) return left.totalScore > right.totalScore;
-        if (left.potential != right.potential) return left.potential > right.potential;
-        if (left.expectedFee != right.expectedFee) return left.expectedFee < right.expectedFee;
-        return left.player < right.player;
+        return left.expectedFee + left.expectedAgentFee < right.expectedFee + right.expectedAgentFee;
     });
-    if (rows.size() > 40) rows.resize(40);
+    if (rows.size() > 20) rows.resize(20);
     return rows;
 }
 
@@ -791,6 +818,8 @@ GuiPageModel buildDashboardModel(AppState& state) {
     }
 
     Team& team = *state.career.myTeam;
+    const DressingRoomSnapshot dressing = dressing_room_service::buildSnapshot(team, state.career.currentWeek);
+    const bool congestedWeek = isCongestedWeek(state.career);
     int injured = 0;
     int lowMorale = 0;
     for (const auto& player : team.players) {
@@ -802,8 +831,10 @@ GuiPageModel buildDashboardModel(AppState& state) {
     out << findNextMatchLine(state.career) << "\r\n\r\n";
     out << "Posicion " << state.career.currentCompetitiveRank() << "/" << state.career.currentCompetitiveFieldSize()
         << " | Puntos " << team.points << " | DG " << (team.goalsFor - team.goalsAgainst) << "\r\n";
-    out << "Moral " << team.morale << " | Lesionados " << injured << " | Alertas de vestuario " << lowMorale << "\r\n";
+    out << "Moral " << team.morale << " | Lesionados " << injured << " | Tension " << dressing.socialTension << "\r\n";
+    out << "Plan semanal: " << team.trainingFocus << (congestedWeek ? " | semana congestionada" : " | semana regular") << "\r\n";
     out << "Objetivo: " << (state.career.boardMonthlyObjective.empty() ? "Sin objetivo mensual activo" : state.career.boardMonthlyObjective) << "\r\n\r\n";
+    out << "Microciclo\r\n" << trainingSchedulePreview(team, congestedWeek) << "\r\n\r\n";
     out << "Lectura del rival\r\n" << buildOpponentReport(state.career);
     model.summary.content = out.str();
 
@@ -813,6 +844,9 @@ GuiPageModel buildDashboardModel(AppState& state) {
     detail << "Impacto inmediato\r\n";
     detail << "Confianza " << state.career.boardConfidence << "/100"
            << " | Progreso " << state.career.boardMonthlyProgress << "/" << state.career.boardMonthlyTarget << "\r\n";
+    detail << "Apoyo de lideres " << dressing.leadershipSupport
+           << " | Aislados " << dressing.isolatedPlayers
+           << " | Promesas en riesgo " << dressing.promiseRiskCount << "\r\n\r\n";
     detail << dressingRoomPanelText(state.career, 4);
     model.detail.content = detail.str();
     return model;
@@ -879,7 +913,7 @@ GuiPageModel buildTacticsModel(AppState& state) {
     model.infoLine = "Lee el plan tactico, el once inicial y el impacto esperado de cada ajuste.";
     model.summary.title = "TacticalSummary";
     model.primary.title = "TacticsBoard";
-    model.primary.columns = {{L"Variable", 120}, {L"Valor", 70}, {L"Efecto estimado", 280}};
+    model.primary.columns = {{L"Variable", 120}, {L"Valor", 90}, {L"Efecto estimado", 260}};
     model.secondary.title = "FormationSelector";
     model.secondary.columns = {{L"Linea", 90}, {L"Jugador", 200}, {L"Pos", 60}, {L"Hab", 50}, {L"Fisico", 60}, {L"Estado", 120}};
     model.footer.title = "TacticalImpactSummary";
@@ -895,13 +929,15 @@ GuiPageModel buildTacticsModel(AppState& state) {
     }
 
     Team& team = *state.career.myTeam;
+    const bool congestedWeek = isCongestedWeek(state.career);
     model.summary.content =
         "Formacion " + team.formation + " | Mentalidad " + team.tactics +
         "\r\nPresion " + std::to_string(team.pressingIntensity) +
         " | Ritmo " + std::to_string(team.tempo) +
         " | Anchura " + std::to_string(team.width) +
         " | Linea " + std::to_string(team.defensiveLine) +
-        "\r\nInstruccion actual: " + team.matchInstruction;
+        "\r\nInstruccion actual: " + team.matchInstruction +
+        " | Plan semanal: " + team.trainingFocus;
 
     model.primary.rows.push_back({"Presion", std::to_string(team.pressingIntensity),
                                   team.pressingIntensity >= 4 ? "Recupera arriba, sube fatiga" : "Presion mas contenida"});
@@ -913,6 +949,8 @@ GuiPageModel buildTacticsModel(AppState& state) {
                                   team.defensiveLine >= 4 ? "Recupera alto, riesgo al balon largo" : "Protege espalda y concede campo"});
     model.primary.rows.push_back({"Instruccion", team.matchInstruction,
                                   team.matchInstruction == "Juego directo" ? "Acelera llegada a ultimo tercio" : "Ajuste situacional"});
+    model.primary.rows.push_back({"Plan semanal", team.trainingFocus,
+                                  congestedWeek ? "Microciclo corto y conservador" : "Carga completa de preparacion"});
 
     std::map<std::string, std::vector<const Player*> > byLine;
     for (int index : team.getStartingXIIndices()) {
@@ -936,11 +974,13 @@ GuiPageModel buildTacticsModel(AppState& state) {
     model.footer.rows.push_back({"Posesion", team.tempo >= 4 ? "Vertical" : "Controlada", team.pressingIntensity >= 4 ? "Transiciones largas" : "Menor recuperacion alta"});
     model.footer.rows.push_back({"Ocasiones", team.width >= 4 ? "Ataque por fuera" : "Juego interior", team.tempo >= 4 ? "Mas error tecnico" : "Menos volumen"});
     model.footer.rows.push_back({"Defensa", team.defensiveLine >= 4 ? "Bloque adelantado" : "Bloque medio/bajo", team.defensiveLine >= 4 ? "Espalda expuesta" : "Mayor asedio rival"});
+    model.footer.rows.push_back({"Fatiga", congestedWeek ? "Gestion conservadora" : "Carga normal", team.pressingIntensity >= 4 ? "El XI llega mas exigido" : "Riesgo medio"});
 
     std::ostringstream detail;
     detail << "Presion alta aumenta recuperaciones, pero castiga a jugadores con fisico bajo.\r\n";
     detail << "Ritmo alto acelera la llegada, aunque empeora la precision en equipos con forma baja.\r\n";
-    detail << "Bloque bajo reduce espacio interior y aumenta probabilidad de centros rivales.\r\n";
+    detail << "Bloque bajo reduce espacio interior y aumenta probabilidad de centros rivales.\r\n\r\n";
+    detail << "Microciclo semanal\r\n" << trainingSchedulePreview(team, congestedWeek, 6) << "\r\n\r\n";
     detail << "Informe rival: " << buildOpponentReport(state.career) << "\r\n\r\n";
     detail << dressingRoomPanelText(state.career, 4) << "\r\n";
     detail << lastMatchPanelText(state.career, 4, 5);
@@ -1108,6 +1148,7 @@ GuiPageModel buildTransfersModel(AppState& state) {
         detail << "Media " << player->skill << " | Potencial " << player->potential << " | Edad " << player->age << "\r\n";
         if (selectedPreview != targets.end()) {
             detail << "Costo estimado " << formatMoneyValue(selectedPreview->expectedFee)
+                   << " | Agente " << formatMoneyValue(selectedPreview->expectedAgentFee)
                    << " | Salario esperado " << formatMoneyValue(selectedPreview->expectedWage) << "\r\n";
             detail << "Radar " << selectedPreview->scoutingLabel
                    << " | Mercado " << selectedPreview->marketLabel << "\r\n";
@@ -1148,11 +1189,16 @@ GuiPageModel buildFinancesModel(AppState& state) {
     }
 
     Team& team = *state.career.myTeam;
+    WeeklyFinanceReport finance = finance_system::projectWeeklyReport(team);
     model.summary.content = buildClubSummaryService(state.career);
     model.primary.rows.push_back({"Presupuesto", formatMoneyValue(team.budget), team.budget >= 0 ? "Caja operativa positiva" : "Caja comprometida"});
     model.primary.rows.push_back({"Deuda", formatMoneyValue(team.debt), team.debt > 0 ? "Vigilar amortizacion" : "Sin deuda relevante"});
-    model.primary.rows.push_back({"Sponsor semanal", formatMoneyValue(team.sponsorWeekly), "Ingreso fijo"});
-    model.primary.rows.push_back({"Valor de plantilla", formatMoneyValue(team.getSquadValue()), "Activo deportivo"});
+    model.primary.rows.push_back({"Sponsor semanal", formatMoneyValue(finance.sponsorIncome), "Ingreso fijo"});
+    model.primary.rows.push_back({"Taquilla estimada", formatMoneyValue(finance.matchdayIncome), "Proyeccion de partido local"});
+    model.primary.rows.push_back({"Merchandising", formatMoneyValue(finance.merchandisingIncome), "Pulso comercial del club"});
+    model.primary.rows.push_back({"Bonos variables", formatMoneyValue(finance.bonusIncome), "Premios por rendimiento"});
+    model.primary.rows.push_back({"Masa salarial", formatMoneyValue(finance.wageBill), "Costo semanal proyectado"});
+    model.primary.rows.push_back({"Buffer de mercado", formatMoneyValue(finance.transferBuffer), finance.riskLevel});
 
     std::vector<const Player*> players;
     for (const auto& player : team.players) players.push_back(&player);
@@ -1171,8 +1217,12 @@ GuiPageModel buildFinancesModel(AppState& state) {
 
     model.detail.content = "Presupuesto " + formatMoneyValue(team.budget) +
                            "\r\nDeuda " + formatMoneyValue(team.debt) +
-                           "\r\nSponsor " + formatMoneyValue(team.sponsorWeekly) +
-                           "\r\nFanbase " + std::to_string(team.fanBase);
+                           "\r\nSponsor " + formatMoneyValue(finance.sponsorIncome) +
+                           "\r\nTaquilla " + formatMoneyValue(finance.matchdayIncome) +
+                           "\r\nMerchandising " + formatMoneyValue(finance.merchandisingIncome) +
+                           "\r\nBonos variables " + formatMoneyValue(finance.bonusIncome) +
+                           "\r\nBuffer de mercado " + formatMoneyValue(finance.transferBuffer) +
+                           "\r\nRiesgo " + finance.riskLevel;
     return model;
 }
 
@@ -1376,6 +1426,12 @@ void refreshCurrentPage(AppState& state) {
     setWindowTextUtf8(state.detailLabel, friendlyPanelTitle(state.currentModel.detail.title));
     setWindowTextUtf8(state.detailEdit, state.currentModel.detail.content);
     setWindowTextUtf8(state.newsLabel, friendlyPanelTitle(state.currentModel.feed.title));
+    if (state.instructionButton) {
+        std::string actionLabel = "Instruccion";
+        if (state.currentPage == GuiPage::Dashboard) actionLabel = "Reunion";
+        else if (state.currentPage == GuiPage::Squad || state.currentPage == GuiPage::Youth) actionLabel = "Hablar";
+        setWindowTextUtf8(state.instructionButton, actionLabel);
+    }
 
     renderListPanel(state.tableLabel, state.tableList, state.currentModel.primary);
     renderListPanel(state.squadLabel, state.squadList, state.currentModel.secondary);

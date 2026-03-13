@@ -55,6 +55,7 @@ TransferTarget evaluateTarget(const Career& career,
     target.age = player.age;
     target.expectedFee = max(player.value, player.releaseClause * 55 / 100) + rivalrySurcharge(buyer, seller, player.value);
     target.expectedWage = max(wageDemandFor(player), player.wage);
+    target.expectedAgentFee = estimatedAgentFee(player, target.expectedFee);
     target.contractRunningOut = player.contractWeeks <= 20;
     target.availableForLoan = player.age <= 24 && player.contractWeeks > 18;
     target.squadNeedScore = ai_squad_planner::positionNeedScore(buyer, normalizePosition(player.position));
@@ -69,21 +70,30 @@ TransferTarget evaluateTarget(const Career& career,
     if (target.urgentNeed) target.fitScore += 10;
     if (target.onShortlist) target.fitScore += 6;
 
-    const long long totalCost = target.expectedFee + target.expectedWage * 8;
+    const long long loyaltyExpectation = max(15000LL, target.expectedWage * 2);
+    const long long totalCost = target.expectedFee + target.expectedAgentFee + loyaltyExpectation + target.expectedWage * 8;
     if (totalCost <= strategy.maxTransferBudget) target.affordabilityScore = 24;
     else if (target.availableForLoan && target.expectedWage <= strategy.maxWageBudget) target.affordabilityScore = 16;
-    else if (target.expectedFee <= strategy.maxTransferBudget * 12 / 10) target.affordabilityScore = 8;
+    else if (target.expectedFee + target.expectedAgentFee <= strategy.maxTransferBudget * 12 / 10) target.affordabilityScore = 8;
     else target.affordabilityScore = -12;
 
     target.competitionScore = clampInt(max(0, player.potential - buyer.getAverageSkill()) / 4 +
                                            max(0, teamPrestigeScore(seller) - teamPrestigeScore(buyer) + 4),
                                        0, 28);
-    target.scoutingConfidence = target.onShortlist ? 88 : target.contractRunningOut ? 74 : 58;
+    target.scoutingConfidence = clampInt(36 + buyer.scoutingChief / 2 + (target.onShortlist ? 14 : 0) +
+                                             (target.contractRunningOut ? 8 : 0) + (target.availableForLoan ? 5 : 0),
+                                         35, 92);
     target.scoutingNote = target.onShortlist
                               ? "seguimiento activo"
                               : target.contractRunningOut ? "ventana contractual"
                                                           : target.availableForLoan ? "opcion de prestamo"
                                                                                     : "perfil general";
+    if (target.expectedAgentFee >= max(12000LL, target.expectedFee / 5)) {
+        target.scoutingNote += " | agente exigente";
+    }
+    if (player.ambition >= 75) {
+        target.scoutingNote += " | jugador ambicioso";
+    }
 
     string reason;
     if (playerRejectsMove(career, buyer, seller, player, NegotiationPromise::Rotation, reason)) {
@@ -91,12 +101,9 @@ TransferTarget evaluateTarget(const Career& career,
     }
 
     target.totalScore = target.fitScore * 0.55 + target.potentialScore * 0.18 +
-                        target.affordabilityScore * 2.1 +
-                        target.scoutingConfidence * 0.08 -
-                        target.competitionScore * 0.22 +
-                        (target.availableForLoan ? 6.0 : 0.0) +
-                        (target.contractRunningOut ? 4.0 : 0.0) +
-                        (target.onShortlist ? 5.0 : 0.0);
+                        target.affordabilityScore * 2.1 + target.scoutingConfidence * 0.08 -
+                        target.competitionScore * 0.22 + (target.availableForLoan ? 6.0 : 0.0) +
+                        (target.contractRunningOut ? 4.0 : 0.0) + (target.onShortlist ? 5.0 : 0.0);
     return target;
 }
 

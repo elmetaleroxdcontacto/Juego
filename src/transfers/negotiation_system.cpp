@@ -320,10 +320,13 @@ bool negotiatePlayerSide(const Career& career,
     const long long demandedWage =
         negotiatedWageDemand(career, buyer, seller, player, profile, promise, competingClubPresent);
     const long long demandedBonus = signingBonusDemand(player, referenceFee, preContract);
+    const long long demandedAgentFee = estimatedAgentFee(player, max(referenceFee, player.value / 2 + 1));
+    const long long demandedLoyaltyBonus = max(preContract ? 18000LL : 12000LL, demandedWage * (preContract ? 5 : 3));
+    const long long demandedAppearanceBonus = max(500LL, demandedWage / 26);
     const int demandedWeeks = promiseContractWeeks(promise, max(preContract ? 104 : player.contractWeeks, 78));
     const long long demandedClause =
         max(static_cast<long long>(player.value * negotiationClauseFactor(profile)),
-            max(demandedWage * 42, (referenceFee + demandedBonus) * 2));
+            max(demandedWage * 42, (referenceFee + demandedBonus + demandedAgentFee) * 2));
 
     state.playerDemand = demandedWage;
     state.agreedPromisedRole = promiseLabel(promise);
@@ -333,6 +336,7 @@ bool negotiatePlayerSide(const Career& career,
     pushRound(state,
               "Propuesta salarial " + formatMoneyValue(openingWage) +
                   " | demanda del agente " + formatMoneyValue(demandedWage) +
+                  " | fee agente " + formatMoneyValue(demandedAgentFee) +
                   (competingClubPresent ? " | hay competencia" : ""));
 
     long long improvedWage = moveTowards(openingWage,
@@ -362,11 +366,17 @@ bool negotiatePlayerSide(const Career& career,
     state.playerAccepted = true;
     state.agreedWage = finalWage;
     state.agreedBonus = demandedBonus;
+    state.agreedAgentFee = demandedAgentFee;
+    state.agreedLoyaltyBonus = demandedLoyaltyBonus;
+    state.agreedAppearanceBonus = demandedAppearanceBonus;
     state.agreedClause = demandedClause;
     state.agreedContractWeeks = demandedWeeks;
     pushRound(state,
               "Acuerdo con el jugador: salario " + formatMoneyValue(state.agreedWage) +
-                  ", bono " + formatMoneyValue(state.agreedBonus) +
+                  ", firma " + formatMoneyValue(state.agreedBonus) +
+                  ", agente " + formatMoneyValue(state.agreedAgentFee) +
+                  ", fidelidad " + formatMoneyValue(state.agreedLoyaltyBonus) +
+                  ", bonus por partido " + formatMoneyValue(state.agreedAppearanceBonus) +
                   ", clausula " + formatMoneyValue(state.agreedClause) + ".");
     return true;
 }
@@ -549,6 +559,9 @@ NegotiationState runRenewalNegotiation(const Career& career,
     state.playerAccepted = true;
     state.agreedWage = finalWage;
     state.agreedBonus = max(10000LL, finalWage * 3);
+    state.agreedAgentFee = max(8000LL, estimatedAgentFee(player, player.value / 2 + 1) / 2);
+    state.agreedLoyaltyBonus = max(12000LL, finalWage * 3);
+    state.agreedAppearanceBonus = max(500LL, finalWage / 28);
     state.agreedClause = max(static_cast<long long>(player.value * negotiationClauseFactor(profile)),
                              finalWage * (profile == NegotiationProfile::Safe ? 48 : 40));
     state.agreedContractWeeks =
@@ -556,6 +569,10 @@ NegotiationState runRenewalNegotiation(const Career& career,
     state.agreedPromisedRole = promiseLabel(promise);
     pushRound(state,
               "Renovacion cerrada: salario " + formatMoneyValue(state.agreedWage) +
+                  ", firma " + formatMoneyValue(state.agreedBonus) +
+                  ", agente " + formatMoneyValue(state.agreedAgentFee) +
+                  ", fidelidad " + formatMoneyValue(state.agreedLoyaltyBonus) +
+                  ", bonus por partido " + formatMoneyValue(state.agreedAppearanceBonus) +
                   ", contrato " + to_string(state.agreedContractWeeks) + " semanas.");
     state.status = "Renovacion acordada";
     return state;

@@ -165,7 +165,7 @@ void showActionButtonsForPage(AppState& state) {
         {state.renewButton, {GuiPage::Squad, GuiPage::Finances}},
         {state.sellButton, {GuiPage::Squad, GuiPage::Transfers}},
         {state.planButton, {GuiPage::Squad, GuiPage::Youth}},
-        {state.instructionButton, {GuiPage::Tactics, GuiPage::Dashboard}},
+        {state.instructionButton, {GuiPage::Tactics, GuiPage::Dashboard, GuiPage::Squad, GuiPage::Youth}},
         {state.youthUpgradeButton, {GuiPage::Youth, GuiPage::Finances, GuiPage::Board}},
         {state.trainingUpgradeButton, {GuiPage::Tactics, GuiPage::Finances, GuiPage::Board}},
         {state.scoutingUpgradeButton, {GuiPage::Transfers, GuiPage::Finances, GuiPage::Board}},

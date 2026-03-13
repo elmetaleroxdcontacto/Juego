@@ -43,6 +43,10 @@ int findSaleCandidateIndex(const Team& team, const vector<string>& candidateName
     return -1;
 }
 
+long long totalDealCost(const NegotiationState& state) {
+    return state.agreedFee + state.agreedBonus + state.agreedAgentFee + state.agreedLoyaltyBonus;
+}
+
 }  // namespace
 
 namespace transfer_market {
@@ -161,9 +165,9 @@ void processCpuTransfers(Career& career) {
                 const NegotiationState negotiation =
                     runTransferNegotiation(career, *team, *seller, newPlayer, profile, promise);
                 if (!negotiation.clubAccepted || !negotiation.playerAccepted) continue;
-                if (team->budget < negotiation.agreedFee + negotiation.agreedBonus) continue;
+                if (team->budget < totalDealCost(negotiation)) continue;
 
-                team->budget -= (negotiation.agreedFee + negotiation.agreedBonus);
+                team->budget -= totalDealCost(negotiation);
                 seller->budget += negotiation.agreedFee;
                 newPlayer.onLoan = false;
                 newPlayer.parentClub.clear();

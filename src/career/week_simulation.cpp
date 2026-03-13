@@ -74,11 +74,15 @@ void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore) {
         long long ticketIncome =
             static_cast<long long>(homeGames[team]) * (team->fanBase * 2500LL + team->stadiumLevel * 7000LL);
         long long seasonTickets = (career.currentWeek % 4 == 1) ? team->fanBase * 900LL : 0LL;
-        long long sponsor = team->sponsorWeekly + max(0, pointsDelta) * 800LL;
+        long long merchandising = static_cast<long long>(team->fanBase) * 350LL +
+                                  static_cast<long long>(teamPrestigeScore(*team)) * 180LL +
+                                  static_cast<long long>(max(0, team->goalsFor - team->goalsAgainst)) * 120LL;
+        long long sponsorActivation = (pointsDelta >= 3 ? 3500LL : 0LL) + (team->fanBase >= 60 ? 2000LL : 0LL);
+        long long sponsor = team->sponsorWeekly + max(0, pointsDelta) * 800LL + sponsorActivation;
         long long performanceBonus = pointsDelta * 4000LL;
         long long solidarity = randInt(0, 3000);
         long long income = divisionBaseIncome(team->division) + sponsor + ticketIncome + seasonTickets +
-                           performanceBonus + solidarity;
+                           merchandising + performanceBonus + solidarity;
         long long wages = weeklyWage(*team);
         long long debtPayment = min(team->debt, max(0LL, income / 8));
         team->debt -= debtPayment;
@@ -95,7 +99,7 @@ void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore) {
         if (career.myTeam == team) {
             ostringstream out;
             out << "Finanzas semanales: +" << income << " (entradas " << ticketIncome << ", abonos "
-                << seasonTickets << ", sponsor " << sponsor << ")"
+                << seasonTickets << ", merch " << merchandising << ", sponsor " << sponsor << ")"
                 << " / -" << wages << " salarios"
                 << " / -" << debtPayment << " deuda"
                 << " / -" << debtInterest << " interes"
@@ -113,6 +117,13 @@ void generateManagerCareerEvents(Career& career) {
     if (rank > 0 && rank <= max(2, field / 4) && randInt(1, 100) <= 18) {
         career.addNews("Entrevista: la prensa describe a " + career.managerName + " como un DT " +
                        managerStyleLabel(*career.myTeam) + ".");
+    }
+    int youthContributors = 0;
+    for (const auto& player : career.myTeam->players) {
+        if (player.age <= 21 && player.matchesPlayed >= 4) youthContributors++;
+    }
+    if (youthContributors >= 2 && randInt(1, 100) <= 16) {
+        career.addNews("Perfil de manager: la prensa valora la apuesta juvenil de " + career.managerName + ".");
     }
     if (career.managerReputation >= 58 && rank > 0 && rank <= career.boardExpectedFinish &&
         randInt(1, 100) <= 12) {
@@ -183,7 +194,7 @@ void weeklyDashboard(const Career& career) {
 
 void applyClubEvent(Career& career) {
     if (!career.myTeam || randInt(1, 100) > 15) return;
-    int event = randInt(1, 4);
+    int event = randInt(1, 6);
     if (event == 1) {
         long long bonus = 50000 + randInt(0, 30000);
         career.myTeam->budget += bonus;
@@ -209,6 +220,33 @@ void applyClubEvent(Career& career) {
         emitUiMessage("[Evento] Accidente en entrenamiento: " + player.name +
                       " fuera " + to_string(player.injuryWeeks) + " semanas.");
         return;
+    }
+    if (event == 4) {
+        for (auto& player : career.myTeam->players) {
+            if (player.age > 29 || player.startsThisSeason > 1) continue;
+            player.happiness = clampInt(player.happiness - 5, 1, 99);
+            player.unhappinessWeeks = clampInt(player.unhappinessWeeks + 1, 0, 52);
+            player.socialGroup = "Frustrados";
+            career.addNews("Vestuario: " + player.name + " pide una conversacion por falta de minutos.");
+            emitUiMessage("[Evento] Vestuario tenso: " + player.name + " reclama mas protagonismo.");
+            return;
+        }
+    }
+    if (event == 5) {
+        const Player* best = nullptr;
+        for (const auto& player : career.myTeam->players) {
+            if (player.injured) continue;
+            if (!best || player.skill > best->skill) best = &player;
+        }
+        if (best) {
+            int idx = static_cast<int>(best - &career.myTeam->players[0]);
+            Player& player = career.myTeam->players[static_cast<size_t>(idx)];
+            player.wantsToLeave = player.ambition >= 60;
+            player.happiness = clampInt(player.happiness - 3, 1, 99);
+            career.addNews("Mercado: un club grande empieza a seguir a " + player.name + ".");
+            emitUiMessage("[Evento] Mercado: aumenta el interes externo por " + player.name + ".");
+            return;
+        }
     }
 
     int maxSquad = getCompetitionConfig(career.myTeam->division).maxSquadSize;
@@ -724,8 +762,19 @@ void updateManagerReputation(Career& career) {
         career.managerReputation = clampInt(career.managerReputation + 1, 1, 100);
     }
     int promiseWarnings = 0;
+    int youthContributors = 0;
     for (const auto& player : career.myTeam->players) {
         if (promiseAtRisk(player, career.currentWeek)) promiseWarnings++;
+        if (player.age <= 21 && player.matchesPlayed >= 4) youthContributors++;
+    }
+    if (youthContributors >= 2) {
+        career.managerReputation = clampInt(career.managerReputation + 1, 1, 100);
+    }
+    DressingRoomSnapshot dressing = dressing_room_service::buildSnapshot(*career.myTeam, career.currentWeek);
+    if (dressing.socialTension <= 2 && career.myTeam->morale >= 68) {
+        career.managerReputation = clampInt(career.managerReputation + 1, 1, 100);
+    } else if (dressing.socialTension >= 5) {
+        career.managerReputation = clampInt(career.managerReputation - 1, 1, 100);
     }
     if (career.boardConfidence <= 25 && promiseWarnings >= 2) {
         career.managerReputation = clampInt(career.managerReputation - 1, 1, 100);
@@ -832,21 +881,59 @@ void simulateBackgroundDivisionWeek(Career& career, const string& divisionId) {
     table.ruleId = divisionId;
     for (Team* team : teams) table.addTeam(team);
     table.sortTable();
+    Team* leader = table.teams.empty() ? nullptr : table.teams.front();
+    Team* bottom = table.teams.empty() ? nullptr : table.teams.back();
+
     if (!headline.empty() && (career.currentWeek % 4 == 0 || headlineMargin >= 3)) {
-        Team* leader = table.teams.empty() ? nullptr : table.teams.front();
         string news = "[Mundo] " + divisionDisplay(divisionId) + ": " + headline;
         if (leader) news += " | Lider " + leader->name + " (" + to_string(leader->points) + " pts)";
         career.addNews(news);
     }
-    if (!table.teams.empty() && randInt(1, 100) <= 14) {
-        Team* leader = table.teams.front();
+    if (leader && randInt(1, 100) <= 14) {
         career.addNews("[Mundo] " + divisionDisplay(divisionId) + ": " + leader->name +
                        " instala una historia de temporada con estilo " + leader->clubStyle + ".");
     }
-    if (table.teams.size() >= 2 && randInt(1, 100) <= 10) {
-        Team* bottom = table.teams.back();
+    if (bottom && randInt(1, 100) <= 10) {
         career.addNews("[Mundo] " + divisionDisplay(divisionId) + ": crece la presion en " + bottom->name +
                        " por su mala racha.");
+    }
+    if (bottom && randInt(1, 100) <= 8) {
+        bottom->morale = clampInt(bottom->morale - 3, 0, 100);
+        career.addNews("[Mundo] " + divisionDisplay(divisionId) + ": " + bottom->name +
+                       " entra en revision de banquillo tras otra semana bajo presion.");
+    }
+    if (leader && leader->youthFacilityLevel + leader->youthCoach >= 130 && randInt(1, 100) <= 12) {
+        const int maxSquad = getCompetitionConfig(divisionId).maxSquadSize;
+        if (maxSquad <= 0 || static_cast<int>(leader->players.size()) < maxSquad) {
+            const string youthPosition = leader->goalsAgainst > leader->goalsFor ? "DEF" : "MED";
+            Player promoted = makeRandomPlayer(youthPosition,
+                                               max(40, leader->getAverageSkill() - 18),
+                                               max(leader->getAverageSkill() - 4, 45),
+                                               17,
+                                               19);
+            promoted.potential = clampInt(promoted.skill + randInt(8, 16), promoted.skill, 95);
+            promoted.contractWeeks = 156;
+            promoted.wage = max(2500LL, promoted.wage / 2);
+            leader->addPlayer(promoted);
+            career.addNews("[Mundo] " + divisionDisplay(divisionId) + ": " + leader->name +
+                           " promociona al juvenil " + promoted.name + ".");
+        }
+    }
+    if (leader && randInt(1, 100) <= 8) {
+        Player* keyPlayer = nullptr;
+        for (auto& player : leader->players) {
+            if (player.injured) continue;
+            if (!keyPlayer || player.skill > keyPlayer->skill) keyPlayer = &player;
+        }
+        if (keyPlayer) {
+            keyPlayer->injured = true;
+            keyPlayer->injuryType = randInt(0, 1) == 0 ? "Sobrecarga" : "Muscular";
+            keyPlayer->injuryWeeks = randInt(1, 3);
+            keyPlayer->injuryHistory++;
+            career.addNews("[Mundo] " + divisionDisplay(divisionId) + ": " + leader->name +
+                           " pierde por lesion a " + keyPlayer->name + " durante " +
+                           to_string(keyPlayer->injuryWeeks) + " semana(s).");
+        }
     }
 }
 
@@ -956,7 +1043,8 @@ void simulateCareerWeek(Career& career) {
     for (auto& team : career.allTeams) {
         healInjuries(team, false);
         recoverFitness(team, 7);
-        player_dev::applyWeeklyTrainingPlan(team);
+        const bool congestedTraining = cupWeek ? team.division == career.activeDivision : (career.currentWeek % 5 == 0 && team.division != career.activeDivision);
+        player_dev::applyWeeklyTrainingPlan(team, congestedTraining);
     }
 
     updateContracts(career);

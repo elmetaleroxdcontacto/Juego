@@ -5,8 +5,8 @@
 
 namespace player_dev {
 
-void applyWeeklyTrainingPlan(Team& team) {
-    development::applyWeeklyTrainingImpact(team);
+void applyWeeklyTrainingPlan(Team& team, bool congestedWeek) {
+    development::applyWeeklyTrainingImpact(team, congestedWeek);
 }
 
 void addYouthPlayers(Team& team, int count) {

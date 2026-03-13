@@ -19,6 +19,7 @@ struct TransferTarget {
     int affordabilityScore = 0;
     int scoutingConfidence = 0;
     int competitionScore = 0;
+    long long expectedAgentFee = 0;
     bool onShortlist = false;
     bool urgentNeed = false;
     std::string scoutingNote;
@@ -38,7 +39,10 @@ struct TransferOffer {
 struct ContractOffer {
     long long wage = 0;
     long long signingBonus = 0;
+    long long agentFee = 0;
+    long long loyaltyBonus = 0;
     long long releaseClause = 0;
+    long long appearanceBonus = 0;
     int contractWeeks = 0;
     std::string promisedRole;
 };
@@ -55,7 +59,10 @@ struct NegotiationState {
     long long agreedFee = 0;
     long long agreedWage = 0;
     long long agreedBonus = 0;
+    long long agreedAgentFee = 0;
+    long long agreedLoyaltyBonus = 0;
     long long agreedClause = 0;
+    long long agreedAppearanceBonus = 0;
     int agreedContractWeeks = 0;
     std::string agreedPromisedRole;
     std::vector<std::string> roundSummaries;

@@ -76,7 +76,19 @@ bool overwriteFromTempFile(const string& sourcePath, const string& targetPath) {
     if (!target.is_open()) return false;
 
     target << source.rdbuf();
-    return source.good() || source.eof() ? target.good() : false;
+    return (source.good() || source.eof()) ? target.good() : false;
+}
+
+bool copyExistingFile(const string& sourcePath, const string& targetPath) {
+    if (!pathExists(sourcePath)) return true;
+#ifdef _WIN32
+    const wstring wideSource = utf8ToWidePath(sourcePath);
+    const wstring wideTarget = utf8ToWidePath(targetPath);
+    if (!wideSource.empty() && !wideTarget.empty()) {
+        if (CopyFileW(wideSource.c_str(), wideTarget.c_str(), FALSE) != 0) return true;
+    }
+#endif
+    return overwriteFromTempFile(sourcePath, targetPath);
 }
 
 bool saveCareer(Career& career) {
@@ -85,6 +97,9 @@ bool saveCareer(Career& career) {
     }
 
     const string tempPath = career.saveFile + ".tmp";
+    const string backupPath = career.saveFile + ".bak";
+    const bool backupReady = copyExistingFile(career.saveFile, backupPath);
+
     ofstream file(tempPath, ios::binary | ios::trunc);
     if (!file.is_open()) return false;
 
@@ -104,6 +119,9 @@ bool saveCareer(Career& career) {
             return true;
         }
         std::remove(tempPath.c_str());
+        if (backupReady && pathExists(backupPath)) {
+            overwriteFromTempFile(backupPath, career.saveFile);
+        }
         return false;
     }
     return true;

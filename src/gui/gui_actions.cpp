@@ -241,8 +241,20 @@ void runPlanAction(AppState& state) {
 }
 
 void runInstructionAction(AppState& state) {
-    ServiceResult result = cycleMatchInstructionService(state.career);
-    finalizeAction(state, result, "Instruccion");
+    if (state.currentPage == GuiPage::Dashboard) {
+        finalizeAction(state, holdTeamMeetingService(state.career), "Reunion");
+        return;
+    }
+    if (state.currentPage == GuiPage::Squad || state.currentPage == GuiPage::Youth) {
+        int row = selectedListViewRow(state.squadList);
+        if (row < 0) {
+            MessageBoxW(state.window, L"Selecciona un jugador.", L"Charla", MB_OK | MB_ICONINFORMATION);
+            return;
+        }
+        finalizeAction(state, talkToPlayerService(state.career, listViewText(state.squadList, row, 0)), "Charla");
+        return;
+    }
+    finalizeAction(state, cycleMatchInstructionService(state.career), "Instruccion");
 }
 
 void runShortlistAction(AppState& state) {

@@ -2371,3 +2371,61 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - `cmake --build build-cmake --config Release --target FootballManagerTests`
   - `FootballManagerTests.exe`: todos los tests pasan
   - `FootballManager.exe --validate`: `Resultado: sin fallas`
+
+## Cambios recientes (2026-03-13) - Mundo, promesas, vestuario y scouting
+
+- Se cerró el ciclo de vida de promesas de temporada: ahora las promesas activas se resuelven explícitamente al final del curso antes del reset de la nueva temporada, evitando que desaparezcan sin premio o castigo.
+- El servicio `world_state_service` ahora genera un pulso del mundo más rico con rumores de banquillo, presión institucional y focos de mercado, además de seguir produciendo records históricos.
+- El cierre de temporada actualiza records de todas las divisiones cargadas, no solo de la división activa del usuario.
+- El scouting quedó recalibrado: la confianza ya no se satura tan fácil, cada informe expone expectativa salarial y etiqueta de riesgo, y el seguimiento de shortlist también devuelve salario esperado.
+- El vestuario pasó a usar dinámica social semanal: grupos como `Lideres`, `Titulares`, `Juveniles`, `Veteranos`, `Competitivos` y `Frustrados` se recalculan según minutos, felicidad, edad y rol prometido.
+- El snapshot de vestuario ahora informa tensión social, apoyo de liderazgo, tamaño del grupo dominante y jugadores aislados.
+- La moral colectiva del partido ya considera salidas potenciales, promesas de posición incumplidas, fatiga severa y focos sociales frustrados.
+- La simulación semanal añadió ingresos de merchandising y activación de sponsor dentro del flujo financiero para representar mejor el estado comercial del club.
+- Se ampliaron los eventos aleatorios de carrera con conflictos por minutos y picos de interés externo por jugadores importantes, además de los eventos previos de sponsor, protesta e lesión.
+- La reputación del entrenador ahora también reacciona al uso de juveniles y a la salud social del vestuario, no solo a la tabla y al estilo táctico.
+- Los reportes de directiva y club muestran la nueva lectura social del plantel, incluyendo tensión, apoyo de líderes y grupos del vestuario.
+- La GUI agrega alertas de promesas bajo presión y de tensión interna alta en el dashboard.
+- Se agregaron tests nuevos para `dressing_room_tension`, `scouting_confidence` y `season_promise_carryover`.
+- Verificación ejecutada:
+  - `cmake --build build-cmake --config Release --target FootballManagerTests`
+  - `build-cmake\\bin\\FootballManagerTests.exe` -> todo OK
+  - `build-cmake\\bin\\FootballManager.exe --validate` -> `Resultado: sin fallas` con `0` errores y `196` advertencias de dataset externo
+- Pendiente real que sigue fuera de este cambio: limpiar carpetas históricas no referenciadas en `data/LigaChilena` y las advertencias residuales de posiciones crudas.
+
+
+## Cambios recientes (2026-03-13) - Mundo vivo, microciclo, mercado y vestuario
+
+- Se profundizo la simulacion semanal del mundo en `src/career/week_simulation.cpp`.
+- Las divisiones de fondo ahora pueden generar titulares de liderato, presion institucional, revision de banquillo, promociones juveniles e lesiones cortas de jugadores clave.
+- El entrenamiento semanal ya funciona como microciclo real en `src/development/training_impact_system.cpp`.
+- Se agregaron horarios y cargas por sesion, diferenciando semanas regulares y congestionadas.
+- `player_dev::applyWeeklyTrainingPlan(...)` ahora acepta semana congestionada y la simulacion la usa al cerrar cada fecha.
+- El mercado se hizo mas humano en `src/transfers/negotiation_system.cpp`, `src/career/app_services.cpp`, `src/ai/ai_transfer_manager.cpp` y `src/transfers/transfer_market.cpp`.
+- Las negociaciones ahora incluyen fee de agente, bonus de fidelidad y bonus por partido dentro de `NegotiationState` y `ContractOffer`.
+- Los fichajes, clausulas, precontratos y renovaciones descuentan el paquete real de firma, no solo fee + bono basico.
+- La IA de mercado ahora estima tambien costo de agente y usa ese costo en shortlist, viabilidad y fichajes CPU.
+- Se agregaron interacciones directas del manager con el vestuario en `src/career/app_services.cpp`.
+- Nuevo servicio `holdTeamMeetingService(...)` para reunion de plantel.
+- Nuevo servicio `talkToPlayerService(...)` para charla individual.
+- Nuevo servicio `cycleTrainingFocusService(...)` para rotar el plan semanal del equipo.
+- La GUI expone estas acciones en `src/gui/gui_actions.cpp`, `src/gui/gui_layout.cpp` y `src/gui/gui_views.cpp`.
+- El boton contextual ahora sirve como `Reunion` en dashboard, `Hablar` en plantilla/cantera e `Instruccion` en tacticas.
+- El dashboard muestra tension social, plan semanal y preview del microciclo.
+- La vista tactica muestra el microciclo, el impacto de fatiga y la relacion entre plan semanal e instruccion de partido.
+- La vista financiera ahora muestra sponsor, taquilla, merchandising, bonos variables y buffer real de mercado.
+- La persistencia se endurecio en `src/io/save_manager.cpp`.
+- Cada guardado deja backup `.bak` del save previo antes de reemplazar el archivo principal.
+- Los reportes de carrera en `src/career/career_reports.cpp` ahora incluyen merchandising, bonos y bloque de microciclo semanal.
+- Se hizo limpieza puntual de datos externos.
+- Se corrigieron las posiciones de Alan Medina en `data/LigaChilena/primera division/CD Everton/players.csv` y Javier Medina en `data/LigaChilena/segunda division/Colchagua CD/players.csv`.
+- Se agrego la herramienta `tools/report_orphan_team_folders.ps1` para auditar carpetas de clubes no listadas en `teams.txt`.
+- El reporte generado queda en `docs/data_cleanup_report.md`.
+- Se ampliaron los tests en `tests/project_tests.cpp`.
+- Nuevos tests: `training_microcycle`, `team_meeting`, `negotiation_agent_costs`, `save_backup`.
+- Verificacion ejecutada:
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `build-cmake/bin/FootballManagerTests.exe`
+- `build.bat --validate`
+- `build-cmake/bin/FootballManager.exe --validate`
+- Estado de validacion actual: `Resultado: sin fallas`, con `0` errores y `194` advertencias de dataset externo aun pendientes, concentradas sobre todo en carpetas no referenciadas y homonimias/doblados de jugadores.

@@ -63,9 +63,18 @@ int qualityPlayersAtPosition(const Team& team, const string& position) {
     return count;
 }
 
+int seasonDeadlineWeek(const Career& career) {
+    return max(career.currentWeek, static_cast<int>(career.schedule.size()));
+}
+
 void pushHeadline(WorldPulseSummary& summary, const string& line) {
     if (line.empty()) return;
     if (summary.headlines.size() < 8) summary.headlines.push_back(line);
+}
+
+void pushSeasonSummary(vector<string>* summaryLines, const string& line) {
+    if (!summaryLines || line.empty()) return;
+    summaryLines->push_back(line);
 }
 
 bool updateRecord(vector<HistoricalRecord>& records,
@@ -112,7 +121,7 @@ void seedSeasonPromises(Career& career) {
     career.activePromises.clear();
     if (!career.myTeam) return;
 
-    const int seasonDeadline = max(career.currentWeek + 4, static_cast<int>(career.schedule.size()));
+    const int seasonDeadline = seasonDeadlineWeek(career);
     const int competitionTarget =
         max(1, career.boardExpectedFinish > 0 ? career.boardExpectedFinish
                                               : max(1, career.currentCompetitiveFieldSize() / 3));
@@ -293,7 +302,124 @@ WorldPulseSummary processWeeklyWorldState(Career& career) {
         }
     }
 
+    if (pressureClubs >= 3 && career.currentWeek % 4 == 2) {
+        career.addNews("[Mundo] Varias directivas entran en modo revision por un arranque irregular.");
+        pushHeadline(summary, "Clima institucional: varias bancas quedan bajo observacion esta semana.");
+    }
+
+    if (mostPressured && career.currentWeek % 5 == 0) {
+        career.addNews("[Mundo] Rumor de banquillo: " + mostPressured->name + " estudia cambios tras semanas de presion.");
+        pushHeadline(summary, "Banquillos: " + mostPressured->name + " aparece en el radar de rumores.");
+    }
+
+    if (career.currentWeek % 5 == 0) {
+        const Team* seller = nullptr;
+        const Player* target = nullptr;
+        int marketScore = -1;
+        for (const auto& club : career.allTeams) {
+            for (const auto& player : club.players) {
+                if (player.age > 29 || player.injured) continue;
+                int score = player.skill + max(0, player.potential - player.skill) +
+                            (player.wantsToLeave ? 12 : 0) + max(0, 52 - player.happiness);
+                if (score > marketScore) {
+                    marketScore = score;
+                    seller = &club;
+                    target = &player;
+                }
+            }
+        }
+        if (seller && target) {
+            career.addNews("[Mundo] Mercado: crece el interes por " + target->name + " de " + seller->name + ".");
+            pushHeadline(summary, "Mercado: " + target->name + " pasa a ser uno de los nombres de la semana.");
+        }
+    }
+
     return summary;
+}
+
+int resolveSeasonCarryover(Career& career, vector<string>* summaryLines) {
+    if (!career.myTeam || career.activePromises.empty()) return 0;
+
+    Team& team = *career.myTeam;
+    const int seasonEnd = seasonDeadlineWeek(career);
+    int resolved = 0;
+    for (auto& promise : career.activePromises) {
+        if (promise.fulfilled || promise.failed) continue;
+        promise.deadlineWeek = min(promise.deadlineWeek, seasonEnd);
+
+        if (promise.category == "Minutos") {
+            Player* player = findPlayerByName(team, promise.subjectName);
+            const int targetStarts = targetStartsForPromise(promise.target);
+            promise.progress = player ? player->startsThisSeason : 0;
+            if (player && promise.progress >= targetStarts) {
+                promise.fulfilled = true;
+                player->happiness = clampInt(player->happiness + 4, 1, 99);
+                player->moraleMomentum = clampInt(player->moraleMomentum + 2, -25, 25);
+                team.morale = clampInt(team.morale + 1, 0, 100);
+                career.addNews("Cierre de temporada: " + player->name + " termina el curso con su promesa de minutos cumplida.");
+                pushSeasonSummary(summaryLines, "Promesa cerrada: " + player->name + " recibe los minutos comprometidos.");
+            } else {
+                promise.failed = true;
+                if (player) {
+                    player->happiness = clampInt(player->happiness - 7, 1, 99);
+                    player->moraleMomentum = clampInt(player->moraleMomentum - 3, -25, 25);
+                    player->wantsToLeave = player->ambition >= 55 || player->promisedRole != "Sin promesa";
+                }
+                team.morale = clampInt(team.morale - 2, 0, 100);
+                career.addNews("Cierre de temporada: " + promise.subjectName + " cierra el ano molesto por una promesa de minutos incumplida.");
+                pushSeasonSummary(summaryLines, "Promesa rota: " + promise.subjectName + " termina la temporada sin los minutos acordados.");
+            }
+            resolved++;
+            continue;
+        }
+
+        if (promise.category == "Fichaje") {
+            promise.progress = qualityPlayersAtPosition(team, promise.target);
+            if (promise.progress >= 3) {
+                promise.fulfilled = true;
+                career.boardConfidence = clampInt(career.boardConfidence + 2, 0, 100);
+                career.addNews("Cierre de temporada: el club termina con profundidad suficiente en " + promise.target + ".");
+                pushSeasonSummary(summaryLines, "Promesa cerrada: la plantilla ya tiene relevo suficiente en " + promise.target + ".");
+            } else {
+                promise.failed = true;
+                career.boardConfidence = clampInt(career.boardConfidence - 3, 0, 100);
+                team.morale = clampInt(team.morale - 1, 0, 100);
+                career.addNews("Cierre de temporada: sigue sin llegar el refuerzo prometido para " + promise.target + ".");
+                pushSeasonSummary(summaryLines, "Promesa rota: la necesidad en " + promise.target + " queda abierta al final del curso.");
+            }
+            resolved++;
+            continue;
+        }
+
+        if (promise.category == "Competicion") {
+            int targetRank = 1;
+            try {
+                targetRank = max(1, stoi(promise.target));
+            } catch (...) {
+                targetRank = 1;
+            }
+            const int currentRank = max(1, career.currentCompetitiveRank());
+            promise.progress = max(0, targetRank - currentRank + 1);
+            if (currentRank <= targetRank) {
+                promise.fulfilled = true;
+                career.managerReputation = clampInt(career.managerReputation + 3, 1, 100);
+                team.morale = clampInt(team.morale + 2, 0, 100);
+                career.addNews("Cierre de temporada: " + team.name + " termina dentro del objetivo competitivo fijado.");
+                pushSeasonSummary(summaryLines, "Promesa cerrada: " + team.name + " cumple la meta de tabla del curso.");
+            } else {
+                promise.failed = true;
+                career.managerReputation = clampInt(career.managerReputation - 2, 1, 100);
+                career.boardConfidence = clampInt(career.boardConfidence - 4, 0, 100);
+                team.morale = clampInt(team.morale - 3, 0, 100);
+                career.addNews("Cierre de temporada: " + team.name + " termina el curso por debajo del objetivo comprometido.");
+                pushSeasonSummary(summaryLines, "Promesa rota: " + team.name + " no alcanza la meta de tabla al final del ano.");
+            }
+            resolved++;
+        }
+    }
+
+    career.activePromises.clear();
+    return resolved;
 }
 
 int updateSeasonRecords(Career& career, const LeagueTable& table) {

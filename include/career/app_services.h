@@ -34,6 +34,8 @@ struct ScoutingCandidate {
     int bigMatches = 0;
     int confidence = 0;
     long long marketValue = 0;
+    long long salaryExpectation = 0;
+    std::string riskLabel;
 };
 
 struct ScoutingSessionResult {
@@ -116,6 +118,9 @@ ServiceResult loanOutPlayerService(Career& career,
                                    const std::string& destinationTeamName,
                                    int loanWeeks);
 ServiceResult cyclePlayerDevelopmentPlanService(Career& career, const std::string& playerName);
+ServiceResult holdTeamMeetingService(Career& career);
+ServiceResult talkToPlayerService(Career& career, const std::string& playerName);
+ServiceResult cycleTrainingFocusService(Career& career);
 ServiceResult cycleMatchInstructionService(Career& career);
 ServiceResult shortlistPlayerService(Career& career,
                                      const std::string& sellerTeamName,

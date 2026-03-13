@@ -8,6 +8,8 @@ struct WeeklyFinanceReport {
     long long wageBill = 0;
     long long sponsorIncome = 0;
     long long matchdayIncome = 0;
+    long long merchandisingIncome = 0;
+    long long bonusIncome = 0;
     long long debtService = 0;
     long long netCashFlow = 0;
     long long transferBuffer = 0;

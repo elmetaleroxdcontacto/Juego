@@ -25,10 +25,24 @@ bool isLeader(const Player& player) {
     return player.leadership >= 72 || playerHasTrait(player, "Lider");
 }
 
+string dynamicSocialGroup(const Player& player, const Team& team, int currentWeek) {
+    if (isLeader(player) && player.happiness >= 55) return "Lideres";
+    if (player.wantsToLeave || player.unhappinessWeeks >= 3 || player.happiness <= 44) return "Frustrados";
+    if (player.age <= 20 || player.promisedRole == "Proyecto") return "Juveniles";
+    if (player.age >= 31) return "Veteranos";
+    if (player.startsThisSeason >= expectedStartsForPromise(player, currentWeek) &&
+        player.skill >= team.getAverageSkill() - 2) {
+        return "Titulares";
+    }
+    if (player.ambition >= 70 && player.professionalism >= 60) return "Competitivos";
+    return "Nucleo";
+}
+
 string buildSummary(const DressingRoomSnapshot& snapshot) {
     ostringstream out;
     out << snapshot.climate << " | promesas en riesgo " << snapshot.promiseRiskCount
         << " | conflictos " << snapshot.conflictCount
+        << " | tension " << snapshot.socialTension
         << " | moral baja " << snapshot.lowMoraleCount
         << " | fatiga alta " << snapshot.fatigueRiskCount
         << " | salidas " << snapshot.wantsOutCount;
@@ -45,8 +59,9 @@ DressingRoomSnapshot buildSnapshot(const Team& team, int currentWeek) {
     map<string, int> socialGroups;
 
     for (const Player& player : team.players) {
+        const string socialGroup = dynamicSocialGroup(player, team, currentWeek);
         if (isLeader(player) && player.happiness >= 55) snapshot.leaderCount++;
-        if (!player.socialGroup.empty()) socialGroups[player.socialGroup]++;
+        if (!socialGroup.empty()) socialGroups[socialGroup]++;
         if (promiseAtRisk(player, currentWeek)) {
             snapshot.promiseRiskCount++;
             if (snapshot.alerts.size() < 8) {
@@ -85,11 +100,28 @@ DressingRoomSnapshot buildSnapshot(const Team& team, int currentWeek) {
         }
     }
 
+    int frustratedGroup = 0;
     for (const auto& entry : socialGroups) {
         snapshot.groups.push_back(entry.first + ": " + to_string(entry.second));
+        snapshot.coreGroupSize = max(snapshot.coreGroupSize, entry.second);
+        if (entry.second <= 1) snapshot.isolatedPlayers++;
+        if (entry.first == "Frustrados") frustratedGroup = entry.second;
     }
     if (socialGroups.size() >= 4) snapshot.conflictCount++;
     if (snapshot.leaderCount == 0 && snapshot.lowMoraleCount >= 2) snapshot.conflictCount++;
+    if (frustratedGroup >= 2) {
+        snapshot.conflictCount++;
+        if (snapshot.alerts.size() < 8) {
+            snapshot.alerts.push_back("Aparece un foco de disconformidad entre jugadores con pocos minutos.");
+        }
+    }
+
+    snapshot.leadershipSupport = max(0, snapshot.leaderCount * 2 - snapshot.lowMoraleCount - snapshot.wantsOutCount);
+    snapshot.socialTension = snapshot.conflictCount + snapshot.positionPromiseRiskCount +
+                             max(0, static_cast<int>(socialGroups.size()) - 3) +
+                             max(0, frustratedGroup - 1) + max(0, snapshot.lowMoraleCount - snapshot.leaderCount);
+    if (snapshot.coreGroupSize >= 5 && snapshot.leaderCount >= 2) snapshot.socialTension = max(0, snapshot.socialTension - 1);
+    if (snapshot.isolatedPlayers >= 3) snapshot.socialTension++;
 
     if (snapshot.alerts.empty()) {
         snapshot.alerts.push_back("El vestuario no presenta focos criticos esta semana.");
@@ -111,6 +143,7 @@ DressingRoomSnapshot applyWeeklyUpdate(Career& career, int pointsDelta) {
     }
 
     for (Player& player : team.players) {
+        player.socialGroup = dynamicSocialGroup(player, team, career.currentWeek);
         const bool wasUnhappy = player.wantsToLeave;
         const int expectedStarts = expectedStartsForPromise(player, career.currentWeek);
         const int unmetStarts = max(0, expectedStarts - player.startsThisSeason);
@@ -183,12 +216,23 @@ DressingRoomSnapshot applyWeeklyUpdate(Career& career, int pointsDelta) {
                               (player.ambition >= 60 || player.professionalism <= 45 || unmetStarts >= 3 ||
                                player.unhappinessWeeks >= 4 ||
                                player.promisedRole != "Sin promesa");
+        if (player.socialGroup == "Frustrados") {
+            player.chemistry = clampInt(player.chemistry - 1, 1, 99);
+        } else if (player.socialGroup == "Lideres" && pointsDelta == 3) {
+            player.chemistry = clampInt(player.chemistry + 1, 1, 99);
+        } else if (player.socialGroup == "Juveniles" && unmetStarts == 0 && player.promisedRole == "Proyecto") {
+            player.happiness = clampInt(player.happiness + 1, 1, 99);
+        }
+        player.socialGroup = dynamicSocialGroup(player, team, career.currentWeek);
         if (!wasUnhappy && player.wantsToLeave) {
             career.addNews(player.name + " queda disconforme con su situacion en " + team.name + ".");
         }
     }
 
     DressingRoomSnapshot snapshot = buildSnapshot(team, career.currentWeek);
+    if (snapshot.socialTension >= 5) {
+        career.addNews("Vestuario: aumentan las fricciones internas en " + team.name + ".");
+    }
     if (snapshot.promiseRiskCount >= 2 || snapshot.wantsOutCount > 0 || snapshot.lowMoraleCount >= 3) {
         career.addNews("Vestuario: " + snapshot.summary + ".");
     }
@@ -200,6 +244,9 @@ string formatSnapshot(const Career& career, size_t maxAlerts) {
     DressingRoomSnapshot snapshot = buildSnapshot(*career.myTeam, career.currentWeek);
     ostringstream out;
     out << "Estado del vestuario\r\n" << snapshot.summary << "\r\n";
+    out << "Apoyo de liderazgo: " << snapshot.leadershipSupport
+        << " | Grupo dominante: " << snapshot.coreGroupSize
+        << " | Aislados: " << snapshot.isolatedPlayers << "\r\n";
     if (!snapshot.groups.empty()) {
         out << "Grupos: " << joinStringValues(snapshot.groups, " | ") << "\r\n";
     }

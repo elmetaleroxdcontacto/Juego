@@ -16,6 +16,10 @@ struct DressingRoomSnapshot {
     int lowMoraleCount = 0;
     int fatigueRiskCount = 0;
     int wantsOutCount = 0;
+    int coreGroupSize = 0;
+    int isolatedPlayers = 0;
+    int socialTension = 0;
+    int leadershipSupport = 0;
     std::vector<std::string> groups;
     std::vector<std::string> alerts;
 };

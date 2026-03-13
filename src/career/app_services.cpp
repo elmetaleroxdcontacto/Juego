@@ -7,7 +7,9 @@
 #include "career/world_state_service.h"
 #include "career/week_simulation.h"
 #include "career/team_management.h"
+#include "career/dressing_room_service.h"
 #include "competition.h"
+#include "development/training_impact_system.h"
 #include "transfers/negotiation_system.h"
 #include "utils.h"
 
@@ -77,6 +79,26 @@ string nextMatchInstruction(const string& current) {
     return instructions.front();
 }
 
+string nextTrainingFocus(const string& current) {
+    static const vector<string> focuses = {"Balanceado", "Recuperacion", "Ataque", "Defensa",
+                                           "Resistencia", "Tecnico", "Tactico", "Preparacion partido"};
+    for (size_t i = 0; i < focuses.size(); ++i) {
+        if (focuses[i] == current) return focuses[(i + 1) % focuses.size()];
+    }
+    return focuses.front();
+}
+
+long long totalNegotiationCommitment(const NegotiationState& state) {
+    return state.agreedFee + state.agreedBonus + state.agreedAgentFee + state.agreedLoyaltyBonus;
+}
+
+string describeContractExtras(const NegotiationState& state) {
+    return string("firma ") + formatMoneyValue(state.agreedBonus) +
+           " | agente " + formatMoneyValue(state.agreedAgentFee) +
+           " | fidelidad " + formatMoneyValue(state.agreedLoyaltyBonus) +
+           " | bonus por partido " + formatMoneyValue(state.agreedAppearanceBonus);
+}
+
 void eraseNamedSelection(vector<string>& values, const string& name) {
     values.erase(remove(values.begin(), values.end(), name), values.end());
 }
@@ -130,7 +152,7 @@ void appendNegotiationMessages(ServiceResult& result, const NegotiationState& st
 
 void registerNegotiatedPromise(Career& career, const Player& player, NegotiationPromise promise) {
     if (!career.myTeam || promise == NegotiationPromise::None) return;
-    const int seasonDeadline = max(career.currentWeek + 4, static_cast<int>(career.schedule.size()));
+    const int seasonDeadline = max(career.currentWeek, static_cast<int>(career.schedule.size()));
     career.activePromises.push_back({
         player.name,
         "Minutos",
@@ -280,16 +302,27 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         int estPotHi = clampInt(player.potential + error, player.skill, 99);
         int fitScore = positionFitScore(player, session.resolvedFocusPosition);
         string fitLabel = fitScore >= 90 ? "ajuste alto" : (fitScore >= 75 ? "ajuste medio" : "ajuste parcial");
-        const int confidence = clampInt(45 + team.scoutingChief / 2 + max(0, 70 - error * 4), 35, 95);
+        const int regionalFamiliarity = club->youthRegion == team.youthRegion ? 8 : 0;
+        const int confidence =
+            clampInt(28 + team.scoutingChief / 3 + (12 - error) * 3 + regionalFamiliarity +
+                         max(0, fitScore - 70) / 4 - max(0, 55 - player.professionalism) / 6,
+                     25, 92);
         const string recommendation =
-            (player.potential >= team.getAverageSkill() + 8 && fitScore >= 85)
+            (player.potential >= team.getAverageSkill() + 8 && fitScore >= 85 && confidence >= 68)
                 ? "Objetivo prioritario"
                 : (player.age <= 21 && player.potential - player.skill >= 10)
                       ? "Proyecto a seguir"
-                      : (player.contractWeeks <= 16 ? "Oportunidad de mercado" : "Seguimiento");
+                      : (player.contractWeeks <= 16
+                             ? "Oportunidad de mercado"
+                             : (player.consistency >= 66 && player.currentForm >= 60 ? "Listo para competir" : "Seguimiento"));
         const string upsideBand =
             (player.potential - player.skill >= 12) ? "Techo alto"
                                                     : (player.potential - player.skill >= 6 ? "Margen medio" : "Techo corto");
+        const long long salaryExpectation = max(player.wage, wageDemandFor(player));
+        const string riskLabel =
+            player.happiness <= 44 ? "riesgo de vestuario"
+                                   : (player.injuryHistory >= 4 ? "riesgo fisico"
+                                                                : (confidence <= 45 ? "informe verde" : "riesgo controlado"));
 
         ScoutingCandidate candidate;
         candidate.playerName = player.name;
@@ -313,6 +346,8 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         candidate.bigMatches = player.bigMatches;
         candidate.confidence = confidence;
         candidate.marketValue = player.value;
+        candidate.salaryExpectation = salaryExpectation;
+        candidate.riskLabel = riskLabel;
         session.candidates.push_back(candidate);
 
         string note = player.name + " | " + club->name + " | " + club->youthRegion + " | Hab " +
@@ -323,8 +358,11 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
                       " | Forma " + playerFormLabel(player) +
                       " | Fiabilidad " + playerReliabilityLabel(player) +
                       " | Conf " + to_string(confidence) +
+                      " | Valor " + formatMoneyValue(player.value) +
+                      " | Salario esp " + formatMoneyValue(salaryExpectation) +
                       " | " + recommendation +
                       " | " + upsideBand +
+                      " | Riesgo " + riskLabel +
                       " | Rasgos " + joinStringValues(player.traits, ", ") +
                       " | Perfil " + personalityLabel(player);
         session.service.messages.push_back("- " + note);
@@ -450,7 +488,8 @@ ServiceResult buyTransferTargetService(Career& career,
     if (!negotiation.clubAccepted || !negotiation.playerAccepted) {
         return failureFromNegotiation(negotiation, "La negociacion no pudo cerrarse.");
     }
-    if (career.myTeam->budget < negotiation.agreedFee + negotiation.agreedBonus) {
+    const long long totalCost = totalNegotiationCommitment(negotiation);
+    if (career.myTeam->budget < totalCost) {
         return failureFromNegotiation(negotiation, "Presupuesto insuficiente para cerrar la operacion.");
     }
 
@@ -463,8 +502,8 @@ ServiceResult buyTransferTargetService(Career& career,
     player.wantsToLeave = false;
     player.happiness = clampInt(player.happiness + 4, 1, 99);
     applyNegotiatedPromise(player, promise);
-    player.promisedPosition = player.position;
-    career.myTeam->budget -= (negotiation.agreedFee + negotiation.agreedBonus);
+    player.promisedPosition = normalizePosition(player.position);
+    career.myTeam->budget -= totalCost;
     career.myTeam->addPlayer(player);
     registerNegotiatedPromise(career, player, promise);
     seller->budget += negotiation.agreedFee;
@@ -473,13 +512,14 @@ ServiceResult buyTransferTargetService(Career& career,
     seller->players.erase(seller->players.begin() + sellerIdx);
     ensureTeamIdentity(*career.myTeam);
     ensureTeamIdentity(*seller);
-    career.addNews(player.name + " firma con " + career.myTeam->name + " desde " + seller->name + ".");
+    career.addNews(player.name + " firma con " + career.myTeam->name + " desde " + seller->name +
+                   " con un paquete contractual que incluye agente y bonus de fidelidad.");
     ServiceResult result;
     result.ok = true;
     result.messages.push_back("Fichaje completado: " + player.name + " llega desde " + seller->name +
                               " por " + formatMoneyValue(negotiation.agreedFee) +
-                              " | bono/agente " + formatMoneyValue(negotiation.agreedBonus) +
                               " | salario " + formatMoneyValue(negotiation.agreedWage) +
+                              " | " + describeContractExtras(negotiation) +
                               " | contrato " + to_string(negotiation.agreedContractWeeks) +
                               " sem | promesa " + negotiation.agreedPromisedRole + ".");
     appendNegotiationMessages(result, negotiation);
@@ -511,7 +551,8 @@ ServiceResult triggerReleaseClauseService(Career& career,
     if (!negotiation.clubAccepted || !negotiation.playerAccepted) {
         return failureFromNegotiation(negotiation, "No se pudo cerrar la clausula.");
     }
-    if (career.myTeam->budget < negotiation.agreedFee + negotiation.agreedBonus) {
+    const long long totalCost = totalNegotiationCommitment(negotiation);
+    if (career.myTeam->budget < totalCost) {
         return failureFromNegotiation(negotiation, "Presupuesto insuficiente para ejecutar la clausula.");
     }
 
@@ -524,9 +565,9 @@ ServiceResult triggerReleaseClauseService(Career& career,
     player.wantsToLeave = false;
     player.happiness = clampInt(player.happiness + 4, 1, 99);
     applyNegotiatedPromise(player, promise);
-    player.promisedPosition = player.position;
+    player.promisedPosition = normalizePosition(player.position);
 
-    career.myTeam->budget -= (negotiation.agreedFee + negotiation.agreedBonus);
+    career.myTeam->budget -= totalCost;
     career.myTeam->addPlayer(player);
     registerNegotiatedPromise(career, player, promise);
     seller->budget += negotiation.agreedFee;
@@ -535,14 +576,15 @@ ServiceResult triggerReleaseClauseService(Career& career,
     seller->players.erase(seller->players.begin() + sellerIdx);
     ensureTeamIdentity(*career.myTeam);
     ensureTeamIdentity(*seller);
-    career.addNews(player.name + " llega a " + career.myTeam->name + " tras ejecutar su clausula en " + seller->name + ".");
+    career.addNews(player.name + " llega a " + career.myTeam->name +
+                   " tras ejecutar su clausula con un contrato reforzado por agente y bonus de fidelidad.");
 
     ServiceResult result;
     result.ok = true;
     result.messages.push_back("Clausula ejecutada: " + player.name + " llega desde " + seller->name +
                               " por " + formatMoneyValue(negotiation.agreedFee) +
-                              " | bono/agente " + formatMoneyValue(negotiation.agreedBonus) +
                               " | salario " + formatMoneyValue(negotiation.agreedWage) +
+                              " | " + describeContractExtras(negotiation) +
                               " | promesa " + negotiation.agreedPromisedRole + ".");
     appendNegotiationMessages(result, negotiation);
     return result;
@@ -574,22 +616,29 @@ ServiceResult signPreContractService(Career& career,
     if (!negotiation.playerAccepted) {
         return failureFromNegotiation(negotiation, "El precontrato no pudo cerrarse.");
     }
-    if (career.myTeam->budget < negotiation.agreedBonus) {
-        return failureFromNegotiation(negotiation, "Presupuesto insuficiente para el bono de firma.");
+    const long long upfrontCost = negotiation.agreedBonus + negotiation.agreedAgentFee + negotiation.agreedLoyaltyBonus;
+    if (career.myTeam->budget < upfrontCost) {
+        return failureFromNegotiation(negotiation, "Presupuesto insuficiente para el paquete de firma.");
     }
-    career.myTeam->budget -= negotiation.agreedBonus;
+    career.myTeam->budget -= upfrontCost;
     eraseNamedSelection(career.scoutingShortlist, seller->name + "|" + player.name);
-    career.pendingTransfers.push_back({player.name, seller->name, career.myTeam->name, career.currentSeason + 1, 0, 0,
+    career.pendingTransfers.push_back({player.name,
+                                       seller->name,
+                                       career.myTeam->name,
+                                       career.currentSeason + 1,
+                                       0,
+                                       upfrontCost,
                                        negotiation.agreedWage,
                                        negotiation.agreedContractWeeks,
                                        true,
                                        false,
                                        negotiation.agreedPromisedRole});
-    career.addNews(player.name + " firma un precontrato con " + career.myTeam->name + ".");
+    career.addNews(player.name + " firma un precontrato con " + career.myTeam->name +
+                   " tras acordar un paquete completo con agente y bonus.");
     ServiceResult result;
     result.ok = true;
-    result.messages.push_back("Precontrato firmado para la temporada siguiente. Bono " +
-                              formatMoneyValue(negotiation.agreedBonus) +
+    result.messages.push_back("Precontrato firmado para la temporada siguiente. " +
+                              describeContractExtras(negotiation) +
                               " | salario " + formatMoneyValue(negotiation.agreedWage) +
                               " | promesa " + negotiation.agreedPromisedRole + ".");
     appendNegotiationMessages(result, negotiation);
@@ -612,26 +661,30 @@ ServiceResult renewPlayerContractService(Career& career,
     if (!negotiation.playerAccepted) {
         return failureFromNegotiation(negotiation, "La renovacion no pudo cerrarse.");
     }
-    if (team.budget < negotiation.agreedWage * 6) {
+    const long long upfrontCost = negotiation.agreedBonus + negotiation.agreedAgentFee + negotiation.agreedLoyaltyBonus;
+    if (team.budget < negotiation.agreedWage * 6 + upfrontCost) {
         return failureFromNegotiation(negotiation, "Presupuesto insuficiente para renovar al jugador.");
     }
 
+    team.budget -= upfrontCost;
     player.wage = negotiation.agreedWage;
     player.contractWeeks = negotiation.agreedContractWeeks;
     player.releaseClause = negotiation.agreedClause;
     player.wantsToLeave = false;
     player.happiness = clampInt(player.happiness + 6, 1, 99);
     applyNegotiatedPromise(player, promise);
-    player.promisedPosition = player.position;
+    player.promisedPosition = normalizePosition(player.position);
     registerNegotiatedPromise(career, player, promise);
     ensureTeamIdentity(team);
-    career.addNews(player.name + " renueva con " + team.name + ".");
+    career.addNews(player.name + " renueva con " + team.name +
+                   " despues de una negociacion con agente, fidelidad y bonus por partido.");
     ServiceResult result;
     result.ok = true;
     result.messages.push_back("Contrato renovado: " + player.name + " | salario " +
                               formatMoneyValue(negotiation.agreedWage) +
                               " | contrato " + to_string(negotiation.agreedContractWeeks) +
-                              " sem | promesa " + negotiation.agreedPromisedRole + ".");
+                              " sem | " + describeContractExtras(negotiation) +
+                              " | promesa " + negotiation.agreedPromisedRole + ".");
     appendNegotiationMessages(result, negotiation);
     return result;
 }
@@ -754,6 +807,95 @@ ServiceResult cyclePlayerDevelopmentPlanService(Career& career, const string& pl
     return result;
 }
 
+ServiceResult holdTeamMeetingService(Career& career) {
+    if (!career.myTeam) return failure("No hay una carrera activa.");
+    Team& team = *career.myTeam;
+    ensureTeamIdentity(team);
+    const DressingRoomSnapshot before = dressing_room_service::buildSnapshot(team, career.currentWeek);
+
+    int improvedPlayers = 0;
+    for (auto& player : team.players) {
+        int delta = 1;
+        if (player.wantsToLeave || promiseAtRisk(player, career.currentWeek)) delta += 2;
+        if (player.happiness <= 45 || player.socialGroup == "Frustrados") delta += 2;
+        if (player.leadership >= 72 || playerHasTrait(player, "Lider")) delta += 1;
+        player.happiness = clampInt(player.happiness + delta, 1, 99);
+        player.chemistry = clampInt(player.chemistry + max(1, delta / 2), 1, 99);
+        player.moraleMomentum = clampInt(player.moraleMomentum + max(1, delta / 2), -25, 25);
+        if (!promiseAtRisk(player, career.currentWeek) && player.happiness >= 52) {
+            player.wantsToLeave = false;
+        }
+        if (delta >= 3) improvedPlayers++;
+    }
+
+    team.morale = clampInt(team.morale + 2 + before.leadershipSupport + (before.socialTension >= 5 ? 2 : 0), 0, 100);
+    const DressingRoomSnapshot after = dressing_room_service::buildSnapshot(team, career.currentWeek);
+
+    ServiceResult result;
+    result.ok = true;
+    result.messages.push_back("Reunion de plantel realizada. Mejoran el clima " + to_string(improvedPlayers) + " jugador(es).");
+    result.messages.push_back("Tension social: " + to_string(before.socialTension) + " -> " + to_string(after.socialTension) +
+                              " | Moral del equipo " + to_string(team.morale) + ".");
+    career.addNews("El manager convoca una reunion de plantel para ordenar el clima interno en " + team.name + ".");
+    return result;
+}
+
+ServiceResult talkToPlayerService(Career& career, const string& playerName) {
+    if (!career.myTeam) return failure("No hay una carrera activa.");
+    Team& team = *career.myTeam;
+    int index = team_mgmt::playerIndexByName(team, playerName);
+    if (index < 0) return failure("No se encontro el jugador seleccionado.");
+    Player& player = team.players[static_cast<size_t>(index)];
+
+    const bool roleConflict = !player.promisedPosition.empty() &&
+                              normalizePosition(player.promisedPosition) != normalizePosition(player.position);
+    int openness = player.professionalism + player.happiness + player.leadership + team.morale / 2;
+    if (player.wantsToLeave) openness -= 18;
+    if (promiseAtRisk(player, career.currentWeek)) openness -= 12;
+    if (roleConflict) openness -= 10;
+
+    ServiceResult result;
+    result.ok = true;
+    if (openness >= 135) {
+        player.happiness = clampInt(player.happiness + 6, 1, 99);
+        player.chemistry = clampInt(player.chemistry + 3, 1, 99);
+        player.moraleMomentum = clampInt(player.moraleMomentum + 4, -25, 25);
+        player.wantsToLeave = false;
+        result.messages.push_back("La charla con " + player.name + " sale muy bien y baja su tension.");
+    } else if (openness >= 110) {
+        player.happiness = clampInt(player.happiness + 3, 1, 99);
+        player.chemistry = clampInt(player.chemistry + 2, 1, 99);
+        player.moraleMomentum = clampInt(player.moraleMomentum + 2, -25, 25);
+        result.messages.push_back(player.name + " acepta el mensaje y queda mas alineado con el plan del club.");
+    } else {
+        player.happiness = clampInt(player.happiness - 1, 1, 99);
+        player.moraleMomentum = clampInt(player.moraleMomentum - 1, -25, 25);
+        result.messages.push_back("La charla con " + player.name + " queda en observacion y no despeja del todo el malestar.");
+    }
+    if (roleConflict) {
+        result.messages.push_back("Sigue pendiente ordenar su rol de posicion prometida (" + player.promisedPosition + ").");
+    }
+    career.addNews("El manager mantiene una charla individual con " + player.name + ".");
+    return result;
+}
+
+ServiceResult cycleTrainingFocusService(Career& career) {
+    if (!career.myTeam) return failure("No hay una carrera activa.");
+    Team& team = *career.myTeam;
+    team.trainingFocus = nextTrainingFocus(team.trainingFocus);
+    ensureTeamIdentity(team);
+
+    ServiceResult result;
+    result.ok = true;
+    result.messages.push_back("Plan semanal actualizado: " + team.trainingFocus + ".");
+    const vector<development::TrainingSessionPlan> schedule = development::buildWeeklyTrainingSchedule(team, false);
+    for (size_t i = 0; i < schedule.size() && i < 3; ++i) {
+        result.messages.push_back("- " + schedule[i].day + ": " + schedule[i].focus + " | " + schedule[i].note);
+    }
+    career.addNews("El cuerpo tecnico redefine el microciclo de " + team.name + " hacia un plan " + team.trainingFocus + ".");
+    return result;
+}
+
 ServiceResult cycleMatchInstructionService(Career& career) {
     if (!career.myTeam) return failure("No hay una carrera activa.");
     Team& team = *career.myTeam;
@@ -815,6 +957,7 @@ ServiceResult followShortlistService(Career& career) {
         int sellerIdx = team_mgmt::playerIndexByName(*seller, fields[1]);
         if (sellerIdx < 0) continue;
         const Player& player = seller->players[static_cast<size_t>(sellerIdx)];
+        long long salaryExpectation = max(player.wage, wageDemandFor(player));
         string note = "[Seguimiento] " + player.name + " | " + seller->name +
                       " | Hab " + to_string(clampInt(player.skill - error, 1, 99)) + "-" +
                       to_string(clampInt(player.skill + error, 1, 99)) +
@@ -822,6 +965,7 @@ ServiceResult followShortlistService(Career& career) {
                       to_string(clampInt(player.potential + error, player.skill, 99)) +
                       " | Contrato " + to_string(player.contractWeeks) +
                       " | Valor " + formatMoneyValue(player.value) +
+                      " | Salario esp " + formatMoneyValue(salaryExpectation) +
                       " | Pie " + player.preferredFoot +
                       " | Sec " + (player.secondaryPositions.empty() ? string("-") : joinStringValues(player.secondaryPositions, "/")) +
                       " | Forma " + playerFormLabel(player) +
