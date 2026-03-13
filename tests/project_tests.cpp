@@ -14,6 +14,7 @@
 #include "engine/models.h"
 #include "io/io.h"
 #include "simulation/match_context.h"
+#include "simulation/match_engine_internal.h"
 #include "simulation/match_engine.h"
 #include "simulation/match_phase.h"
 #include "simulation/simulation.h"
@@ -769,6 +770,7 @@ void testSaveLoadRoundTripPreservesCareerState() {
     original.lastMatchCenter.postMatchImpact = "Moral +3 | / -2";
     original.lastMatchCenter.phaseSummaries = {"1-15: domina | Club Persistencia", "16-30: domina ^ Club Persistencia"};
     original.newsFeed.push_back("T8-F5: Noticia| de prueba;");
+    original.managerInbox.push_back("[Resumen] T8-F5: Bandeja| de manager");
     original.scoutInbox.push_back("Informe^ de ojeo");
     original.scoutingShortlist.push_back("Promesa| del norte; central");
     original.history.push_back({7, "primera division", "Club Persistencia", 2, "Club Persistencia", "Ascenso| Norte", "Descenso; Sur", "Nota ^ historica"});
@@ -786,6 +788,12 @@ void testSaveLoadRoundTripPreservesCareerState() {
     original.myTeam->players[0].unhappinessWeeks = 2;
     original.myTeam->players[0].promisedPosition = "DEF";
     original.myTeam->players[0].socialGroup = "Lideres";
+    original.myTeam->players[0].roleDuty = "Ataque";
+    original.myTeam->headCoachName = "DT Persistente";
+    original.myTeam->headCoachStyle = "Presion";
+    original.myTeam->jobSecurity = 47;
+    original.myTeam->transferPolicy = "Cantera y valor futuro";
+    original.myTeam->scoutingRegions = {"Metropolitana", "Sur", "Internacional"};
     original.saveFile = savePath;
 
     expect(original.saveCareer(), "El guardado roundtrip debe completarse.");
@@ -809,6 +817,8 @@ void testSaveLoadRoundTripPreservesCareerState() {
            "La carga debe preservar las fases resumidas del match center.");
     expect(loaded.history.size() == 1 && loaded.history.front().champion == "Club Persistencia",
            "La carga debe preservar historial de temporada.");
+    expect(!loaded.managerInbox.empty() && loaded.managerInbox.front().find("Bandeja") != string::npos,
+           "La carga debe preservar la bandeja del manager.");
     expect(!loaded.activePromises.empty() && loaded.activePromises.front().category == "Minutos",
            "La carga debe preservar promesas activas.");
     expect(!loaded.historicalRecords.empty() && loaded.historicalRecords.front().value == 71,
@@ -817,8 +827,13 @@ void testSaveLoadRoundTripPreservesCareerState() {
            "La carga debe restaurar el club controlado.");
     expect(loaded.myTeam->players[0].moraleMomentum == 7 &&
                loaded.myTeam->players[0].fatigueLoad == 31 &&
-               loaded.myTeam->players[0].promisedPosition == "DEF",
-           "La carga debe preservar momento, carga y promesa de posicion del jugador.");
+               loaded.myTeam->players[0].promisedPosition == "DEF" &&
+               loaded.myTeam->players[0].roleDuty == "Ataque",
+           "La carga debe preservar momento, carga, duty y promesa de posicion del jugador.");
+    expect(loaded.myTeam->headCoachName == "DT Persistente" &&
+               loaded.myTeam->transferPolicy == "Cantera y valor futuro" &&
+               loaded.myTeam->scoutingRegions.size() == 3,
+           "La carga debe preservar metadata de entrenador, politica y red de scouting del club.");
     expect(!loaded.pendingTransfers.empty() && loaded.pendingTransfers.front().toTeam == "Club Destino",
            "La carga debe preservar fichajes pendientes.");
 
@@ -1020,6 +1035,71 @@ void testNegotiationTracksAgentCosts() {
            "La negociacion debe incluir bonus por partido.");
 }
 
+void testRoleDutyShapesMatchSnapshot() {
+    Player player = makePlayer("Duty Test", "DEF", 68, 74, 24, 72, 72);
+    player.role = "Carrilero";
+
+    int attackAttack = player.attack;
+    int defenseAttack = player.defense;
+    player.roleDuty = "Ataque";
+    match_internal::applyRoleModifier(player, attackAttack, defenseAttack);
+
+    int attackDefend = player.attack;
+    int defenseDefend = player.defense;
+    player.roleDuty = "Defensa";
+    match_internal::applyRoleModifier(player, attackDefend, defenseDefend);
+
+    expect(attackAttack > attackDefend,
+           "El duty ofensivo debe subir mas el peso ofensivo del rol respecto al duty defensivo.");
+    expect(defenseDefend > defenseAttack,
+           "El duty defensivo debe subir mas el peso defensivo del rol respecto al duty ofensivo.");
+}
+
+void testTeamIdentitySeedsWorldMetadata() {
+    Team team = makeTeam("Metadata FC", "primera division", 69, 3, 3, "Pressing", "Contra-presion", 700000);
+    team.headCoachName.clear();
+    team.transferPolicy.clear();
+    team.scoutingRegions.clear();
+    team.goalkeepingCoach = 0;
+    team.performanceAnalyst = 0;
+
+    ensureTeamIdentity(team);
+
+    expect(!team.headCoachName.empty(), "La identidad del club debe sembrar un entrenador principal.");
+    expect(!team.transferPolicy.empty(), "La identidad del club debe sembrar una politica de mercado.");
+    expect(!team.scoutingRegions.empty(), "La identidad del club debe sembrar una red minima de scouting.");
+    expect(team.goalkeepingCoach > 0 && team.performanceAnalyst > 0,
+           "La identidad del club debe completar el staff ampliado.");
+}
+
+void testManagerInboxTracksNewsAndScouting() {
+    Career career;
+    career.currentSeason = 1;
+    career.currentWeek = 3;
+    career.allTeams.push_back(makeTeam("Inbox United", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 800000));
+    career.allTeams.push_back(makeTeam("Region Sur FC", "primera division", 67, 3, 3, "Balanced", "Equilibrado", 620000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Inbox United");
+    expect(career.myTeam != nullptr, "La prueba de inbox necesita club usuario.");
+
+    career.myTeam->scoutingRegions = {"Metropolitana", "Sur"};
+    career.findTeamByName("Region Sur FC")->youthRegion = "Sur";
+    career.addNews("[Mundo] Prueba de noticia prioritaria.");
+    const size_t before = career.managerInbox.size();
+    const ScoutingSessionResult session = runScoutingSessionService(career, "Sur", "DEF");
+    expect(session.service.ok, "La sesion de scouting de prueba debe completarse.");
+    expect(career.managerInbox.size() > before,
+           "El inbox del manager debe crecer con noticias y scouting relevante.");
+}
+
+void testConfiguredWorldDataLoads() {
+    const int managerChangeChance = world_state_service::worldRuleValue("manager_change_chance", 0);
+    const vector<string> regions = world_state_service::listConfiguredScoutingRegions();
+    expect(managerChangeChance > 0, "Las reglas de mundo configuradas deben cargarse desde CSV o fallback.");
+    expect(find(regions.begin(), regions.end(), "Internacional") != regions.end(),
+           "La lista configurable de regiones debe exponer la cobertura internacional.");
+}
+
 void testSaveCareerCreatesBackup() {
     const string savePath = "saves/test_backup_save.txt";
     Career career;
@@ -1071,6 +1151,10 @@ int main() {
         {"season_promise_carryover", testSeasonTransitionResolvesCarryoverPromises},
         {"training_microcycle", testWeeklyTrainingScheduleAdaptsToCongestion},
         {"team_meeting", testTeamMeetingImprovesMorale},
+        {"role_duty_snapshot", testRoleDutyShapesMatchSnapshot},
+        {"club_world_metadata", testTeamIdentitySeedsWorldMetadata},
+        {"manager_inbox", testManagerInboxTracksNewsAndScouting},
+        {"configured_world_data", testConfiguredWorldDataLoads},
         {"negotiation_agent_costs", testNegotiationTracksAgentCosts},
         {"save_backup", testSaveCareerCreatesBackup},
         {"simulate_match_state", testSimulateMatchAppliesPostProcessState},

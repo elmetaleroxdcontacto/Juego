@@ -1,5 +1,6 @@
 #include "career/career_reports.h"
 
+#include "ai/ai_squad_planner.h"
 #include "career/dressing_room_service.h"
 #include "career/match_center_service.h"
 #include "career/match_analysis_store.h"
@@ -77,6 +78,51 @@ vector<string> historicalRecordLines(const Career& career, size_t limit = 4) {
                         " | " + to_string(record.value) + " | T" + to_string(record.season));
     }
     return lines;
+}
+
+vector<string> plannerLines(const Team& team) {
+    const SquadNeedReport planner = ai_squad_planner::analyzeSquad(team);
+    return {
+        "Necesidad principal: " + planner.weakestPosition + " | riesgo de rotacion " + to_string(planner.rotationRisk),
+        "Exceso relativo: " + planner.surplusPosition + " | presion de venta " + to_string(planner.salePressure),
+        "Posiciones finas: " + (planner.thinPositions.empty() ? string("-") : joinStringValues(planner.thinPositions, ", ")),
+        "Cobertura juvenil: " + (planner.youthCoverPositions.empty() ? string("-") : joinStringValues(planner.youthCoverPositions, ", ")),
+        "Candidatos de salida: " + (planner.saleCandidates.empty() ? string("-") : joinStringValues(planner.saleCandidates, ", "))
+    };
+}
+
+vector<string> dataHubLines(const Team& team) {
+    int attackCore = 0;
+    int controlCore = 0;
+    int defenseCore = 0;
+    int contracts = 0;
+    int fatigueRisk = 0;
+    int youths = 0;
+    for (const auto& player : team.players) {
+        const string pos = normalizePosition(player.position);
+        if (pos == "DEL") attackCore += player.attack + player.currentForm / 2;
+        if (pos == "MED") controlCore += player.skill + player.tacticalDiscipline / 2;
+        if (pos == "DEF" || pos == "ARQ") defenseCore += player.defense + player.consistency / 2;
+        if (player.contractWeeks <= 20) contracts++;
+        if (player.fatigueLoad >= 55 || player.fitness <= 58) fatigueRisk++;
+        if (player.age <= 21 && player.potential >= player.skill + 8) youths++;
+    }
+    return {
+        "Hub ofensivo: " + to_string(attackCore),
+        "Hub de control: " + to_string(controlCore),
+        "Hub defensivo: " + to_string(defenseCore),
+        "Contratos en zona critica: " + to_string(contracts),
+        "Riesgos fisicos: " + to_string(fatigueRisk),
+        "Pipeline juvenil: " + to_string(youths)
+    };
+}
+
+vector<string> inboxLines(const Career& career, size_t limit = 6) {
+    vector<string> out;
+    if (career.managerInbox.empty()) return out;
+    const size_t start = career.managerInbox.size() > limit ? career.managerInbox.size() - limit : 0;
+    for (size_t i = start; i < career.managerInbox.size(); ++i) out.push_back(career.managerInbox[i]);
+    return out;
 }
 
 }  // namespace
@@ -264,6 +310,8 @@ CareerReport buildBoardReport(const Career& career) {
     addFact(report, "Confianza", boardStatusLabel(career.boardConfidence) + " (" + to_string(career.boardConfidence) + "/100)");
     addFact(report, "Reputacion manager", to_string(career.managerReputation) + "/100");
     addFact(report, "Perfil del DT", "juego " + managerStyleLabel(*career.myTeam));
+    addFact(report, "Estabilidad del club", to_string(career.myTeam->jobSecurity) + "/100");
+    addFact(report, "DT del club", career.myTeam->headCoachName);
     addFact(report, "Advertencias", to_string(career.boardWarningWeeks));
     addFact(report, "Vestuario", dressingRoomClimate(*career.myTeam));
     addFact(report, "Promesas en riesgo", to_string(promisesAtRisk(*career.myTeam, career.currentWeek)));
@@ -298,6 +346,7 @@ CareerReport buildBoardReport(const Career& career) {
     addBlock(report, "Vestuario", dressing.alerts);
     addBlock(report, "Grupos del vestuario", dressing.groups);
     addBlock(report, "Promesas activas", activePromiseLines(career));
+    addBlock(report, "Inbox del manager", inboxLines(career));
 
     vector<string> offers;
     for (Team* job : jobs) {
@@ -337,6 +386,10 @@ CareerReport buildClubReport(const Career& career) {
     addFact(report, "Buffer de mercado", formatMoneyValue(finance.transferBuffer));
     addFact(report, "Riesgo", finance.riskLevel);
     addFact(report, "Prestigio", to_string(teamPrestigeScore(team)));
+    addFact(report, "DT principal", team.headCoachName.empty() ? "Sin registro" : team.headCoachName);
+    addFact(report, "Estilo del DT", team.headCoachStyle.empty() ? "Equilibrado" : team.headCoachStyle);
+    addFact(report, "Seguridad del cargo", to_string(team.jobSecurity) + "/100");
+    addFact(report, "Politica de mercado", team.transferPolicy.empty() ? "Mixta" : team.transferPolicy);
     addFact(report, "Identidad", team.clubStyle.empty() ? "Equilibrio competitivo" : team.clubStyle);
     addFact(report, "Cantera", team.youthIdentity.empty() ? "Talento local" : team.youthIdentity);
     addFact(report, "Rival principal", team.primaryRival.empty() ? "Sin clasico definido" : team.primaryRival);
@@ -359,6 +412,9 @@ CareerReport buildClubReport(const Career& career) {
     addBlock(report, "Vestuario", dressing.alerts);
     addBlock(report, "Grupos sociales", dressing.groups);
     addBlock(report, "Promesas activas", activePromiseLines(career));
+    addBlock(report, "Planner de plantilla", plannerLines(team));
+    addBlock(report, "Data hub", dataHubLines(team));
+    addBlock(report, "Inbox del manager", inboxLines(career));
     {
         const bool congestedWeek = career.cupActive &&
                                    (career.currentWeek == 1 || career.currentWeek % 4 == 0 ||
@@ -381,8 +437,11 @@ CareerReport buildClubReport(const Career& career) {
                  "Medico " + to_string(team.medicalTeam),
                  "Asistente " + to_string(team.assistantCoach),
                  "Preparador fisico " + to_string(team.fitnessCoach),
+                 "Entrenador arqueros " + to_string(team.goalkeepingCoach),
+                 "Analista " + to_string(team.performanceAnalyst),
                  "Jefe juveniles " + to_string(team.youthCoach),
                  "Region juvenil: " + team.youthRegion,
+                 "Red scouting: " + (team.scoutingRegions.empty() ? string("-") : joinStringValues(team.scoutingRegions, ", ")),
              });
     addBlock(report,
              "Staff tecnico",
@@ -391,6 +450,8 @@ CareerReport buildClubReport(const Career& career) {
                  "Preparador fisico " + to_string(team.fitnessCoach) + " | recuperacion y resistencia",
                  "Medico " + to_string(team.medicalTeam) + " | baja riesgo y acorta lesiones",
                  "Scouting " + to_string(team.scoutingChief) + " | precision de informes y shortlist",
+                 "Entrenador arqueros " + to_string(team.goalkeepingCoach) + " | sostiene rendimiento del portero",
+                 "Analista " + to_string(team.performanceAnalyst) + " | mejora preparacion de rival y microciclo",
                  "Juveniles " + to_string(team.youthCoach) + " | eleva potencial e intake",
              });
     return report;
@@ -431,11 +492,13 @@ CareerReport buildScoutingReport(const Career& career) {
 
     const Team& team = *career.myTeam;
     addFact(report, "Jefe de scouting", to_string(team.scoutingChief) + "/99");
+    addFact(report, "Analista", to_string(team.performanceAnalyst) + "/99");
     addFact(report, "Costo de informe", formatMoneyValue(max(3000LL, 9000LL - team.scoutingChief * 50LL)));
     addFact(report, "Necesidad detectada", detectScoutingNeed(team));
     addFact(report, "Informes guardados", to_string(career.scoutInbox.size()));
     addFact(report, "Shortlist activa", to_string(career.scoutingShortlist.size()));
     addFact(report, "Red juvenil", team.youthRegion + " | coach " + to_string(team.youthCoach));
+    addFact(report, "Cobertura scouting", team.scoutingRegions.empty() ? "-" : joinStringValues(team.scoutingRegions, ", "));
 
     if (!career.scoutingShortlist.empty()) {
         vector<string> shortlistLines;
@@ -458,6 +521,8 @@ CareerReport buildScoutingReport(const Career& career) {
         }
         addBlock(report, "Shortlist", std::move(shortlistLines));
     }
+
+    addBlock(report, "Inbox del manager", inboxLines(career, 4));
 
     if (!career.scoutInbox.empty()) {
         vector<string> notes;

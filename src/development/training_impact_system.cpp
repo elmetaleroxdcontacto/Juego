@@ -128,6 +128,8 @@ void applyWeeklyTrainingImpact(Team& team, bool congestedWeek) {
     const int fitnessBonus = max(0, team.fitnessCoach - 55) / 15;
     const int medicalBonus = max(0, team.medicalTeam - 55) / 15;
     const int youthBonus = max(0, team.youthCoach - 55) / 15;
+    const int goalkeepingBonus = max(0, team.goalkeepingCoach - 55) / 15;
+    const int analystBonus = max(0, team.performanceAnalyst - 55) / 15;
 
     const int attackSessions = countSessions(schedule, {"Ataque"});
     const int defenseSessions = countSessions(schedule, {"Defensa"});
@@ -156,7 +158,7 @@ void applyWeeklyTrainingImpact(Team& team, bool congestedWeek) {
         if (player.injured) continue;
 
         int recovery = 1 + facilityBonus + fitnessBonus + medicalBonus / 2 + recoverySessions;
-        recovery += tacticalSessions / 2;
+        recovery += tacticalSessions / 2 + analystBonus / 2;
         recovery += congestedWeek ? 1 : 0;
         recovery += (player.age <= 21) ? youthBonus / 2 : 0;
         recovery -= max(0, player.fatigueLoad - 35) / 22;
@@ -165,20 +167,25 @@ void applyWeeklyTrainingImpact(Team& team, bool congestedWeek) {
         player.fatigueLoad = max(0, player.fatigueLoad - max(2, recovery + recoverySessions));
 
         if (tacticalSessions > 0) {
-            player.tacticalDiscipline = clampInt(player.tacticalDiscipline + tacticalSessions / 2, 1, 99);
+            player.tacticalDiscipline = clampInt(player.tacticalDiscipline + tacticalSessions / 2 + analystBonus / 2, 1, 99);
             player.currentForm = clampInt(player.currentForm + min(2, tacticalSessions), 1, 99);
         }
         if (technicalSessions > 0) {
             player.currentForm = clampInt(player.currentForm + 1, 1, 99);
         }
-        if (setPieceSessions > 0 && randInt(1, 100) <= clampInt(6 + setPieceSessions * 4 + assistantBonus, 8, 30)) {
+        if (setPieceSessions > 0 && randInt(1, 100) <= clampInt(6 + setPieceSessions * 4 + assistantBonus + analystBonus, 8, 30)) {
             player.setPieceSkill = min(99, player.setPieceSkill + 1);
+        }
+        if (normalizePosition(player.position) == "ARQ" && (focus == "Defensa" || focus == "Tactico" || focus == "Preparacion partido") &&
+            randInt(1, 100) <= clampInt(8 + goalkeepingBonus * 4 + tacticalSessions * 3, 8, 28)) {
+            player.defense = min(100, player.defense + 1);
         }
 
         int baseGrowth = 8 + max(0, player.potential - player.skill) / 4 + max(0, 23 - player.age) +
                          max(0, player.professionalism - 55) / 10 + max(0, player.happiness - 50) / 12 +
                          facilityBonus * 2 + assistantBonus + youthBonus;
-        baseGrowth += attackSessions * 3 + defenseSessions * 3 + technicalSessions * 2 + tacticalSessions * 2;
+        baseGrowth += attackSessions * 3 + defenseSessions * 3 + technicalSessions * 2 + tacticalSessions * 2 + analystBonus;
+        if (normalizePosition(player.position) == "ARQ") baseGrowth += goalkeepingBonus;
         baseGrowth += setPieceSessions;
         baseGrowth -= scheduleLoad + player.fatigueLoad / 14;
         if (congestedWeek) baseGrowth -= 2;
@@ -220,7 +227,7 @@ void applyWeeklyTrainingImpact(Team& team, bool congestedWeek) {
 
     int moraleBoost = tacticalSessions + recoverySessions + (congestedWeek ? 1 : 0);
     if (focus == "Ataque" || focus == "Defensa") moraleBoost += 1;
-    team.morale = clampInt(team.morale + moraleBoost / 2 + assistantBonus, 0, 100);
+    team.morale = clampInt(team.morale + moraleBoost / 2 + assistantBonus + analystBonus / 2, 0, 100);
 }
 
 }  // namespace development

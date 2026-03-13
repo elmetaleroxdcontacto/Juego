@@ -889,20 +889,22 @@ void simulateBackgroundDivisionWeek(Career& career, const string& divisionId) {
         if (leader) news += " | Lider " + leader->name + " (" + to_string(leader->points) + " pts)";
         career.addNews(news);
     }
-    if (leader && randInt(1, 100) <= 14) {
+    if (leader && randInt(1, 100) <= world_state_service::worldRuleValue("background_leader_story_chance", 14)) {
         career.addNews("[Mundo] " + divisionDisplay(divisionId) + ": " + leader->name +
                        " instala una historia de temporada con estilo " + leader->clubStyle + ".");
     }
-    if (bottom && randInt(1, 100) <= 10) {
+    if (bottom && randInt(1, 100) <= world_state_service::worldRuleValue("background_pressure_story_chance", 10)) {
         career.addNews("[Mundo] " + divisionDisplay(divisionId) + ": crece la presion en " + bottom->name +
                        " por su mala racha.");
     }
-    if (bottom && randInt(1, 100) <= 8) {
+    if (bottom && randInt(1, 100) <= world_state_service::worldRuleValue("background_manager_review_chance", 8)) {
+        ensureTeamIdentity(*bottom);
         bottom->morale = clampInt(bottom->morale - 3, 0, 100);
+        bottom->jobSecurity = clampInt(bottom->jobSecurity - 6, 5, 92);
         career.addNews("[Mundo] " + divisionDisplay(divisionId) + ": " + bottom->name +
-                       " entra en revision de banquillo tras otra semana bajo presion.");
+                       " entra en revision de banquillo tras otra semana bajo presion con " + bottom->headCoachName + ".");
     }
-    if (leader && leader->youthFacilityLevel + leader->youthCoach >= 130 && randInt(1, 100) <= 12) {
+    if (leader && leader->youthFacilityLevel + leader->youthCoach >= 130 && randInt(1, 100) <= world_state_service::worldRuleValue("background_youth_promotion_chance", 12)) {
         const int maxSquad = getCompetitionConfig(divisionId).maxSquadSize;
         if (maxSquad <= 0 || static_cast<int>(leader->players.size()) < maxSquad) {
             const string youthPosition = leader->goalsAgainst > leader->goalsFor ? "DEF" : "MED";
@@ -919,7 +921,7 @@ void simulateBackgroundDivisionWeek(Career& career, const string& divisionId) {
                            " promociona al juvenil " + promoted.name + ".");
         }
     }
-    if (leader && randInt(1, 100) <= 8) {
+    if (leader && randInt(1, 100) <= world_state_service::worldRuleValue("background_injury_story_chance", 8)) {
         Player* keyPlayer = nullptr;
         for (auto& player : leader->players) {
             if (player.injured) continue;

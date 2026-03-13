@@ -41,6 +41,23 @@ string defaultRoleForPosition(const string& position) {
     return "Default";
 }
 
+string defaultDutyForPosition(const string& position) {
+    string norm = normalizePosition(position);
+    if (norm == "ARQ") return "Defensa";
+    if (norm == "DEF") return "Defensa";
+    if (norm == "MED") return "Apoyo";
+    if (norm == "DEL") return "Ataque";
+    return "Apoyo";
+}
+
+string defaultDutyForRole(const string& role, const string& position) {
+    const string compact = toLower(trim(role));
+    if (compact == "pivote" || compact == "stopper" || compact == "tradicional") return "Defensa";
+    if (compact == "carrilero" || compact == "enganche" || compact == "poacher" || compact == "objetivo") return "Ataque";
+    if (compact == "organizador" || compact == "boxtobox" || compact == "falso9" || compact == "pressing") return "Apoyo";
+    return defaultDutyForPosition(position);
+}
+
 string defaultDevelopmentPlanForPosition(const string& position) {
     string norm = normalizePosition(position);
     if (norm == "ARQ") return "Reflejos";
@@ -122,6 +139,7 @@ void ensurePlayerProfile(Player& p, bool regenerateTraits) {
     }
     if (p.secondaryPositions.empty()) p.secondaryPositions = inferSecondaryPositions(p);
     if (p.role.empty()) p.role = defaultRoleForPosition(p.position);
+    if (p.roleDuty.empty()) p.roleDuty = defaultDutyForRole(p.role, p.position);
     if (p.developmentPlan.empty()) p.developmentPlan = defaultDevelopmentPlanForPosition(p.position);
     if (p.promisedRole.empty()) p.promisedRole = "Sin promesa";
     if (p.promisedPosition.empty()) p.promisedPosition = p.position;
@@ -220,6 +238,44 @@ static string inferPrimaryRival(const string& clubName) {
     return "";
 }
 
+static string inferCoachName(const Team& team) {
+    static const vector<string> firstNames = {"Marco", "Luis", "Diego", "Jorge", "Pablo", "Ruben", "Hector", "Matias"};
+    static const vector<string> lastNames = {"Soto", "Mena", "Rojas", "Valdes", "Tapia", "Pizarro", "Leal", "Munoz"};
+    int hash = 0;
+    for (char ch : normalizeTeamId(team.name)) hash += static_cast<unsigned char>(ch);
+    return firstNames[static_cast<size_t>(hash % static_cast<int>(firstNames.size()))] + " " +
+           lastNames[static_cast<size_t>((hash / 3) % static_cast<int>(lastNames.size()))];
+}
+
+static string inferCoachStyle(const Team& team) {
+    if (team.tactics == "Pressing") return "Intensidad";
+    if (team.tactics == "Defensive" || team.matchInstruction == "Bloque bajo") return "Orden";
+    if (team.matchInstruction == "Juego directo") return "Transicion";
+    if (team.trainingFocus == "Ataque") return "Ofensivo";
+    return "Equilibrado";
+}
+
+static string inferTransferPolicy(const Team& team) {
+    if (team.youthFacilityLevel >= 4 || team.youthCoach >= 72) return "Cantera y valor futuro";
+    if (team.debt > team.sponsorWeekly * 18) return "Vender antes de comprar";
+    if (team.clubPrestige >= 70) return "Competir por titulares hechos";
+    return "Mercado de oportunidades";
+}
+
+static vector<string> inferScoutingRegions(const Team& team) {
+    vector<string> regions;
+    auto addRegion = [&](const string& region) {
+        if (region.empty()) return;
+        if (find(regions.begin(), regions.end(), region) == regions.end()) regions.push_back(region);
+    };
+    addRegion(team.youthRegion.empty() ? string("Metropolitana") : team.youthRegion);
+    if (team.scoutingChief >= 58) addRegion("Centro");
+    if (team.scoutingChief >= 64) addRegion("Sur");
+    if (team.scoutingChief >= 70) addRegion("Norte");
+    if (team.clubPrestige >= 68 || team.scoutingChief >= 78) addRegion("Internacional");
+    return regions;
+}
+
 static int calculateTeamPrestige(const Team& team) {
     long long achievementScore = static_cast<long long>(team.achievements.size()) * 2;
     long long financialPower = clampInt(static_cast<int>(team.sponsorWeekly / 60000LL), 0, 10);
@@ -241,6 +297,14 @@ void ensureTeamIdentity(Team& team) {
     team.clubStyle = inferClubStyle(team);
     team.youthIdentity = inferYouthIdentity(team);
     if (team.primaryRival.empty()) team.primaryRival = inferPrimaryRival(team.name);
+    if (team.goalkeepingCoach <= 0) team.goalkeepingCoach = max(45, team.fitnessCoach - 2);
+    if (team.performanceAnalyst <= 0) team.performanceAnalyst = max(45, team.assistantCoach - 1);
+    if (team.headCoachName.empty()) team.headCoachName = inferCoachName(team);
+    if (team.headCoachReputation <= 0) team.headCoachReputation = clampInt(team.clubPrestige - 6 + team.assistantCoach / 8, 25, 92);
+    if (team.headCoachStyle.empty()) team.headCoachStyle = inferCoachStyle(team);
+    if (team.jobSecurity <= 0) team.jobSecurity = 58;
+    if (team.transferPolicy.empty()) team.transferPolicy = inferTransferPolicy(team);
+    if (team.scoutingRegions.empty()) team.scoutingRegions = inferScoutingRegions(team);
 }
 
 bool areRivalClubs(const Team& a, const Team& b) {
@@ -354,6 +418,7 @@ Player makeRandomPlayer(const string& position, int skillMin, int skillMax, int 
     p.lastTrainedSeason = -1;
     p.lastTrainedWeek = -1;
     p.role = defaultRoleForPosition(position);
+    p.roleDuty = defaultDutyForRole(p.role, position);
     p.promisedPosition = position;
     ensurePlayerProfile(p, true);
     return p;
@@ -393,6 +458,8 @@ Team::Team(string n)
       scoutingChief(55),
       youthCoach(55),
       medicalTeam(55),
+      goalkeepingCoach(55),
+      performanceAnalyst(55),
       youthRegion("Metropolitana"),
       debt(0),
       sponsorWeekly(25000),
@@ -404,7 +471,13 @@ Team::Team(string n)
       clubStyle(""),
       youthIdentity(""),
       primaryRival(""),
-      matchInstruction("Equilibrado") {}
+      matchInstruction("Equilibrado"),
+      headCoachName(""),
+      headCoachReputation(50),
+      headCoachStyle(""),
+      jobSecurity(58),
+      transferPolicy(""),
+      scoutingRegions() {}
 
 void Team::addPlayer(const Player& p) {
     players.push_back(p);
@@ -1318,12 +1391,26 @@ const Team* Career::findTeamByName(const string& name) const {
     return nullptr;
 }
 
+void Career::addInboxItem(const string& item, const string& channel) {
+    if (item.empty()) return;
+    string entry = channel.empty() ? item : ("[" + channel + "] " + item);
+    managerInbox.push_back(entry);
+    if (managerInbox.size() > 60) {
+        managerInbox.erase(managerInbox.begin(), managerInbox.begin() + static_cast<long long>(managerInbox.size() - 60));
+    }
+}
+
 void Career::addNews(const string& item) {
     if (item.empty()) return;
     string entry = "T" + to_string(currentSeason) + "-F" + to_string(currentWeek) + ": " + item;
     newsFeed.push_back(entry);
     if (newsFeed.size() > 40) {
         newsFeed.erase(newsFeed.begin(), newsFeed.begin() + static_cast<long long>(newsFeed.size() - 40));
+    }
+    const string lower = toLower(item);
+    if (lower.find("[mundo]") != string::npos || lower.find("promesa") != string::npos || lower.find("fich") != string::npos ||
+        lower.find("lesion") != string::npos || lower.find("directiva") != string::npos || lower.find("record") != string::npos) {
+        addInboxItem(entry, "Resumen");
     }
 }
 

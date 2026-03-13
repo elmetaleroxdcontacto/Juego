@@ -26,6 +26,10 @@ namespace finance_system {
 long long calculateWeeklyPayroll(const Team& team) {
     long long wages = 0;
     for (const auto& player : team.players) wages += player.wage;
+    const long long staffPayroll = static_cast<long long>(team.assistantCoach + team.fitnessCoach + team.scoutingChief +
+                                                          team.youthCoach + team.medicalTeam + team.goalkeepingCoach +
+                                                          team.performanceAnalyst) * 55LL;
+    wages += staffPayroll;
     return wages * getCompetitionConfig(team.division).wageFactor / 100;
 }
 

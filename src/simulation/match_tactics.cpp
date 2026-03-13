@@ -20,6 +20,7 @@ string compactToken(string value) {
 
 void applyRoleModifier(const Player& p, int& attack, int& defense) {
     string role = compactToken(p.role);
+    string duty = compactToken(p.roleDuty);
     if (role == "stopper") {
         defense += 5;
         attack -= 1;
@@ -59,6 +60,16 @@ void applyRoleModifier(const Player& p, int& attack, int& defense) {
     } else if (role == "objetivo") {
         attack += 4;
         defense += 1;
+    }
+    if (duty == "ataque") {
+        attack += 3;
+        defense -= 2;
+    } else if (duty == "apoyo") {
+        attack += 1;
+        defense += 1;
+    } else if (duty == "defensa") {
+        defense += 3;
+        attack -= 2;
     }
     attack = clampInt(attack, 1, 120);
     defense = clampInt(defense, 1, 120);
@@ -120,6 +131,8 @@ void applyPlayerStateModifier(const Player& p, const Team& team, int& attack, in
         attack += 1;
         defense += 1;
     }
+    if (compactToken(p.roleDuty) == "ataque" && team.matchInstruction == "Presion final") attack += 1;
+    if (compactToken(p.roleDuty) == "defensa" && (team.matchInstruction == "Bloque bajo" || team.tactics == "Defensive")) defense += 2;
     if (p.socialGroup == "Lideres" && team.morale >= 60) defense += 1;
     if (p.socialGroup == "Juveniles" && p.currentForm >= 65) attack += 1;
     attack = clampInt(attack, 1, 130);

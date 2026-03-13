@@ -26,6 +26,9 @@ struct ScoutingCandidate {
     std::vector<std::string> traits;
     std::string recommendation;
     std::string upsideBand;
+    std::string networkFitLabel;
+    std::string availabilityLabel;
+    std::string agentLabel;
     int estimatedSkillMin = 0;
     int estimatedSkillMax = 0;
     int estimatedPotentialMin = 0;

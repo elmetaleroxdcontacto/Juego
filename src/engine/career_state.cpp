@@ -330,12 +330,26 @@ const Team* Career::findTeamByName(const string& name) const {
     return nullptr;
 }
 
+void Career::addInboxItem(const string& item, const string& channel) {
+    if (item.empty()) return;
+    string entry = channel.empty() ? item : ("[" + channel + "] " + item);
+    managerInbox.push_back(entry);
+    if (managerInbox.size() > 60) {
+        managerInbox.erase(managerInbox.begin(), managerInbox.begin() + static_cast<long long>(managerInbox.size() - 60));
+    }
+}
+
 void Career::addNews(const string& item) {
     if (item.empty()) return;
     string entry = "T" + to_string(currentSeason) + "-F" + to_string(currentWeek) + ": " + item;
     newsFeed.push_back(entry);
     if (newsFeed.size() > 40) {
         newsFeed.erase(newsFeed.begin(), newsFeed.begin() + static_cast<long long>(newsFeed.size() - 40));
+    }
+    const string lower = toLower(item);
+    if (lower.find("[mundo]") != string::npos || lower.find("promesa") != string::npos || lower.find("fich") != string::npos ||
+        lower.find("lesion") != string::npos || lower.find("directiva") != string::npos || lower.find("record") != string::npos) {
+        addInboxItem(entry, "Resumen");
     }
 }
 

@@ -88,6 +88,39 @@ string nextTrainingFocus(const string& current) {
     return focuses.front();
 }
 
+bool hasScoutingCoverage(const Team& team, const string& region) {
+    if (region.empty() || region == "Todas") return true;
+    return find(team.scoutingRegions.begin(), team.scoutingRegions.end(), region) != team.scoutingRegions.end();
+}
+
+string scoutingCoverageLabel(const Team& team, const string& region) {
+    if (region.empty() || region == "Todas") return "Cobertura abierta";
+    return hasScoutingCoverage(team, region) ? "Region cubierta" : "Cobertura baja";
+}
+
+string availabilityLabel(const Player& player) {
+    if (player.contractWeeks <= 12) return "Contrato corto";
+    if (player.wantsToLeave || player.happiness <= 42) return "Abierto a salir";
+    if (player.releaseClause <= player.value * 2) return "Clausula accesible";
+    return "Negociacion dura";
+}
+
+string agentProfileLabel(const Player& player) {
+    const int difficulty = agentDifficulty(player);
+    if (difficulty >= 72) return "Agente duro";
+    if (difficulty >= 58) return "Agente exigente";
+    return "Agente manejable";
+}
+
+void appendScoutInbox(Career& career, const string& note, const string& inboxLine) {
+    career.scoutInbox.push_back(note);
+    if (career.scoutInbox.size() > 40) {
+        career.scoutInbox.erase(career.scoutInbox.begin(),
+                                career.scoutInbox.begin() + static_cast<long long>(career.scoutInbox.size() - 40));
+    }
+    career.addInboxItem(inboxLine, "Scouting");
+}
+
 long long totalNegotiationCommitment(const NegotiationState& state) {
     return state.agreedFee + state.agreedBonus + state.agreedAgentFee + state.agreedLoyaltyBonus;
 }
@@ -193,6 +226,7 @@ ServiceResult startCareerService(Career& career,
     career.managerName = managerName.empty() ? "Manager" : managerName;
     career.managerReputation = 50;
     career.newsFeed.clear();
+    career.managerInbox.clear();
     career.scoutInbox.clear();
     career.scoutingShortlist.clear();
     career.history.clear();
@@ -249,12 +283,14 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         return session;
     }
     Team& team = *career.myTeam;
-    long long scoutCost = max(3000LL, 9000LL - team.scoutingChief * 50LL);
+    ensureTeamIdentity(team);
+    const int analystBonus = max(0, team.performanceAnalyst - 55) / 6;
+    long long scoutCost = max(3000LL, 9000LL - team.scoutingChief * 50LL - analystBonus * 120LL);
     if (team.budget < scoutCost) {
         session.service = failure("Presupuesto insuficiente para ojeo.");
         return session;
     }
-    session.resolvedRegion = region.empty() ? "Todas" : region;
+    session.resolvedRegion = region.empty() ? (team.scoutingRegions.empty() ? string("Todas") : team.scoutingRegions.front()) : region;
     session.resolvedFocusPosition = normalizePosition(focusPos);
     if (session.resolvedFocusPosition == "N/A" || session.resolvedFocusPosition.empty()) {
         session.resolvedFocusPosition = detectScoutingNeed(team);
@@ -263,7 +299,10 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
     vector<pair<Team*, int>> reports;
     for (auto& club : career.allTeams) {
         if (&club == career.myTeam) continue;
+        ensureTeamIdentity(club);
+        const bool coveredRegion = hasScoutingCoverage(team, club.youthRegion);
         if (session.resolvedRegion != "Todas" && club.youthRegion != session.resolvedRegion) continue;
+        if (session.resolvedRegion == "Todas" && !coveredRegion && team.scoutingChief < 62) continue;
         for (size_t i = 0; i < club.players.size(); ++i) {
             const Player& player = club.players[i];
             if (player.onLoan) continue;
@@ -276,17 +315,19 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         return session;
     }
     sort(reports.begin(), reports.end(), [&](const auto& left, const auto& right) {
-        const Player& a = left.first->players[static_cast<size_t>(left.second)];
-        const Player& b = right.first->players[static_cast<size_t>(right.second)];
+        const Team& clubA = *left.first;
+        const Team& clubB = *right.first;
+        const Player& a = clubA.players[static_cast<size_t>(left.second)];
+        const Player& b = clubB.players[static_cast<size_t>(right.second)];
         int fitA = a.potential + a.professionalism / 2 + a.currentForm / 2 +
-                   positionFitScore(a, session.resolvedFocusPosition);
+                   positionFitScore(a, session.resolvedFocusPosition) + (hasScoutingCoverage(team, clubA.youthRegion) ? 6 : 0);
         int fitB = b.potential + b.professionalism / 2 + b.currentForm / 2 +
-                   positionFitScore(b, session.resolvedFocusPosition);
+                   positionFitScore(b, session.resolvedFocusPosition) + (hasScoutingCoverage(team, clubB.youthRegion) ? 6 : 0);
         if (fitA != fitB) return fitA > fitB;
         return a.skill > b.skill;
     });
     if (reports.size() > 5) reports.resize(5);
-    int error = clampInt(14 - team.scoutingChief / 10, 2, 10);
+    int error = clampInt(14 - team.scoutingChief / 10 - analystBonus / 2, 2, 10);
     team.budget -= scoutCost;
     session.scoutingCost = scoutCost;
     session.service.ok = true;
@@ -302,11 +343,13 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         int estPotHi = clampInt(player.potential + error, player.skill, 99);
         int fitScore = positionFitScore(player, session.resolvedFocusPosition);
         string fitLabel = fitScore >= 90 ? "ajuste alto" : (fitScore >= 75 ? "ajuste medio" : "ajuste parcial");
+        const bool coveredRegion = hasScoutingCoverage(team, club->youthRegion);
         const int regionalFamiliarity = club->youthRegion == team.youthRegion ? 8 : 0;
+        const int networkBonus = coveredRegion ? world_state_service::worldRuleValue("scouting_network_bonus", 8) : -6;
         const int confidence =
-            clampInt(28 + team.scoutingChief / 3 + (12 - error) * 3 + regionalFamiliarity +
+            clampInt(26 + team.scoutingChief / 3 + analystBonus + (12 - error) * 3 + regionalFamiliarity + networkBonus +
                          max(0, fitScore - 70) / 4 - max(0, 55 - player.professionalism) / 6,
-                     25, 92);
+                     20, 94);
         const string recommendation =
             (player.potential >= team.getAverageSkill() + 8 && fitScore >= 85 && confidence >= 68)
                 ? "Objetivo prioritario"
@@ -336,6 +379,9 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         candidate.personalityLabel = personalityLabel(player);
         candidate.recommendation = recommendation;
         candidate.upsideBand = upsideBand;
+        candidate.networkFitLabel = scoutingCoverageLabel(team, club->youthRegion);
+        candidate.availabilityLabel = availabilityLabel(player);
+        candidate.agentLabel = agentProfileLabel(player);
         candidate.secondaryPositions = player.secondaryPositions;
         candidate.traits = player.traits;
         candidate.estimatedSkillMin = estSkillLo;
@@ -357,20 +403,19 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
                       " | Sec " + (player.secondaryPositions.empty() ? string("-") : joinStringValues(player.secondaryPositions, "/")) +
                       " | Forma " + playerFormLabel(player) +
                       " | Fiabilidad " + playerReliabilityLabel(player) +
+                      " | Cobertura " + candidate.networkFitLabel +
                       " | Conf " + to_string(confidence) +
                       " | Valor " + formatMoneyValue(player.value) +
                       " | Salario esp " + formatMoneyValue(salaryExpectation) +
+                      " | Disponibilidad " + candidate.availabilityLabel +
+                      " | " + candidate.agentLabel +
                       " | " + recommendation +
                       " | " + upsideBand +
                       " | Riesgo " + riskLabel +
                       " | Rasgos " + joinStringValues(player.traits, ", ") +
                       " | Perfil " + personalityLabel(player);
         session.service.messages.push_back("- " + note);
-        career.scoutInbox.push_back(note);
-    }
-    if (career.scoutInbox.size() > 40) {
-        career.scoutInbox.erase(career.scoutInbox.begin(),
-                                career.scoutInbox.begin() + static_cast<long long>(career.scoutInbox.size() - 40));
+        appendScoutInbox(career, note, "Informe nuevo de " + player.name + " en " + club->name + ".");
     }
     career.addNews("El scouting completa un informe en la region " + session.resolvedRegion + " para " + team.name + ".");
     return session;
@@ -401,10 +446,17 @@ ServiceResult upgradeClubService(Career& career, ClubUpgrade upgrade) {
             break;
         case ClubUpgrade::Training:
             team.trainingFacilityLevel++;
+            team.goalkeepingCoach = clampInt(team.goalkeepingCoach + 3, 1, 99);
             message = team.name + " mejora su centro de entrenamiento.";
             break;
         case ClubUpgrade::Scouting:
             team.scoutingChief = clampInt(team.scoutingChief + 5, 1, 99);
+            for (const auto& regionName : world_state_service::listConfiguredScoutingRegions()) {
+                if (!hasScoutingCoverage(team, regionName)) {
+                    team.scoutingRegions.push_back(regionName);
+                    break;
+                }
+            }
             message = team.name + " fortalece su red de scouting.";
             break;
         case ClubUpgrade::Medical:
@@ -413,6 +465,7 @@ ServiceResult upgradeClubService(Career& career, ClubUpgrade upgrade) {
             break;
         case ClubUpgrade::AssistantCoach:
             team.assistantCoach = clampInt(team.assistantCoach + 5, 1, 99);
+            team.performanceAnalyst = clampInt(team.performanceAnalyst + 3, 1, 99);
             message = team.name + " refuerza su cuerpo tecnico.";
             break;
         case ClubUpgrade::FitnessCoach:
@@ -980,12 +1033,13 @@ ServiceResult followShortlistService(Career& career) {
         career.scoutInbox.erase(career.scoutInbox.begin(),
                                 career.scoutInbox.begin() + static_cast<long long>(career.scoutInbox.size() - 40));
     }
+    career.addInboxItem("Se actualizan " + to_string(career.scoutingShortlist.size()) + " objetivos de shortlist.", "Scouting");
     career.addNews("El scouting actualiza informes de la shortlist de " + team.name + ".");
     return result;
 }
 
 std::vector<std::string> listYouthRegionsService() {
-    return {"Metropolitana", "Norte", "Centro", "Sur", "Patagonia"};
+    return world_state_service::listConfiguredScoutingRegions();
 }
 
 std::string buildCompetitionSummaryService(const Career& career) {

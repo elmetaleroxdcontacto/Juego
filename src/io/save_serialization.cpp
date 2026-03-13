@@ -9,7 +9,7 @@ using namespace std;
 
 namespace {
 
-static constexpr int kCareerSaveVersion = 9;
+static constexpr int kCareerSaveVersion = 10;
 
 string escapeSaveField(const string& value) {
     string out;
@@ -379,6 +379,7 @@ string encodePlayerFields(const Player& player) {
         to_string(player.seasonRedCards),
         to_string(player.matchesSuspended),
         player.role,
+        player.roleDuty,
         to_string(player.setPieceSkill),
         to_string(player.leadership),
         to_string(player.professionalism),
@@ -454,6 +455,7 @@ Player decodePlayerFields(const vector<string>& fields) {
     if (idx < fields.size()) player.seasonRedCards = parseIntField(fields[idx++]); else player.seasonRedCards = 0;
     if (idx < fields.size()) player.matchesSuspended = parseIntField(fields[idx++]); else player.matchesSuspended = 0;
     if (idx < fields.size()) player.role = fields[idx++]; else player.role = defaultRoleForPosition(player.position);
+    if (idx < fields.size()) player.roleDuty = fields[idx++]; else player.roleDuty = defaultDutyForRole(player.role, player.position);
     if (idx < fields.size()) player.setPieceSkill = parseIntField(fields[idx++], clampInt(player.skill + randInt(-6, 6), 25, 99));
     else player.setPieceSkill = clampInt(player.skill + randInt(-6, 6), 25, 99);
     if (idx < fields.size()) player.leadership = parseIntField(fields[idx++], clampInt(35 + randInt(0, 45), 1, 99));
@@ -514,6 +516,7 @@ bool serializeCareer(ostream& file, const Career& career) {
     const int& boardYouthTarget = career.boardYouthTarget;
     const int& boardWarningWeeks = career.boardWarningWeeks;
     const vector<string>& newsFeed = career.newsFeed;
+    const vector<string>& managerInbox = career.managerInbox;
     const vector<string>& scoutInbox = career.scoutInbox;
     const vector<string>& scoutingShortlist = career.scoutingShortlist;
     const vector<SeasonHistoryEntry>& history = career.history;
@@ -552,6 +555,7 @@ bool serializeCareer(ostream& file, const Career& career) {
                                to_string(boardWarningWeeks)}, '|')
          << "\n";
     file << "NEWS " << encodeStringList(newsFeed) << "\n";
+    file << "INBOX " << encodeStringList(managerInbox) << "\n";
     file << "SCOUT " << encodeStringList(scoutInbox) << "\n";
     file << "SHORTLIST " << encodeStringList(scoutingShortlist) << "\n";
     file << "HISTORY " << encodeHistory(history) << "\n";
@@ -613,6 +617,8 @@ bool serializeCareer(ostream& file, const Career& career) {
                     to_string(team.scoutingChief),
                     to_string(team.youthCoach),
                     to_string(team.medicalTeam),
+                    to_string(team.goalkeepingCoach),
+                    to_string(team.performanceAnalyst),
                     team.youthRegion,
                     to_string(team.debt),
                     to_string(team.sponsorWeekly),
@@ -624,7 +630,13 @@ bool serializeCareer(ostream& file, const Career& career) {
                     to_string(storedPrestige),
                     storedClubStyle,
                     storedYouthIdentity,
-                    team.primaryRival
+                    team.primaryRival,
+                    team.headCoachName,
+                    to_string(team.headCoachReputation),
+                    team.headCoachStyle,
+                    to_string(team.jobSecurity),
+                    team.transferPolicy,
+                    encodeStringList(team.scoutingRegions)
                 }, '|')
              << "\n";
         file << "PLAYERS " << team.players.size() << "\n";
@@ -654,6 +666,7 @@ bool deserializeCareer(istream& file, Career& career) {
     auto& boardYouthTarget = career.boardYouthTarget;
     auto& boardWarningWeeks = career.boardWarningWeeks;
     auto& newsFeed = career.newsFeed;
+    auto& managerInbox = career.managerInbox;
     auto& scoutInbox = career.scoutInbox;
     auto& scoutingShortlist = career.scoutingShortlist;
     auto& history = career.history;
@@ -748,6 +761,11 @@ bool deserializeCareer(istream& file, Career& career) {
         newsFeed.clear();
         if (teamsLine.rfind("NEWS ", 0) == 0) {
             newsFeed = decodeStringList(teamsLine.substr(5));
+            if (!getline(file, teamsLine)) return false;
+        }
+        managerInbox.clear();
+        if (teamsLine.rfind("INBOX ", 0) == 0) {
+            managerInbox = decodeStringList(teamsLine.substr(6));
             if (!getline(file, teamsLine)) return false;
         }
         scoutInbox.clear();
@@ -874,18 +892,27 @@ bool deserializeCareer(istream& file, Career& career) {
             if (fields.size() > extra + 19) team.scoutingChief = clampInt(parseIntField(fields[extra + 19], 55), 1, 99); else team.scoutingChief = 55;
             if (fields.size() > extra + 20) team.youthCoach = clampInt(parseIntField(fields[extra + 20], 55), 1, 99); else team.youthCoach = 55;
             if (fields.size() > extra + 21) team.medicalTeam = clampInt(parseIntField(fields[extra + 21], 55), 1, 99); else team.medicalTeam = 55;
-            if (fields.size() > extra + 22) team.youthRegion = fields[extra + 22]; else team.youthRegion = "Metropolitana";
-            if (fields.size() > extra + 23) team.debt = parseLongField(fields[extra + 23]); else team.debt = 0;
-            if (fields.size() > extra + 24) team.sponsorWeekly = parseLongField(fields[extra + 24], 25000); else team.sponsorWeekly = 25000;
-            if (fields.size() > extra + 25) team.stadiumLevel = parseIntField(fields[extra + 25], 1); else team.stadiumLevel = 1;
-            if (fields.size() > extra + 26) team.youthFacilityLevel = parseIntField(fields[extra + 26], 1); else team.youthFacilityLevel = 1;
-            if (fields.size() > extra + 27) team.trainingFacilityLevel = parseIntField(fields[extra + 27], 1); else team.trainingFacilityLevel = 1;
-            if (fields.size() > extra + 28) team.fanBase = parseIntField(fields[extra + 28], 12); else team.fanBase = 12;
-            if (fields.size() > extra + 29) team.matchInstruction = fields[extra + 29]; else team.matchInstruction = "Equilibrado";
-            if (fields.size() > extra + 30) team.clubPrestige = clampInt(parseIntField(fields[extra + 30]), 1, 99); else team.clubPrestige = 0;
-            if (fields.size() > extra + 31) team.clubStyle = fields[extra + 31]; else team.clubStyle.clear();
-            if (fields.size() > extra + 32) team.youthIdentity = fields[extra + 32]; else team.youthIdentity.clear();
-            if (fields.size() > extra + 33) team.primaryRival = fields[extra + 33]; else team.primaryRival.clear();
+            const bool hasExpandedWorldFields = fields.size() > extra + 35;
+            if (hasExpandedWorldFields && fields.size() > extra + 22) team.goalkeepingCoach = clampInt(parseIntField(fields[extra + 22], 55), 1, 99); else team.goalkeepingCoach = 55;
+            if (hasExpandedWorldFields && fields.size() > extra + 23) team.performanceAnalyst = clampInt(parseIntField(fields[extra + 23], 55), 1, 99); else team.performanceAnalyst = 55;
+            if (fields.size() > extra + (hasExpandedWorldFields ? 24 : 22)) team.youthRegion = fields[extra + (hasExpandedWorldFields ? 24 : 22)]; else team.youthRegion = "Metropolitana";
+            if (fields.size() > extra + (hasExpandedWorldFields ? 25 : 23)) team.debt = parseLongField(fields[extra + (hasExpandedWorldFields ? 25 : 23)]); else team.debt = 0;
+            if (fields.size() > extra + (hasExpandedWorldFields ? 26 : 24)) team.sponsorWeekly = parseLongField(fields[extra + (hasExpandedWorldFields ? 26 : 24)], 25000); else team.sponsorWeekly = 25000;
+            if (fields.size() > extra + (hasExpandedWorldFields ? 27 : 25)) team.stadiumLevel = parseIntField(fields[extra + (hasExpandedWorldFields ? 27 : 25)], 1); else team.stadiumLevel = 1;
+            if (fields.size() > extra + (hasExpandedWorldFields ? 28 : 26)) team.youthFacilityLevel = parseIntField(fields[extra + (hasExpandedWorldFields ? 28 : 26)], 1); else team.youthFacilityLevel = 1;
+            if (fields.size() > extra + (hasExpandedWorldFields ? 29 : 27)) team.trainingFacilityLevel = parseIntField(fields[extra + (hasExpandedWorldFields ? 29 : 27)], 1); else team.trainingFacilityLevel = 1;
+            if (fields.size() > extra + (hasExpandedWorldFields ? 30 : 28)) team.fanBase = parseIntField(fields[extra + (hasExpandedWorldFields ? 30 : 28)], 12); else team.fanBase = 12;
+            if (fields.size() > extra + (hasExpandedWorldFields ? 31 : 29)) team.matchInstruction = fields[extra + (hasExpandedWorldFields ? 31 : 29)]; else team.matchInstruction = "Equilibrado";
+            if (fields.size() > extra + (hasExpandedWorldFields ? 32 : 30)) team.clubPrestige = clampInt(parseIntField(fields[extra + (hasExpandedWorldFields ? 32 : 30)]), 1, 99); else team.clubPrestige = 0;
+            if (fields.size() > extra + (hasExpandedWorldFields ? 33 : 31)) team.clubStyle = fields[extra + (hasExpandedWorldFields ? 33 : 31)]; else team.clubStyle.clear();
+            if (fields.size() > extra + (hasExpandedWorldFields ? 34 : 32)) team.youthIdentity = fields[extra + (hasExpandedWorldFields ? 34 : 32)]; else team.youthIdentity.clear();
+            if (fields.size() > extra + (hasExpandedWorldFields ? 35 : 33)) team.primaryRival = fields[extra + (hasExpandedWorldFields ? 35 : 33)]; else team.primaryRival.clear();
+            if (hasExpandedWorldFields && fields.size() > extra + 36) team.headCoachName = fields[extra + 36]; else team.headCoachName.clear();
+            if (hasExpandedWorldFields && fields.size() > extra + 37) team.headCoachReputation = parseIntField(fields[extra + 37], 50); else team.headCoachReputation = 50;
+            if (hasExpandedWorldFields && fields.size() > extra + 38) team.headCoachStyle = fields[extra + 38]; else team.headCoachStyle.clear();
+            if (hasExpandedWorldFields && fields.size() > extra + 39) team.jobSecurity = parseIntField(fields[extra + 39], 58); else team.jobSecurity = 58;
+            if (hasExpandedWorldFields && fields.size() > extra + 40) team.transferPolicy = fields[extra + 40]; else team.transferPolicy.clear();
+            if (hasExpandedWorldFields && fields.size() > extra + 41) team.scoutingRegions = decodeStringList(fields[extra + 41]); else team.scoutingRegions.clear();
             if (fields.size() <= extra + 19) {
                 team.preferredBench.clear();
                 if (fields.size() > extra + 11) team.captain = fields[extra + 11];
@@ -952,6 +979,7 @@ bool deserializeCareer(istream& file, Career& career) {
     managerName = "Manager";
     managerReputation = 50;
     newsFeed.clear();
+    managerInbox.clear();
     scoutInbox.clear();
     scoutingShortlist.clear();
     history.clear();

@@ -98,9 +98,23 @@ TeamMatchSnapshot buildSnapshot(const Team& team,
         }
 
         const string compactRole = match_internal::compactToken(player.role);
+        const string compactDuty = match_internal::compactToken(player.roleDuty);
         if (compactRole == "poacher" || compactRole == "objetivo") finishingQuality += 5;
         if (compactRole == "organizador" || compactRole == "enganche") chanceCreation += 6;
         if (compactRole == "carrilero") lineBreakThreat += 5;
+        if (compactDuty == "ataque") {
+            lineBreakThreat += 8;
+            chanceCreation += 4;
+            defensiveShape -= 2;
+        } else if (compactDuty == "apoyo") {
+            chanceCreation += 2;
+            pressResistance += 2;
+        } else if (compactDuty == "defensa") {
+            defensiveShape += 8;
+            pressResistance += 2;
+            lineBreakThreat -= 2;
+            pressingLoad -= 1;
+        }
     }
 
     match_internal::applyFormationBias(team, snapshot.xi, attack, defense);
@@ -176,6 +190,27 @@ TeamMatchSnapshot buildSnapshot(const Team& team,
         snapshot.chanceCreation += 6;
         snapshot.finishingQuality += 4;
         snapshot.defensiveShape -= 3;
+    }
+
+    const int analystBonus = max(0, team.performanceAnalyst - 55) / 4;
+    const int goalkeepingBonus = max(0, team.goalkeepingCoach - 55) / 3;
+    snapshot.goalkeeperPower += goalkeepingBonus;
+    snapshot.pressResistance += analystBonus;
+    snapshot.defensiveShape += analystBonus / 2;
+    snapshot.tacticalCompatibility += analystBonus / 140.0;
+    if (team.trainingFocus == "Ataque") {
+        snapshot.chanceCreation += 5;
+        snapshot.finishingQuality += 4;
+    } else if (team.trainingFocus == "Defensa") {
+        snapshot.defensiveShape += 6;
+        snapshot.pressResistance += 3;
+    } else if (team.trainingFocus == "Resistencia" || team.trainingFocus == "Recuperacion") {
+        snapshot.pressingLoad -= 4;
+        snapshot.fatigueFactor = min(1.08, snapshot.fatigueFactor + 0.03);
+    } else if (team.trainingFocus == "Tactico" || team.trainingFocus == "Preparacion partido") {
+        snapshot.pressResistance += 5;
+        snapshot.defensiveShape += 3;
+        snapshot.tacticalCompatibility += 0.05;
     }
 
     snapshot.chanceCreation = clampInt(snapshot.chanceCreation, 35, 130);

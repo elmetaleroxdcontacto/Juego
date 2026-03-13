@@ -25,13 +25,15 @@ ClubTransferStrategy buildClubTransferStrategy(const Career& career, const Team&
     strategy.weakestPosition = squad.weakestPosition;
     strategy.surplusPosition = squad.surplusPosition;
     strategy.needsLiquidity = team.budget < 120000 || team.debt > team.sponsorWeekly * 18;
-    strategy.youthFocus = team.youthFacilityLevel >= 3 || team.youthCoach >= 75 || team.youthIdentity == "Cantera estructurada";
-    strategy.promotionPush = teamPrestigeScore(team) >= 58 || career.currentSeason <= 2;
+    strategy.youthFocus = team.youthFacilityLevel >= 3 || team.youthCoach >= 75 || team.youthIdentity == "Cantera estructurada" ||
+                         team.transferPolicy == "Cantera y valor futuro";
+    strategy.promotionPush = teamPrestigeScore(team) >= 58 || career.currentSeason <= 2 || team.headCoachStyle == "Presion";
     strategy.needsStarter = squad.rotationRisk >= 5 || !squad.thinPositions.empty();
     strategy.trustYouthCover = strategy.youthFocus && !squad.youthCoverPositions.empty();
     strategy.rotationRisk = squad.rotationRisk;
     strategy.salePressure = squad.salePressure;
     strategy.maxTargets = strategy.promotionPush ? 6 : 4;
+    if (team.transferPolicy == "Vender antes de comprar") strategy.maxTargets = min(strategy.maxTargets, 3);
     strategy.maxTransferBudget = finance_system::calculateTransferBuffer(team);
     strategy.maxWageBudget = max(20000LL, finance_system::calculateWeeklyPayroll(team) / 4);
     strategy.priorityPositions = squad.priorityPositions;
@@ -94,6 +96,12 @@ TransferTarget evaluateTarget(const Career& career,
     if (player.ambition >= 75) {
         target.scoutingNote += " | jugador ambicioso";
     }
+    if (buyer.transferPolicy == "Cantera y valor futuro" && player.age <= 21) {
+        target.scoutingNote += " | encaja con politica juvenil";
+    } else if (buyer.transferPolicy == "Vender antes de comprar") {
+        target.scoutingNote += " | el club vigila mucho el coste total";
+    }
+    if (buyer.headCoachStyle == "Presion" && playerHasTrait(player, "Presiona")) target.fitScore += 6;
 
     string reason;
     if (playerRejectsMove(career, buyer, seller, player, NegotiationPromise::Rotation, reason)) {

@@ -5,11 +5,104 @@
 #include "utils/utils.h"
 
 #include <algorithm>
+#include <map>
 #include <sstream>
 
 using namespace std;
 
 namespace {
+
+const char* kWorldRulesPath = "data/configs/world_rules.csv";
+const char* kScoutingRegionsPath = "data/configs/scouting_regions.csv";
+
+struct WorldConfigCache {
+    bool loaded = false;
+    map<string, int> worldRules;
+    vector<string> scoutingRegions;
+};
+
+WorldConfigCache& configCache() {
+    static WorldConfigCache cache;
+    return cache;
+}
+
+void loadConfiguredWorldData() {
+    WorldConfigCache& cache = configCache();
+    if (cache.loaded) return;
+    cache.loaded = true;
+    cache.worldRules = {
+        {"background_leader_story_chance", 14},
+        {"background_pressure_story_chance", 10},
+        {"background_manager_review_chance", 8},
+        {"background_youth_promotion_chance", 12},
+        {"background_injury_story_chance", 8},
+        {"weekly_pressure_headline_mod", 3},
+        {"manager_change_chance", 7},
+        {"world_talent_headline_mod", 4},
+        {"world_market_headline_mod", 5},
+        {"scouting_network_bonus", 8},
+    };
+    cache.scoutingRegions = {"Metropolitana", "Centro", "Sur", "Norte", "Patagonia", "Internacional"};
+
+    vector<string> lines;
+    if (readTextFileLines(kWorldRulesPath, lines) && lines.size() > 1) {
+        for (size_t i = 1; i < lines.size(); ++i) {
+            const string line = trim(lines[i]);
+            if (line.empty()) continue;
+            const vector<string> cols = splitCsvLine(line);
+            if (cols.size() < 2) continue;
+            const string key = toLower(trim(cols[0]));
+            if (key.empty()) continue;
+            cache.worldRules[key] = parseAge(cols[1]);
+        }
+    }
+
+    lines.clear();
+    if (readTextFileLines(kScoutingRegionsPath, lines) && lines.size() > 1) {
+        cache.scoutingRegions.clear();
+        for (size_t i = 1; i < lines.size(); ++i) {
+            const string line = trim(lines[i]);
+            if (line.empty()) continue;
+            const vector<string> cols = splitCsvLine(line);
+            if (cols.empty()) continue;
+            const string name = trim(cols[0]);
+            if (!name.empty() && find(cache.scoutingRegions.begin(), cache.scoutingRegions.end(), name) == cache.scoutingRegions.end()) {
+                cache.scoutingRegions.push_back(name);
+            }
+        }
+        if (cache.scoutingRegions.empty()) {
+            cache.scoutingRegions = {"Metropolitana", "Centro", "Sur", "Norte", "Patagonia", "Internacional"};
+        }
+    }
+}
+
+int configuredWorldRule(const string& key, int defaultValue) {
+    loadConfiguredWorldData();
+    const auto& rules = configCache().worldRules;
+    auto it = rules.find(toLower(trim(key)));
+    return it == rules.end() ? defaultValue : it->second;
+}
+
+vector<string> configuredScoutingRegions() {
+    loadConfiguredWorldData();
+    return configCache().scoutingRegions;
+}
+
+string replacementCoachName(const Team& team, int salt) {
+    static const vector<string> firstNames = {"Nicolas", "Mauricio", "Sebastian", "Cristian", "Patricio", "Rodolfo"};
+    static const vector<string> lastNames = {"Araya", "Cisternas", "Yanez", "Henriquez", "Orellana", "Fuenzalida"};
+    int hash = salt;
+    for (char ch : normalizeTeamId(team.name)) hash += static_cast<unsigned char>(ch);
+    return firstNames[static_cast<size_t>(hash % static_cast<int>(firstNames.size()))] + " " +
+           lastNames[static_cast<size_t>((hash / 5) % static_cast<int>(lastNames.size()))];
+}
+
+string replacementCoachStyle(const Team& team) {
+    if (team.matchInstruction == "Juego directo") return "Vertical";
+    if (team.tactics == "Pressing") return "Presion";
+    if (team.tactics == "Defensive") return "Contencion";
+    return "Control";
+}
 
 int targetStartsForPromise(const string& target) {
     if (target == "Titular") return 4;
@@ -276,12 +369,13 @@ WorldPulseSummary processWeeklyWorldState(Career& career) {
         }
     }
     summary.pressureClubs = pressureClubs;
-    if (mostPressured && career.currentWeek % 3 == 0) {
+    if (mostPressured && career.currentWeek % max(1, configuredWorldRule("weekly_pressure_headline_mod", 3)) == 0) {
         career.addNews("[Mundo] " + mostPressured->name + " entra en zona de presion institucional.");
+        career.addInboxItem(mostPressured->name + " queda en la mira por su mala racha.", "Mundo");
         pushHeadline(summary, "Mundo: " + mostPressured->name + " queda bajo fuerte presion por resultados.");
     }
 
-    if (career.currentWeek % 4 == 0) {
+    if (career.currentWeek % max(1, configuredWorldRule("world_talent_headline_mod", 4)) == 0) {
         const Team* clubOwner = nullptr;
         const Player* prospect = nullptr;
         int upside = -1;
@@ -302,17 +396,17 @@ WorldPulseSummary processWeeklyWorldState(Career& career) {
         }
     }
 
-    if (pressureClubs >= 3 && career.currentWeek % 4 == 2) {
+    if (pressureClubs >= 3 && career.currentWeek % max(1, configuredWorldRule("world_talent_headline_mod", 4)) == 2) {
         career.addNews("[Mundo] Varias directivas entran en modo revision por un arranque irregular.");
         pushHeadline(summary, "Clima institucional: varias bancas quedan bajo observacion esta semana.");
     }
 
-    if (mostPressured && career.currentWeek % 5 == 0) {
+    if (mostPressured && career.currentWeek % max(1, configuredWorldRule("world_market_headline_mod", 5)) == 0) {
         career.addNews("[Mundo] Rumor de banquillo: " + mostPressured->name + " estudia cambios tras semanas de presion.");
         pushHeadline(summary, "Banquillos: " + mostPressured->name + " aparece en el radar de rumores.");
     }
 
-    if (career.currentWeek % 5 == 0) {
+    if (career.currentWeek % max(1, configuredWorldRule("world_market_headline_mod", 5)) == 0) {
         const Team* seller = nullptr;
         const Player* target = nullptr;
         int marketScore = -1;
@@ -330,7 +424,34 @@ WorldPulseSummary processWeeklyWorldState(Career& career) {
         }
         if (seller && target) {
             career.addNews("[Mundo] Mercado: crece el interes por " + target->name + " de " + seller->name + ".");
+            career.addInboxItem("El mercado se mueve alrededor de " + target->name + " (" + seller->name + ").", "Mercado");
             pushHeadline(summary, "Mercado: " + target->name + " pasa a ser uno de los nombres de la semana.");
+        }
+    }
+
+    for (auto& club : career.allTeams) {
+        ensureTeamIdentity(club);
+        const int played = club.wins + club.draws + club.losses;
+        if (played < 4) continue;
+        int pressure = 55 - club.morale + max(0, club.goalsAgainst - club.goalsFor) * 2;
+        pressure += max(0, teamPrestigeScore(club) - club.points * 2 / max(1, played));
+        if (&club == career.myTeam) pressure += max(0, 50 - career.boardConfidence) / 3;
+        club.jobSecurity = clampInt(72 - pressure / 2 + club.headCoachReputation / 10, 8, 92);
+        club.headCoachStyle = replacementCoachStyle(club);
+
+        if (club.jobSecurity <= 30 && randInt(1, 100) <= configuredWorldRule("background_manager_review_chance", 8)) {
+            career.addNews("[Mundo] " + club.name + " entra en revision tecnica con " + club.headCoachName + ".");
+            pushHeadline(summary, "Banquillo caliente: " + club.name + " evalua el trabajo de " + club.headCoachName + ".");
+        }
+        if (club.jobSecurity <= 18 && randInt(1, 100) <= configuredWorldRule("manager_change_chance", 7)) {
+            const string oldCoach = club.headCoachName;
+            club.headCoachName = replacementCoachName(club, career.currentWeek + club.points);
+            club.headCoachReputation = clampInt(club.headCoachReputation + randInt(-4, 7), 25, 95);
+            club.jobSecurity = 64;
+            club.transferPolicy = club.debt > club.sponsorWeekly * 18 ? "Reconstruccion austera" : "Rearme competitivo";
+            career.addNews("[Mundo] " + club.name + " cambia de entrenador: sale " + oldCoach + " y llega " + club.headCoachName + ".");
+            career.addInboxItem(club.name + " cambia de entrenador. Nuevo estilo: " + club.headCoachStyle + ".", "Mundo");
+            pushHeadline(summary, "Cambio de banquillo: " + club.name + " presenta a " + club.headCoachName + ".");
         }
     }
 
@@ -503,6 +624,14 @@ int updateSeasonRecords(Career& career, const LeagueTable& table) {
                                            static_cast<long long>(career.historicalRecords.size() - 40));
     }
     return updates;
+}
+
+int worldRuleValue(const string& key, int defaultValue) {
+    return configuredWorldRule(key, defaultValue);
+}
+
+vector<string> listConfiguredScoutingRegions() {
+    return configuredScoutingRegions();
 }
 
 string formatPromiseSummary(const Career& career, size_t maxLines) {

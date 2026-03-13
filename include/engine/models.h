@@ -57,6 +57,7 @@ struct Player {
     int lastTrainedSeason;
     int lastTrainedWeek;
     std::string role;
+    std::string roleDuty;
     std::string developmentPlan;
     std::string promisedRole;
     std::string promisedPosition;
@@ -144,6 +145,8 @@ class Team;
 
 void applyPositionStats(Player& p);
 std::string defaultRoleForPosition(const std::string& position);
+std::string defaultDutyForPosition(const std::string& position);
+std::string defaultDutyForRole(const std::string& role, const std::string& position);
 std::string defaultDevelopmentPlanForPosition(const std::string& position);
 void ensurePlayerProfile(Player& p, bool regenerateTraits = false);
 std::vector<std::string> generatePlayerTraits(const Player& p, bool youth = false);
@@ -195,6 +198,8 @@ public:
     int scoutingChief;
     int youthCoach;
     int medicalTeam;
+    int goalkeepingCoach;
+    int performanceAnalyst;
     std::string youthRegion;
     long long debt;
     long long sponsorWeekly;
@@ -207,6 +212,12 @@ public:
     std::string youthIdentity;
     std::string primaryRival;
     std::string matchInstruction;
+    std::string headCoachName;
+    int headCoachReputation;
+    std::string headCoachStyle;
+    int jobSecurity;
+    std::string transferPolicy;
+    std::vector<std::string> scoutingRegions;
     std::vector<HeadToHeadRecord> headToHead;
     std::vector<std::string> achievements;
 
@@ -274,6 +285,7 @@ struct Career {
     int boardMonthlyProgress;
     int boardMonthlyDeadlineWeek;
     std::vector<std::string> newsFeed;
+    std::vector<std::string> managerInbox;
     std::vector<std::string> scoutInbox;
     std::vector<std::string> scoutingShortlist;
     std::vector<SeasonHistoryEntry> history;
@@ -307,6 +319,7 @@ struct Career {
     Team* findTeamByName(const std::string& name);
     const Team* findTeamByName(const std::string& name) const;
     void addNews(const std::string& item);
+    void addInboxItem(const std::string& item, const std::string& channel = "");
     void executePendingTransfers();
     void initializeSeasonCup();
     void initializeDynamicObjective();

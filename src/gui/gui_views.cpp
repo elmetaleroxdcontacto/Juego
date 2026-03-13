@@ -2,6 +2,7 @@
 
 #ifdef _WIN32
 
+#include "ai/ai_squad_planner.h"
 #include "ai/ai_transfer_manager.h"
 #include "career/dressing_room_service.h"
 #include "career/match_analysis_store.h"
@@ -9,6 +10,7 @@
 #include "career/career_support.h"
 #include "development/training_impact_system.h"
 #include "finance/finance_system.h"
+#include "transfers/negotiation_system.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -430,7 +432,7 @@ std::string buildPlayerProfile(const Team& team, const Player* player) {
         << " | " << player->age << " anos"
         << " | Media " << player->skill
         << " | Potencial " << player->potential << "\r\n";
-    out << "Rol " << player->role
+    out << "Rol " << player->role << " (" << player->roleDuty << ")"
         << " | Promesa " << player->promisedRole
         << " | Posicion prometida " << player->promisedPosition
         << " | Pie " << player->preferredFoot << "\r\n\r\n";
@@ -846,7 +848,10 @@ GuiPageModel buildDashboardModel(AppState& state) {
            << " | Progreso " << state.career.boardMonthlyProgress << "/" << state.career.boardMonthlyTarget << "\r\n";
     detail << "Apoyo de lideres " << dressing.leadershipSupport
            << " | Aislados " << dressing.isolatedPlayers
-           << " | Promesas en riesgo " << dressing.promiseRiskCount << "\r\n\r\n";
+           << " | Promesas en riesgo " << dressing.promiseRiskCount << "\r\n";
+    detail << "DT del club " << team.headCoachName
+           << " | Seguridad " << team.jobSecurity
+           << " | Politica " << team.transferPolicy << "\r\n\r\n";
     detail << dressingRoomPanelText(state.career, 4);
     model.detail.content = detail.str();
     return model;
@@ -892,6 +897,7 @@ GuiPageModel buildSquadModel(AppState& state, bool youthOnly) {
         count++;
     }
     count = std::max(1, count);
+    const SquadNeedReport planner = ai_squad_planner::analyzeSquad(team);
     std::ostringstream out;
     out << "Jugadores visibles " << count
         << " | Edad media " << (avgAge / count)
@@ -900,6 +906,11 @@ GuiPageModel buildSquadModel(AppState& state, bool youthOnly) {
     out << "Filtro actual: " << state.currentFilter << "\r\n";
     out << "Orden: columna " << state.squadSort.column + 1
         << (state.squadSort.ascending ? " asc" : " desc") << "\r\n";
+    out << "Planner: necesidad " << planner.weakestPosition
+        << " | exceso " << planner.surplusPosition
+        << " | riesgo de rotacion " << planner.rotationRisk << "\r\n";
+    out << "Cobertura juvenil: " << (planner.youthCoverPositions.empty() ? std::string("-") : joinStringValues(planner.youthCoverPositions, ", ")) << "\r\n";
+    out << "Ventas probables: " << (planner.saleCandidates.empty() ? std::string("-") : joinStringValues(planner.saleCandidates, ", ")) << "\r\n";
     model.summary.content = out.str();
     return model;
 }
@@ -1103,12 +1114,14 @@ GuiPageModel buildTransfersModel(AppState& state) {
     model.summary.content = "Presupuesto actual " + formatMoneyValue(team.budget) + "\r\n"
                             "Filtro " + state.currentFilter + "\r\n"
                             "Pendientes " + std::to_string(state.career.pendingTransfers.size()) + "\r\n"
-                            "Shortlist " + std::to_string(state.career.scoutingShortlist.size());
+                            "Shortlist " + std::to_string(state.career.scoutingShortlist.size()) + "\r\n"
+                            "Red scouting " + (team.scoutingRegions.empty() ? std::string("-") : joinStringValues(team.scoutingRegions, ", "));
     model.primary.rows.push_back({"Necesidad", detectScoutingNeed(team), "Lectura del plantel actual"});
     model.primary.rows.push_back({"Presupuesto", formatMoneyValue(team.budget), "Define agresividad de mercado"});
     model.primary.rows.push_back({"Contratos cortos", std::to_string(std::count_if(team.players.begin(), team.players.end(), [](const Player& p) { return p.contractWeeks <= 12; })),
                                   "Renovar antes de fichar profundidad"});
     model.primary.rows.push_back({"Scouting", std::to_string(team.scoutingChief), "Mejora precision de objetivos"});
+    model.primary.rows.push_back({"Politica", team.transferPolicy, "Define si el club compra valor, cantera o urgencia"});
     model.primary.rows.push_back({"Venta IA", std::to_string(strategy.salePressure), "Presion para liberar suplentes marginales"});
 
     std::vector<TransferPreviewItem> targets = buildTransferTargets(state.career, state.currentFilter);
@@ -1159,6 +1172,8 @@ GuiPageModel buildTransfersModel(AppState& state) {
         detail << "Interes jugador " << playerInterestLabel(state.career, *seller, *player)
                << " | Interes vendedor " << sellerInterestLabel(*seller, *player) << "\r\n";
         detail << "Rol esperado " << expectedRoleLabel(*state.career.myTeam, *player) << "\r\n";
+        detail << "Disponibilidad " << (player->contractWeeks <= 12 ? "Contrato corto" : (player->wantsToLeave ? "Abierto a salir" : "Negociacion dura"))
+               << " | Agente " << (agentDifficulty(*player) >= 72 ? "duro" : (agentDifficulty(*player) >= 58 ? "exigente" : "manejable")) << "\r\n";
         detail << "Rasgos: " << (player->traits.empty() ? "-" : joinStringValues(player->traits, ", "));
         model.detail.content = detail.str();
     }
@@ -1257,6 +1272,10 @@ GuiPageModel buildBoardModel(AppState& state) {
         Team& team = *state.career.myTeam;
         model.secondary.rows.push_back({"Expectativa", teamExpectationLabel(team), "Perfil de club"});
         model.secondary.rows.push_back({"Prestigio", std::to_string(team.clubPrestige), "Influye en fichajes"});
+        model.secondary.rows.push_back({"DT del club", team.headCoachName, team.headCoachStyle});
+        model.secondary.rows.push_back({"Seguridad", std::to_string(team.jobSecurity), "Estabilidad del banquillo"});
+        model.secondary.rows.push_back({"Politica", team.transferPolicy, "Mercado del club"});
+        model.secondary.rows.push_back({"Red scouting", team.scoutingRegions.empty() ? std::string("-") : joinStringValues(team.scoutingRegions, ", "), "Cobertura activa"});
         model.secondary.rows.push_back({"Identidad cantera", team.youthIdentity, "Condiciona objetivos"});
         model.secondary.rows.push_back({"Estilo", team.clubStyle, "Contexto institucional"});
     }
@@ -1296,15 +1315,19 @@ GuiPageModel buildNewsModel(AppState& state) {
         model.primary.rows.push_back({type, line});
     }
 
+    for (const auto& item : state.career.managerInbox) {
+        model.secondary.rows.push_back({"Inbox", item});
+    }
     for (const auto& item : state.career.scoutInbox) {
         model.secondary.rows.push_back({"Scouting", item});
     }
-    if (model.secondary.rows.empty()) model.secondary.rows.push_back({"Scouting", "Sin informes recientes"});
+    if (model.secondary.rows.empty()) model.secondary.rows.push_back({"Inbox", "Sin novedades recientes"});
 
     for (const auto& alert : alerts) {
         model.footer.rows.push_back({"Alerta", alert});
     }
     model.summary.content = "Entradas visibles: " + std::to_string(model.feed.lines.size()) +
+                            "\r\nInbox manager: " + std::to_string(state.career.managerInbox.size()) +
                             "\r\nFiltro actual: " + state.currentFilter;
     model.detail.content = lastMatchPanelText(state.career, 5, 8) + "\r\n" + dressingRoomPanelText(state.career, 4);
     return model;
