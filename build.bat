@@ -12,9 +12,15 @@ set "CMAKE_BUILD_DIR=%ROOT_DIR%\build-cmake"
 set "SRC_DIR=%ROOT_DIR%\src"
 set "OUTPUT=%ROOT_DIR%\FootballManager.exe"
 set "GAME_ARGS=%*"
+set "TARGET_NAME=FootballManager"
 set "CXX=g++"
 set "FALLBACK_CXXFLAGS=-std=c++17 -static -Iinclude -Isrc"
 set "FALLBACK_LDFLAGS=-std=c++17 -static -lcomctl32 -lgdi32"
+
+if /i "%~1"=="--cli" set "TARGET_NAME=FootballManagerCLI"
+if /i "%~1"=="--validate" set "TARGET_NAME=FootballManagerCLI"
+if /i "%TARGET_NAME%"=="FootballManagerCLI" set "OUTPUT=%ROOT_DIR%\FootballManagerCLI.exe"
+if /i "%TARGET_NAME%"=="FootballManager" set "FALLBACK_LDFLAGS=-std=c++17 -static -mwindows -lcomctl32 -lgdi32"
 
 if /i "%FM_FORCE_FALLBACK%"=="1" goto :legacy_build
 
@@ -29,11 +35,11 @@ if not exist "%CMAKE_BUILD_DIR%" mkdir "%CMAKE_BUILD_DIR%"
 cmake -S "%ROOT_DIR%" -B "%CMAKE_BUILD_DIR%" -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=%CXX% > "%CMAKE_BUILD_DIR%\cmake-config.log" 2>&1
 if errorlevel 1 goto :legacy_build_after_cmake_config
 
-cmake --build "%CMAKE_BUILD_DIR%" --config Release --target FootballManager > "%CMAKE_BUILD_DIR%\cmake-build.log" 2>&1
+cmake --build "%CMAKE_BUILD_DIR%" --config Release --target %TARGET_NAME% > "%CMAKE_BUILD_DIR%\cmake-build.log" 2>&1
 if errorlevel 1 goto :legacy_build_after_cmake_build
 
-set "OUTPUT=%CMAKE_BUILD_DIR%\bin\FootballManager.exe"
-if not exist "%OUTPUT%" set "OUTPUT=%CMAKE_BUILD_DIR%\FootballManager.exe"
+set "OUTPUT=%CMAKE_BUILD_DIR%\bin\%TARGET_NAME%.exe"
+if not exist "%OUTPUT%" set "OUTPUT=%CMAKE_BUILD_DIR%\%TARGET_NAME%.exe"
 goto :run_game
 
 :legacy_build_after_cmake_config
@@ -54,10 +60,16 @@ del /q "%BUILD_DIR%\*.o" 2>nul
 set "OBJECTS="
 
 for /R "%SRC_DIR%" %%F in (*.cpp) do (
-    echo Compilando %%~nxF...
-    %CXX% -c "%%~fF" -o "%BUILD_DIR%\%%~nF.o" %FALLBACK_CXXFLAGS%
-    if errorlevel 1 goto :compile_error
-    set "OBJECTS=!OBJECTS! "%BUILD_DIR%\%%~nF.o""
+    set "SKIP_FILE="
+    if /i "%TARGET_NAME%"=="FootballManager" if /i "%%~nxF"=="main.cpp" set "SKIP_FILE=1"
+    if /i "%TARGET_NAME%"=="FootballManagerCLI" if /i "%%~nxF"=="winmain.cpp" set "SKIP_FILE=1"
+
+    if not defined SKIP_FILE (
+        echo Compilando %%~nxF...
+        %CXX% -c "%%~fF" -o "%BUILD_DIR%\%%~nF.o" %FALLBACK_CXXFLAGS%
+        if errorlevel 1 goto :compile_error
+        set "OBJECTS=!OBJECTS! "%BUILD_DIR%\%%~nF.o""
+    )
 )
 
 if not defined OBJECTS goto :no_sources

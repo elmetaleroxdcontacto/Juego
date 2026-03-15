@@ -30,16 +30,18 @@ int GameController::run(int argc, char* argv[]) {
     if (argc > 1 && string(argv[1]) == "--validate") {
         return runValidationSuite(true);
     }
+#ifdef FM_CONSOLE_DEFAULT
+    return runConsoleApp();
+#else
     if (argc > 1 && string(argv[1]) == "--cli") {
         return runConsoleApp();
     }
 
 #ifdef _WIN32
-    HWND consoleWindow = GetConsoleWindow();
-    if (consoleWindow) ShowWindow(consoleWindow, SW_HIDE);
     return runGuiApp();
 #else
     return runConsoleApp();
+#endif
 #endif
 }
 

@@ -2429,3 +2429,14 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - `build.bat --validate`
 - `build-cmake/bin/FootballManager.exe --validate`
 - Estado de validacion actual: `Resultado: sin fallas`, con `0` errores y `194` advertencias de dataset externo aun pendientes, concentradas sobre todo en carpetas no referenciadas y homonimias/doblados de jugadores.
+- Ajuste Windows GUI/CLI:
+- Se corrigio que al abrir el juego normal tambien apareciera `cmd`; la causa era que `FootballManager.exe` se estaba generando como aplicacion de consola y luego intentaba ocultarla.
+- `CMakeLists.txt` ahora construye `FootballManager.exe` como app `WIN32` en Windows y agrega un ejecutable separado `FootballManagerCLI.exe` para `--cli` y `--validate`.
+- Se agrego `src/winmain.cpp` como punto de entrada exclusivo para la GUI en Windows.
+- `src/engine/game_controller.cpp` ahora separa el flujo por defecto de GUI del flujo de consola con `FM_CONSOLE_DEFAULT`.
+- `build.bat` ahora elige el target correcto segun argumentos: sin flags abre `FootballManager.exe`; con `--cli` o `--validate` compila y ejecuta `FootballManagerCLI.exe`.
+- Verificacion ejecutada:
+- `build.bat`
+- `build.bat --cli`
+- Comprobacion de subsistema con `objdump -p`: `FootballManager.exe` quedo como `Windows GUI` y `FootballManagerCLI.exe` como `Windows CUI`.
+- Nota de entorno: el camino CMake en `build-cmake` sigue fallando por un bloqueo externo de `ar.exe` al renombrar `objects.a`, pero el fallback directo con `g++` compilo ambos ejecutables correctamente.

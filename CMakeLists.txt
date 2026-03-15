@@ -115,11 +115,12 @@ set(FM_CONSOLE_UI_SOURCES
     src/ui/ui.cpp
 )
 
-set(FM_ENTRY_SOURCES
+set(FM_CONSOLE_ENTRY_SOURCES
     src/main.cpp
 )
 
 set(FM_GUI_SOURCES)
+set(FM_GUI_ENTRY_SOURCES ${FM_CONSOLE_ENTRY_SOURCES})
 if(WIN32)
     list(APPEND FM_GUI_SOURCES
         src/gui/gui.cpp
@@ -128,16 +129,30 @@ if(WIN32)
         src/gui/gui_shared.cpp
         src/gui/gui_views.cpp
     )
+    set(FM_GUI_ENTRY_SOURCES
+        src/winmain.cpp
+    )
 endif()
 
-add_executable(FootballManager
-    ${FM_CORE_SOURCES}
-    ${FM_APP_SOURCES}
-    ${FM_ENTRY_SOURCES}
-    ${FM_CONSOLE_UI_SOURCES}
-    ${FM_VALIDATOR_SOURCES}
-    ${FM_GUI_SOURCES}
-)
+if(WIN32)
+    add_executable(FootballManager WIN32
+        ${FM_CORE_SOURCES}
+        ${FM_APP_SOURCES}
+        ${FM_GUI_ENTRY_SOURCES}
+        ${FM_CONSOLE_UI_SOURCES}
+        ${FM_VALIDATOR_SOURCES}
+        ${FM_GUI_SOURCES}
+    )
+else()
+    add_executable(FootballManager
+        ${FM_CORE_SOURCES}
+        ${FM_APP_SOURCES}
+        ${FM_GUI_ENTRY_SOURCES}
+        ${FM_CONSOLE_UI_SOURCES}
+        ${FM_VALIDATOR_SOURCES}
+        ${FM_GUI_SOURCES}
+    )
+endif()
 
 function(fm_configure_target target_name)
     target_include_directories(${target_name} PRIVATE
@@ -160,6 +175,18 @@ function(fm_configure_target target_name)
 endfunction()
 
 fm_configure_target(FootballManager)
+
+if(WIN32)
+    add_executable(FootballManagerCLI
+        ${FM_CORE_SOURCES}
+        ${FM_APP_SOURCES}
+        ${FM_CONSOLE_ENTRY_SOURCES}
+        ${FM_CONSOLE_UI_SOURCES}
+        ${FM_VALIDATOR_SOURCES}
+    )
+    target_compile_definitions(FootballManagerCLI PRIVATE FM_CONSOLE_DEFAULT=1)
+    fm_configure_target(FootballManagerCLI)
+endif()
 
 if(BUILD_TESTING)
     add_executable(FootballManagerTests
