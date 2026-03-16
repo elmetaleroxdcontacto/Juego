@@ -75,6 +75,33 @@ void applyRoleModifier(const Player& p, int& attack, int& defense) {
     defense = clampInt(defense, 1, 120);
 }
 
+void applyIndividualInstructionModifier(const Player& p, const Team& team, int& attack, int& defense) {
+    const string instruction = compactToken(p.individualInstruction);
+    if (instruction == "arriesgarpase") {
+        attack += 3;
+        defense -= 1;
+    } else if (instruction == "abrircampo") {
+        attack += 2 + (team.width >= 4 ? 1 : 0);
+    } else if (instruction == "cerrarpordentro") {
+        defense += 3;
+        attack -= 1;
+    } else if (instruction == "atacarespalda") {
+        attack += 4 + (team.tempo >= 4 || team.matchInstruction == "Juego directo" ? 1 : 0);
+        defense -= 2;
+    } else if (instruction == "conservarposicion") {
+        defense += 2;
+        attack -= 1;
+    } else if (instruction == "marcarfuerte") {
+        defense += 3;
+        attack -= 1;
+    } else if (instruction == "descansomedico") {
+        attack -= 3;
+        defense -= 3;
+    }
+    attack = clampInt(attack, 1, 125);
+    defense = clampInt(defense, 1, 125);
+}
+
 void applyTraitModifier(const Player& p, int& attack, int& defense) {
     if (playerHasTrait(p, "Lider")) defense += 1;
     if (playerHasTrait(p, "Competidor")) {

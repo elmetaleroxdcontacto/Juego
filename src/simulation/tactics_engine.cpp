@@ -1,4 +1,4 @@
-#include "simulation/tactics_engine.h"
+﻿#include "simulation/tactics_engine.h"
 
 #include "simulation/match_engine_internal.h"
 #include "utils/utils.h"
@@ -43,11 +43,34 @@ TacticalProfile buildTacticalProfile(const Team& team) {
                                max(0, team.pressingIntensity - 3) * 0.05;
     profile.setPieceThreat = (team.matchInstruction == "Balon parado" ? 0.34 : 0.0) +
                              max(0, team.width - 3) * 0.04;
+
+    if (team.matchInstruction == "Bloque bajo") {
+        profile.defensiveBlock += 0.18;
+        profile.tempo = max(0.20, profile.tempo - 0.08);
+    } else if (team.matchInstruction == "Pausar juego") {
+        profile.tempo = max(0.18, profile.tempo - 0.12);
+    } else if (team.matchInstruction == "Por bandas") {
+        profile.width += 0.08;
+    } else if (team.matchInstruction == "Contra-presion") {
+        profile.pressing += 0.08;
+    }
+
     profile.risk = profile.mentality * 0.33 +
                    profile.pressing * 0.22 +
                    profile.tempo * 0.22 +
                    max(0.0, profile.width - 0.60) * 0.12 +
                    max(0.0, static_cast<double>(team.defensiveLine - 3)) * 0.13;
+    if (team.matchInstruction == "Bloque bajo") profile.risk -= 0.08;
+    if (team.matchInstruction == "Pausar juego") profile.risk -= 0.05;
+
+    profile.pressing = clampValue(profile.pressing, 0.18, 1.05);
+    profile.tempo = clampValue(profile.tempo, 0.18, 1.05);
+    profile.width = clampValue(profile.width, 0.22, 1.05);
+    profile.defensiveBlock = clampValue(profile.defensiveBlock, 0.24, 0.98);
+    profile.directness = clampValue(profile.directness, 0.0, 0.72);
+    profile.transitionThreat = clampValue(profile.transitionThreat, 0.0, 0.82);
+    profile.setPieceThreat = clampValue(profile.setPieceThreat, 0.0, 0.72);
+    profile.risk = clampValue(profile.risk, 0.05, 0.95);
     return profile;
 }
 
@@ -124,3 +147,4 @@ double defensiveSecurityWeight(const TacticalProfile& profile) {
 }
 
 }  // namespace tactics_engine
+

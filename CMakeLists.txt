@@ -12,6 +12,8 @@ set(FM_CAREER_SOURCES
     src/career/analytics_service.cpp
     src/career/app_services.cpp
     src/career/inbox_service.cpp
+    src/career/medical_service.cpp
+    src/career/staff_service.cpp
     src/career/career_runtime.cpp
     src/career/career_reports.cpp
     src/career/career_manager.cpp

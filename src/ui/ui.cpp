@@ -1,6 +1,7 @@
 ﻿#include "ui.h"
 
 #include "ai/team_ai.h"
+#include "career/app_services.h"
 #include "career/match_analysis_store.h"
 #include "career/dressing_room_service.h"
 #include "career/career_reports.h"
@@ -202,6 +203,7 @@ void viewTeam(Team& team) {
                  << ", Fel " << p.happiness << ", Quim " << p.chemistry
                  << ", Lider " << p.leadership << ", Profesionalismo " << p.professionalism
                  << ", Disciplina tactica " << p.tacticalDiscipline
+                 << ", Instr " << p.individualInstruction
                  << ", Plan " << p.developmentPlan << ", Promesa " << p.promisedRole
                  << ", Rasgos " << joinStringValues(p.traits, ", ")
                  << (p.wantsToLeave ? ", Quiere salir" : "")
@@ -382,7 +384,12 @@ void changeTactics(Team& team) {
     cout << "Tacticas cambiadas a " << team.tactics << endl;
 }
 
-void manageLineup(Team& team) {
+void manageLineup(Career& career) {
+    if (!career.myTeam) {
+        cout << "No hay una carrera activa." << endl;
+        return;
+    }
+    Team& team = *career.myTeam;
     if (team.players.empty()) {
         cout << "No hay jugadores disponibles." << endl;
         return;
@@ -442,10 +449,11 @@ void manageLineup(Team& team) {
         cout << "7. Elegir lanzador de tiros libres" << endl;
         cout << "8. Elegir lanzador de corners" << endl;
         cout << "9. Politica de rotacion" << endl;
-        cout << "10. Ver plan actual" << endl;
-        cout << "11. Volver" << endl;
-        int choice = readInt("Elige opcion: ", 1, 11);
-        if (choice == 11) break;
+        cout << "10. Cambiar instruccion individual" << endl;
+        cout << "11. Ver plan actual" << endl;
+        cout << "12. Volver" << endl;
+        int choice = readInt("Elige opcion: ", 1, 12);
+        if (choice == 12) break;
 
         if (choice == 1) {
             team.preferredXI.clear();
@@ -495,11 +503,25 @@ void manageLineup(Team& team) {
             else team.rotationPolicy = "Rotacion";
             cout << "Politica actualizada." << endl;
         } else if (choice == 10) {
+            cout << "Jugadores e instruccion actual:" << endl;
+            for (size_t i = 0; i < team.players.size(); ++i) {
+                cout << i + 1 << ". " << team.players[i].name
+                     << " (" << team.players[i].position << ")"
+                     << " | Instr. " << team.players[i].individualInstruction << endl;
+            }
+            int idx = readInt("Jugador (0 para cancelar): ", 0, static_cast<int>(team.players.size()));
+            if (idx == 0) continue;
+            ServiceResult result = cyclePlayerInstructionService(career, team.players[static_cast<size_t>(idx - 1)].name);
+            for (const auto& message : result.messages) {
+                cout << message << endl;
+            }
+        } else if (choice == 11) {
             auto xi = team.getStartingXIIndices();
             cout << "XI actual:" << endl;
             for (int idx : xi) {
                 if (idx >= 0 && idx < static_cast<int>(team.players.size())) {
-                    cout << "- " << team.players[idx].name << " (" << team.players[idx].position << ")" << endl;
+                    cout << "- " << team.players[idx].name << " (" << team.players[idx].position << ")"
+                         << " | Instr. " << team.players[idx].individualInstruction << endl;
                 }
             }
             auto bench = team.getBenchIndices();
@@ -507,7 +529,8 @@ void manageLineup(Team& team) {
                 cout << "Banca actual:" << endl;
                 for (int idx : bench) {
                     if (idx >= 0 && idx < static_cast<int>(team.players.size())) {
-                        cout << "- " << team.players[idx].name << " (" << team.players[idx].position << ")" << endl;
+                        cout << "- " << team.players[idx].name << " (" << team.players[idx].position << ")"
+                             << " | Instr. " << team.players[idx].individualInstruction << endl;
                     }
                 }
             }
@@ -753,7 +776,7 @@ void displayBoardStatus(Career& career) {
     ui_reports::displayBoardStatus(career);
 }
 
-void displayNewsFeed(const Career& career) {
+void displayNewsFeed(Career& career) {
     ui_reports::displayNewsFeed(career);
 }
 

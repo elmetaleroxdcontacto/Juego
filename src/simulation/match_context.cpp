@@ -56,6 +56,7 @@ TeamMatchSnapshot buildSnapshot(const Team& team,
         int playerAttack = player.attack;
         int playerDefense = player.defense;
         match_internal::applyRoleModifier(player, playerAttack, playerDefense);
+        match_internal::applyIndividualInstructionModifier(player, team, playerAttack, playerDefense);
         match_internal::applyTraitModifier(player, playerAttack, playerDefense);
         match_internal::applyPlayerStateModifier(player, team, playerAttack, playerDefense);
 
@@ -99,6 +100,7 @@ TeamMatchSnapshot buildSnapshot(const Team& team,
 
         const string compactRole = match_internal::compactToken(player.role);
         const string compactDuty = match_internal::compactToken(player.roleDuty);
+        const string compactInstruction = match_internal::compactToken(player.individualInstruction);
         if (compactRole == "poacher" || compactRole == "objetivo") finishingQuality += 5;
         if (compactRole == "organizador" || compactRole == "enganche") chanceCreation += 6;
         if (compactRole == "carrilero") lineBreakThreat += 5;
@@ -114,6 +116,28 @@ TeamMatchSnapshot buildSnapshot(const Team& team,
             pressResistance += 2;
             lineBreakThreat -= 2;
             pressingLoad -= 1;
+        }
+        if (compactInstruction == "arriesgarpase") {
+            chanceCreation += 6;
+            pressResistance -= 2;
+        } else if (compactInstruction == "abrircampo") {
+            lineBreakThreat += 4;
+            setPieceThreat += 2;
+        } else if (compactInstruction == "cerrarpordentro") {
+            defensiveShape += 6;
+            lineBreakThreat -= 2;
+        } else if (compactInstruction == "atacarespalda") {
+            lineBreakThreat += 8;
+            finishingQuality += 4;
+        } else if (compactInstruction == "conservarposicion") {
+            defensiveShape += 4;
+            pressResistance += 3;
+        } else if (compactInstruction == "marcarfuerte") {
+            defensiveShape += 5;
+            pressingLoad += 2;
+        } else if (compactInstruction == "descansomedico") {
+            pressingLoad -= 4;
+            chanceCreation -= 2;
         }
     }
 

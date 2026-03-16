@@ -1,4 +1,4 @@
-#include "io/save_manager.h"
+﻿#include "io/save_manager.h"
 
 #include "io/save_serialization.h"
 #include "utils/utils.h"
@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <fstream>
+#include <utility>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -128,14 +129,30 @@ bool saveCareer(Career& career) {
 }
 
 bool loadCareer(Career& career) {
-    string resolvedSave = career.saveFile;
+    const string requestedSave = career.saveFile;
+    string resolvedSave = requestedSave;
     if (!pathExists(resolvedSave) && resolvedSave == "saves/career_save.txt" && pathExists("career_save.txt")) {
         resolvedSave = "career_save.txt";
     }
 
     ifstream file(resolvedSave, ios::binary);
     if (!file.is_open()) return false;
-    return save_serialization::deserializeCareer(file, career);
+
+    Career loadedCareer;
+    loadedCareer.saveFile = requestedSave;
+    if (!save_serialization::deserializeCareer(file, loadedCareer)) return false;
+
+    const string controlledTeam = loadedCareer.myTeam ? loadedCareer.myTeam->name : "";
+    career = std::move(loadedCareer);
+    career.saveFile = requestedSave;
+    if (career.activeDivision.empty() && !career.allTeams.empty()) {
+        career.activeDivision = career.allTeams.front().division;
+    }
+    if (!career.activeDivision.empty()) {
+        career.setActiveDivision(career.activeDivision);
+    }
+    career.myTeam = controlledTeam.empty() ? nullptr : career.findTeamByName(controlledTeam);
+    return true;
 }
 
 }  // namespace save_manager
@@ -147,3 +164,4 @@ bool Career::saveCareer() {
 bool Career::loadCareer() {
     return save_manager::loadCareer(*this);
 }
+

@@ -43,6 +43,13 @@ struct RawTeamRecord {
     vector<RawPlayerRecord> players;
 };
 
+struct DuplicatePlayerOccurrence {
+    string teamLabel;
+    string position;
+    int age = 0;
+    bool hasAge = false;
+};
+
 struct CachedRosterAudit {
     bool ready = false;
     DataValidationReport report;
@@ -58,8 +65,18 @@ struct IgnoredFolderCache {
     set<string> keys;
 };
 
+struct DuplicateWhitelistCache {
+    bool loaded = false;
+    set<string> names;
+};
+
 static IgnoredFolderCache& ignoredFolderCache() {
     static IgnoredFolderCache cache;
+    return cache;
+}
+
+static DuplicateWhitelistCache& duplicateWhitelistCache() {
+    static DuplicateWhitelistCache cache;
     return cache;
 }
 
@@ -88,6 +105,48 @@ static const set<string>& ignoredTeamFolders() {
 static bool isIgnoredTeamFolder(const string& divisionId, const string& folderName) {
     const string key = toLower(trim(divisionId)) + "|" + normalizeTeamId(folderName);
     return ignoredTeamFolders().find(key) != ignoredTeamFolders().end();
+}
+
+static const set<string>& duplicatePlayerWhitelist() {
+    DuplicateWhitelistCache& cache = duplicateWhitelistCache();
+    if (cache.loaded) return cache.names;
+    cache.loaded = true;
+
+    vector<string> lines;
+    if (!readTextFileLines("data/configs/duplicate_player_whitelist.csv", lines) || lines.size() <= 1) {
+        return cache.names;
+    }
+    for (size_t i = 1; i < lines.size(); ++i) {
+        const string line = trim(lines[i]);
+        if (line.empty()) continue;
+        const vector<string> cols = splitCsvLine(line);
+        if (cols.empty()) continue;
+        const string name = toLower(trim(cols[0]));
+        if (!name.empty()) cache.names.insert(name);
+    }
+    return cache.names;
+}
+
+static bool isWhitelistedDuplicatePlayer(const string& playerName) {
+    const string key = toLower(trim(playerName));
+    return !key.empty() && duplicatePlayerWhitelist().find(key) != duplicatePlayerWhitelist().end();
+}
+
+static bool likelyLegitHomonym(const vector<DuplicatePlayerOccurrence>& occurrences) {
+    if (occurrences.size() < 2) return false;
+    bool ageGap = false;
+    bool roleGap = false;
+    for (size_t i = 0; i < occurrences.size(); ++i) {
+        for (size_t j = i + 1; j < occurrences.size(); ++j) {
+            if (occurrences[i].hasAge && occurrences[j].hasAge && abs(occurrences[i].age - occurrences[j].age) >= 2) {
+                ageGap = true;
+            }
+            const string leftPos = normalizePosition(occurrences[i].position);
+            const string rightPos = normalizePosition(occurrences[j].position);
+            if (leftPos != "N/A" && rightPos != "N/A" && leftPos != rightPos) roleGap = true;
+        }
+    }
+    return ageGap || roleGap;
 }
 
 static bool hasSuspiciousEncoding(const string& text) {
@@ -676,7 +735,7 @@ DataValidationReport buildRosterDataValidationReport() {
     report.errorCount = 0;
     report.warningCount = 0;
 
-    map<string, vector<string> > playerTeams;
+    map<string, vector<DuplicatePlayerOccurrence> > playerTeams;
 
     for (const DivisionInfo& div : kDivisions) {
         if (!isDirectory(div.folder)) continue;
@@ -708,7 +767,8 @@ DataValidationReport buildRosterDataValidationReport() {
 
         set<string> listedIds;
         for (const auto& entry : listedTeams) {
-            listedIds.insert(normalizeTeamId(entry.first.empty() ? entry.second : entry.first));
+            const string listedFolderName = entry.second.empty() ? entry.first : entry.second;
+            listedIds.insert(normalizeTeamId(listedFolderName));
         }
         vector<string> actualDirs = listDirectories(div.folder);
         for (const string& dir : actualDirs) {
@@ -816,7 +876,7 @@ DataValidationReport buildRosterDataValidationReport() {
                                  "El jugador aparece repetido dentro del mismo equipo.",
                                  "Eliminar la fila duplicada o corregir el nombre.");
                 }
-                playerTeams[playerKey].push_back(displayName + " [" + div.id + "]");
+                playerTeams[playerKey].push_back({displayName + " [" + div.id + "]", normalizedPosition, player.age, player.hasAge});
 
                 if (hasSuspiciousEncoding(playerName) || hasSuspiciousEncoding(sourcePosition) || hasSuspiciousEncoding(rawPosition)) {
                     addDataIssue(report,
@@ -932,18 +992,19 @@ DataValidationReport buildRosterDataValidationReport() {
     }
 
     for (const auto& entry : playerTeams) {
-        set<string> uniqueTeams(entry.second.begin(), entry.second.end());
-        if (uniqueTeams.size() > 1) {
-            vector<string> teams(uniqueTeams.begin(), uniqueTeams.end());
-            addDataIssue(report,
-                         "WARNING",
-                         "Jugador duplicado",
-                         "",
-                         "",
-                         entry.first,
-                         "El mismo nombre aparece en varios equipos: " + joinStringValues(teams, ", "),
-                         "Verificar si es el mismo jugador repetido o un caso legitimo de homonimia.");
-        }
+        set<string> uniqueTeams;
+        for (const auto& occurrence : entry.second) uniqueTeams.insert(occurrence.teamLabel);
+        if (uniqueTeams.size() <= 1) continue;
+        if (isWhitelistedDuplicatePlayer(entry.first) || likelyLegitHomonym(entry.second)) continue;
+        vector<string> teams(uniqueTeams.begin(), uniqueTeams.end());
+        addDataIssue(report,
+                     "WARNING",
+                     "Jugador duplicado",
+                     "",
+                     "",
+                     entry.first,
+                     "El mismo nombre aparece en varios equipos: " + joinStringValues(teams, ", "),
+                     "Verificar si es el mismo jugador repetido o un caso legitimo de homonimia.");
     }
 
     vector<string> playerDirs = listDirectories("data/players");

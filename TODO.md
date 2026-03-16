@@ -2478,3 +2478,35 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - `build.bat --validate` -> compila CLI OK
 - `build-cmake\bin\FootballManagerCLI.exe --validate` -> `Resultado: sin fallas`, `0` errores y `85` advertencias activas de datos externos
 - Pendiente real despues de este bloque: limpiar duplicados nominales de jugadores y las pocas carpetas huerfanas activas que todavia quedan fuera del ignore list.
+
+## Cambios recientes (2026-03-16) - Staff real, scouting por asignaciones, centro medico e inbox accionable
+
+- Se agregaron dos modulos nuevos de carrera: `career/staff_service` y `career/medical_service`.
+- `career/staff_service` construye perfiles de staff, detecta el area mas debil del club y entrega un resumen reutilizable para reportes y GUI.
+- `career/medical_service` centraliza el estado medico del plantel, combinando lesion, fatiga acumulada, riesgo de recaida y recomendacion del cuerpo medico.
+- `Player` ahora guarda `individualInstruction` para soportar instrucciones individuales persistentes a nivel tactico.
+- `models.cpp` agrega `defaultInstructionForPosition(...)` para inicializar la instruccion del jugador sin romper el comportamiento base del motor.
+- `match_engine_internal.h`, `match_tactics.cpp` y `match_context.cpp` incorporan esas instrucciones individuales al calculo tactico del partido.
+- Se mantuvo `Libre` como valor por defecto para no alterar el balance previo mientras las nuevas instrucciones se activan desde la experiencia de juego.
+- `Career` ahora persiste `scoutingAssignments`, y `models.h` agrega la estructura `ScoutingAssignment` para representar asignaciones de red de scouting por region, perfil y prioridad.
+- `app_services.h` y `app_services.cpp` suman servicios nuevos para: rotar instruccion individual del jugador, crear asignaciones de scouting, resolver decisiones del inbox y revisar la estructura de staff.
+- `gui_actions.cpp` conecta esos servicios con acciones reales del manager: charla, reunion, decision del inbox, revision de staff y cambio de instruccion individual.
+- `gui_layout.cpp` y `gui_views.cpp` se ajustaron para que la GUI principal muestre mejor el centro del manager, el estado medico, la debilidad de staff y las asignaciones activas.
+- La vista de jugador ahora muestra instruccion individual y una lectura medica resumida.
+- La seccion de lesiones paso a funcionar mas como centro medico del club usando `medical_service`.
+- El feed de alertas y la vista de noticias agregan avisos por asignaciones de scouting y por necesidades del staff tecnico.
+- `week_simulation.cpp` ahora hace progresar semanalmente las asignaciones de scouting y dispara informes completos cuando alcanzan su deadline.
+- `world_state_service.cpp` profundiza el mundo autonomo con renovaciones de fondo, descontento de jugadores por baja moral y cambios de politica de fichajes por estres financiero.
+- `career_reports.cpp` agrega bloques nuevos para asignaciones de scouting, staff tecnico y centro medico en los reportes del club, scouting y directiva.
+- `save_serialization.cpp` sube a `VERSION 12` para guardar `individualInstruction` y `scoutingAssignments` dentro del save.
+- `validators.cpp` agrega heuristicas y una whitelist externa en `data/configs/duplicate_player_whitelist.csv` para distinguir mejor homonimias legitimas de duplicados reales.
+- Esa mejora bajo la auditoria de datos externos de `85` a `52` advertencias activas, manteniendo `0` errores.
+- Se agrego el archivo nuevo `data/configs/duplicate_player_whitelist.csv` para normalizar excepciones conocidas sin ocultar problemas reales.
+- `tests/project_tests.cpp` suma cobertura nueva para `player_instruction_service`, `inbox_medical_decision`, `staff_review` y `scouting_assignments`.
+- `save_load_roundtrip` tambien fue ampliado para verificar la persistencia de instrucciones individuales y asignaciones de scouting.
+- Verificacion ejecutada:
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `build-cmake\\bin\\FootballManagerTests.exe` -> todo OK
+- `build-cmake\\bin\\FootballManagerCLI.exe --validate` -> `Resultado: sin fallas`, `0` errores y `52` advertencias activas
+- Resultado practico de este bloque: el juego principal ya incorpora una capa mas FM-like de staff, decisiones del manager, scouting por red, centro medico y lectura contextual del club, y al mismo tiempo la base externa quedo mas limpia.
+- Pendiente real despues de este bloque: limpiar los ultimos duplicados nominales activos y decidir si algunas carpetas huerfanas restantes deben volver a `teams.txt` o archivarse definitivamente.

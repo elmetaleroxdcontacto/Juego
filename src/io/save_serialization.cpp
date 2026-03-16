@@ -9,7 +9,7 @@ using namespace std;
 
 namespace {
 
-static constexpr int kCareerSaveVersion = 11;
+static constexpr int kCareerSaveVersion = 12;
 
 string escapeSaveField(const string& value) {
     string out;
@@ -347,6 +347,38 @@ vector<HistoricalRecord> decodeHistoricalRecords(const string& encoded) {
     return records;
 }
 
+string encodeScoutingAssignments(const vector<ScoutingAssignment>& assignments) {
+    vector<string> encodedEntries;
+    encodedEntries.reserve(assignments.size());
+    for (const auto& assignment : assignments) {
+        encodedEntries.push_back(joinEscapedFields({
+            assignment.region,
+            assignment.focusPosition,
+            assignment.priority,
+            to_string(assignment.weeksRemaining),
+            to_string(assignment.knowledgeLevel)
+        }, '^'));
+    }
+    return joinEscapedFields(encodedEntries, '~');
+}
+
+vector<ScoutingAssignment> decodeScoutingAssignments(const string& encoded) {
+    vector<ScoutingAssignment> assignments;
+    if (encoded.empty()) return assignments;
+    for (const string& token : splitEscapedFields(encoded, '~')) {
+        auto parts = splitEscapedFields(token, '^');
+        if (parts.size() < 5) continue;
+        ScoutingAssignment assignment;
+        assignment.region = parts[0];
+        assignment.focusPosition = parts[1];
+        assignment.priority = parts[2];
+        assignment.weeksRemaining = parseIntField(parts[3]);
+        assignment.knowledgeLevel = parseIntField(parts[4]);
+        assignments.push_back(assignment);
+    }
+    return assignments;
+}
+
 string encodePlayerFields(const Player& player) {
     return joinEscapedFields({
         player.name,
@@ -380,6 +412,7 @@ string encodePlayerFields(const Player& player) {
         to_string(player.matchesSuspended),
         player.role,
         player.roleDuty,
+        player.individualInstruction,
         to_string(player.setPieceSkill),
         to_string(player.leadership),
         to_string(player.professionalism),
@@ -454,8 +487,10 @@ Player decodePlayerFields(const vector<string>& fields) {
     if (idx < fields.size()) player.seasonYellowCards = parseIntField(fields[idx++]); else player.seasonYellowCards = 0;
     if (idx < fields.size()) player.seasonRedCards = parseIntField(fields[idx++]); else player.seasonRedCards = 0;
     if (idx < fields.size()) player.matchesSuspended = parseIntField(fields[idx++]); else player.matchesSuspended = 0;
+    const bool hasIndividualInstruction = fields.size() >= 56;
     if (idx < fields.size()) player.role = fields[idx++]; else player.role = defaultRoleForPosition(player.position);
     if (idx < fields.size()) player.roleDuty = fields[idx++]; else player.roleDuty = defaultDutyForRole(player.role, player.position);
+    if (hasIndividualInstruction && idx < fields.size()) player.individualInstruction = fields[idx++]; else player.individualInstruction = defaultInstructionForPosition(player.position);
     if (idx < fields.size()) player.setPieceSkill = parseIntField(fields[idx++], clampInt(player.skill + randInt(-6, 6), 25, 99));
     else player.setPieceSkill = clampInt(player.skill + randInt(-6, 6), 25, 99);
     if (idx < fields.size()) player.leadership = parseIntField(fields[idx++], clampInt(35 + randInt(0, 45), 1, 99));
@@ -519,6 +554,7 @@ bool serializeCareer(ostream& file, const Career& career) {
     const vector<string>& managerInbox = career.managerInbox;
     const vector<string>& scoutInbox = career.scoutInbox;
     const vector<string>& scoutingShortlist = career.scoutingShortlist;
+    const vector<ScoutingAssignment>& scoutingAssignments = career.scoutingAssignments;
     const vector<SeasonHistoryEntry>& history = career.history;
     const vector<SquadPromise>& activePromises = career.activePromises;
     const vector<HistoricalRecord>& historicalRecords = career.historicalRecords;
@@ -558,6 +594,7 @@ bool serializeCareer(ostream& file, const Career& career) {
     file << "INBOX " << encodeStringList(managerInbox) << "\n";
     file << "SCOUT " << encodeStringList(scoutInbox) << "\n";
     file << "SHORTLIST " << encodeStringList(scoutingShortlist) << "\n";
+    file << "ASSIGNMENTS " << encodeScoutingAssignments(scoutingAssignments) << "\n";
     file << "HISTORY " << encodeHistory(history) << "\n";
     file << "PROMISES " << encodePromises(activePromises) << "\n";
     file << "RECORDS " << encodeHistoricalRecords(historicalRecords) << "\n";
@@ -677,6 +714,7 @@ bool deserializeCareer(istream& file, Career& career) {
     auto& managerInbox = career.managerInbox;
     auto& scoutInbox = career.scoutInbox;
     auto& scoutingShortlist = career.scoutingShortlist;
+    auto& scoutingAssignments = career.scoutingAssignments;
     auto& history = career.history;
     auto& activePromises = career.activePromises;
     auto& historicalRecords = career.historicalRecords;
@@ -784,6 +822,11 @@ bool deserializeCareer(istream& file, Career& career) {
         scoutingShortlist.clear();
         if (teamsLine.rfind("SHORTLIST ", 0) == 0) {
             scoutingShortlist = decodeStringList(teamsLine.substr(10));
+            if (!getline(file, teamsLine)) return false;
+        }
+        scoutingAssignments.clear();
+        if (teamsLine.rfind("ASSIGNMENTS ", 0) == 0) {
+            scoutingAssignments = decodeScoutingAssignments(teamsLine.substr(12));
             if (!getline(file, teamsLine)) return false;
         }
         history.clear();

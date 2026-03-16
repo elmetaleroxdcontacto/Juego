@@ -5,6 +5,8 @@
 #include "career/career_reports.h"
 #include "career/inbox_service.h"
 #include "career/dressing_room_service.h"
+#include "career/medical_service.h"
+#include "career/staff_service.h"
 #include "career/match_analysis_store.h"
 #include "career/match_center_service.h"
 #include "career/career_support.h"
@@ -774,6 +776,7 @@ void testSaveLoadRoundTripPreservesCareerState() {
     original.lastMatchCenter.phaseSummaries = {"1-15: domina | Club Persistencia", "16-30: domina ^ Club Persistencia"};
     original.newsFeed.push_back("T8-F5: Noticia| de prueba;");
     original.managerInbox.push_back("[Resumen] T8-F5: Bandeja| de manager");
+    original.scoutingAssignments.push_back({"Sur", "DEF", "Urgente", 2, 61});
     original.scoutInbox.push_back("Informe^ de ojeo");
     original.scoutingShortlist.push_back("Promesa| del norte; central");
     original.history.push_back({7, "primera division", "Club Persistencia", 2, "Club Persistencia", "Ascenso| Norte", "Descenso; Sur", "Nota ^ historica"});
@@ -792,6 +795,7 @@ void testSaveLoadRoundTripPreservesCareerState() {
     original.myTeam->players[0].promisedPosition = "DEF";
     original.myTeam->players[0].socialGroup = "Lideres";
     original.myTeam->players[0].roleDuty = "Ataque";
+    original.myTeam->players[0].individualInstruction = "Marcar fuerte";
     original.myTeam->headCoachName = "DT Persistente";
     original.myTeam->headCoachStyle = "Presion";
     original.myTeam->headCoachTenureWeeks = 28;
@@ -842,8 +846,9 @@ void testSaveLoadRoundTripPreservesCareerState() {
     expect(loaded.myTeam->players[0].moraleMomentum == 7 &&
                loaded.myTeam->players[0].fatigueLoad == 31 &&
                loaded.myTeam->players[0].promisedPosition == "DEF" &&
-               loaded.myTeam->players[0].roleDuty == "Ataque",
-           "La carga debe preservar momento, carga, duty y promesa de posicion del jugador.");
+               loaded.myTeam->players[0].roleDuty == "Ataque" &&
+               loaded.myTeam->players[0].individualInstruction == "Marcar fuerte",
+           "La carga debe preservar momento, carga, duty, instruccion y promesa de posicion del jugador.");
     expect(loaded.myTeam->headCoachName == "DT Persistente" &&
                loaded.myTeam->transferPolicy == "Cantera y valor futuro" &&
                loaded.myTeam->scoutingRegions.size() == 3 &&
@@ -854,6 +859,8 @@ void testSaveLoadRoundTripPreservesCareerState() {
            "La carga debe preservar el staff con nombre propio.");
     expect(!loaded.pendingTransfers.empty() && loaded.pendingTransfers.front().toTeam == "Club Destino",
            "La carga debe preservar fichajes pendientes.");
+    expect(!loaded.scoutingAssignments.empty() && loaded.scoutingAssignments.front().region == "Sur",
+           "La carga debe preservar asignaciones activas de scouting.");
 
     std::remove(savePath.c_str());
 }
@@ -1031,6 +1038,84 @@ void testTeamMeetingImprovesMorale() {
            "La reunion debe mejorar el estado del jugador mas afectado.");
 }
 
+void testPlayerInstructionServiceCyclesInstruction() {
+    Career career;
+    career.currentSeason = 1;
+    career.currentWeek = 2;
+    career.allTeams.push_back(makeTeam("Instruccion FC", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
+    career.allTeams.push_back(makeTeam("Rival A", "primera division", 66, 2, 2, "Defensive", "Bloque bajo", 620000));
+    career.allTeams.push_back(makeTeam("Rival B", "primera division", 66, 2, 2, "Defensive", "Pausar juego", 610000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Instruccion FC");
+    expect(career.myTeam != nullptr, "La prueba de instrucciones necesita club usuario.");
+
+    Player& player = career.myTeam->players[8];
+    const string before = player.individualInstruction;
+    const ServiceResult result = cyclePlayerInstructionService(career, player.name);
+    expect(result.ok, "La instruccion individual debe poder ciclarse desde servicio.");
+    expect(player.individualInstruction != before, "La instruccion individual debe cambiar al menos un paso.");
+}
+
+void testInboxDecisionPrioritizesRecovery() {
+    Career career;
+    career.currentSeason = 1;
+    career.currentWeek = 4;
+    career.allTeams.push_back(makeTeam("Inbox Medico", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
+    career.allTeams.push_back(makeTeam("Rival A", "primera division", 66, 2, 2, "Defensive", "Bloque bajo", 620000));
+    career.allTeams.push_back(makeTeam("Rival B", "primera division", 66, 2, 2, "Defensive", "Pausar juego", 610000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Inbox Medico");
+    expect(career.myTeam != nullptr, "La prueba de inbox medico necesita club usuario.");
+
+    Player& player = career.myTeam->players[0];
+    player.fitness = 48;
+    player.fatigueLoad = 78;
+    career.addInboxItem("Lesion y fatiga acumulada en el lateral titular.", "Medical");
+
+    const ServiceResult result = resolveInboxDecisionService(career);
+    expect(result.ok, "El inbox debe poder disparar una decision medica automatizada.");
+    expect(career.myTeam->trainingFocus == "Recuperacion", "La decision medica debe orientar la semana a recuperacion.");
+    expect(player.individualInstruction == "Descanso medico", "El jugador en riesgo debe recibir proteccion individual.");
+}
+
+void testStaffReviewImprovesWeakestArea() {
+    Career career;
+    career.currentSeason = 1;
+    career.currentWeek = 3;
+    career.allTeams.push_back(makeTeam("Staff Review", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 1200000));
+    career.allTeams.push_back(makeTeam("Rival A", "primera division", 66, 2, 2, "Defensive", "Bloque bajo", 620000));
+    career.allTeams.push_back(makeTeam("Rival B", "primera division", 66, 2, 2, "Defensive", "Pausar juego", 610000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Staff Review");
+    expect(career.myTeam != nullptr, "La prueba de staff necesita club usuario.");
+
+    career.myTeam->medicalTeam = 42;
+    career.myTeam->medicalChiefName.clear();
+    const ServiceResult result = reviewStaffStructureService(career);
+    expect(result.ok, "La revision de staff debe poder reforzar el area mas debil.");
+    expect(career.myTeam->medicalTeam > 42, "La revision de staff debe subir el nivel del area mas debil.");
+}
+
+void testScoutingAssignmentShowsInReport() {
+    Career career;
+    career.currentSeason = 1;
+    career.currentWeek = 2;
+    career.allTeams.push_back(makeTeam("Asignacion Scout", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
+    career.allTeams.push_back(makeTeam("Rival A", "primera division", 68, 3, 3, "Balanced", "Equilibrado", 620000));
+    career.allTeams.push_back(makeTeam("Rival B", "primera division", 67, 3, 3, "Balanced", "Equilibrado", 610000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Asignacion Scout");
+    expect(career.myTeam != nullptr, "La prueba de asignacion necesita club usuario.");
+
+    const ServiceResult result = createScoutingAssignmentService(career, "Sur", "DEF", 3);
+    expect(result.ok, "La asignacion de scouting debe crearse correctamente.");
+    expect(career.scoutingAssignments.size() == 1, "La carrera debe conservar la asignacion activa.");
+    const CareerReport report = buildScoutingReport(career);
+    const string dump = formatCareerReport(report);
+    expect(dump.find("Sur") != string::npos && dump.find("DEF") != string::npos,
+           "El informe de scouting debe mostrar las asignaciones activas.");
+}
+
 void testNegotiationTracksAgentCosts() {
     Career career;
     Team team = makeTeam("Club Grande", "primera division", 74, 4, 4, "Pressing", "Contra-presion", 1500000);
@@ -1161,6 +1246,17 @@ void testIgnoredArchivedFoldersConfigSuppressesKnownWarnings() {
            "Las carpetas historicas ignoradas no deben seguir apareciendo como advertencias activas.");
 }
 
+void testTeamsTxtFolderAliasesDoNotTriggerOrphanWarnings() {
+    const DataValidationReport report = buildRosterDataValidationReport();
+    const string issueDump = joinLines(report.lines);
+    expect(issueDump.find("Integridad liga | tercera division a | Futuro |") == string::npos,
+           "Las entradas Display|Folder de teams.txt no deben marcar carpetas activas como huerfanas.");
+    expect(issueDump.find("Integridad liga | tercera division b | Audax Paipote |") == string::npos,
+           "Las entradas con alias de carpeta en teams.txt deben reconocerse en la auditoria.");
+    expect(issueDump.find("Integridad liga | tercera division b | Rep?blica Ind. de Hualqui |") == string::npos,
+           "Los nombres de carpeta configurados explicitamente en teams.txt deben evitar falsos positivos de integridad.");
+}
+
 void testSaveCareerCreatesBackup() {
     const string savePath = "saves/test_backup_save.txt";
     Career career;
@@ -1212,6 +1308,10 @@ int main() {
         {"season_promise_carryover", testSeasonTransitionResolvesCarryoverPromises},
         {"training_microcycle", testWeeklyTrainingScheduleAdaptsToCongestion},
         {"team_meeting", testTeamMeetingImprovesMorale},
+        {"player_instruction_service", testPlayerInstructionServiceCyclesInstruction},
+        {"inbox_medical_decision", testInboxDecisionPrioritizesRecovery},
+        {"staff_review", testStaffReviewImprovesWeakestArea},
+        {"scouting_assignments", testScoutingAssignmentShowsInReport},
         {"role_duty_snapshot", testRoleDutyShapesMatchSnapshot},
         {"club_world_metadata", testTeamIdentitySeedsWorldMetadata},
         {"manager_inbox", testManagerInboxTracksNewsAndScouting},
@@ -1219,6 +1319,7 @@ int main() {
         {"league_registry_data", testLeagueRegistryLoadsConfiguredData},
         {"analytics_inbox_blocks", testAnalyticsAndInboxServicesProduceUsefulBlocks},
         {"ignored_archived_folders", testIgnoredArchivedFoldersConfigSuppressesKnownWarnings},
+        {"teams_txt_folder_aliases", testTeamsTxtFolderAliasesDoNotTriggerOrphanWarnings},
         {"negotiation_agent_costs", testNegotiationTracksAgentCosts},
         {"save_backup", testSaveCareerCreatesBackup},
         {"simulate_match_state", testSimulateMatchAppliesPostProcessState},

@@ -5,6 +5,8 @@
 #include "ai/ai_squad_planner.h"
 #include "career/analytics_service.h"
 #include "career/inbox_service.h"
+#include "career/medical_service.h"
+#include "career/staff_service.h"
 #include "ai/ai_transfer_manager.h"
 #include "career/dressing_room_service.h"
 #include "career/match_analysis_store.h"
@@ -277,6 +279,17 @@ std::vector<std::string> buildAlertLines(const Career& career) {
     if (dressing.promiseRiskCount > 0) {
         alerts.push_back("[Promesas] " + std::to_string(dressing.promiseRiskCount) + " promesa(s) bajo presion");
     }
+    if (!career.scoutingAssignments.empty()) {
+        const auto& assignment = career.scoutingAssignments.front();
+        alerts.push_back("[Scouting] Seguimiento activo en " + assignment.region + " para " + assignment.focusPosition);
+    }
+    const auto staffProfiles = staff_service::buildStaffProfiles(*career.myTeam);
+    auto weakestStaff = std::min_element(staffProfiles.begin(), staffProfiles.end(), [](const staff_service::StaffProfile& left, const staff_service::StaffProfile& right) {
+        return left.rating < right.rating;
+    });
+    if (weakestStaff != staffProfiles.end() && weakestStaff->rating <= 54) {
+        alerts.push_back("[Staff] Area debil: " + weakestStaff->role + " (" + std::to_string(weakestStaff->rating) + ")");
+    }
     if (alerts.empty()) {
         alerts.push_back("[Estado] No hay alertas criticas esta semana");
     }
@@ -435,6 +448,7 @@ std::string buildPlayerProfile(const Team& team, const Player* player) {
         << " | Media " << player->skill
         << " | Potencial " << player->potential << "\r\n";
     out << "Rol " << player->role << " (" << player->roleDuty << ")"
+        << " | Instr. " << player->individualInstruction
         << " | Promesa " << player->promisedRole
         << " | Posicion prometida " << player->promisedPosition
         << " | Pie " << player->preferredFoot << "\r\n\r\n";
@@ -475,7 +489,21 @@ std::string buildPlayerProfile(const Team& team, const Player* player) {
     out << "Lesiones previas " << player->injuryHistory
         << " | Amarillas " << player->seasonYellowCards
         << " | Rojas " << player->seasonRedCards << "\r\n";
-    out << "Aporte relativo: " << expectedRoleLabel(team, *player);
+    const auto medicalStatuses = medical_service::buildMedicalStatuses(team);
+    auto medical = std::find_if(medicalStatuses.begin(), medicalStatuses.end(), [&](const medical_service::MedicalStatus& status) {
+        return status.playerName == player->name;
+    });
+    out << "Aporte relativo: " << expectedRoleLabel(team, *player) << "\r\n";
+    out << "Centro medico\r\n";
+    if (medical != medicalStatuses.end()) {
+        out << medical->diagnosis
+            << " | carga " << medical->workloadRisk
+            << " | recaida " << medical->relapseRisk
+            << " | " << medical->recommendation;
+        if (medical->weeksOut > 0) out << " | baja " << medical->weeksOut << " sem";
+    } else {
+        out << "Sin alertas medicas relevantes";
+    }
     return out.str();
 }
 
@@ -551,20 +579,19 @@ ListPanelModel buildLeagueTableModel(const Career& career, const std::string& fi
 ListPanelModel buildInjuryModel(const Career& career) {
     ListPanelModel model;
     model.title = "InjuryListWidget";
-    model.columns = {{L"Jugador", 220}, {L"Tipo", 120}, {L"Sem", 50}, {L"Fisico", 60}, {L"Nota", 160}};
+    model.columns = {{L"Jugador", 220}, {L"Tipo", 120}, {L"Sem", 50}, {L"Riesgo", 60}, {L"Nota", 220}};
     if (!career.myTeam) return model;
-    for (const auto& player : career.myTeam->players) {
-        if (!player.injured && player.fitness >= 65) continue;
+    for (const auto& status : medical_service::buildMedicalStatuses(*career.myTeam)) {
         model.rows.push_back({
-            player.name,
-            player.injured ? player.injuryType : "Fatiga",
-            player.injured ? std::to_string(player.injuryWeeks) : "-",
-            std::to_string(player.fitness),
-            player.injured ? "No disponible" : "Reducir cargas"
+            status.playerName,
+            status.diagnosis,
+            status.weeksOut > 0 ? std::to_string(status.weeksOut) : "-",
+            std::to_string(status.relapseRisk),
+            status.recommendation
         });
     }
     if (model.rows.empty()) {
-        model.rows.push_back({"No hay lesiones actualmente", "-", "-", "-", "Plantilla completa y disponible"});
+        model.rows.push_back({"No hay alertas medicas", "-", "-", "-", "Plantilla completa y disponible"});
     }
     return model;
 }
@@ -1337,6 +1364,7 @@ GuiPageModel buildNewsModel(AppState& state) {
     model.summary.content = "Entradas visibles: " + std::to_string(model.feed.lines.size()) +
                             "\r\nInbox manager: " + std::to_string(state.career.managerInbox.size()) +
                             "\r\nScouting: " + std::to_string(state.career.scoutInbox.size()) +
+                            "\r\nAsignaciones: " + std::to_string(state.career.scoutingAssignments.size()) +
                             "\r\nFiltro actual: " + state.currentFilter;
     model.detail.content = inbox_service::buildInboxDigest(state.career, 8) + "\r\n" +
                            lastMatchPanelText(state.career, 5, 8) + "\r\n" + dressingRoomPanelText(state.career, 4);
@@ -1463,7 +1491,17 @@ void refreshCurrentPage(AppState& state) {
         std::string actionLabel = "Instruccion";
         if (state.currentPage == GuiPage::Dashboard) actionLabel = "Reunion";
         else if (state.currentPage == GuiPage::Squad || state.currentPage == GuiPage::Youth) actionLabel = "Hablar";
+        else if (state.currentPage == GuiPage::Board) actionLabel = "Staff";
+        else if (state.currentPage == GuiPage::News) actionLabel = "Decidir";
         setWindowTextUtf8(state.instructionButton, actionLabel);
+    }
+    if (state.planButton) {
+        std::string planLabel = "Plan";
+        if (state.currentPage == GuiPage::Squad) planLabel = "Instrucc.";
+        setWindowTextUtf8(state.planButton, planLabel);
+    }
+    if (state.scoutActionButton) {
+        setWindowTextUtf8(state.scoutActionButton, state.currentPage == GuiPage::News ? "Asignar" : "Otear");
     }
 
     renderListPanel(state.tableLabel, state.tableList, state.currentModel.primary);

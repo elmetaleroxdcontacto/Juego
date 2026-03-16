@@ -58,6 +58,7 @@ struct Player {
     int lastTrainedWeek;
     std::string role;
     std::string roleDuty;
+    std::string individualInstruction;
     std::string developmentPlan;
     std::string promisedRole;
     std::string promisedPosition;
@@ -93,6 +94,14 @@ struct PendingTransfer {
     bool preContract;
     bool loan;
     std::string promisedRole;
+};
+
+struct ScoutingAssignment {
+    std::string region;
+    std::string focusPosition;
+    std::string priority;
+    int weeksRemaining = 0;
+    int knowledgeLevel = 0;
 };
 
 struct SquadPromise {
@@ -147,6 +156,7 @@ void applyPositionStats(Player& p);
 std::string defaultRoleForPosition(const std::string& position);
 std::string defaultDutyForPosition(const std::string& position);
 std::string defaultDutyForRole(const std::string& role, const std::string& position);
+std::string defaultInstructionForPosition(const std::string& position);
 std::string defaultDevelopmentPlanForPosition(const std::string& position);
 void ensurePlayerProfile(Player& p, bool regenerateTraits = false);
 std::vector<std::string> generatePlayerTraits(const Player& p, bool youth = false);
@@ -296,6 +306,7 @@ struct Career {
     std::vector<std::string> managerInbox;
     std::vector<std::string> scoutInbox;
     std::vector<std::string> scoutingShortlist;
+    std::vector<ScoutingAssignment> scoutingAssignments;
     std::vector<SeasonHistoryEntry> history;
     std::vector<SquadPromise> activePromises;
     std::vector<HistoricalRecord> historicalRecords;

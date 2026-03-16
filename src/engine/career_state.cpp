@@ -260,6 +260,7 @@ void Career::setActiveDivision(const string& id) {
 
 void Career::resetSeason() {
     activePromises.clear();
+    scoutingAssignments.clear();
     for (auto& team : allTeams) {
         team.resetSeasonStats();
         team.morale = 50;

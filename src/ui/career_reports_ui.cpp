@@ -3,10 +3,12 @@
 #include "career/app_services.h"
 #include "career/career_reports.h"
 #include "career/career_support.h"
+#include "career/inbox_service.h"
 #include "utils/utils.h"
 
 #include <algorithm>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -20,6 +22,21 @@ void printMessages(const ServiceResult& result) {
 
 void printReport(const CareerReport& report) {
     cout << "\n" << formatCareerReport(report);
+}
+
+void printActiveScoutingAssignments(const Career& career) {
+    if (career.scoutingAssignments.empty()) {
+        cout << "No hay asignaciones activas." << endl;
+        return;
+    }
+    cout << "Asignaciones activas:" << endl;
+    for (const auto& assignment : career.scoutingAssignments) {
+        cout << "- " << assignment.region
+             << " | foco " << assignment.focusPosition
+             << " | prioridad " << assignment.priority
+             << " | conocimiento " << assignment.knowledgeLevel << "%"
+             << " | resta " << assignment.weeksRemaining << " sem" << endl;
+    }
 }
 
 }  // namespace
@@ -58,16 +75,56 @@ void displayBoardStatus(Career& career) {
     printMessages(result);
 }
 
-void displayNewsFeed(const Career& career) {
-    cout << "\n=== Noticias ===" << endl;
+void displayNewsFeed(Career& career) {
+    cout << "\n=== Centro del Manager ===" << endl;
+
+    const auto inboxEntries = inbox_service::buildCombinedInbox(career, 10);
+    if (inboxEntries.empty()) {
+        cout << "Inbox sin decisiones urgentes." << endl;
+    } else {
+        cout << "Inbox activo:" << endl;
+        for (const auto& entry : inboxEntries) {
+            cout << "- [" << entry.channel << "] " << entry.text << endl;
+        }
+    }
+
+    cout << "\nNoticias recientes:" << endl;
     if (career.newsFeed.empty()) {
-        cout << "No hay novedades registradas." << endl;
+        cout << "- No hay novedades registradas." << endl;
+    } else {
+        int start = max(0, static_cast<int>(career.newsFeed.size()) - 10);
+        for (size_t i = static_cast<size_t>(start); i < career.newsFeed.size(); ++i) {
+            cout << "- " << career.newsFeed[i] << endl;
+        }
+    }
+
+    cout << "\n";
+    printActiveScoutingAssignments(career);
+
+    cout << "\n1. Resolver decision prioritaria" << endl;
+    cout << "2. Crear asignacion de scouting" << endl;
+    cout << "3. Volver" << endl;
+    int action = readInt("Elige opcion: ", 1, 3);
+    if (action == 3) return;
+
+    if (action == 1) {
+        printMessages(resolveInboxDecisionService(career));
         return;
     }
-    int start = max(0, static_cast<int>(career.newsFeed.size()) - 15);
-    for (size_t i = static_cast<size_t>(start); i < career.newsFeed.size(); ++i) {
-        cout << "- " << career.newsFeed[i] << endl;
+
+    vector<string> regions = {"Metropolitana", "Norte", "Centro", "Sur", "Patagonia", "Todas"};
+    cout << "Regiones:" << endl;
+    for (size_t i = 0; i < regions.size(); ++i) {
+        cout << i + 1 << ". " << regions[i] << endl;
     }
+    int regionChoice = readInt("Elegir region: ", 1, static_cast<int>(regions.size()));
+    string focusPos = normalizePosition(readLine("Foco de posicion (ARQ/DEF/MED/DEL o Enter para necesidad): "));
+    if (focusPos == "N/A") focusPos.clear();
+    int durationWeeks = readInt("Duracion de seguimiento (2-6 semanas): ", 2, 6);
+    printMessages(createScoutingAssignmentService(career,
+                                                  regions[static_cast<size_t>(regionChoice - 1)],
+                                                  focusPos,
+                                                  durationWeeks));
 }
 
 void displaySeasonHistory(const Career& career) {
@@ -100,10 +157,11 @@ void displayClubOperations(Career& career) {
     cout << "8. Mejorar cuerpo medico" << endl;
     cout << "9. Contratar entrenador de arqueros" << endl;
     cout << "10. Contratar analista de rendimiento" << endl;
-    cout << "11. Cambiar region juvenil" << endl;
-    cout << "12. Volver" << endl;
-    int choice = readInt("Elige opcion: ", 1, 12);
-    if (choice == 12) return;
+    cout << "11. Revisar estructura de staff" << endl;
+    cout << "12. Cambiar region juvenil" << endl;
+    cout << "13. Volver" << endl;
+    int choice = readInt("Elige opcion: ", 1, 13);
+    if (choice == 13) return;
 
     ServiceResult result;
     switch (choice) {
@@ -117,7 +175,8 @@ void displayClubOperations(Career& career) {
         case 8: result = upgradeClubService(career, ClubUpgrade::Medical); break;
         case 9: result = upgradeClubService(career, ClubUpgrade::GoalkeepingCoach); break;
         case 10: result = upgradeClubService(career, ClubUpgrade::PerformanceAnalyst); break;
-        case 11: {
+        case 11: result = reviewStaffStructureService(career); break;
+        case 12: {
             vector<string> regions = listYouthRegionsService();
             for (size_t i = 0; i < regions.size(); ++i) {
                 cout << i + 1 << ". " << regions[i] << endl;

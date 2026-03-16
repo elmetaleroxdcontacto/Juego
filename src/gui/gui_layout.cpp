@@ -157,7 +157,7 @@ void showActionButtonsForPage(AppState& state) {
         std::vector<GuiPage> pages;
     };
     const std::vector<Mapping> mappings = {
-        {state.scoutActionButton, {GuiPage::Transfers, GuiPage::Dashboard, GuiPage::Youth}},
+        {state.scoutActionButton, {GuiPage::Transfers, GuiPage::Dashboard, GuiPage::Youth, GuiPage::News}},
         {state.shortlistButton, {GuiPage::Transfers}},
         {state.followShortlistButton, {GuiPage::Transfers, GuiPage::News}},
         {state.buyButton, {GuiPage::Transfers}},
@@ -165,7 +165,7 @@ void showActionButtonsForPage(AppState& state) {
         {state.renewButton, {GuiPage::Squad, GuiPage::Finances}},
         {state.sellButton, {GuiPage::Squad, GuiPage::Transfers}},
         {state.planButton, {GuiPage::Squad, GuiPage::Youth}},
-        {state.instructionButton, {GuiPage::Tactics, GuiPage::Dashboard, GuiPage::Squad, GuiPage::Youth}},
+        {state.instructionButton, {GuiPage::Tactics, GuiPage::Dashboard, GuiPage::Squad, GuiPage::Youth, GuiPage::Board, GuiPage::News}},
         {state.youthUpgradeButton, {GuiPage::Youth, GuiPage::Finances, GuiPage::Board}},
         {state.trainingUpgradeButton, {GuiPage::Tactics, GuiPage::Finances, GuiPage::Board}},
         {state.scoutingUpgradeButton, {GuiPage::Transfers, GuiPage::Finances, GuiPage::Board}},

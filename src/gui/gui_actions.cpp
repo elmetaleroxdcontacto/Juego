@@ -180,7 +180,9 @@ void validateSystem(AppState& state) {
 }
 
 void runScoutingAction(AppState& state) {
-    ServiceResult result = scoutPlayersService(state.career, "Todas", "");
+    ServiceResult result = state.currentPage == GuiPage::News
+        ? createScoutingAssignmentService(state.career, "", "", 3)
+        : scoutPlayersService(state.career, "Todas", "");
     finalizeAction(state, result, "Scouting", true);
 }
 
@@ -236,8 +238,10 @@ void runPlanAction(AppState& state) {
         MessageBoxW(state.window, L"Selecciona un jugador.", L"Plan individual", MB_OK | MB_ICONINFORMATION);
         return;
     }
-    ServiceResult result = cyclePlayerDevelopmentPlanService(state.career, listViewText(state.squadList, row, 0));
-    finalizeAction(state, result, "Plan individual");
+    ServiceResult result = state.currentPage == GuiPage::Squad
+        ? cyclePlayerInstructionService(state.career, listViewText(state.squadList, row, 0))
+        : cyclePlayerDevelopmentPlanService(state.career, listViewText(state.squadList, row, 0));
+    finalizeAction(state, result, state.currentPage == GuiPage::Squad ? "Instruccion individual" : "Plan individual");
 }
 
 void runInstructionAction(AppState& state) {

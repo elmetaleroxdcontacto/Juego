@@ -6,8 +6,11 @@
 #include "utils.h"
 #include "validators.h"
 
+#include <clocale>
+#include <functional>
 #include <iostream>
 #include <limits>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -15,9 +18,81 @@
 
 using namespace std;
 
+namespace {
+
+size_t warningSignature(const vector<string>& warnings) {
+    size_t seed = warnings.size();
+    hash<string> hasher;
+    for (const auto& warning : warnings) {
+        seed ^= hasher(warning) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+    return seed;
+}
+
+bool startsWith(const string& value, const string& prefix) {
+    return value.rfind(prefix, 0) == 0;
+}
+
+void configureConsoleEncoding() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
+    setlocale(LC_ALL, ".UTF-8");
+}
+
+}  // namespace
+
 void GameController::showLoadWarnings() const {
-    for (const auto& warning : engine_.career().loadWarnings) {
-        cout << "[AVISO] " << warning << endl;
+    const auto& warnings = engine_.career().loadWarnings;
+    if (warnings.empty()) return;
+
+    const size_t signature = warningSignature(warnings);
+    if (signature == lastLoadWarningSignature_) return;
+    lastLoadWarningSignature_ = signature;
+
+    string summary;
+    string reportLine;
+    string okLine;
+    vector<string> highlighted;
+    size_t warningLines = 0;
+    for (const auto& warning : warnings) {
+        if (summary.empty() && startsWith(warning, "Errores:")) {
+            summary = warning;
+            continue;
+        }
+        if (startsWith(warning, "[WARNING]")) {
+            warningLines++;
+            if (highlighted.size() < 3) highlighted.push_back(warning);
+            continue;
+        }
+        if (reportLine.empty() && warning.find("Reporte completo disponible") != string::npos) {
+            reportLine = warning;
+            continue;
+        }
+        if (okLine.empty() && startsWith(warning, "[OK]")) {
+            okLine = warning;
+        }
+    }
+
+    if (!summary.empty()) {
+        cout << "[AVISO] " << summary << endl;
+    }
+    if (!highlighted.empty()) {
+        cout << "[AVISO] Incidencias destacadas:" << endl;
+        for (const auto& line : highlighted) {
+            cout << "[AVISO] - " << line << endl;
+        }
+        if (warningLines > highlighted.size()) {
+            cout << "[AVISO] ... y " << (warningLines - highlighted.size())
+                 << " advertencia(s) adicional(es)." << endl;
+        }
+    }
+    if (!reportLine.empty()) {
+        cout << "[AVISO] " << reportLine << endl;
+    }
+    if (!okLine.empty()) {
+        cout << "[AVISO] " << okLine << endl;
     }
 }
 
@@ -46,6 +121,7 @@ int GameController::run(int argc, char* argv[]) {
 }
 
 int GameController::runConsoleApp() {
+    configureConsoleEncoding();
     engine_.initialize();
     showLoadWarnings();
 
@@ -145,7 +221,7 @@ void GameController::runCareerMode() {
             case 10: displayBoardStatus(career); break;
             case 11: displayNewsFeed(career); break;
             case 12: displaySeasonHistory(career); break;
-            case 13: manageLineup(*career.myTeam); break;
+            case 13: manageLineup(career); break;
             case 14: displayClubOperations(career); break;
             case 15: displayAchievementsMenu(career); break;
             case 16: {

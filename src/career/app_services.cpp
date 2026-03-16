@@ -8,6 +8,9 @@
 #include "career/week_simulation.h"
 #include "career/team_management.h"
 #include "career/dressing_room_service.h"
+#include "career/inbox_service.h"
+#include "career/medical_service.h"
+#include "career/staff_service.h"
 #include "competition.h"
 #include "development/training_impact_system.h"
 #include "transfers/negotiation_system.h"
@@ -67,6 +70,52 @@ string nextDevelopmentPlan(const string& current) {
         if (plans[i] == current) return plans[(i + 1) % plans.size()];
     }
     return plans.front();
+}
+
+string nextInstructionForPlayer(const Player& player) {
+    static const vector<string> goalkeepers = {"Libre", "Conservar posicion", "Abrir campo", "Descanso medico"};
+    static const vector<string> defenders = {"Libre", "Cerrar por dentro", "Marcar fuerte", "Abrir campo", "Conservar posicion", "Descanso medico"};
+    static const vector<string> midfielders = {"Libre", "Arriesgar pase", "Abrir campo", "Conservar posicion", "Marcar fuerte", "Descanso medico"};
+    static const vector<string> forwards = {"Libre", "Atacar espalda", "Abrir campo", "Conservar posicion", "Marcar fuerte", "Descanso medico"};
+    const vector<string>* options = &midfielders;
+    const string pos = normalizePosition(player.position);
+    if (pos == "ARQ") options = &goalkeepers;
+    else if (pos == "DEF") options = &defenders;
+    else if (pos == "DEL") options = &forwards;
+    for (size_t i = 0; i < options->size(); ++i) {
+        if ((*options)[i] == player.individualInstruction) return (*options)[(i + 1) % options->size()];
+    }
+    return options->front();
+}
+
+string resolveAssignmentRegion(const Team& team, const string& region) {
+    if (!region.empty()) return region;
+    if (!team.scoutingRegions.empty()) return team.scoutingRegions.front();
+    if (!team.youthRegion.empty()) return team.youthRegion;
+    return "Todas";
+}
+
+string assignmentPriorityLabel(const Team& team, const string& focusPos) {
+    return normalizePosition(focusPos) == detectScoutingNeed(team) ? "Urgente" : "Seguimiento";
+}
+
+void consumeMatchingInboxEntry(vector<string>& inbox, const string& text) {
+    for (auto it = inbox.rbegin(); it != inbox.rend(); ++it) {
+        if (*it != text) continue;
+        inbox.erase(next(it).base());
+        return;
+    }
+}
+
+ClubUpgrade staffUpgradeForRole(const string& role) {
+    const string lower = toLower(trim(role));
+    if (lower.find("asistente") != string::npos) return ClubUpgrade::AssistantCoach;
+    if (lower.find("preparador") != string::npos) return ClubUpgrade::FitnessCoach;
+    if (lower.find("scouting") != string::npos) return ClubUpgrade::Scouting;
+    if (lower.find("juveniles") != string::npos) return ClubUpgrade::YouthCoach;
+    if (lower.find("medico") != string::npos) return ClubUpgrade::Medical;
+    if (lower.find("arquero") != string::npos) return ClubUpgrade::GoalkeepingCoach;
+    return ClubUpgrade::PerformanceAnalyst;
 }
 
 string nextMatchInstruction(const string& current) {
@@ -261,6 +310,7 @@ ServiceResult startCareerService(Career& career,
     career.managerInbox.clear();
     career.scoutInbox.clear();
     career.scoutingShortlist.clear();
+    career.scoutingAssignments.clear();
     career.history.clear();
     career.activePromises.clear();
     career.historicalRecords.clear();
@@ -272,7 +322,6 @@ ServiceResult startCareerService(Career& career,
     world_state_service::seedSeasonPromises(career);
     result.ok = true;
     result.messages.push_back("Nueva carrera iniciada con " + career.myTeam->name + ".");
-    result.messages.insert(result.messages.end(), career.loadWarnings.begin(), career.loadWarnings.end());
     return result;
 }
 
@@ -286,7 +335,6 @@ ServiceResult loadCareerService(Career& career) {
     result.messages.push_back(result.ok
                                   ? "Carrera cargada: " + (career.myTeam ? career.myTeam->name : string("Sin club")) + "."
                                   : "No se encontro una carrera guardada.");
-    result.messages.insert(result.messages.end(), career.loadWarnings.begin(), career.loadWarnings.end());
     return result;
 }
 
@@ -463,6 +511,41 @@ ServiceResult scoutPlayersService(Career& career, const string& region, const st
     return runScoutingSessionService(career, region, focusPos).service;
 }
 
+ServiceResult createScoutingAssignmentService(Career& career, const string& region, const string& focusPos, int durationWeeks) {
+    if (!career.myTeam) return failure("No hay una carrera activa.");
+    Team& team = *career.myTeam;
+    ensureTeamIdentity(team);
+    ScoutingAssignment assignment;
+    assignment.region = resolveAssignmentRegion(team, region);
+    assignment.focusPosition = normalizePosition(focusPos);
+    if (assignment.focusPosition == "N/A" || assignment.focusPosition.empty()) assignment.focusPosition = detectScoutingNeed(team);
+    assignment.priority = assignmentPriorityLabel(team, assignment.focusPosition);
+    assignment.weeksRemaining = clampInt(durationWeeks, 2, 6);
+    assignment.knowledgeLevel = clampInt(team.scoutingChief / 3 + max(0, team.performanceAnalyst - 50) / 5, 18, 58);
+
+    for (const auto& current : career.scoutingAssignments) {
+        if (current.region == assignment.region && current.focusPosition == assignment.focusPosition) {
+            return failure("Ya existe una asignacion activa para esa zona y posicion.");
+        }
+    }
+
+    const long long setupCost = max(1200LL, 3200LL - team.scoutingChief * 12LL - team.performanceAnalyst * 8LL);
+    if (team.budget < setupCost) return failure("Presupuesto insuficiente para abrir una asignacion de scouting.");
+    team.budget -= setupCost;
+    career.scoutingAssignments.push_back(assignment);
+    career.addInboxItem("Nueva asignacion: " + assignment.region + " | foco " + assignment.focusPosition +
+                        " | prioridad " + assignment.priority + ".", "Scouting");
+    career.addNews("El scouting abre seguimiento prolongado en " + assignment.region + " con foco " + assignment.focusPosition + ".");
+
+    ServiceResult result;
+    result.ok = true;
+    result.messages.push_back("Asignacion creada: " + assignment.region + " | foco " + assignment.focusPosition +
+                              " | prioridad " + assignment.priority +
+                              " | duracion " + to_string(assignment.weeksRemaining) +
+                              " sem | inversion " + formatMoneyValue(setupCost) + ".");
+    return result;
+}
+
 ServiceResult upgradeClubService(Career& career, ClubUpgrade upgrade) {
     if (!career.myTeam) return failure("No hay una carrera activa.");
     Team& team = *career.myTeam;
@@ -537,6 +620,20 @@ ServiceResult upgradeClubService(Career& career, ClubUpgrade upgrade) {
     ServiceResult result;
     result.ok = true;
     result.messages.push_back(message + " Inversion " + formatMoneyValue(cost) + ".");
+    return result;
+}
+
+ServiceResult reviewStaffStructureService(Career& career) {
+    if (!career.myTeam) return failure("No hay una carrera activa.");
+    Team& team = *career.myTeam;
+    ensureTeamIdentity(team);
+    const string weakestRole = staff_service::weakestStaffRole(team);
+    ServiceResult result = upgradeClubService(career, staffUpgradeForRole(weakestRole));
+    if (result.ok) {
+        result.messages.insert(result.messages.begin(), "Revision de staff: se prioriza reforzar " + weakestRole + ".");
+    } else {
+        result.messages.insert(result.messages.begin(), "Revision de staff: el area mas debil hoy es " + weakestRole + ".");
+    }
     return result;
 }
 
@@ -915,6 +1012,20 @@ ServiceResult cyclePlayerDevelopmentPlanService(Career& career, const string& pl
     return result;
 }
 
+ServiceResult cyclePlayerInstructionService(Career& career, const string& playerName) {
+    if (!career.myTeam) return failure("No hay una carrera activa.");
+    Team& team = *career.myTeam;
+    int index = team_mgmt::playerIndexByName(team, playerName);
+    if (index < 0) return failure("No se encontro el jugador seleccionado.");
+    Player& player = team.players[static_cast<size_t>(index)];
+    player.individualInstruction = nextInstructionForPlayer(player);
+    career.addNews("Instruccion individual actualizada para " + player.name + ": " + player.individualInstruction + ".");
+    ServiceResult result;
+    result.ok = true;
+    result.messages.push_back(player.name + " cambia su instruccion a " + player.individualInstruction + ".");
+    return result;
+}
+
 ServiceResult holdTeamMeetingService(Career& career) {
     if (!career.myTeam) return failure("No hay una carrera activa.");
     Team& team = *career.myTeam;
@@ -1019,6 +1130,59 @@ ServiceResult cycleMatchInstructionService(Career& career) {
     ServiceResult result;
     result.ok = true;
     result.messages.push_back("Instruccion de partido actual: " + team.matchInstruction + ".");
+    return result;
+}
+
+ServiceResult resolveInboxDecisionService(Career& career) {
+    if (!career.myTeam) return failure("No hay una carrera activa.");
+    Team& team = *career.myTeam;
+    ensureTeamIdentity(team);
+
+    const auto inboxEntries = inbox_service::buildCombinedInbox(career, 8);
+    const auto medicalStatuses = medical_service::buildMedicalStatuses(team);
+    if (inboxEntries.empty() && medicalStatuses.empty()) {
+        return failure("No hay decisiones urgentes en el inbox.");
+    }
+
+    string latestText;
+    bool scoutingEntry = false;
+    if (!inboxEntries.empty()) {
+        latestText = inboxEntries.back().text;
+        scoutingEntry = inboxEntries.back().scouting;
+    }
+    const string lower = toLower(latestText);
+
+    ServiceResult result;
+    if (!medicalStatuses.empty() && (lower.find("lesion") != string::npos || lower.find("fatiga") != string::npos || lower.empty())) {
+        team.trainingFocus = "Recuperacion";
+        int protectedPlayers = 0;
+        for (const auto& status : medicalStatuses) {
+            int index = team_mgmt::playerIndexByName(team, status.playerName);
+            if (index < 0) continue;
+            Player& player = team.players[static_cast<size_t>(index)];
+            player.individualInstruction = "Descanso medico";
+            player.fatigueLoad = clampInt(player.fatigueLoad - 6, 0, 100);
+            protectedPlayers++;
+            if (protectedPlayers >= 2) break;
+        }
+        result.ok = true;
+        result.messages.push_back("Decision de inbox: se prioriza recuperacion y se protegen " + to_string(protectedPlayers) + " jugador(es)." );
+        result.messages.push_back("Plan semanal actualizado a Recuperacion.");
+    } else if (lower.find("staff") != string::npos) {
+        result = reviewStaffStructureService(career);
+    } else if (scoutingEntry || lower.find("scouting") != string::npos || lower.find("mercado") != string::npos || lower.find("shortlist") != string::npos) {
+        if (!career.scoutingShortlist.empty()) result = followShortlistService(career);
+        else result = createScoutingAssignmentService(career, "", detectScoutingNeed(team), 3);
+    } else if (lower.find("promesa") != string::npos || lower.find("directiva") != string::npos || lower.find("vestuario") != string::npos) {
+        result = holdTeamMeetingService(career);
+    } else {
+        result = cycleMatchInstructionService(career);
+    }
+
+    if (result.ok && !latestText.empty()) {
+        consumeMatchingInboxEntry(career.managerInbox, latestText);
+        consumeMatchingInboxEntry(career.scoutInbox, latestText);
+    }
     return result;
 }
 

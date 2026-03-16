@@ -294,12 +294,29 @@ void scoutPlayers(Career& career) {
     cout << "\n=== Ojeo de Jugadores ===" << endl;
     cout << "Presupuesto: $" << career.myTeam->budget << endl;
     cout << "Jefe de scouting: " << career.myTeam->scoutingChief << "/99" << endl;
-    cout << "1. Otear jugadores" << endl;
-    cout << "2. Ver informes guardados" << endl;
-    cout << "3. Volver" << endl;
-    int choice = readInt("Elige una opcion: ", 1, 3);
+    cout << "Asignaciones activas: " << career.scoutingAssignments.size() << endl;
+    cout << "1. Otear jugadores ahora" << endl;
+    cout << "2. Crear asignacion de scouting" << endl;
+    cout << "3. Ver asignaciones activas" << endl;
+    cout << "4. Ver informes guardados" << endl;
+    cout << "5. Volver" << endl;
+    int choice = readInt("Elige una opcion: ", 1, 5);
 
-    if (choice == 2) {
+    if (choice == 3) {
+        if (career.scoutingAssignments.empty()) {
+            cout << "No hay asignaciones activas." << endl;
+            return;
+        }
+        for (const auto& assignment : career.scoutingAssignments) {
+            cout << "- " << assignment.region
+                 << " | foco " << assignment.focusPosition
+                 << " | prioridad " << assignment.priority
+                 << " | conocimiento " << assignment.knowledgeLevel << "%"
+                 << " | resta " << assignment.weeksRemaining << " sem" << endl;
+        }
+        return;
+    }
+    if (choice == 4) {
         if (career.scoutInbox.empty()) {
             cout << "No hay informes guardados." << endl;
             return;
@@ -309,13 +326,22 @@ void scoutPlayers(Career& career) {
         }
         return;
     }
-    if (choice == 3) return;
+    if (choice == 5) return;
 
     cout << "Regiones: 1. Metropolitana 2. Norte 3. Centro 4. Sur 5. Patagonia 6. Todas" << endl;
     vector<string> regionOptions = {"Metropolitana", "Norte", "Centro", "Sur", "Patagonia", "Todas"};
     int regionChoice = readInt("Elegir region: ", 1, static_cast<int>(regionOptions.size()));
     string focusPos = normalizePosition(readLine("Foco de posicion (ARQ/DEF/MED/DEL o Enter para necesidad): "));
     if (focusPos == "N/A") focusPos.clear();
+
+    if (choice == 2) {
+        int durationWeeks = readInt("Duracion de seguimiento (2-6 semanas): ", 2, 6);
+        printServiceResult(createScoutingAssignmentService(career,
+                                                           regionOptions[static_cast<size_t>(regionChoice - 1)],
+                                                           focusPos,
+                                                           durationWeeks));
+        return;
+    }
 
     ScoutingSessionResult session = runScoutingSessionService(career, regionOptions[static_cast<size_t>(regionChoice - 1)], focusPos);
     printServiceResult(session.service);

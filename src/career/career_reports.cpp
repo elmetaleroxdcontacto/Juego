@@ -4,6 +4,8 @@
 #include "career/analytics_service.h"
 #include "career/dressing_room_service.h"
 #include "career/inbox_service.h"
+#include "career/medical_service.h"
+#include "career/staff_service.h"
 #include "career/match_center_service.h"
 #include "career/match_analysis_store.h"
 #include "career/career_support.h"
@@ -91,6 +93,40 @@ vector<string> plannerLines(const Team& team) {
         "Cobertura juvenil: " + (planner.youthCoverPositions.empty() ? string("-") : joinStringValues(planner.youthCoverPositions, ", ")),
         "Candidatos de salida: " + (planner.saleCandidates.empty() ? string("-") : joinStringValues(planner.saleCandidates, ", "))
     };
+}
+
+vector<string> scoutingAssignmentLines(const Career& career) {
+    vector<string> lines;
+    for (const auto& assignment : career.scoutingAssignments) {
+        lines.push_back(assignment.region + " | foco " + assignment.focusPosition +
+                        " | prioridad " + assignment.priority +
+                        " | conocimiento " + to_string(assignment.knowledgeLevel) +
+                        "% | " + to_string(assignment.weeksRemaining) + " sem");
+    }
+    return lines;
+}
+
+vector<string> staffDigestLines(const Team& team) {
+    vector<string> lines;
+    for (const auto& profile : staff_service::buildStaffProfiles(team)) {
+        lines.push_back(profile.role + " | " + profile.name +
+                        " | nivel " + to_string(profile.rating) +
+                        " | " + profile.status +
+                        " | costo " + formatMoneyValue(profile.weeklyCost));
+    }
+    return lines;
+}
+
+vector<string> medicalDigestLines(const Team& team) {
+    vector<string> lines;
+    for (const auto& status : medical_service::buildMedicalStatuses(team)) {
+        lines.push_back(status.playerName + " | " + status.diagnosis +
+                        " | carga " + to_string(status.workloadRisk) +
+                        " | recaida " + to_string(status.relapseRisk) +
+                        " | " + status.recommendation);
+    }
+    if (lines.empty()) lines.push_back("Centro medico sin casos criticos.");
+    return lines;
 }
 
 
@@ -285,6 +321,7 @@ CareerReport buildBoardReport(const Career& career) {
     addFact(report, "Vestuario", dressingRoomClimate(*career.myTeam));
     addFact(report, "Promesas en riesgo", to_string(promisesAtRisk(*career.myTeam, career.currentWeek)));
     addFact(report, "Promesas activas", to_string(career.activePromises.size()));
+    addFact(report, "Asignaciones scouting", to_string(career.scoutingAssignments.size()));
     addFact(report, "Tension social", to_string(dressing.socialTension));
     addFact(report, "Apoyo de lideres", to_string(dressing.leadershipSupport));
     addFact(report, "Expectativa del club", teamExpectationLabel(*career.myTeam));
@@ -316,6 +353,7 @@ CareerReport buildBoardReport(const Career& career) {
     addBlock(report, "Grupos del vestuario", dressing.groups);
     addBlock(report, "Promesas activas", activePromiseLines(career));
     addBlock(report, "Centro del manager", inbox_service::buildInboxSummaryLines(career));
+    addBlock(report, "Staff tecnico", staffDigestLines(*career.myTeam));
 
     vector<string> offers;
     for (Team* job : jobs) {
@@ -383,8 +421,10 @@ CareerReport buildClubReport(const Career& career) {
     addBlock(report, "Grupos sociales", dressing.groups);
     addBlock(report, "Promesas activas", activePromiseLines(career));
     addBlock(report, "Planner de plantilla", plannerLines(team));
+    addBlock(report, "Centro medico", medicalDigestLines(team));
     addBlock(report, "Data hub", analytics_service::buildTeamAnalyticsLines(career, team));
     addBlock(report, "Centro del manager", inbox_service::buildInboxSummaryLines(career));
+    addBlock(report, "Staff tecnico", staffDigestLines(*career.myTeam));
     addBlock(report, "Tendencias de partido", analytics_service::buildMatchTrendLines(career));
     {
         const bool congestedWeek = career.cupActive &&
@@ -414,17 +454,7 @@ CareerReport buildClubReport(const Career& career) {
                  "Region juvenil: " + team.youthRegion,
                  "Red scouting: " + (team.scoutingRegions.empty() ? string("-") : joinStringValues(team.scoutingRegions, ", ")),
              });
-    addBlock(report,
-             "Staff tecnico",
-             {
-                 team.assistantCoachName + " | asistente " + to_string(team.assistantCoach) + " | organiza automatismos y moral competitiva",
-                 team.fitnessCoachName + " | preparador " + to_string(team.fitnessCoach) + " | recuperacion y resistencia",
-                 team.medicalChiefName + " | medico " + to_string(team.medicalTeam) + " | baja riesgo y acorta lesiones",
-                 team.scoutingChiefName + " | scouting " + to_string(team.scoutingChief) + " | precision de informes y shortlist",
-                 team.goalkeepingCoachName + " | arqueros " + to_string(team.goalkeepingCoach) + " | sostiene rendimiento del portero",
-                 team.performanceAnalystName + " | analista " + to_string(team.performanceAnalyst) + " | mejora preparacion de rival y microciclo",
-                 team.youthCoachName + " | juveniles " + to_string(team.youthCoach) + " | eleva potencial e intake",
-             });
+    addBlock(report, "Staff tecnico", staffDigestLines(team));
     return report;
 }
 
@@ -468,6 +498,7 @@ CareerReport buildScoutingReport(const Career& career) {
     addFact(report, "Necesidad detectada", detectScoutingNeed(team));
     addFact(report, "Informes guardados", to_string(career.scoutInbox.size()));
     addFact(report, "Shortlist activa", to_string(career.scoutingShortlist.size()));
+    addFact(report, "Asignaciones activas", to_string(career.scoutingAssignments.size()));
     addFact(report, "Red juvenil", team.youthRegion + " | coach " + to_string(team.youthCoach));
     addFact(report, "Cobertura scouting", team.scoutingRegions.empty() ? "-" : joinStringValues(team.scoutingRegions, ", "));
 
@@ -494,6 +525,7 @@ CareerReport buildScoutingReport(const Career& career) {
     }
 
     addBlock(report, "Centro del manager", inbox_service::buildInboxSummaryLines(career, 4));
+    addBlock(report, "Asignaciones scouting", scoutingAssignmentLines(career));
 
     if (!career.scoutInbox.empty()) {
         vector<string> notes;

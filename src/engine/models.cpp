@@ -59,6 +59,11 @@ string defaultDutyForRole(const string& role, const string& position) {
     return defaultDutyForPosition(position);
 }
 
+string defaultInstructionForPosition(const string& position) {
+    (void)position;
+    return "Libre";
+}
+
 string defaultDevelopmentPlanForPosition(const string& position) {
     string norm = normalizePosition(position);
     if (norm == "ARQ") return "Reflejos";
@@ -141,6 +146,7 @@ void ensurePlayerProfile(Player& p, bool regenerateTraits) {
     if (p.secondaryPositions.empty()) p.secondaryPositions = inferSecondaryPositions(p);
     if (p.role.empty()) p.role = defaultRoleForPosition(p.position);
     if (p.roleDuty.empty()) p.roleDuty = defaultDutyForRole(p.role, p.position);
+    if (p.individualInstruction.empty()) p.individualInstruction = defaultInstructionForPosition(p.position);
     if (p.developmentPlan.empty()) p.developmentPlan = defaultDevelopmentPlanForPosition(p.position);
     if (p.promisedRole.empty()) p.promisedRole = "Sin promesa";
     if (p.promisedPosition.empty()) p.promisedPosition = p.position;

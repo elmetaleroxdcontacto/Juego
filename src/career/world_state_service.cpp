@@ -41,6 +41,10 @@ void loadConfiguredWorldData() {
         {"world_talent_headline_mod", 4},
         {"world_market_headline_mod", 5},
         {"scouting_network_bonus", 8},
+        {"background_staff_hire_chance", 10},
+        {"background_contract_drift_chance", 12},
+        {"background_player_unrest_chance", 10},
+        {"background_finance_story_chance", 8},
     };
     cache.scoutingRegions = {"Metropolitana", "Centro", "Sur", "Norte", "Patagonia", "Internacional"};
 
@@ -443,6 +447,39 @@ WorldPulseSummary processWeeklyWorldState(Career& career) {
             club.performanceAnalystName.clear();
             ensureTeamIdentity(club);
             if (&club == career.myTeam) career.addInboxItem("El club suma al analista " + club.performanceAnalystName + ".", "Staff");
+        }
+        if (randInt(1, 100) <= configuredWorldRule("background_contract_drift_chance", 12)) {
+            Player* expiring = nullptr;
+            for (auto& player : club.players) {
+                if (player.contractWeeks > 0 && player.contractWeeks <= 18 && !player.injured) {
+                    expiring = &player;
+                    break;
+                }
+            }
+            if (expiring && club.budget > expiring->wage * 8) {
+                expiring->contractWeeks += randInt(36, 72);
+                expiring->wantsToLeave = false;
+                expiring->happiness = clampInt(expiring->happiness + 3, 1, 99);
+                career.addNews("[Mundo] " + club.name + " acelera la renovacion de " + expiring->name + ".");
+            }
+        }
+        if (club.morale <= 46 && randInt(1, 100) <= configuredWorldRule("background_player_unrest_chance", 10)) {
+            Player* uneasy = nullptr;
+            for (auto& player : club.players) {
+                if (player.injured) continue;
+                if (!uneasy || player.happiness < uneasy->happiness) uneasy = &player;
+            }
+            if (uneasy) {
+                uneasy->wantsToLeave = true;
+                uneasy->happiness = clampInt(uneasy->happiness - 4, 1, 99);
+                career.addNews("[Mundo] Vestuario: " + uneasy->name + " se inquieta en " + club.name + ".");
+                pushHeadline(summary, "Mercado latente: " + uneasy->name + " queda inquieto en " + club.name + ".");
+            }
+        }
+        if (club.debt > club.sponsorWeekly * 18 && randInt(1, 100) <= configuredWorldRule("background_finance_story_chance", 8)) {
+            club.transferPolicy = "Venta necesaria";
+            career.addNews("[Mundo] Finanzas: " + club.name + " entra en modo venta por tension de caja.");
+            pushHeadline(summary, "Finanzas: " + club.name + " pasa a priorizar ventas para aliviar caja.");
         }
         const int played = club.wins + club.draws + club.losses;
         if (played < 4) continue;

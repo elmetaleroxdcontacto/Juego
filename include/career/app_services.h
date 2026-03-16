@@ -126,10 +126,17 @@ ServiceResult loanOutPlayerService(Career& career,
                                    const std::string& destinationTeamName,
                                    int loanWeeks);
 ServiceResult cyclePlayerDevelopmentPlanService(Career& career, const std::string& playerName);
+ServiceResult cyclePlayerInstructionService(Career& career, const std::string& playerName);
 ServiceResult holdTeamMeetingService(Career& career);
 ServiceResult talkToPlayerService(Career& career, const std::string& playerName);
 ServiceResult cycleTrainingFocusService(Career& career);
 ServiceResult cycleMatchInstructionService(Career& career);
+ServiceResult createScoutingAssignmentService(Career& career,
+                                              const std::string& region = "",
+                                              const std::string& focusPos = "",
+                                              int durationWeeks = 3);
+ServiceResult resolveInboxDecisionService(Career& career);
+ServiceResult reviewStaffStructureService(Career& career);
 ServiceResult shortlistPlayerService(Career& career,
                                      const std::string& sellerTeamName,
                                      const std::string& playerName);

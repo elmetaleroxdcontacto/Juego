@@ -1,5 +1,6 @@
 #include "career/week_simulation.h"
 
+#include "career/app_services.h"
 #include "ai/team_ai.h"
 #include "career/match_analysis_store.h"
 #include "career/dressing_room_service.h"
@@ -426,6 +427,38 @@ void runMonthlyDevelopment(Career& career) {
                                " prospecto(s) muestran una aceleracion especial.");
             }
         }
+    }
+}
+
+void progressScoutingAssignments(Career& career) {
+    if (!career.myTeam || career.scoutingAssignments.empty()) return;
+
+    Team& team = *career.myTeam;
+    for (size_t i = 0; i < career.scoutingAssignments.size();) {
+        ScoutingAssignment& assignment = career.scoutingAssignments[i];
+        assignment.weeksRemaining = max(0, assignment.weeksRemaining - 1);
+        assignment.knowledgeLevel = clampInt(assignment.knowledgeLevel + team.scoutingChief / 5 + max(0, team.performanceAnalyst - 50) / 6, 0, 100);
+
+        if (assignment.weeksRemaining <= 0) {
+            const ScoutingSessionResult session = runScoutingSessionService(career, assignment.region, assignment.focusPosition);
+            if (session.service.ok) {
+                const string lead = session.candidates.empty()
+                    ? string("sin candidato destacado")
+                    : session.candidates.front().playerName + " (" + session.candidates.front().clubName + ")";
+                career.addInboxItem("Asignacion cerrada en " + assignment.region + " | foco " + assignment.focusPosition +
+                                    " | radar " + lead + ".", "Scouting");
+            } else {
+                career.addInboxItem("Asignacion pausada en " + assignment.region + ": " + session.service.messages.front(), "Scouting");
+            }
+            career.scoutingAssignments.erase(career.scoutingAssignments.begin() + static_cast<long long>(i));
+            continue;
+        }
+
+        if (assignment.weeksRemaining == 1 || assignment.knowledgeLevel >= 72) {
+            career.addInboxItem("Seguimiento en curso: " + assignment.region + " | foco " + assignment.focusPosition +
+                                " | conocimiento " + to_string(assignment.knowledgeLevel) + "%.", "Scouting");
+        }
+        ++i;
     }
 }
 
@@ -1074,6 +1107,7 @@ void simulateCareerWeek(Career& career) {
     }
 
     runMonthlyDevelopment(career);
+    progressScoutingAssignments(career);
     updateShortlistAlerts(career);
     career.updateDynamicObjectiveStatus();
     career.updateBoardConfidence();

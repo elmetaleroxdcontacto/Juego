@@ -10,6 +10,7 @@ namespace match_internal {
 std::string compactToken(std::string value);
 
 void applyRoleModifier(const Player& p, int& attack, int& defense);
+void applyIndividualInstructionModifier(const Player& p, const Team& team, int& attack, int& defense);
 void applyTraitModifier(const Player& p, int& attack, int& defense);
 void applyPlayerStateModifier(const Player& p, const Team& team, int& attack, int& defense);
 void applyMatchInstruction(const Team& team, int& attack, int& defense);
