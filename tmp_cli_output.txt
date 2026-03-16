@@ -1,0 +1,81 @@
+[AVISO] Errores: 0 | Advertencias: 52
+[AVISO] Incidencias destacadas:
+[AVISO] - [WARNING] Integridad liga | tercera division a | Futuro | Existe una carpeta de equipo no referenciada en teams.txt. | Sugerencia: Agregarla a teams.txt o retirarla si ya no forma parte de la base.
+[AVISO] - [WARNING] Integridad liga | tercera division b | Audax Paipote | Existe una carpeta de equipo no referenciada en teams.txt. | Sugerencia: Agregarla a teams.txt o retirarla si ya no forma parte de la base.
+[AVISO] - [WARNING] Integridad liga | tercera division b | CSD Ovalle | Existe una carpeta de equipo no referenciada en teams.txt. | Sugerencia: Agregarla a teams.txt o retirarla si ya no forma parte de la base.
+[AVISO] ... y 3 advertencia(s) adicional(es).
+[AVISO] Reporte completo disponible en saves/roster_validation_report.txt
+[AVISO] [OK] La carga no detecto inconsistencias estructurales.
+
+=== Football Manager Game ===
+1. Modo Carrera
+2. Iniciar Juego Rapido
+3. Modo Copa
+4. Validar sistema
+5. Salir
+Elige una opcion: 
+=== Modo Carrera ===
+
+Opciones de Carrera:
+1. Continuar Carrera
+2. Nueva Carrera
+3. Volver al Menu Principal
+Elige una opcion: 
+Selecciona la division:
+1. Primera Division
+2. Primera B
+3. Segunda Division
+4. Tercera Division A
+5. Tercera Division B
+Elige una division: 
+Equipos de Primera Division:
+1. Audax Italiano
+2. CD Cobresal
+3. CD Everton
+4. CD Ñublense
+5. CD O'Higgins
+6. CD Palestino
+7. CD Universidad Católica
+8. Club Universidad de Chile
+9. Coquimbo Unido
+10. CSD Colo-Colo
+11. Deportes Concepción
+12. Deportes La Serena
+13. Deportes Limache
+14. Huachipato FC
+15. Unión La Calera
+16. Universidad de Concepción
+Elige un numero de equipo: Nombre del manager (Enter para 'Manager'): Nueva carrera iniciada con Audax Italiano.
+
+Temporada 1, Semana 1
+
+Modo Carrera
+1. Ver Equipo
+2. Entrenar Jugador
+3. Cambiar Tacticas
+4. Simular Semana
+5. Centro de Competicion
+6. Ver Tabla de Posiciones
+7. Mercado de Transferencias
+8. Ojeo de Jugadores
+9. Ver Estadisticas
+10. Objetivos y Directiva
+11. Noticias
+12. Historial de Temporadas
+13. Alineacion y Rotacion
+14. Club y Finanzas
+15. Ver Logros
+16. Guardar Carrera
+17. Retirar Jugador
+18. Plan de Entrenamiento
+19. Editar Equipo
+20. Volver al Menu Principal
+Elige una opcion: Volviendo al menu principal.
+
+=== Football Manager Game ===
+1. Modo Carrera
+2. Iniciar Juego Rapido
+3. Modo Copa
+4. Validar sistema
+5. Salir
+Elige una opcion: Saliendo del juego.

@@ -2510,3 +2510,37 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - `build-cmake\\bin\\FootballManagerCLI.exe --validate` -> `Resultado: sin fallas`, `0` errores y `52` advertencias activas
 - Resultado practico de este bloque: el juego principal ya incorpora una capa mas FM-like de staff, decisiones del manager, scouting por red, centro medico y lectura contextual del club, y al mismo tiempo la base externa quedo mas limpia.
 - Pendiente real despues de este bloque: limpiar los ultimos duplicados nominales activos y decidir si algunas carpetas huerfanas restantes deben volver a `teams.txt` o archivarse definitivamente.
+
+## Cambios recientes (2026-03-16) - Consola, validacion limpia y cierre total de advertencias
+
+- Se corrigio la experiencia del modo consola en `game_controller.cpp`, `career_reports_ui.cpp`, `market_ui.cpp` y `ui.cpp`.
+- `showLoadWarnings()` ahora resume incidencias en vez de inundar la consola con todas las lineas crudas al arrancar carrera.
+- Se elimino la duplicacion del resumen de advertencias al crear o cargar carrera.
+- La consola de Windows quedo preparada para UTF-8 real, evitando mojibake visible en nombres con acentos y `Ñ`.
+- La opcion `Noticias` paso a funcionar como inbox accionable tambien en CLI.
+- Desde consola ahora se pueden revisar y resolver decisiones del `managerInbox`.
+- El flujo de scouting en CLI fue ampliado para crear y revisar asignaciones activas semanales.
+- La vista de alineacion/plantel en consola ahora muestra `individualInstruction` y permite rotarla desde el menu.
+- El bloque `Club y Finanzas` en consola suma una revision real de staff.
+- Se corrigio un bug de validacion en `validators.cpp` con carpetas activas configuradas en `teams.txt` como `Display|Folder`.
+- La auditoria ahora reconoce correctamente alias de carpeta como `Futuro`, `Audax Paipote`, `CSD Ovalle`, `Laja Historico`, `Nacimiento` y `Republica Ind. de Hualqui`.
+- Se agrego un test nuevo `teams_txt_folder_aliases` para asegurar que esos alias no vuelvan a disparar falsos positivos de integridad.
+- Se limpio la deuda restante de duplicados nominales en `data/LigaChilena`.
+- Se renombraron ocurrencias activas duplicadas en 18 archivos `players.csv`, conservando una referencia principal por nombre y eliminando colisiones reales entre plantillas.
+- Con esa limpieza la auditoria externa bajo de `52` advertencias a `0`, manteniendo `0` errores.
+- `save_manager.cpp` fue reforzado para cargar primero en una `Career` fresca y luego rehidratar el estado sobre el objeto activo.
+- Ese ajuste corrigio la falla de `Guardado/carga` que aparecia en la suite de validacion cuando el objeto ya estaba inicializado.
+- `tactics_engine.cpp` ahora da mas peso real a `Bloque bajo`, `Pausar juego`, `Por bandas` y `Contra-presion` dentro del perfil tactico.
+- Eso corrigio la regresion de `low_block_chance_quality` y dejo mas coherente la relacion entre instrucciones y calidad de ocasiones.
+- `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe` fueron recompilados con este bloque final.
+- Verificacion ejecutada:
+- `build-cmake\\bin\\FootballManagerTests.exe` -> `All tests passed`
+- `build-cmake\\bin\\FootballManagerCLI.exe --validate` -> `Resultado: sin fallas`
+- Auditoria final de datos externos -> `Errores: 0 | Advertencias: 0`
+- Todos estos cambios quedaron subidos a GitHub en `origin/main`.
+- Commit publicado: `459f28d` - `Expand manager systems and clear validation warnings`
+- Descripcion del commit:
+- agrega servicios de staff y centro medico, mas flujos CLI accionables para inbox, scouting e instrucciones individuales
+- mejora perfiles tacticos del motor de partido y endurece save/load para juego principal y validador
+- corrige validacion de aliases `Display|Folder` en `teams.txt` y limpia los duplicados activos de `LigaChilena`
+- actualiza tests, CMake y `TODO.md` con esta pasada
