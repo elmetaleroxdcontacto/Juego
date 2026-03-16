@@ -1,6 +1,7 @@
 param(
     [string]$BasePath = ".\data\LigaChilena",
-    [string]$OutputPath = ".\docs\data_cleanup_report.md"
+    [string]$OutputPath = ".\docs\data_cleanup_report.md",
+    [string]$IgnorePath = ".\data\configs\ignored_team_folders.csv"
 )
 
 Set-StrictMode -Version Latest
@@ -10,6 +11,17 @@ function Normalize-Id([string]$Value) {
     $value = $Value.Trim().ToLowerInvariant()
     $value = [regex]::Replace($value, "[^a-z0-9]+", " ").Trim()
     return $value
+}
+
+function Read-IgnoredFolders([string]$Path) {
+    $ids = @{}
+    if (-not (Test-Path $Path)) { return $ids }
+    foreach ($row in Import-Csv $Path) {
+        if (-not $row.division -or -not $row.folder) { continue }
+        $key = ((Normalize-Id $row.division) + "|" + (Normalize-Id $row.folder))
+        $ids[$key] = $true
+    }
+    return $ids
 }
 
 function Read-TeamList([string]$TeamsFile) {
@@ -26,6 +38,7 @@ function Read-TeamList([string]$TeamsFile) {
     return $ids
 }
 
+$ignoredFolders = Read-IgnoredFolders $IgnorePath
 $divisions = Get-ChildItem $BasePath -Directory | Sort-Object Name
 $lines = @("# Reporte de Carpetas Huerfanas", "", "Generado automaticamente para revisar carpetas de clubes que existen en disco pero no estan listadas en teams.txt.", "")
 
@@ -37,6 +50,8 @@ foreach ($division in $divisions) {
     $orphans = @()
     foreach ($folder in $folders) {
         $id = Normalize-Id $folder.Name
+        $ignoreKey = (Normalize-Id $division.Name) + "|" + $id
+        if ($ignoredFolders.ContainsKey($ignoreKey)) { continue }
         if (-not $listed.ContainsKey($id)) { $orphans += $folder.Name }
     }
     $lines += "## $($division.Name)"

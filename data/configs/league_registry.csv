@@ -1,0 +1,6 @@
+id,folder,display,competition_rules
+"primera division","data/LigaChilena/primera division","Primera Division","data/LigaChilena/competition_rules.csv"
+"primera b","data/LigaChilena/primera b","Primera B","data/LigaChilena/competition_rules.csv"
+"segunda division","data/LigaChilena/segunda division","Segunda Division","data/LigaChilena/competition_rules.csv"
+"tercera division a","data/LigaChilena/tercera division a","Tercera Division A","data/LigaChilena/competition_rules.csv"
+"tercera division b","data/LigaChilena/tercera division b","Tercera Division B","data/LigaChilena/competition_rules.csv"

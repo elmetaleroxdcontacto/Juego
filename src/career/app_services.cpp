@@ -112,6 +112,34 @@ string agentProfileLabel(const Player& player) {
     return "Agente manejable";
 }
 
+string scoutingReportStage(int confidence, bool coveredRegion) {
+    if (confidence >= 84 && coveredRegion) return "Informe completo";
+    if (confidence >= 68) return coveredRegion ? "Seguimiento avanzado" : "Seguimiento parcial";
+    return coveredRegion ? "Primer vistazo" : "Radar lejano";
+}
+
+string scoutingHiddenRiskLabel(const Player& player, int confidence) {
+    int risk = 0;
+    if (player.consistency <= 48) risk += 2;
+    if (player.professionalism <= 45) risk += 2;
+    if (player.injuryHistory >= 2) risk += 2;
+    if (player.bigMatches <= 45) risk += 1;
+    if (confidence < 60) risk += 1;
+    if (risk >= 5) return "Riesgo alto";
+    if (risk >= 3) return "Riesgo medio";
+    return "Riesgo controlado";
+}
+
+string nextStaffHireName(const Team& team, const string& roleLabel, int currentLevel) {
+    static const vector<string> firstNames = {"Oscar", "German", "Fabian", "Leonardo", "Victor", "Damian", "Ignacio", "Tomas"};
+    static const vector<string> lastNames = {"Navarro", "Rivera", "Carrasco", "Saavedra", "Abarca", "Henriquez", "Vera", "Olivares"};
+    int hash = currentLevel;
+    const string key = normalizeTeamId(team.name) + normalizeTeamId(roleLabel);
+    for (char ch : key) hash += static_cast<unsigned char>(ch);
+    return firstNames[static_cast<size_t>(hash % static_cast<int>(firstNames.size()))] + " " +
+           lastNames[static_cast<size_t>((hash / 7) % static_cast<int>(lastNames.size()))];
+}
+
 void appendScoutInbox(Career& career, const string& note, const string& inboxLine) {
     career.scoutInbox.push_back(note);
     if (career.scoutInbox.size() > 40) {
@@ -146,6 +174,8 @@ long long upgradeCost(const Team& team, ClubUpgrade upgrade) {
         case ClubUpgrade::AssistantCoach: return 35000LL + static_cast<long long>(team.assistantCoach) * 1200LL;
         case ClubUpgrade::FitnessCoach: return 32000LL + static_cast<long long>(team.fitnessCoach) * 1200LL;
         case ClubUpgrade::YouthCoach: return 34000LL + static_cast<long long>(team.youthCoach) * 1200LL;
+        case ClubUpgrade::GoalkeepingCoach: return 31000LL + static_cast<long long>(team.goalkeepingCoach) * 1100LL;
+        case ClubUpgrade::PerformanceAnalyst: return 30000LL + static_cast<long long>(team.performanceAnalyst) * 1100LL;
     }
     return 0;
 }
@@ -160,6 +190,8 @@ string upgradeLabel(ClubUpgrade upgrade) {
         case ClubUpgrade::AssistantCoach: return "asistente tecnico";
         case ClubUpgrade::FitnessCoach: return "preparador fisico";
         case ClubUpgrade::YouthCoach: return "jefe de juveniles";
+        case ClubUpgrade::GoalkeepingCoach: return "entrenador de arqueros";
+        case ClubUpgrade::PerformanceAnalyst: return "analista de rendimiento";
     }
     return "club";
 }
@@ -382,6 +414,9 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         candidate.networkFitLabel = scoutingCoverageLabel(team, club->youthRegion);
         candidate.availabilityLabel = availabilityLabel(player);
         candidate.agentLabel = agentProfileLabel(player);
+        candidate.reportStage = scoutingReportStage(confidence, hasScoutingCoverage(team, club->youthRegion));
+        candidate.hiddenRiskLabel = scoutingHiddenRiskLabel(player, confidence);
+        candidate.knowledgeLevel = clampInt(confidence + (hasScoutingCoverage(team, club->youthRegion) ? 8 : -4), 25, 99);
         candidate.secondaryPositions = player.secondaryPositions;
         candidate.traits = player.traits;
         candidate.estimatedSkillMin = estSkillLo;
@@ -404,14 +439,17 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
                       " | Forma " + playerFormLabel(player) +
                       " | Fiabilidad " + playerReliabilityLabel(player) +
                       " | Cobertura " + candidate.networkFitLabel +
+                      " | " + candidate.reportStage +
                       " | Conf " + to_string(confidence) +
+                      " | Conocimiento " + to_string(candidate.knowledgeLevel) +
                       " | Valor " + formatMoneyValue(player.value) +
                       " | Salario esp " + formatMoneyValue(salaryExpectation) +
                       " | Disponibilidad " + candidate.availabilityLabel +
                       " | " + candidate.agentLabel +
                       " | " + recommendation +
                       " | " + upsideBand +
-                      " | Riesgo " + riskLabel +
+                      " | Riesgo visible " + riskLabel +
+                      " | Riesgo oculto " + candidate.hiddenRiskLabel +
                       " | Rasgos " + joinStringValues(player.traits, ", ") +
                       " | Perfil " + personalityLabel(player);
         session.service.messages.push_back("- " + note);
@@ -447,34 +485,51 @@ ServiceResult upgradeClubService(Career& career, ClubUpgrade upgrade) {
         case ClubUpgrade::Training:
             team.trainingFacilityLevel++;
             team.goalkeepingCoach = clampInt(team.goalkeepingCoach + 3, 1, 99);
+            if (team.goalkeepingCoachName.empty()) team.goalkeepingCoachName = nextStaffHireName(team, "arquero", team.goalkeepingCoach);
             message = team.name + " mejora su centro de entrenamiento.";
             break;
         case ClubUpgrade::Scouting:
             team.scoutingChief = clampInt(team.scoutingChief + 5, 1, 99);
+            team.scoutingChiefName = nextStaffHireName(team, "scouting", team.scoutingChief);
             for (const auto& regionName : world_state_service::listConfiguredScoutingRegions()) {
                 if (!hasScoutingCoverage(team, regionName)) {
                     team.scoutingRegions.push_back(regionName);
                     break;
                 }
             }
-            message = team.name + " fortalece su red de scouting.";
+            message = team.name + " fortalece su red de scouting con " + team.scoutingChiefName + ".";
             break;
         case ClubUpgrade::Medical:
             team.medicalTeam = clampInt(team.medicalTeam + 5, 1, 99);
-            message = team.name + " fortalece el cuerpo medico.";
+            team.medicalChiefName = nextStaffHireName(team, "medico", team.medicalTeam);
+            message = team.name + " fortalece el cuerpo medico con " + team.medicalChiefName + ".";
             break;
         case ClubUpgrade::AssistantCoach:
             team.assistantCoach = clampInt(team.assistantCoach + 5, 1, 99);
             team.performanceAnalyst = clampInt(team.performanceAnalyst + 3, 1, 99);
-            message = team.name + " refuerza su cuerpo tecnico.";
+            team.assistantCoachName = nextStaffHireName(team, "assistant", team.assistantCoach);
+            if (team.performanceAnalystName.empty()) team.performanceAnalystName = nextStaffHireName(team, "analyst", team.performanceAnalyst);
+            message = team.name + " refuerza su cuerpo tecnico con " + team.assistantCoachName + ".";
             break;
         case ClubUpgrade::FitnessCoach:
             team.fitnessCoach = clampInt(team.fitnessCoach + 5, 1, 99);
-            message = team.name + " mejora su preparacion fisica.";
+            team.fitnessCoachName = nextStaffHireName(team, "fitness", team.fitnessCoach);
+            message = team.name + " mejora su preparacion fisica con " + team.fitnessCoachName + ".";
             break;
         case ClubUpgrade::YouthCoach:
             team.youthCoach = clampInt(team.youthCoach + 5, 1, 99);
-            message = team.name + " mejora la conduccion de juveniles.";
+            team.youthCoachName = nextStaffHireName(team, "youth", team.youthCoach);
+            message = team.name + " mejora la conduccion de juveniles con " + team.youthCoachName + ".";
+            break;
+        case ClubUpgrade::GoalkeepingCoach:
+            team.goalkeepingCoach = clampInt(team.goalkeepingCoach + 5, 1, 99);
+            team.goalkeepingCoachName = nextStaffHireName(team, "goalkeeping", team.goalkeepingCoach);
+            message = team.name + " incorpora a " + team.goalkeepingCoachName + " para el trabajo de arqueros.";
+            break;
+        case ClubUpgrade::PerformanceAnalyst:
+            team.performanceAnalyst = clampInt(team.performanceAnalyst + 5, 1, 99);
+            team.performanceAnalystName = nextStaffHireName(team, "analyst", team.performanceAnalyst);
+            message = team.name + " suma al analista " + team.performanceAnalystName + ".";
             break;
     }
     ensureTeamIdentity(team);
@@ -926,7 +981,13 @@ ServiceResult talkToPlayerService(Career& career, const string& playerName) {
         result.messages.push_back("La charla con " + player.name + " queda en observacion y no despeja del todo el malestar.");
     }
     if (roleConflict) {
-        result.messages.push_back("Sigue pendiente ordenar su rol de posicion prometida (" + player.promisedPosition + ").");
+        if (player.versatility >= 58 || player.professionalism >= 70) {
+            player.position = normalizePosition(player.promisedPosition);
+            player.roleDuty = defaultDutyForPosition(player.position);
+            result.messages.push_back("Se realinea su uso con la posicion prometida (" + player.promisedPosition + ").");
+        } else {
+            result.messages.push_back("Sigue pendiente ordenar su rol de posicion prometida (" + player.promisedPosition + ").");
+        }
     }
     career.addNews("El manager mantiene una charla individual con " + player.name + ".");
     return result;

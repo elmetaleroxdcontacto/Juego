@@ -53,6 +53,43 @@ static CachedRosterAudit& rosterAuditCache() {
     return cache;
 }
 
+struct IgnoredFolderCache {
+    bool loaded = false;
+    set<string> keys;
+};
+
+static IgnoredFolderCache& ignoredFolderCache() {
+    static IgnoredFolderCache cache;
+    return cache;
+}
+
+static const set<string>& ignoredTeamFolders() {
+    IgnoredFolderCache& cache = ignoredFolderCache();
+    if (cache.loaded) return cache.keys;
+    cache.loaded = true;
+
+    vector<string> lines;
+    if (!readTextFileLines("data/configs/ignored_team_folders.csv", lines) || lines.size() <= 1) {
+        return cache.keys;
+    }
+    for (size_t i = 1; i < lines.size(); ++i) {
+        const string line = trim(lines[i]);
+        if (line.empty()) continue;
+        const vector<string> cols = splitCsvLine(line);
+        if (cols.size() < 2) continue;
+        const string division = toLower(trim(cols[0]));
+        const string folder = normalizeTeamId(cols[1]);
+        if (division.empty() || folder.empty()) continue;
+        cache.keys.insert(division + "|" + folder);
+    }
+    return cache.keys;
+}
+
+static bool isIgnoredTeamFolder(const string& divisionId, const string& folderName) {
+    const string key = toLower(trim(divisionId)) + "|" + normalizeTeamId(folderName);
+    return ignoredTeamFolders().find(key) != ignoredTeamFolders().end();
+}
+
 static bool hasSuspiciousEncoding(const string& text) {
     return text.find("Ã") != string::npos || text.find("Â") != string::npos ||
            text.find("â") != string::npos || text.find("�") != string::npos;
@@ -677,6 +714,7 @@ DataValidationReport buildRosterDataValidationReport() {
         for (const string& dir : actualDirs) {
             string folderName = pathFilename(dir);
             string folderId = normalizeTeamId(folderName);
+            if (isIgnoredTeamFolder(div.id, folderName)) continue;
             if (!folderId.empty() && listedIds.find(folderId) == listedIds.end()) {
                 addDataIssue(report,
                              "WARNING",

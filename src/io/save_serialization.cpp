@@ -9,7 +9,7 @@ using namespace std;
 
 namespace {
 
-static constexpr int kCareerSaveVersion = 10;
+static constexpr int kCareerSaveVersion = 11;
 
 string escapeSaveField(const string& value) {
     string out;
@@ -636,7 +636,15 @@ bool serializeCareer(ostream& file, const Career& career) {
                     team.headCoachStyle,
                     to_string(team.jobSecurity),
                     team.transferPolicy,
-                    encodeStringList(team.scoutingRegions)
+                    encodeStringList(team.scoutingRegions),
+                    team.assistantCoachName,
+                    team.fitnessCoachName,
+                    team.scoutingChiefName,
+                    team.youthCoachName,
+                    team.medicalChiefName,
+                    team.goalkeepingCoachName,
+                    team.performanceAnalystName,
+                    to_string(team.headCoachTenureWeeks)
                 }, '|')
              << "\n";
         file << "PLAYERS " << team.players.size() << "\n";
@@ -913,6 +921,15 @@ bool deserializeCareer(istream& file, Career& career) {
             if (hasExpandedWorldFields && fields.size() > extra + 39) team.jobSecurity = parseIntField(fields[extra + 39], 58); else team.jobSecurity = 58;
             if (hasExpandedWorldFields && fields.size() > extra + 40) team.transferPolicy = fields[extra + 40]; else team.transferPolicy.clear();
             if (hasExpandedWorldFields && fields.size() > extra + 41) team.scoutingRegions = decodeStringList(fields[extra + 41]); else team.scoutingRegions.clear();
+            const bool hasNamedStaffFields = fields.size() > extra + 42;
+            if (hasNamedStaffFields && fields.size() > extra + 42) team.assistantCoachName = fields[extra + 42]; else team.assistantCoachName.clear();
+            if (hasNamedStaffFields && fields.size() > extra + 43) team.fitnessCoachName = fields[extra + 43]; else team.fitnessCoachName.clear();
+            if (hasNamedStaffFields && fields.size() > extra + 44) team.scoutingChiefName = fields[extra + 44]; else team.scoutingChiefName.clear();
+            if (hasNamedStaffFields && fields.size() > extra + 45) team.youthCoachName = fields[extra + 45]; else team.youthCoachName.clear();
+            if (hasNamedStaffFields && fields.size() > extra + 46) team.medicalChiefName = fields[extra + 46]; else team.medicalChiefName.clear();
+            if (hasNamedStaffFields && fields.size() > extra + 47) team.goalkeepingCoachName = fields[extra + 47]; else team.goalkeepingCoachName.clear();
+            if (hasNamedStaffFields && fields.size() > extra + 48) team.performanceAnalystName = fields[extra + 48]; else team.performanceAnalystName.clear();
+            if (hasNamedStaffFields && fields.size() > extra + 49) team.headCoachTenureWeeks = parseIntField(fields[extra + 49], 0); else team.headCoachTenureWeeks = 0;
             if (fields.size() <= extra + 19) {
                 team.preferredBench.clear();
                 if (fields.size() > extra + 11) team.captain = fields[extra + 11];

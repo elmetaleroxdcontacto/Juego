@@ -1,5 +1,7 @@
 ﻿#include "utils.h"
 
+#include "competition/league_registry.h"
+
 #include <algorithm>
 #include <cerrno>
 #include <cctype>
@@ -413,12 +415,7 @@ void getDivisionSkillRange(const string& division, int& minSkill, int& maxSkill)
 }
 
 string divisionDisplay(const string& id) {
-    if (id == "primera division") return "Primera Division";
-    if (id == "primera b") return "Primera B";
-    if (id == "segunda division") return "Segunda Division";
-    if (id == "tercera division a") return "Tercera Division A";
-    if (id == "tercera division b") return "Tercera Division B";
-    return id;
+    return divisionDisplayName(id);
 }
 
 string readLine(const string& prompt) {

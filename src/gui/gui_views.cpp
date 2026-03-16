@@ -3,6 +3,8 @@
 #ifdef _WIN32
 
 #include "ai/ai_squad_planner.h"
+#include "career/analytics_service.h"
+#include "career/inbox_service.h"
 #include "ai/ai_transfer_manager.h"
 #include "career/dressing_room_service.h"
 #include "career/match_analysis_store.h"
@@ -108,12 +110,12 @@ std::string friendlyPanelTitle(const std::string& title) {
     if (title == "ClubProfile") return "Perfil del club";
     if (title == "CoachHistory") return "Historial del entrenador";
     if (title == "BoardReport") return "Informe de directiva";
-    if (title == "NewsFeedPanel") return "Noticias";
+    if (title == "NewsFeedPanel") return "Titulares del mundo";
     if (title == "NewsCardList") return "Titulares";
-    if (title == "ScoutingInbox") return "Bandeja de scouting";
+    if (title == "ScoutingInbox") return "Centro del manager";
     if (title == "NewsDetail") return "Detalle";
     if (title == "AlertPanel") return "Alertas";
-    if (title == "AlertPanel / NewsFeedPanel") return "Noticias y alertas";
+    if (title == "AlertPanel / NewsFeedPanel") return "Pulso del club";
     return title;
 }
 
@@ -840,6 +842,7 @@ GuiPageModel buildDashboardModel(AppState& state) {
     out << "Lectura del rival\r\n" << buildOpponentReport(state.career);
     model.summary.content = out.str();
 
+    const auto analyticsLines = analytics_service::buildTeamAnalyticsLines(state.career, team);
     std::ostringstream detail;
     detail << "Ultimo resultado\r\n";
     detail << lastMatchPanelText(state.career, 6, 6) << "\r\n\r\n";
@@ -851,8 +854,13 @@ GuiPageModel buildDashboardModel(AppState& state) {
            << " | Promesas en riesgo " << dressing.promiseRiskCount << "\r\n";
     detail << "DT del club " << team.headCoachName
            << " | Seguridad " << team.jobSecurity
-           << " | Politica " << team.transferPolicy << "\r\n\r\n";
-    detail << dressingRoomPanelText(state.career, 4);
+           << " | Politica " << team.transferPolicy << "\r\n";
+    if (!analyticsLines.empty()) {
+        detail << analyticsLines.front() << "\r\n";
+        if (analyticsLines.size() > 1) detail << analyticsLines[1] << "\r\n";
+        if (analyticsLines.size() > 2) detail << analyticsLines[2] << "\r\n";
+    }
+    detail << "\r\n" << dressingRoomPanelText(state.career, 4);
     model.detail.content = detail.str();
     return model;
 }
@@ -1225,9 +1233,11 @@ GuiPageModel buildFinancesModel(AppState& state) {
             player.name, formatMoneyValue(player.wage), std::to_string(player.contractWeeks), player.promisedRole, risk
         });
     }
-    model.footer.rows.push_back({"Cantera", std::to_string(team.youthFacilityLevel), std::to_string(team.youthCoach), "Afecta intake y potencial"});
-    model.footer.rows.push_back({"Entrenamiento", std::to_string(team.trainingFacilityLevel), std::to_string(team.fitnessCoach), "Afecta progreso y recuperacion"});
-    model.footer.rows.push_back({"Scouting", std::to_string(team.scoutingChief), std::to_string(team.scoutingChief), "Afecta mercado y reportes"});
+    model.footer.rows.push_back({"Cantera", std::to_string(team.youthFacilityLevel), team.youthCoachName, "Coach " + std::to_string(team.youthCoach) + " | impacta intake y potencial"});
+    model.footer.rows.push_back({"Entrenamiento", std::to_string(team.trainingFacilityLevel), team.fitnessCoachName, "Coach " + std::to_string(team.fitnessCoach) + " | progreso y recuperacion"});
+    model.footer.rows.push_back({"Arqueros", std::to_string(team.goalkeepingCoach), team.goalkeepingCoachName, "Sostiene rendimiento del portero"});
+    model.footer.rows.push_back({"Scouting", std::to_string(team.scoutingChief), team.scoutingChiefName, "Mercado, cobertura e informes"});
+    model.footer.rows.push_back({"Analisis", std::to_string(team.performanceAnalyst), team.performanceAnalystName, "Microciclo y preparacion rival"});
     model.footer.rows.push_back({"Estadio", std::to_string(team.stadiumLevel), std::to_string(team.fanBase), "Impacta recaudacion"});
 
     model.detail.content = "Presupuesto " + formatMoneyValue(team.budget) +
@@ -1273,6 +1283,7 @@ GuiPageModel buildBoardModel(AppState& state) {
         model.secondary.rows.push_back({"Expectativa", teamExpectationLabel(team), "Perfil de club"});
         model.secondary.rows.push_back({"Prestigio", std::to_string(team.clubPrestige), "Influye en fichajes"});
         model.secondary.rows.push_back({"DT del club", team.headCoachName, team.headCoachStyle});
+        model.secondary.rows.push_back({"Antiguedad DT", std::to_string(team.headCoachTenureWeeks) + " sem", "Tiempo del proyecto actual"});
         model.secondary.rows.push_back({"Seguridad", std::to_string(team.jobSecurity), "Estabilidad del banquillo"});
         model.secondary.rows.push_back({"Politica", team.transferPolicy, "Mercado del club"});
         model.secondary.rows.push_back({"Red scouting", team.scoutingRegions.empty() ? std::string("-") : joinStringValues(team.scoutingRegions, ", "), "Cobertura activa"});
@@ -1293,8 +1304,8 @@ GuiPageModel buildNewsModel(AppState& state) {
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state.career, alerts);
-    model.infoLine = "Noticias, scouting y alertas para seguir el pulso del mundo de juego.";
-    model.summary.title = "NewsFeedPanel";
+    model.infoLine = "Centro del manager: inbox, scouting, rumores y alertas para seguir el pulso del mundo.";
+    model.summary.title = "ScoutingInbox";
     model.primary.title = "NewsCardList";
     model.primary.columns = {{L"Tipo", 120}, {L"Titular", 620}};
     model.secondary.title = "ScoutingInbox";
@@ -1315,11 +1326,8 @@ GuiPageModel buildNewsModel(AppState& state) {
         model.primary.rows.push_back({type, line});
     }
 
-    for (const auto& item : state.career.managerInbox) {
-        model.secondary.rows.push_back({"Inbox", item});
-    }
-    for (const auto& item : state.career.scoutInbox) {
-        model.secondary.rows.push_back({"Scouting", item});
+    for (const auto& entry : inbox_service::buildCombinedInbox(state.career, 18)) {
+        model.secondary.rows.push_back({entry.channel, entry.text});
     }
     if (model.secondary.rows.empty()) model.secondary.rows.push_back({"Inbox", "Sin novedades recientes"});
 
@@ -1328,8 +1336,10 @@ GuiPageModel buildNewsModel(AppState& state) {
     }
     model.summary.content = "Entradas visibles: " + std::to_string(model.feed.lines.size()) +
                             "\r\nInbox manager: " + std::to_string(state.career.managerInbox.size()) +
+                            "\r\nScouting: " + std::to_string(state.career.scoutInbox.size()) +
                             "\r\nFiltro actual: " + state.currentFilter;
-    model.detail.content = lastMatchPanelText(state.career, 5, 8) + "\r\n" + dressingRoomPanelText(state.career, 4);
+    model.detail.content = inbox_service::buildInboxDigest(state.career, 8) + "\r\n" +
+                           lastMatchPanelText(state.career, 5, 8) + "\r\n" + dressingRoomPanelText(state.career, 4);
     return model;
 }
 

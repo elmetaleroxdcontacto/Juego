@@ -1,7 +1,9 @@
 #include "ai/ai_squad_planner.h"
 #include "ai/ai_transfer_manager.h"
+#include "career/analytics_service.h"
 #include "career/app_services.h"
 #include "career/career_reports.h"
+#include "career/inbox_service.h"
 #include "career/dressing_room_service.h"
 #include "career/match_analysis_store.h"
 #include "career/match_center_service.h"
@@ -10,6 +12,7 @@
 #include "career/season_transition.h"
 #include "career/world_state_service.h"
 #include "competition/competition.h"
+#include "competition/league_registry.h"
 #include "development/training_impact_system.h"
 #include "engine/models.h"
 #include "io/io.h"
@@ -791,9 +794,20 @@ void testSaveLoadRoundTripPreservesCareerState() {
     original.myTeam->players[0].roleDuty = "Ataque";
     original.myTeam->headCoachName = "DT Persistente";
     original.myTeam->headCoachStyle = "Presion";
+    original.myTeam->headCoachTenureWeeks = 28;
     original.myTeam->jobSecurity = 47;
     original.myTeam->transferPolicy = "Cantera y valor futuro";
     original.myTeam->scoutingRegions = {"Metropolitana", "Sur", "Internacional"};
+    original.myTeam->assistantCoachName = "Ayudante Persistente";
+    original.myTeam->fitnessCoachName = "PF Persistente";
+    original.myTeam->scoutingChiefName = "Scout Persistente";
+    original.myTeam->youthCoachName = "Juveniles Persistente";
+    original.myTeam->medicalChiefName = "Medico Persistente";
+    original.myTeam->goalkeepingCoachName = "Arqueros Persistente";
+    original.myTeam->performanceAnalystName = "Analista Persistente";
+    expect(original.myTeam->headCoachTenureWeeks == 28 &&
+               original.myTeam->assistantCoachName == "Ayudante Persistente",
+           "El fixture debe sembrar tenure y staff nominal antes del guardado.");
     original.saveFile = savePath;
 
     expect(original.saveCareer(), "El guardado roundtrip debe completarse.");
@@ -832,8 +846,12 @@ void testSaveLoadRoundTripPreservesCareerState() {
            "La carga debe preservar momento, carga, duty y promesa de posicion del jugador.");
     expect(loaded.myTeam->headCoachName == "DT Persistente" &&
                loaded.myTeam->transferPolicy == "Cantera y valor futuro" &&
-               loaded.myTeam->scoutingRegions.size() == 3,
-           "La carga debe preservar metadata de entrenador, politica y red de scouting del club.");
+               loaded.myTeam->scoutingRegions.size() == 3 &&
+               loaded.myTeam->headCoachTenureWeeks == 28,
+           "La carga debe preservar metadata de entrenador, politica, red de scouting y antiguedad del club.");
+    expect(loaded.myTeam->assistantCoachName == "Ayudante Persistente" &&
+               loaded.myTeam->performanceAnalystName == "Analista Persistente",
+           "La carga debe preservar el staff con nombre propio.");
     expect(!loaded.pendingTransfers.empty() && loaded.pendingTransfers.front().toTeam == "Club Destino",
            "La carga debe preservar fichajes pendientes.");
 
@@ -1100,6 +1118,49 @@ void testConfiguredWorldDataLoads() {
            "La lista configurable de regiones debe exponer la cobertura internacional.");
 }
 
+void testLeagueRegistryLoadsConfiguredData() {
+    const vector<DivisionInfo>& divisions = listRegisteredDivisions();
+    expect(!divisions.empty(), "El registro de ligas debe exponer divisiones configuradas.");
+    expect(divisions.front().folder.find("LigaChilena") != string::npos,
+           "El registro de ligas debe entregar carpetas de datos reales.");
+    expect(registeredCompetitionRulesPath().find("competition_rules.csv") != string::npos,
+           "El registro de ligas debe exponer la ruta de reglas de competicion.");
+}
+
+void testAnalyticsAndInboxServicesProduceUsefulBlocks() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 5;
+    career.allTeams.push_back(makeTeam("Analitica FC", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 800000));
+    career.allTeams.push_back(makeTeam("Rival Analitico", "primera division", 68, 3, 3, "Balanced", "Equilibrado", 620000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Analitica FC");
+    expect(career.myTeam != nullptr, "La prueba de analitica necesita club usuario.");
+    career.lastMatchCenter.opponentName = "Rival Analitico";
+    career.lastMatchCenter.myGoals = 2;
+    career.lastMatchCenter.oppGoals = 1;
+    career.lastMatchCenter.myExpectedGoalsTenths = 16;
+    career.lastMatchCenter.oppExpectedGoalsTenths = 8;
+    career.lastMatchCenter.tacticalSummary = "Se gano la espalda del rival.";
+    career.lastMatchCenter.fatigueSummary = "El lateral derecho termino cargado.";
+    career.addInboxItem("Hay revision de contratos en tres puestos.", "Directiva");
+    career.scoutInbox.push_back("Scout: aparece una opcion joven en el sur.");
+
+    const auto analytics = analytics_service::buildTeamAnalyticsLines(career, *career.myTeam);
+    const auto inbox = inbox_service::buildInboxSummaryLines(career, 4);
+    expect(!analytics.empty() && analytics.front().find("Indice ofensivo") != string::npos,
+           "El data hub debe producir lineas utiles para reportes y GUI.");
+    expect(!inbox.empty() && inbox.front().find("|") != string::npos,
+           "El inbox combinado debe resumir canal y contenido.");
+}
+
+void testIgnoredArchivedFoldersConfigSuppressesKnownWarnings() {
+    const DataValidationReport report = buildRosterDataValidationReport();
+    const string issueDump = joinLines(report.lines);
+    expect(issueDump.find("AC Barnechea") == string::npos,
+           "Las carpetas historicas ignoradas no deben seguir apareciendo como advertencias activas.");
+}
+
 void testSaveCareerCreatesBackup() {
     const string savePath = "saves/test_backup_save.txt";
     Career career;
@@ -1155,6 +1216,9 @@ int main() {
         {"club_world_metadata", testTeamIdentitySeedsWorldMetadata},
         {"manager_inbox", testManagerInboxTracksNewsAndScouting},
         {"configured_world_data", testConfiguredWorldDataLoads},
+        {"league_registry_data", testLeagueRegistryLoadsConfiguredData},
+        {"analytics_inbox_blocks", testAnalyticsAndInboxServicesProduceUsefulBlocks},
+        {"ignored_archived_folders", testIgnoredArchivedFoldersConfigSuppressesKnownWarnings},
         {"negotiation_agent_costs", testNegotiationTracksAgentCosts},
         {"save_backup", testSaveCareerCreatesBackup},
         {"simulate_match_state", testSimulateMatchAppliesPostProcessState},

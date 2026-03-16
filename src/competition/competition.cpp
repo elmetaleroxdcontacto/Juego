@@ -1,5 +1,6 @@
 #include "competition.h"
 
+#include "competition/league_registry.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -8,8 +9,6 @@
 using namespace std;
 
 namespace {
-
-const char* kCompetitionRulesPath = "data/LigaChilena/competition_rules.csv";
 
 CompetitionConfig makeDefaultCompetitionConfig() {
     return {
@@ -199,8 +198,9 @@ bool reloadCompetitionConfigs() {
     gCompetitionConfigsLoaded = true;
 
     vector<string> lines;
-    if (!readTextFileLines(kCompetitionRulesPath, lines) || lines.size() <= 1) {
-        gCompetitionWarnings.push_back("No se pudo cargar " + string(kCompetitionRulesPath) + ". Se usan reglas integradas.");
+    const string rulesPath = registeredCompetitionRulesPath();
+    if (!readTextFileLines(rulesPath, lines) || lines.size() <= 1) {
+        gCompetitionWarnings.push_back("No se pudo cargar " + rulesPath + ". Se usan reglas integradas.");
         return false;
     }
 

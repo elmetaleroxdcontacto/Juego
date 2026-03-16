@@ -9,7 +9,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(FM_CAREER_SOURCES
+    src/career/analytics_service.cpp
     src/career/app_services.cpp
+    src/career/inbox_service.cpp
     src/career/career_runtime.cpp
     src/career/career_reports.cpp
     src/career/career_manager.cpp
@@ -35,6 +37,7 @@ set(FM_AI_SOURCES
 
 set(FM_COMPETITION_SOURCES
     src/competition/competition.cpp
+    src/competition/league_registry.cpp
 )
 
 set(FM_ENGINE_SOURCES

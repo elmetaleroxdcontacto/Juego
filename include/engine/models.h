@@ -200,6 +200,13 @@ public:
     int medicalTeam;
     int goalkeepingCoach;
     int performanceAnalyst;
+    std::string assistantCoachName;
+    std::string fitnessCoachName;
+    std::string scoutingChiefName;
+    std::string youthCoachName;
+    std::string medicalChiefName;
+    std::string goalkeepingCoachName;
+    std::string performanceAnalystName;
     std::string youthRegion;
     long long debt;
     long long sponsorWeekly;
@@ -215,6 +222,7 @@ public:
     std::string headCoachName;
     int headCoachReputation;
     std::string headCoachStyle;
+    int headCoachTenureWeeks;
     int jobSecurity;
     std::string transferPolicy;
     std::vector<std::string> scoutingRegions;

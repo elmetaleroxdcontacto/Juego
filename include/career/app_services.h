@@ -29,6 +29,9 @@ struct ScoutingCandidate {
     std::string networkFitLabel;
     std::string availabilityLabel;
     std::string agentLabel;
+    std::string reportStage;
+    std::string hiddenRiskLabel;
+    int knowledgeLevel = 0;
     int estimatedSkillMin = 0;
     int estimatedSkillMax = 0;
     int estimatedPotentialMin = 0;
@@ -57,7 +60,9 @@ enum class ClubUpgrade {
     Medical,
     AssistantCoach,
     FitnessCoach,
-    YouthCoach
+    YouthCoach,
+    GoalkeepingCoach,
+    PerformanceAnalyst
 };
 
 enum class NegotiationProfile {

@@ -431,6 +431,19 @@ WorldPulseSummary processWeeklyWorldState(Career& career) {
 
     for (auto& club : career.allTeams) {
         ensureTeamIdentity(club);
+        club.headCoachTenureWeeks = clampInt(club.headCoachTenureWeeks + 1, 0, 520);
+        if (club.scoutingChief <= 58 && club.budget > 90000 && randInt(1, 100) <= configuredWorldRule("background_staff_hire_chance", 10)) {
+            club.scoutingChief = clampInt(club.scoutingChief + randInt(2, 5), 1, 99);
+            club.scoutingChiefName.clear();
+            ensureTeamIdentity(club);
+            if (&club == career.myTeam) career.addInboxItem("La directiva autoriza reforzar scouting con " + club.scoutingChiefName + ".", "Staff");
+        }
+        if (club.performanceAnalyst <= 57 && club.budget > 70000 && randInt(1, 100) <= configuredWorldRule("background_staff_hire_chance", 10)) {
+            club.performanceAnalyst = clampInt(club.performanceAnalyst + randInt(2, 5), 1, 99);
+            club.performanceAnalystName.clear();
+            ensureTeamIdentity(club);
+            if (&club == career.myTeam) career.addInboxItem("El club suma al analista " + club.performanceAnalystName + ".", "Staff");
+        }
         const int played = club.wins + club.draws + club.losses;
         if (played < 4) continue;
         int pressure = 55 - club.morale + max(0, club.goalsAgainst - club.goalsFor) * 2;
@@ -447,6 +460,7 @@ WorldPulseSummary processWeeklyWorldState(Career& career) {
             const string oldCoach = club.headCoachName;
             club.headCoachName = replacementCoachName(club, career.currentWeek + club.points);
             club.headCoachReputation = clampInt(club.headCoachReputation + randInt(-4, 7), 25, 95);
+            club.headCoachTenureWeeks = 0;
             club.jobSecurity = 64;
             club.transferPolicy = club.debt > club.sponsorWeekly * 18 ? "Reconstruccion austera" : "Rearme competitivo";
             career.addNews("[Mundo] " + club.name + " cambia de entrenador: sale " + oldCoach + " y llega " + club.headCoachName + ".");

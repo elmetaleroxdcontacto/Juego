@@ -1,6 +1,7 @@
 ﻿#include "models.h"
 
 #include "competition/competition.h"
+#include "competition/league_registry.h"
 #include "io/io.h"
 #include "utils/utils.h"
 
@@ -247,6 +248,16 @@ static string inferCoachName(const Team& team) {
            lastNames[static_cast<size_t>((hash / 3) % static_cast<int>(lastNames.size()))];
 }
 
+static string inferStaffName(const Team& team, const string& roleKey, int salt) {
+    static const vector<string> firstNames = {"Cristian", "Andres", "Felipe", "Ramon", "Mauricio", "Nicolas", "Rafael", "Claudio"};
+    static const vector<string> lastNames = {"Araya", "Contreras", "Caceres", "Escobar", "Maldonado", "Astudillo", "Sepulveda", "Fuentes"};
+    int hash = salt;
+    const string key = normalizeTeamId(team.name) + normalizeTeamId(roleKey);
+    for (char ch : key) hash += static_cast<unsigned char>(ch);
+    return firstNames[static_cast<size_t>(hash % static_cast<int>(firstNames.size()))] + " " +
+           lastNames[static_cast<size_t>((hash / 5) % static_cast<int>(lastNames.size()))];
+}
+
 static string inferCoachStyle(const Team& team) {
     if (team.tactics == "Pressing") return "Intensidad";
     if (team.tactics == "Defensive" || team.matchInstruction == "Bloque bajo") return "Orden";
@@ -302,9 +313,17 @@ void ensureTeamIdentity(Team& team) {
     if (team.headCoachName.empty()) team.headCoachName = inferCoachName(team);
     if (team.headCoachReputation <= 0) team.headCoachReputation = clampInt(team.clubPrestige - 6 + team.assistantCoach / 8, 25, 92);
     if (team.headCoachStyle.empty()) team.headCoachStyle = inferCoachStyle(team);
+    if (team.headCoachTenureWeeks < 0) team.headCoachTenureWeeks = 0;
     if (team.jobSecurity <= 0) team.jobSecurity = 58;
     if (team.transferPolicy.empty()) team.transferPolicy = inferTransferPolicy(team);
     if (team.scoutingRegions.empty()) team.scoutingRegions = inferScoutingRegions(team);
+    if (team.assistantCoachName.empty()) team.assistantCoachName = inferStaffName(team, "assistant", 11);
+    if (team.fitnessCoachName.empty()) team.fitnessCoachName = inferStaffName(team, "fitness", 17);
+    if (team.scoutingChiefName.empty()) team.scoutingChiefName = inferStaffName(team, "scouting", 23);
+    if (team.youthCoachName.empty()) team.youthCoachName = inferStaffName(team, "youth", 29);
+    if (team.medicalChiefName.empty()) team.medicalChiefName = inferStaffName(team, "medical", 31);
+    if (team.goalkeepingCoachName.empty()) team.goalkeepingCoachName = inferStaffName(team, "goalkeeping", 37);
+    if (team.performanceAnalystName.empty()) team.performanceAnalystName = inferStaffName(team, "analyst", 41);
 }
 
 bool areRivalClubs(const Team& a, const Team& b) {
@@ -460,6 +479,13 @@ Team::Team(string n)
       medicalTeam(55),
       goalkeepingCoach(55),
       performanceAnalyst(55),
+      assistantCoachName(""),
+      fitnessCoachName(""),
+      scoutingChiefName(""),
+      youthCoachName(""),
+      medicalChiefName(""),
+      goalkeepingCoachName(""),
+      performanceAnalystName(""),
       youthRegion("Metropolitana"),
       debt(0),
       sponsorWeekly(25000),
@@ -475,6 +501,7 @@ Team::Team(string n)
       headCoachName(""),
       headCoachReputation(50),
       headCoachStyle(""),
+      headCoachTenureWeeks(0),
       jobSecurity(58),
       transferPolicy(""),
       scoutingRegions() {}
@@ -910,13 +937,7 @@ void LeagueTable::displayTable() {
     }
 }
 
-const vector<DivisionInfo> kDivisions = {
-    {"primera division", "data/LigaChilena/primera division", "Primera Division"},
-    {"primera b", "data/LigaChilena/primera b", "Primera B"},
-    {"segunda division", "data/LigaChilena/segunda division", "Segunda Division"},
-    {"tercera division a", "data/LigaChilena/tercera division a", "Tercera Division A"},
-    {"tercera division b", "data/LigaChilena/tercera division b", "Tercera Division B"}
-};
+const vector<DivisionInfo> kDivisions = listRegisteredDivisions();
 
 #if 0  // Career state and persistence were moved to engine/career_state.cpp and io/save_serialization.cpp.
 Career::Career()

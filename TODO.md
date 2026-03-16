@@ -2440,3 +2440,41 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - `build.bat --cli`
 - Comprobacion de subsistema con `objdump -p`: `FootballManager.exe` quedo como `Windows GUI` y `FootballManagerCLI.exe` como `Windows CUI`.
 - Nota de entorno: el camino CMake en `build-cmake` sigue fallando por un bloqueo externo de `ar.exe` al renombrar `objects.a`, pero el fallback directo con `g++` compilo ambos ejecutables correctamente.
+
+
+## Cambios recientes (2026-03-16) - Registro de ligas, inbox central, staff y data hub
+
+- Se agrego un registro externo de ligas en `data/configs/league_registry.csv` y un modulo nuevo `competition/league_registry`.
+- `competition.cpp` ya no depende de una ruta fija hardcodeada para `competition_rules.csv`; ahora usa el registro externo.
+- `utils.cpp` y el arranque de carrera quedaron alineados con el registro configurable de divisiones, reforzando la base para modding.
+- Se agregaron dos modulos nuevos de arquitectura: `career/analytics_service` y `career/inbox_service`.
+- `career/analytics_service` construye un data hub reusable con indices ofensivos, control, defensa, continuidad del XI, balance de roles, alertas de carga y lectura del ultimo partido.
+- `career/inbox_service` unifica `managerInbox` y `scoutInbox` para que reportes y GUI usen una sola lectura del centro del manager.
+- Los reportes de club, directiva y scouting ahora usan esos modulos nuevos y muestran un centro del manager mas claro, tendencias del ultimo partido y un data hub mas FM-like.
+- La GUI fue ajustada para empujar mas fuerte el concepto de inbox central y pulso del club.
+- La pagina de noticias ahora funciona mas como centro del manager y muestra mejor la mezcla de inbox, scouting y alertas.
+- El dashboard muestra informacion analitica mas util junto con contexto del DT y lectura inmediata del club.
+- Se profundizo el scouting.
+- `ScoutingCandidate` ahora expone `reportStage`, `knowledgeLevel` y `hiddenRiskLabel`.
+- Los informes de scouting muestran mejor si el reporte es radar lejano, seguimiento parcial o informe completo.
+- Se reforzo el sistema de staff.
+- `Team` ahora persiste nombres propios para asistente, PF, scouting, juveniles, medico, entrenador de arqueros y analista.
+- Tambien se agrega `headCoachTenureWeeks` para seguir la antiguedad del DT del club.
+- `upgradeClubService(...)` ahora puede contratar explicitamente `GoalkeepingCoach` y `PerformanceAnalyst`.
+- El menu de infraestructura/club en consola fue ampliado para exponer esos dos fichajes de staff.
+- `world_state_service` ahora mueve tambien el ecosistema de staff y aumenta la antiguedad semanal del DT.
+- Los clubes pueden reforzar scouting y analisis en background segun presupuesto y reglas de mundo configurables.
+- La persistencia subio a `VERSION 11` en `save_serialization.cpp` para guardar nombres de staff y antiguedad del DT.
+- La limpieza de deuda de datos se externalizo parcialmente con `data/configs/ignored_team_folders.csv`.
+- `validators.cpp` ya soporta una lista de carpetas archivadas/ignoradas para no mezclar historico con dataset activo.
+- `tools/report_orphan_team_folders.ps1` ahora tambien respeta ese archivo de ignorados.
+- La auditoria CLI bajo de `194` advertencias a `85` advertencias activas al validar con el binario recompilado.
+- Se agregaron tests nuevos para `league_registry_data`, `analytics_inbox_blocks` e `ignored_archived_folders`.
+- `save_load_roundtrip` fue ampliado para cubrir staff con nombre propio y antiguedad del DT.
+- Verificacion ejecutada:
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `build-cmake\bin\FootballManagerTests.exe` -> todo OK
+- `cmake --build build-cmake --config Release --target FootballManager` -> compila GUI OK
+- `build.bat --validate` -> compila CLI OK
+- `build-cmake\bin\FootballManagerCLI.exe --validate` -> `Resultado: sin fallas`, `0` errores y `85` advertencias activas de datos externos
+- Pendiente real despues de este bloque: limpiar duplicados nominales de jugadores y las pocas carpetas huerfanas activas que todavia quedan fuera del ignore list.

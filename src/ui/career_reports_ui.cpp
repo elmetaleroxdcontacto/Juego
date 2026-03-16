@@ -98,10 +98,12 @@ void displayClubOperations(Career& career) {
     cout << "6. Contratar jefe de scouting" << endl;
     cout << "7. Contratar jefe de juveniles" << endl;
     cout << "8. Mejorar cuerpo medico" << endl;
-    cout << "9. Cambiar region juvenil" << endl;
-    cout << "10. Volver" << endl;
-    int choice = readInt("Elige opcion: ", 1, 10);
-    if (choice == 10) return;
+    cout << "9. Contratar entrenador de arqueros" << endl;
+    cout << "10. Contratar analista de rendimiento" << endl;
+    cout << "11. Cambiar region juvenil" << endl;
+    cout << "12. Volver" << endl;
+    int choice = readInt("Elige opcion: ", 1, 12);
+    if (choice == 12) return;
 
     ServiceResult result;
     switch (choice) {
@@ -113,7 +115,9 @@ void displayClubOperations(Career& career) {
         case 6: result = upgradeClubService(career, ClubUpgrade::Scouting); break;
         case 7: result = upgradeClubService(career, ClubUpgrade::YouthCoach); break;
         case 8: result = upgradeClubService(career, ClubUpgrade::Medical); break;
-        case 9: {
+        case 9: result = upgradeClubService(career, ClubUpgrade::GoalkeepingCoach); break;
+        case 10: result = upgradeClubService(career, ClubUpgrade::PerformanceAnalyst); break;
+        case 11: {
             vector<string> regions = listYouthRegionsService();
             for (size_t i = 0; i < regions.size(); ++i) {
                 cout << i + 1 << ". " << regions[i] << endl;
