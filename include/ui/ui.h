@@ -1,23 +1,15 @@
-#pragma once
+﻿#pragma once
 
 #include "career/career_runtime.h"
 #include "career/week_simulation.h"
 #include "engine/models.h"
+#include "ui/team_ui.h"
 
 void transferMarket(Career& career);
 void scoutPlayers(Career& career);
-void retirePlayer(Team& team);
 void displayMainMenu();
 void displayGameMenu();
 void displayCareerMenu();
-void viewTeam(Team& team);
-void addPlayer(Team& team);
-void trainPlayer(Team& team, int season = -1, int week = -1);
-void changeTactics(Team& team);
-void editTeam(Team& team);
-void setTrainingPlan(Team& team);
-void manageLineup(Career& career);
-void displayStatistics(Team& team);
 void displayCompetitionCenter(Career& career);
 void displayBoardStatus(Career& career);
 void displayNewsFeed(Career& career);

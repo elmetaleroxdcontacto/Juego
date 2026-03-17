@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+﻿cmake_minimum_required(VERSION 3.16)
 
 project(FootballManagerGame LANGUAGES CXX)
 
@@ -117,6 +117,7 @@ set(FM_CONSOLE_UI_SOURCES
     src/ui/career_reports_ui.cpp
     src/ui/cup_ui.cpp
     src/ui/market_ui.cpp
+    src/ui/team_ui.cpp
     src/ui/ui.cpp
 )
 
@@ -131,6 +132,7 @@ if(WIN32)
         src/gui/gui.cpp
         src/gui/gui_actions.cpp
         src/gui/gui_layout.cpp
+        src/gui/gui_runtime.cpp
         src/gui/gui_shared.cpp
         src/gui/gui_views.cpp
     )
@@ -205,3 +207,5 @@ if(BUILD_TESTING)
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
 endif()
+
+

@@ -2544,3 +2544,100 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - mejora perfiles tacticos del motor de partido y endurece save/load para juego principal y validador
 - corrige validacion de aliases `Display|Folder` en `teams.txt` y limpia los duplicados activos de `LigaChilena`
 - actualiza tests, CMake y `TODO.md` con esta pasada
+
+## Auditoria del proyecto (2026-03-16) - Arquitectura, modularidad y escalabilidad
+
+### Problemas encontrados
+
+- `src/ui/ui.cpp` concentraba demasiadas responsabilidades: menus, vista de plantel, entrenamiento, alineacion, edicion de equipo, narrativa semanal, transicion de temporada y utilidades de competicion en un solo archivo.
+- La separacion entre UI y logica de carrera mejoro mucho en las ultimas iteraciones, pero el modulo de consola seguia mezclando flujos de navegacion con operaciones de gestion del plantel.
+- `src/engine/models.cpp`, `src/gui/gui_views.cpp`, `src/career/app_services.cpp`, `src/io/save_serialization.cpp`, `src/career/week_simulation.cpp` y `src/validators/validators.cpp` siguen siendo hotspots de mantenimiento por volumen y mezcla de responsabilidades.
+- Persisten bloques legacy marcados con `#if 0` en `src/engine/models.cpp` y `src/ui/ui.cpp`; son deuda estructural porque dificultan distinguir la ruta viva del codigo historico.
+- El build actual sigue mostrando warnings por helpers legacy no usados en `src/ui/ui.cpp`; no se eliminaron a ciegas en esta pasada para no romper rutas antiguas sin mapear primero sus dependencias reales.
+
+### Cambios aplicados
+
+- Se hizo una auditoria completa de la estructura del repo, el grafo de modulos y los archivos mas grandes para identificar el punto de refactor de mayor impacto y menor riesgo.
+- Se creo un modulo nuevo de consola: `src/ui/team_ui.cpp` con su header `include/ui/team_ui.h`.
+- Ese modulo extrae la gestion de plantel/equipo fuera de `src/ui/ui.cpp`.
+- Funciones movidas al modulo nuevo:
+- `retirePlayer(...)`
+- `viewTeam(...)`
+- `addPlayer(...)`
+- `trainPlayer(...)`
+- `changeTactics(...)`
+- `manageLineup(...)`
+- `setTrainingPlan(...)`
+- `editTeam(...)`
+- `displayStatistics(...)`
+- `include/ui/ui.h` ahora funciona como header agregador y delega la parte de gestion de equipo en `ui/team_ui.h`.
+- `CMakeLists.txt` fue actualizado para compilar `src/ui/team_ui.cpp` dentro de `FM_CONSOLE_UI_SOURCES`.
+- Resultado directo del split:
+- `src/ui/ui.cpp` bajo de `2592` lineas a `1970` lineas.
+- La logica de gestion de equipo quedo encapsulada en un archivo nuevo de `636` lineas, reduciendo acoplamiento y clarificando la frontera de la UI de consola.
+- Se recompilo el proyecto completo y se verifico que el refactor no rompio ni la GUI, ni la CLI, ni la validacion de datos.
+
+### Archivos modificados
+
+- `CMakeLists.txt`
+- `include/ui/ui.h`
+- `include/ui/team_ui.h`
+- `src/ui/ui.cpp`
+- `src/ui/team_ui.cpp`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `build-cmake\\bin\\FootballManagerTests.exe` -> `All tests passed`
+- `build-cmake\\bin\\FootballManagerCLI.exe --validate` -> `Resultado: sin fallas`
+- Auditoria actual de datos -> `Errores: 0 | Advertencias: 0`
+
+### Mejoras futuras recomendadas
+
+- Extraer de `src/ui/ui.cpp` el bloque de simulacion semanal y transicion de temporada a modulos de carrera dedicados, para dejar la UI como una capa orquestadora y no como ejecutora de logica de dominio.
+- Partir `src/gui/gui_views.cpp` por pantallas o secciones (`dashboard`, `inbox`, `market`, `medical`, `board`) para bajar complejidad de GUI.
+- Seguir desmontando responsabilidades de `src/engine/models.cpp` hacia modulos mas explicitos (`team_identity`, `roster_selection`, `table_helpers`, `career_lookup`).
+- Separar `save_serialization.cpp` por bloques (`career`, `team`, `player`, `world_state`) para hacer el save mas mantenible.
+- Resolver o eliminar el codigo legacy marcado con `#if 0` solo despues de mapear sus callers o reemplazos activos.
+- Consolidar los helpers `static` no usados de `src/ui/ui.cpp`; hoy son deuda visible y deberian moverse, reusarse o borrarse en una pasada controlada.
+
+## Auditoria del proyecto (2026-03-16) - Segunda pasada de arquitectura GUI y consola
+
+### Problemas encontrados
+
+- `src/gui/gui_views.cpp` seguia mezclando dos responsabilidades: construccion del modelo de pagina y actualizacion/render de controles Win32.
+- `src/ui/ui.cpp` aun mantenia helpers legacy y bloques historicos que ya no representaban el flujo activo del juego, lo que hacia mas dificil distinguir el codigo vivo del codigo heredado.
+- La division inicial de UI de consola ya habia reducido complejidad, pero faltaba una segunda pasada para separar mejor runtime/presentacion en GUI y seguir limpiando deuda arquitectonica.
+
+### Cambios aplicados
+
+- Se creo `src/gui/gui_runtime.cpp` para mover fuera de `src/gui/gui_views.cpp` la capa de runtime y refresco de la GUI Win32.
+- `src/gui/gui_runtime.cpp` ahora concentra el render y sincronizacion de controles: `renderFeed`, `renderListPanel`, `refreshFilterComboOptions`, `fillDivisionCombo`, `fillTeamCombo`, `syncManagerNameFromUi`, `syncCombosFromCareer`, `setStatus`, `refreshCurrentPage`, `refreshAll`, `setCurrentPage`, `handleFilterChange`, `handleListSelectionChange` y `handleListColumnClick`.
+- `src/gui/gui_views.cpp` quedo enfocado en construir `GuiPageModel` y en los builders de pantalla, reduciendo mezcla entre datos de vista y manipulacion de widgets.
+- `CMakeLists.txt` fue actualizado para compilar el nuevo modulo `src/gui/gui_runtime.cpp` dentro de `FM_GUI_SOURCES`.
+- En `src/ui/ui.cpp` se eliminaron helpers sin uso y bloques legacy de transicion de temporada, incluyendo el bloque historico marcado con `#if 0`, para clarificar la ruta activa de la consola.
+- Se corrigio una regresion del refactor en `displayLeagueTables(...)`, reemplazando dependencia a helpers internos de competicion por las utilidades locales `buildGroupTable(...)` y `regionalGroupTitle(...)`.
+- Con esta pasada, la capa consola quedo mas limpia y la GUI separa mejor construccion de modelos versus actualizacion de controles.
+
+### Archivos modificados
+
+- `CMakeLists.txt`
+- `src/gui/gui_views.cpp`
+- `src/gui/gui_runtime.cpp`
+- `src/ui/ui.cpp`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `build-cmake\\bin\\FootballManagerTests.exe` -> `All tests passed`
+- `build-cmake\\bin\\FootballManagerCLI.exe --validate` -> `Resultado: sin fallas`
+- Auditoria actual de datos -> `Errores: 0 | Advertencias: 0`
+
+### Mejoras futuras recomendadas
+
+- Partir `src/gui/gui_views.cpp` aun mas, por pantallas (`dashboard`, `squad`, `news`, `board`, `finances`) para que cada vista tenga un builder propio.
+- Revisar `src/gui/gui_actions.cpp` con el mismo criterio y separar acciones por dominio o pantalla.
+- Continuar la limpieza de deuda en `src/engine/models.cpp`, `src/career/app_services.cpp` y `src/io/save_serialization.cpp`, que siguen siendo hotspots de mantenimiento.
+- Extraer mas flujo de carrera desde la consola a servicios dedicados, dejando la UI como capa de orquestacion fina.
