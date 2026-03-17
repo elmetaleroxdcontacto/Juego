@@ -2641,3 +2641,53 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Revisar `src/gui/gui_actions.cpp` con el mismo criterio y separar acciones por dominio o pantalla.
 - Continuar la limpieza de deuda en `src/engine/models.cpp`, `src/career/app_services.cpp` y `src/io/save_serialization.cpp`, que siguen siendo hotspots de mantenimiento.
 - Extraer mas flujo de carrera desde la consola a servicios dedicados, dejando la UI como capa de orquestacion fina.
+
+## Auditoria del proyecto (2026-03-16) - Tercera pasada: builders por pantalla y modulos de Team/LeagueTable
+
+### Problemas encontrados
+
+- `src/gui/gui_views.cpp` seguia siendo un hotspot grande porque aun mezclaba helpers compartidos y todos los builders de pantallas en un solo archivo.
+- `src/engine/models.cpp` continuaba concentrando responsabilidades de identidad de jugador, seleccion del XI, valoracion del plantel y tabla de liga en el mismo modulo.
+- El objetivo de separar GUI por pantallas y empezar a desmontar `models.cpp` seguia pendiente para acercar el proyecto a una arquitectura mas profesional y escalable.
+
+### Cambios aplicados
+
+- Se creo `include/gui/gui_view_builders.h` como header compartido para declarar builders de pagina y helpers de vista reutilizables.
+- Se dividio la GUI en modulos mas claros:
+- `src/gui/gui_view_common.cpp` concentra helpers compartidos, construccion de paneles reutilizables y funciones comunes de vista.
+- `src/gui/gui_view_overview.cpp` contiene los builders de `Dashboard`, `Squad`, `Youth` y `Tactics`.
+- `src/gui/gui_view_competition.cpp` contiene los builders de `Calendar` y `League`.
+- `src/gui/gui_view_management.cpp` contiene los builders de `Transfers`, `Finances`, `Board` y `News`.
+- `src/gui/gui_views.cpp` quedo reducido al dispatcher `buildModel(...)`, dejando de mezclar dispatch con construccion detallada de todas las pantallas.
+- Se creo `src/engine/league_table.cpp` para extraer la logica de ordenamiento, desempate y render de `LeagueTable` fuera de `src/engine/models.cpp`.
+- Se creo `src/engine/team_selection.cpp` para mover fuera de `src/engine/models.cpp` la seleccion del XI, el banco y los calculos agregados del equipo (`getStartingXIIndices`, `getBenchIndices`, `getTotalAttack`, `getTotalDefense`, `getAverageSkill`, `getAverageStamina`, `getSquadValue`).
+- `src/engine/models.cpp` quedo mas enfocado en identidad de jugadores, perfiles y serializacion del dominio, reduciendo mezcla con seleccion deportiva y tabla competitiva.
+- `CMakeLists.txt` fue actualizado para compilar todos los modulos nuevos de GUI y engine.
+
+### Archivos modificados
+
+- `CMakeLists.txt`
+- `TODO.md`
+- `include/gui/gui_view_builders.h`
+- `src/gui/gui_view_common.cpp`
+- `src/gui/gui_view_overview.cpp`
+- `src/gui/gui_view_competition.cpp`
+- `src/gui/gui_view_management.cpp`
+- `src/gui/gui_views.cpp`
+- `src/engine/models.cpp`
+- `src/engine/league_table.cpp`
+- `src/engine/team_selection.cpp`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `build-cmake\\bin\\FootballManagerTests.exe` -> `All tests passed`
+- `build-cmake\\bin\\FootballManagerCLI.exe --validate` -> `Resultado: sin fallas`
+- Auditoria actual de datos -> `Errores: 0 | Advertencias: 0`
+
+### Mejoras futuras recomendadas
+
+- Partir `src/gui/gui_actions.cpp` por dominios (`market`, `board`, `inbox`, `staff`) para emparejar la nueva division de builders.
+- Seguir desmontando `src/engine/models.cpp` en modulos como `player_identity`, `player_profile`, `team_identity` y `career_lookup`.
+- Extraer la persistencia de `src/io/save_serialization.cpp` por bloques de dominio para mantener la misma claridad que ya se logro en GUI y engine.
+- Revisar `src/career/app_services.cpp` con el mismo enfoque y separar reporting, scouting, board e interacciones del manager.

@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.16)
 
 project(FootballManagerGame LANGUAGES CXX)
 
@@ -45,7 +45,9 @@ set(FM_COMPETITION_SOURCES
 set(FM_ENGINE_SOURCES
     src/engine/career_state.cpp
     src/engine/game_engine.cpp
+    src/engine/league_table.cpp
     src/engine/models.cpp
+    src/engine/team_selection.cpp
 )
 
 set(FM_APP_SOURCES
@@ -134,6 +136,10 @@ if(WIN32)
         src/gui/gui_layout.cpp
         src/gui/gui_runtime.cpp
         src/gui/gui_shared.cpp
+        src/gui/gui_view_common.cpp
+        src/gui/gui_view_competition.cpp
+        src/gui/gui_view_management.cpp
+        src/gui/gui_view_overview.cpp
         src/gui/gui_views.cpp
     )
     set(FM_GUI_ENTRY_SOURCES
@@ -207,5 +213,7 @@ if(BUILD_TESTING)
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
 endif()
+
+
 
 
