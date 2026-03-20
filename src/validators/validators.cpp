@@ -1182,12 +1182,18 @@ ValidationSuiteSummary buildValidationSuiteSummary() {
 
     int failures = 0;
     ValidationSuiteSummary summary;
+    summary.logicFailureCount = 0;
+    summary.dataErrorCount = 0;
+    summary.dataWarningCount = 0;
     summary.lines.push_back("");
     summary.lines.push_back("=== Suite de Validacion ===");
     for (const auto& result : results) {
         if (!result.ok) failures++;
         summary.lines.push_back(string(result.ok ? "[OK] " : "[FAIL] ") + result.name + ": " + result.detail);
     }
+    summary.logicFailureCount = failures;
+    summary.dataErrorCount = rosterReport.errorCount;
+    summary.dataWarningCount = rosterReport.warningCount;
     summary.lines.insert(summary.lines.end(), rosterReport.lines.begin(), rosterReport.lines.end());
     summary.ok = (failures == 0 && rosterReport.errorCount == 0);
     summary.lines.push_back("");

@@ -12,6 +12,34 @@ bool containsText(const std::string& text, const std::string& needle) {
     return text.find(needle) != std::string::npos;
 }
 
+std::wstring buildValidationDialogText(const ValidationSuiteSummary& summary) {
+    std::ostringstream out;
+    out << "Resumen de validacion\n\n";
+    out << "Fallos logicos: " << summary.logicFailureCount << "\n";
+    out << "Errores de datos: " << summary.dataErrorCount << "\n";
+    out << "Advertencias de datos: " << summary.dataWarningCount << "\n";
+
+    int shown = 0;
+    for (const auto& line : summary.lines) {
+        if (!(containsText(line, "[FAIL]") || containsText(line, "[ERROR]") || containsText(line, "[WARNING]"))) {
+            continue;
+        }
+        if (shown == 0) out << "\nIncidencias destacadas:";
+        if (shown >= 6) {
+            out << "\n- ... ver reporte completo en saves/roster_validation_report.txt";
+            break;
+        }
+        out << "\n- " << line;
+        ++shown;
+    }
+
+    if (shown == 0) {
+        out << "\n\nNo se detectaron incidencias activas.";
+    }
+    out << "\n\nDetalle completo disponible en saves/roster_validation_report.txt";
+    return utf8ToWide(out.str());
+}
+
 void showServiceMessages(AppState& state, const ServiceResult& result, const std::string& title) {
     if (result.messages.empty()) return;
     std::ostringstream out;
@@ -170,11 +198,12 @@ void validateSystem(AppState& state) {
     setStatus(state, "Ejecutando validacion...");
     UpdateWindow(state.window);
     ValidationSuiteSummary summary = runValidationService();
+    const std::wstring dialogText = buildValidationDialogText(summary);
     if (summary.ok) {
-        MessageBoxW(state.window, L"La suite de validacion termino sin fallas.", L"Football Manager", MB_OK | MB_ICONINFORMATION);
+        MessageBoxW(state.window, dialogText.c_str(), L"Football Manager", MB_OK | MB_ICONINFORMATION);
         setStatus(state, "Validacion completada sin fallas.");
     } else {
-        MessageBoxW(state.window, L"La suite de validacion detecto fallas.", L"Football Manager", MB_OK | MB_ICONWARNING);
+        MessageBoxW(state.window, dialogText.c_str(), L"Football Manager", MB_OK | MB_ICONWARNING);
         setStatus(state, "Validacion completada con fallas.");
     }
 }

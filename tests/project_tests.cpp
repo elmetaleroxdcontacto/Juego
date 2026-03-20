@@ -4,6 +4,8 @@
 #include "career/app_services.h"
 #include "career/career_reports.h"
 #include "career/inbox_service.h"
+#include "career/manager_advice.h"
+#include "career/transfer_briefing.h"
 #include "career/dressing_room_service.h"
 #include "career/medical_service.h"
 #include "career/staff_service.h"
@@ -169,6 +171,8 @@ void testValidationSuiteReflectsRosterAudit() {
         expect(!summary.ok, "La suite debe fallar si la auditoria de datos detecta errores.");
         expect(joinLines(summary.lines).find("error(es) de datos") != string::npos,
                "El resumen de validacion debe informar errores de datos.");
+    } else {
+        expect(summary.ok, "La suite debe quedar sana cuando no existen errores de datos ni fallas logicas.");
     }
 }
 
@@ -240,13 +244,18 @@ void testLowBlockSuppressesChanceQuality() {
     Team lowBlock = makeTeam("Muralla", "primera division", 68, 1, 2, "Defensive", "Bloque bajo", 680000);
     Team openGame = makeTeam("Abierto", "primera division", 68, 4, 4, "Offensive", "Por bandas", 680000);
 
+    setRandomSeed(20260320);
     const MatchSetup lowBlockSetup = match_context::buildMatchSetup(home, lowBlock, false, false);
+    setRandomSeed(20260320);
     const MatchSetup openSetup = match_context::buildMatchSetup(home, openGame, false, false);
 
+    setRandomSeed(424242);
     const MatchPhaseEvaluation lowBlockEval =
         match_phase::evaluatePhase(lowBlockSetup, home, lowBlock, lowBlockSetup.home, lowBlockSetup.away, 1, 16, 30);
+    setRandomSeed(424242);
     const MatchPhaseEvaluation openEval =
         match_phase::evaluatePhase(openSetup, home, openGame, openSetup.home, openSetup.away, 1, 16, 30);
+    resetRandomSeed();
 
     expect(lowBlockEval.report.homeChanceProbability < openEval.report.homeChanceProbability,
            "Un bloque bajo debe recortar la calidad media de las llegadas rivales.");
@@ -1239,6 +1248,119 @@ void testAnalyticsAndInboxServicesProduceUsefulBlocks() {
            "El inbox combinado debe resumir canal y contenido.");
 }
 
+void testManagerAdviceHighlightsUrgentActions() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 6;
+    career.boardConfidence = 34;
+    career.boardMonthlyObjective = "Sumar al menos 6 puntos en 4 semanas";
+    career.boardMonthlyTarget = 6;
+    career.boardMonthlyProgress = 2;
+    career.allTeams.push_back(makeTeam("Plan FC", "primera division", 68, 4, 4, "Pressing", "Contra-presion", 120000));
+    career.allTeams.push_back(makeTeam("Rival Sur", "primera division", 67, 2, 2, "Defensive", "Bloque bajo", 620000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Plan FC");
+    expect(career.myTeam != nullptr, "La prueba de recomendaciones necesita club usuario.");
+
+    career.myTeam->debt = 500000;
+    career.myTeam->morale = 42;
+    career.myTeam->players[0].contractWeeks = 8;
+    career.myTeam->players[1].contractWeeks = 10;
+    career.myTeam->players[0].fitness = 54;
+    career.myTeam->players[0].fatigueLoad = 74;
+    career.myTeam->players[1].happiness = 36;
+    career.activePromises.push_back({career.myTeam->players[0].name, "Minutos", "Titular", 4, 8, 1, false, false});
+
+    const auto advice = manager_advice::buildManagerActionLines(career, 6);
+    const string dump = joinLines(advice);
+    expect(dump.find("Renovar") != string::npos,
+           "Las recomendaciones deben detectar contratos cortos.");
+    expect(dump.find("vestuario") != string::npos || dump.find("Vestuario") != string::npos,
+           "Las recomendaciones deben detectar gestion emocional urgente.");
+    expect(dump.find("Directiva") != string::npos,
+           "Las recomendaciones deben detectar presion de directiva.");
+}
+
+void testTransferBriefingBuildsActionableMarketView() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 4;
+    career.managerReputation = 72;
+    career.scoutingShortlist.push_back("Mercado Norte|Objetivo Creativo");
+
+    career.allTeams.push_back(makeTeam("Mercado Local", "primera division", 66, 3, 3, "Balanced", "Equilibrado", 950000));
+    career.allTeams.push_back(makeTeam("Mercado Norte", "primera division", 72, 3, 3, "Balanced", "Equilibrado", 820000));
+    career.allTeams.push_back(makeTeam("Mercado Sur", "primera division", 70, 2, 2, "Defensive", "Bloque bajo", 760000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Mercado Local");
+    expect(career.myTeam != nullptr, "La prueba de briefing de mercado necesita club usuario.");
+
+    Team* seller = career.findTeamByName("Mercado Norte");
+    expect(seller != nullptr, "La prueba de briefing de mercado necesita club vendedor.");
+    seller->players.clear();
+
+    Player target = makePlayer("Objetivo Creativo", "MED", 76, 84, 22, 74, 76);
+    target.value = 420000;
+    target.releaseClause = 760000;
+    target.wage = 18000;
+    target.contractWeeks = 16;
+    target.currentForm = 72;
+    seller->addPlayer(target);
+
+    Player loanTarget = makePlayer("Proyecto Cedido", "MED", 71, 83, 20, 75, 77);
+    loanTarget.value = 360000;
+    loanTarget.releaseClause = 700000;
+    loanTarget.wage = 11000;
+    loanTarget.contractWeeks = 92;
+    seller->addPlayer(loanTarget);
+
+    const auto options = transfer_briefing::buildTransferOptions(career, "MED", true, 5);
+    expect(!options.empty(), "El briefing de mercado debe devolver objetivos.");
+    expect(!options.front().competitionLabel.empty() &&
+               !options.front().actionLabel.empty() &&
+               !options.front().packageLabel.empty(),
+           "Cada objetivo debe bajar el mercado a competencia, accion y paquete.");
+
+    const auto pulse = transfer_briefing::buildMarketPulseLines(career, 4);
+    expect(!pulse.empty(), "El mercado debe devolver una lectura resumida para la semana.");
+
+    const auto opportunities = transfer_briefing::buildTransferOpportunityLines(career, "MED", 2);
+    expect(!opportunities.empty() && opportunities.front().find("Entrada") != string::npos,
+           "Las oportunidades resumidas deben incluir el paquete economico recomendado.");
+}
+
+void testMatchCenterAddsRecommendedAdjustments() {
+    Career career;
+    career.lastMatchAnalysis = "Partido denso y largo.";
+    career.lastMatchPlayerOfTheMatch = "Figura Test";
+    career.lastMatchCenter.competitionLabel = "Liga";
+    career.lastMatchCenter.opponentName = "Rival Tactico";
+    career.lastMatchCenter.venueLabel = "Visita";
+    career.lastMatchCenter.myGoals = 0;
+    career.lastMatchCenter.oppGoals = 2;
+    career.lastMatchCenter.myShots = 6;
+    career.lastMatchCenter.oppShots = 15;
+    career.lastMatchCenter.myShotsOnTarget = 1;
+    career.lastMatchCenter.oppShotsOnTarget = 7;
+    career.lastMatchCenter.myPossession = 39;
+    career.lastMatchCenter.oppPossession = 61;
+    career.lastMatchCenter.myExpectedGoalsTenths = 7;
+    career.lastMatchCenter.oppExpectedGoalsTenths = 18;
+    career.lastMatchCenter.weather = "Lluvia";
+    career.lastMatchCenter.tacticalSummary = "El rival encontro la espalda.";
+    career.lastMatchCenter.fatigueSummary = "El equipo llego roto al cierre.";
+    career.lastMatchCenter.postMatchImpact = "Moral -4";
+    career.lastMatchCenter.phaseSummaries = {"1-15: el rival rompe por fuera"};
+
+    const MatchCenterView view = match_center_service::buildLastMatchCenter(career, 3, 3);
+    expect(view.available, "El match center debe quedar disponible con snapshot cargado.");
+    expect(!view.recommendationLines.empty(),
+           "El match center debe devolver ajustes sugeridos cuando el partido deja problemas claros.");
+    const string dump = joinLines(view.recommendationLines);
+    expect(dump.find("Proteger mejor el area") != string::npos || dump.find("volumen ofensivo") != string::npos,
+           "Los ajustes sugeridos deben explicar que corregir tras el partido.");
+}
+
 void testIgnoredArchivedFoldersConfigSuppressesKnownWarnings() {
     const DataValidationReport report = buildRosterDataValidationReport();
     const string issueDump = joinLines(report.lines);
@@ -1318,6 +1440,9 @@ int main() {
         {"configured_world_data", testConfiguredWorldDataLoads},
         {"league_registry_data", testLeagueRegistryLoadsConfiguredData},
         {"analytics_inbox_blocks", testAnalyticsAndInboxServicesProduceUsefulBlocks},
+        {"manager_advice", testManagerAdviceHighlightsUrgentActions},
+        {"transfer_briefing", testTransferBriefingBuildsActionableMarketView},
+        {"match_center_adjustments", testMatchCenterAddsRecommendedAdjustments},
         {"ignored_archived_folders", testIgnoredArchivedFoldersConfigSuppressesKnownWarnings},
         {"teams_txt_folder_aliases", testTeamsTxtFolderAliasesDoNotTriggerOrphanWarnings},
         {"negotiation_agent_costs", testNegotiationTracksAgentCosts},

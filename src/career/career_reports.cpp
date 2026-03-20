@@ -4,12 +4,14 @@
 #include "career/analytics_service.h"
 #include "career/dressing_room_service.h"
 #include "career/inbox_service.h"
+#include "career/manager_advice.h"
 #include "career/medical_service.h"
 #include "career/staff_service.h"
 #include "career/match_center_service.h"
 #include "career/match_analysis_store.h"
 #include "career/career_support.h"
 #include "career/team_management.h"
+#include "career/transfer_briefing.h"
 #include "career/world_state_service.h"
 #include "competition/competition.h"
 #include "development/training_impact_system.h"
@@ -279,6 +281,8 @@ CareerReport buildCompetitionReport(const Career& career) {
         addBlock(report, "Ultimas noticias", std::move(news));
     }
     addBlock(report, "Records historicos", historicalRecordLines(career));
+    addBlock(report, "Acciones sugeridas", manager_advice::buildManagerActionLines(career, 4));
+    addBlock(report, "Narrativa de la semana", manager_advice::buildCareerStorylines(career, 3));
     MatchCenterView matchCenter = match_center_service::buildLastMatchCenter(career, 3, 4);
     if (matchCenter.available) {
         vector<string> lastMatchBlock;
@@ -287,6 +291,7 @@ CareerReport buildCompetitionReport(const Career& career) {
         if (!matchCenter.fatigueSummary.empty()) lastMatchBlock.push_back(matchCenter.fatigueSummary);
         if (!matchCenter.playerOfTheMatch.empty()) lastMatchBlock.push_back("Figura: " + matchCenter.playerOfTheMatch);
         addBlock(report, "Ultimo analisis", std::move(lastMatchBlock));
+        addBlock(report, "Ajustes tras el ultimo partido", matchCenter.recommendationLines);
     }
     if (!career.cupChampion.empty()) {
         addBlock(report, "Copa", {"Campeon: " + career.cupChampion});
@@ -354,6 +359,8 @@ CareerReport buildBoardReport(const Career& career) {
     addBlock(report, "Promesas activas", activePromiseLines(career));
     addBlock(report, "Centro del manager", inbox_service::buildInboxSummaryLines(career));
     addBlock(report, "Staff tecnico", staffDigestLines(*career.myTeam));
+    addBlock(report, "Acciones sugeridas", manager_advice::buildManagerActionLines(career, 4));
+    addBlock(report, "Narrativa de la semana", manager_advice::buildCareerStorylines(career, 3));
 
     vector<string> offers;
     for (Team* job : jobs) {
@@ -422,6 +429,10 @@ CareerReport buildClubReport(const Career& career) {
     addBlock(report, "Promesas activas", activePromiseLines(career));
     addBlock(report, "Planner de plantilla", plannerLines(team));
     addBlock(report, "Centro medico", medicalDigestLines(team));
+    addBlock(report, "Acciones sugeridas", manager_advice::buildManagerActionLines(career, 5));
+    addBlock(report, "Narrativa de la semana", manager_advice::buildCareerStorylines(career, 4));
+    addBlock(report, "Pulso de mercado", transfer_briefing::buildMarketPulseLines(career, 4));
+    addBlock(report, "Oportunidades de mercado", transfer_briefing::buildTransferOpportunityLines(career, "", 3));
     addBlock(report, "Data hub", analytics_service::buildTeamAnalyticsLines(career, team));
     addBlock(report, "Centro del manager", inbox_service::buildInboxSummaryLines(career));
     addBlock(report, "Staff tecnico", staffDigestLines(*career.myTeam));
@@ -480,6 +491,7 @@ CareerReport buildMatchCenterReport(const Career& career) {
     addBlock(report, "Impacto", {center.postMatchImpact});
     addBlock(report, "Fases", center.phaseLines);
     addBlock(report, "Timeline", center.eventLines);
+    addBlock(report, "Ajustes sugeridos", center.recommendationLines);
     return report;
 }
 
@@ -526,6 +538,12 @@ CareerReport buildScoutingReport(const Career& career) {
 
     addBlock(report, "Centro del manager", inbox_service::buildInboxSummaryLines(career, 4));
     addBlock(report, "Asignaciones scouting", scoutingAssignmentLines(career));
+    addBlock(report, "Acciones sugeridas", manager_advice::buildManagerActionLines(career, 3));
+    addBlock(report, "Narrativa de la semana", manager_advice::buildCareerStorylines(career, 3));
+    addBlock(report, "Pulso de mercado", transfer_briefing::buildMarketPulseLines(career, 3));
+    addBlock(report,
+             "Objetivos sugeridos",
+             transfer_briefing::buildTransferOpportunityLines(career, detectScoutingNeed(team), 3));
 
     if (!career.scoutInbox.empty()) {
         vector<string> notes;

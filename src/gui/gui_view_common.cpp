@@ -5,6 +5,7 @@
 #include "ai/ai_squad_planner.h"
 #include "career/analytics_service.h"
 #include "career/inbox_service.h"
+#include "career/manager_advice.h"
 #include "career/medical_service.h"
 #include "career/staff_service.h"
 #include "ai/ai_transfer_manager.h"
@@ -696,6 +697,9 @@ std::vector<TransferPreviewItem> buildTransferTargets(const Career& career, cons
                 transferMarketLabel(target),
                 expectedRoleLabel(buyer, player),
                 target.scoutingNote,
+                manager_advice::buildTransferCompetitionLabel(career, seller, player, target),
+                manager_advice::buildTransferActionLabel(career, seller, player, target),
+                manager_advice::buildTransferPackageLabel(target),
                 target.onShortlist,
                 target.urgentNeed,
                 target.scoutingConfidence,

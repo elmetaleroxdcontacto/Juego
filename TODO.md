@@ -2691,3 +2691,139 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Seguir desmontando `src/engine/models.cpp` en modulos como `player_identity`, `player_profile`, `team_identity` y `career_lookup`.
 - Extraer la persistencia de `src/io/save_serialization.cpp` por bloques de dominio para mantener la misma claridad que ya se logro en GUI y engine.
 - Revisar `src/career/app_services.cpp` con el mismo enfoque y separar reporting, scouting, board e interacciones del manager.
+
+## Auditoria del proyecto (2026-03-20) - confiabilidad, recomendaciones accionables y lectura de temporada
+
+### Problemas encontrados
+
+- La suite de tests podia dejar pasar fallas logicas de la validacion completa porque `validation_suite` no exigia un estado sano cuando no habia errores de datos.
+- El test `low_block_chance_quality` podia volverse flaky por el uso de RNG compartido en la evaluacion de fases.
+- La GUI mostraba la validacion con un popup demasiado generico, sin explicar cuantos fallos logicos, errores de datos o advertencias habia.
+- El proyecto ya generaba mucha informacion rica en `dashboard`, `board`, `news`, `finances`, `scouting` y `match center`, pero todavia faltaba convertir esa lectura en acciones sugeridas para el jugador.
+- El `match center` devolvia buen contexto del ultimo partido, pero faltaba una capa final de “que haria ahora” para bajar esa info a decisiones tacticas.
+- El mercado ya tenia buenas señales internas (`competitionScore`, `affordabilityScore`, shortlist, contratos cortos), pero la vista no exponia bien urgencia, competencia y paquete economico recomendado.
+- Quedaba pendiente hacer un refactor pequeno pero real para no seguir inflando archivos grandes con mas heuristicas de UI y reportes.
+
+### Cambios aplicados
+
+- Se agrego control explicito del RNG en `include/utils/utils.h` y `src/utils/utils.cpp` con `setRandomSeed(...)` y `resetRandomSeed()`, de modo que los tests tacticos puedan fijar escenarios reproducibles.
+- Se reforzo `tests/project_tests.cpp`:
+- `validation_suite` ahora exige `summary.ok` cuando no existen errores de datos.
+- `low_block_chance_quality` ahora usa una semilla fija para comparar ambos escenarios con el mismo ruido aleatorio.
+- Se agregaron pruebas nuevas para `manager_advice` y para los ajustes sugeridos del `match center`.
+- Se amplió `ValidationSuiteSummary` en `include/validators/validators.h` y `src/validators/validators.cpp` para exponer conteo de fallos logicos, errores de datos y advertencias.
+- Se mejoro `src/gui/gui_actions.cpp` para que la validacion muestre un resumen util con incidencias destacadas y referencia al reporte completo, en vez de un simple “paso/fallo”.
+- Se creo el modulo nuevo `include/career/manager_advice.h` + `src/career/manager_advice.cpp` para sacar heuristicas de accion/narrativa fuera de archivos ya cargados:
+- `buildManagerActionLines(...)` genera decisiones sugeridas para vestuario, renovaciones, carga, mercado, directiva y caja.
+- `buildCareerStorylines(...)` resume la narrativa activa de la semana.
+- `buildTransferCompetitionLabel(...)`, `buildTransferActionLabel(...)` y `buildTransferPackageLabel(...)` bajan las señales del mercado a lenguaje accionable.
+- Se integro ese modulo nuevo en `src/career/career_reports.cpp`, agregando bloques de `Acciones sugeridas` y `Narrativa de la semana` a reportes de competicion, directiva, club y scouting.
+- Se amplió `MatchCenterView` en `include/career/match_center_service.h` y `src/career/match_center_service.cpp` con `recommendationLines`, generando ajustes sugeridos a partir de xG, tiros, control territorial y fatiga.
+- `formatLastMatchCenter(...)` ahora imprime tambien una seccion `Ajustes sugeridos`.
+- Se conectaron estas mejoras a la GUI:
+- `src/gui/gui_view_overview.cpp` ahora muestra decisiones sugeridas y narrativa de semana en el `Dashboard`.
+- `src/gui/gui_view_management.cpp` expone en `Transfers` la competencia, la recomendacion de movimiento y el paquete economico estimado del objetivo seleccionado.
+- `src/gui/gui_view_management.cpp` tambien suma recomendaciones/narrativa en `Finances`, `Board` y `News`.
+- Se extendio `TransferPreviewItem` en `include/gui/gui_view_builders.h` y se completan los nuevos campos desde `src/gui/gui_view_common.cpp`.
+- `CMakeLists.txt` fue actualizado para compilar el nuevo modulo `manager_advice.cpp`.
+
+### Archivos modificados
+
+- `CMakeLists.txt`
+- `TODO.md`
+- `include/career/manager_advice.h`
+- `include/career/match_center_service.h`
+- `include/gui/gui_view_builders.h`
+- `include/utils/utils.h`
+- `include/validators/validators.h`
+- `src/career/career_reports.cpp`
+- `src/career/manager_advice.cpp`
+- `src/career/match_center_service.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_view_common.cpp`
+- `src/gui/gui_view_management.cpp`
+- `src/gui/gui_view_overview.cpp`
+- `src/utils/utils.cpp`
+- `src/validators/validators.cpp`
+- `tests/project_tests.cpp`
+
+### Verificacion ejecutada
+
+- Recompilacion de objetos con `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- En este entorno MinGW + OneDrive el enlace por `objects.a` quedo bloqueado por permisos, asi que el link final de `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe` se completo manualmente reutilizando los `.obj` ya generados por CMake.
+- `build-cmake\\bin\\FootballManagerTests.exe` -> `All tests passed`
+- `build-cmake\\bin\\FootballManagerCLI.exe --validate` -> `Resultado: sin fallas`
+- Auditoria actual de datos -> `Errores: 0 | Advertencias: 0`
+
+### Mejoras futuras recomendadas
+
+- Llevar el mismo enfoque de recomendaciones accionables a la consola (`src/ui/`) para que CLI y GUI queden mas parejos.
+- Seguir desmontando `src/career/app_services.cpp` y `src/engine/models.cpp`, que siguen siendo hotspots aunque esta pasada evito inflarlos mas.
+- Si el entorno sigue en OneDrive, evaluar un build dir fuera de sincronizacion para evitar los bloqueos de `ar.exe` con MinGW.
+
+## Auditoria del proyecto (2026-03-20) - segunda pasada sobre mercado, CLI y pulso semanal
+
+### Objetivo de esta pasada
+
+- Aplicar la tanda siguiente de mejoras de producto que habia quedado propuesta despues de la evaluacion del proyecto:
+- convertir mas informacion en decisiones concretas
+- hacer el mercado mas vivo
+- bajar mejor el ultimo partido a acciones
+- emparejar mas la experiencia entre GUI y CLI
+- hacer un refactor pequeno y reutilizable en vez de seguir inflando vistas aisladas
+
+### Cambios aplicados
+
+- Se creo el modulo nuevo `include/career/transfer_briefing.h` + `src/career/transfer_briefing.cpp`.
+- Este modulo concentra logica compartida para mercado:
+- `buildTransferOptions(...)` arma objetivos con competencia, accion recomendada, paquete economico y confianza de scouting
+- `buildPreContractOptions(...)` y `buildLoanOptions(...)` respetan las reglas reales de elegibilidad del juego
+- `buildMarketPulseLines(...)` resume la situacion del mercado del club en lenguaje de manager
+- `buildTransferOpportunityLines(...)` baja los mejores objetivos a una lista corta accionable
+- `src/ui/market_ui.cpp` dejo de construir su pool de mercado localmente y ahora reutiliza el briefing compartido.
+- La consola del mercado ahora muestra para cada objetivo:
+- competencia del movimiento
+- accion sugerida (`mover ahora`, `pedir mas scouting`, `explorar cesion`, etc.)
+- paquete economico estimado
+- nota de scouting y nivel de confianza
+- Se mejoro tambien la UX del mercado CLI:
+- la portada del mercado imprime un `Pulso de mercado`
+- la entrada a prestamos ahora permite filtrar por posicion
+- el flujo de precontrato vuelve a respetar exactamente la regla de `<= 12` semanas restantes
+- `src/career/career_reports.cpp` ahora suma lectura de mercado a los reportes estructurados:
+- `Club y Finanzas` agrega `Pulso de mercado` y `Oportunidades de mercado`
+- `Scouting` agrega `Pulso de mercado` y `Objetivos sugeridos`
+- Como esos reportes ya alimentan GUI y parte del CLI, el salto llega a mas de una interfaz con el mismo contenido.
+- `src/ui/career_reports_ui.cpp` se reforzo para que `Noticias / Centro del Manager` en consola muestre:
+- acciones sugeridas
+- narrativa de la semana
+- pulso de mercado
+- lectura del ultimo partido
+- ajustes inmediatos postpartido
+- Esto deja al CLI mucho mas cerca del nivel de lectura accionable que ya habia ganado la GUI.
+- `CMakeLists.txt` fue actualizado para compilar el nuevo modulo `transfer_briefing.cpp`.
+
+### Tests y validacion
+
+- `tests/project_tests.cpp` suma la prueba nueva `transfer_briefing`, que verifica que el modulo entregue objetivos accionables, pulso de mercado y paquetes economicos resumidos.
+- Recompilacion completa:
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- Verificacion:
+- `build-cmake\\bin\\FootballManagerTests.exe` -> `All tests passed`
+- `build-cmake\\bin\\FootballManagerCLI.exe --validate` -> `Resultado: sin fallas`
+- En esta pasada el build enlazo bien por CMake y no hizo falta repetir el workaround manual de link.
+
+### Archivos modificados en esta pasada
+
+- `CMakeLists.txt`
+- `TODO.md`
+- `include/career/transfer_briefing.h`
+- `src/career/career_reports.cpp`
+- `src/career/transfer_briefing.cpp`
+- `src/ui/career_reports_ui.cpp`
+- `src/ui/market_ui.cpp`
+- `tests/project_tests.cpp`
+
+### Siguiente paso natural
+
+- Si se quiere seguir con esta linea, lo mas valioso ahora seria llevar el mismo enfoque de modulo compartido a `src/career/app_services.cpp` para separar mejor mercado, scouting, inbox y decisiones del manager.

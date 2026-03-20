@@ -5,6 +5,7 @@
 #include "ai/ai_squad_planner.h"
 #include "career/analytics_service.h"
 #include "career/dressing_room_service.h"
+#include "career/manager_advice.h"
 #include "career/career_support.h"
 #include "utils/utils.h"
 
@@ -16,6 +17,8 @@ namespace gui_win32 {
 GuiPageModel buildDashboardModel(AppState& state) {
     GuiPageModel model;
     std::vector<std::string> alerts = buildAlertLines(state.career);
+    const auto actionLines = manager_advice::buildManagerActionLines(state.career, 4);
+    const auto storyLines = manager_advice::buildCareerStorylines(state.career, 3);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state.career, alerts);
@@ -69,6 +72,16 @@ GuiPageModel buildDashboardModel(AppState& state) {
     out << "Moral " << team.morale << " | Lesionados " << injured << " | Tension " << dressing.socialTension << "\r\n";
     out << "Plan semanal: " << team.trainingFocus << (congestedWeek ? " | semana congestionada" : " | semana regular") << "\r\n";
     out << "Objetivo: " << (state.career.boardMonthlyObjective.empty() ? "Sin objetivo mensual activo" : state.career.boardMonthlyObjective) << "\r\n\r\n";
+    if (!actionLines.empty()) {
+        out << "Decisiones sugeridas\r\n";
+        for (const auto& line : actionLines) out << "- " << line << "\r\n";
+        out << "\r\n";
+    }
+    if (!storyLines.empty()) {
+        out << "Clima de la semana\r\n";
+        for (const auto& line : storyLines) out << "- " << line << "\r\n";
+        out << "\r\n";
+    }
     out << "Microciclo\r\n" << trainingSchedulePreview(team, congestedWeek) << "\r\n\r\n";
     out << "Lectura del rival\r\n" << buildOpponentReport(state.career);
     model.summary.content = out.str();
@@ -90,6 +103,14 @@ GuiPageModel buildDashboardModel(AppState& state) {
         detail << analyticsLines.front() << "\r\n";
         if (analyticsLines.size() > 1) detail << analyticsLines[1] << "\r\n";
         if (analyticsLines.size() > 2) detail << analyticsLines[2] << "\r\n";
+    }
+    if (!actionLines.empty()) {
+        detail << "\r\nAcciones sugeridas\r\n";
+        for (const auto& line : actionLines) detail << "- " << line << "\r\n";
+    }
+    if (!storyLines.empty()) {
+        detail << "\r\nNarrativa de la semana\r\n";
+        for (const auto& line : storyLines) detail << "- " << line << "\r\n";
     }
     detail << "\r\n" << dressingRoomPanelText(state.career, 4);
     model.detail.content = detail.str();

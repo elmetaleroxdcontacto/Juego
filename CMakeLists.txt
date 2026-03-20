@@ -12,10 +12,12 @@ set(FM_CAREER_SOURCES
     src/career/analytics_service.cpp
     src/career/app_services.cpp
     src/career/inbox_service.cpp
+    src/career/manager_advice.cpp
     src/career/medical_service.cpp
     src/career/staff_service.cpp
     src/career/career_runtime.cpp
     src/career/career_reports.cpp
+    src/career/transfer_briefing.cpp
     src/career/career_manager.cpp
     src/career/dressing_room_service.cpp
     src/career/match_analysis_store.cpp

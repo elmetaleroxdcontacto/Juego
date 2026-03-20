@@ -1,6 +1,8 @@
 #include "ui.h"
 
 #include "career/app_services.h"
+#include "career/career_reports.h"
+#include "career/transfer_briefing.h"
 #include "competition.h"
 #include "transfers/negotiation_system.h"
 #include "utils.h"
@@ -12,34 +14,33 @@ using namespace std;
 
 namespace {
 
-vector<pair<Team*, int>> buildTransferPool(Career& career, const string& filterPos, bool includeClauseTargets) {
-    vector<pair<Team*, int>> pool;
-    for (auto& club : career.allTeams) {
-        if (&club == career.myTeam) continue;
-        if (!includeClauseTargets && club.players.size() <= 18) continue;
-        for (size_t i = 0; i < club.players.size(); ++i) {
-            const Player& player = club.players[i];
-            if (player.onLoan) continue;
-            if (!filterPos.empty() && positionFitScore(player, filterPos) < 70) continue;
-            if (player.age > 35) continue;
-            pool.push_back({&club, static_cast<int>(i)});
-        }
-    }
-    sort(pool.begin(), pool.end(), [](const pair<Team*, int>& a, const pair<Team*, int>& b) {
-        const Player& pa = a.first->players[static_cast<size_t>(a.second)];
-        const Player& pb = b.first->players[static_cast<size_t>(b.second)];
-        if (pa.skill != pb.skill) return pa.skill > pb.skill;
-        if (pa.value != pb.value) return pa.value < pb.value;
-        return pa.name < pb.name;
-    });
-    if (pool.size() > 25) pool.resize(25);
-    return pool;
-}
-
 void printServiceResult(const ServiceResult& result) {
     for (const auto& message : result.messages) {
         cout << message << endl;
     }
+}
+
+void printBriefingSection(const string& title, const vector<string>& lines) {
+    if (lines.empty()) return;
+    cout << title << ":" << endl;
+    for (const auto& line : lines) {
+        cout << "- " << line << endl;
+    }
+}
+
+void printTransferOption(const transfer_briefing::TransferOptionBrief& option, bool emphasizeClause) {
+    cout << option.playerName << " (" << option.position << ", " << option.sellerName << ")"
+         << " Hab " << option.skill
+         << " | Valor " << formatMoneyValue(option.marketValue)
+         << " | Salario " << formatMoneyValue(option.wage);
+    if (emphasizeClause) {
+        cout << " | Clausula " << formatMoneyValue(option.releaseClause);
+    }
+    cout << " | " << option.competitionLabel
+         << " | " << option.actionLabel << endl;
+    cout << "   " << option.packageLabel
+         << " | scouting " << option.scoutingConfidence << "%"
+         << " | " << option.scoutingNote << endl;
 }
 
 NegotiationProfile promptNegotiationProfile() {
@@ -76,7 +77,7 @@ void buyFromClub(Career& career) {
 
     string filter = normalizePosition(readLine("Filtrar por posicion (ARQ/DEF/MED/DEL o Enter para todas): "));
     if (filter == "N/A") filter.clear();
-    auto pool = buildTransferPool(career, filter, false);
+    auto pool = transfer_briefing::buildTransferOptions(career, filter, false);
     if (pool.empty()) {
         cout << "No hay jugadores transferibles en este momento." << endl;
         return;
@@ -84,22 +85,16 @@ void buyFromClub(Career& career) {
 
     cout << "\nJugadores disponibles:" << endl;
     for (size_t i = 0; i < pool.size(); ++i) {
-        Team* seller = pool[i].first;
-        const Player& player = seller->players[static_cast<size_t>(pool[i].second)];
-        cout << i + 1 << ". " << player.name << " (" << player.position << ", " << seller->name << ")"
-             << " Hab " << player.skill << " | Valor $" << player.value
-             << " | Pie " << player.preferredFoot
-             << " | Forma " << playerFormLabel(player)
-             << " | Clausula $" << player.releaseClause << endl;
+        cout << i + 1 << ". ";
+        printTransferOption(pool[i], false);
     }
     int choice = readInt("Elige jugador (0 para cancelar): ", 0, static_cast<int>(pool.size()));
     if (choice == 0) return;
 
-    Team* seller = pool[static_cast<size_t>(choice - 1)].first;
-    const Player& target = seller->players[static_cast<size_t>(pool[static_cast<size_t>(choice - 1)].second)];
+    const auto& target = pool[static_cast<size_t>(choice - 1)];
     NegotiationProfile profile = promptNegotiationProfile();
     NegotiationPromise promise = promptNegotiationPromise();
-    printServiceResult(buyTransferTargetService(career, seller->name, target.name, profile, promise));
+    printServiceResult(buyTransferTargetService(career, target.sellerName, target.playerName, profile, promise));
 }
 
 void triggerReleaseClause(Career& career) {
@@ -112,7 +107,7 @@ void triggerReleaseClause(Career& career) {
 
     string filter = normalizePosition(readLine("Filtrar por posicion (ARQ/DEF/MED/DEL o Enter para todas): "));
     if (filter == "N/A") filter.clear();
-    auto pool = buildTransferPool(career, filter, true);
+    auto pool = transfer_briefing::buildTransferOptions(career, filter, true);
     if (pool.empty()) {
         cout << "No hay clausulas ejecutables disponibles." << endl;
         return;
@@ -120,32 +115,21 @@ void triggerReleaseClause(Career& career) {
 
     cout << "\nObjetivos con clausula:" << endl;
     for (size_t i = 0; i < pool.size(); ++i) {
-        Team* seller = pool[i].first;
-        const Player& player = seller->players[static_cast<size_t>(pool[i].second)];
-        cout << i + 1 << ". " << player.name << " (" << player.position << ", " << seller->name << ")"
-             << " Hab " << player.skill << " | Clausula $" << player.releaseClause
-             << " | Salario $" << player.wage << endl;
+        cout << i + 1 << ". ";
+        printTransferOption(pool[i], true);
     }
     int choice = readInt("Ejecutar clausula de (0 para cancelar): ", 0, static_cast<int>(pool.size()));
     if (choice == 0) return;
 
-    Team* seller = pool[static_cast<size_t>(choice - 1)].first;
-    const Player& target = seller->players[static_cast<size_t>(pool[static_cast<size_t>(choice - 1)].second)];
+    const auto& target = pool[static_cast<size_t>(choice - 1)];
     NegotiationProfile profile = promptNegotiationProfile();
     NegotiationPromise promise = promptNegotiationPromise();
-    printServiceResult(triggerReleaseClauseService(career, seller->name, target.name, profile, promise));
+    printServiceResult(triggerReleaseClauseService(career, target.sellerName, target.playerName, profile, promise));
 }
 
 void signPreContractUi(Career& career) {
     if (!career.myTeam) return;
-    vector<pair<Team*, int>> pool = buildTransferPool(career, "", true);
-    vector<pair<Team*, int>> eligible;
-    for (const auto& entry : pool) {
-        const Player& player = entry.first->players[static_cast<size_t>(entry.second)];
-        if (player.contractWeeks > 12) continue;
-        if (player.onLoan) continue;
-        eligible.push_back(entry);
-    }
+    vector<transfer_briefing::TransferOptionBrief> eligible = transfer_briefing::buildPreContractOptions(career);
     if (eligible.empty()) {
         cout << "No hay jugadores elegibles para precontrato." << endl;
         return;
@@ -153,29 +137,24 @@ void signPreContractUi(Career& career) {
 
     cout << "\nJugadores elegibles para precontrato:" << endl;
     for (size_t i = 0; i < eligible.size(); ++i) {
-        const Player& player = eligible[i].first->players[static_cast<size_t>(eligible[i].second)];
-        cout << i + 1 << ". " << player.name << " (" << player.position << ", " << eligible[i].first->name << ")"
-             << " Hab " << player.skill << " | Contrato restante " << player.contractWeeks << " sem" << endl;
+        cout << i + 1 << ". ";
+        printTransferOption(eligible[i], false);
+        cout << "   Contrato restante " << eligible[i].contractWeeks << " sem" << endl;
     }
     int choice = readInt("Jugador (0 para cancelar): ", 0, static_cast<int>(eligible.size()));
     if (choice == 0) return;
 
-    Team* seller = eligible[static_cast<size_t>(choice - 1)].first;
-    const Player& target = seller->players[static_cast<size_t>(eligible[static_cast<size_t>(choice - 1)].second)];
+    const auto& target = eligible[static_cast<size_t>(choice - 1)];
     NegotiationProfile profile = promptNegotiationProfile();
     NegotiationPromise promise = promptNegotiationPromise();
-    printServiceResult(signPreContractService(career, seller->name, target.name, profile, promise));
+    printServiceResult(signPreContractService(career, target.sellerName, target.playerName, profile, promise));
 }
 
 void loanInPlayerUi(Career& career) {
     if (!career.myTeam) return;
-    auto pool = buildTransferPool(career, "", false);
-    vector<pair<Team*, int>> loanable;
-    for (const auto& entry : pool) {
-        const Player& player = entry.first->players[static_cast<size_t>(entry.second)];
-        if (player.contractWeeks <= 12) continue;
-        loanable.push_back(entry);
-    }
+    string filter = normalizePosition(readLine("Filtrar prestamo por posicion (ARQ/DEF/MED/DEL o Enter para todas): "));
+    if (filter == "N/A") filter.clear();
+    auto loanable = transfer_briefing::buildLoanOptions(career, filter);
     if (loanable.empty()) {
         cout << "No hay jugadores disponibles para prestamo." << endl;
         return;
@@ -183,17 +162,15 @@ void loanInPlayerUi(Career& career) {
 
     cout << "\nJugadores disponibles a prestamo:" << endl;
     for (size_t i = 0; i < loanable.size(); ++i) {
-        const Player& player = loanable[i].first->players[static_cast<size_t>(loanable[i].second)];
-        cout << i + 1 << ". " << player.name << " (" << player.position << ", " << loanable[i].first->name << ")"
-             << " Hab " << player.skill << " | Valor $" << player.value << endl;
+        cout << i + 1 << ". ";
+        printTransferOption(loanable[i], false);
     }
     int choice = readInt("Jugador (0 para cancelar): ", 0, static_cast<int>(loanable.size()));
     if (choice == 0) return;
 
-    Team* seller = loanable[static_cast<size_t>(choice - 1)].first;
-    const Player& target = seller->players[static_cast<size_t>(loanable[static_cast<size_t>(choice - 1)].second)];
+    const auto& target = loanable[static_cast<size_t>(choice - 1)];
     int loanWeeks = readInt("Duracion del prestamo (8-26 semanas): ", 8, 26);
-    printServiceResult(loanInPlayerService(career, seller->name, target.name, loanWeeks));
+    printServiceResult(loanInPlayerService(career, target.sellerName, target.playerName, loanWeeks));
 }
 
 void loanOutPlayerUi(Career& career) {
@@ -271,7 +248,8 @@ void transferMarket(Career& career) {
     if (!career.myTeam) return;
     Team& team = *career.myTeam;
     cout << "\n=== Mercado de Transferencias ===" << endl;
-    cout << "Presupuesto: $" << team.budget << endl;
+    cout << "Presupuesto: " << formatMoneyValue(team.budget) << endl;
+    printBriefingSection("Pulso de mercado", transfer_briefing::buildMarketPulseLines(career, 3));
     cout << "1. Comprar desde otro club" << endl;
     cout << "2. Ejecutar clausula de rescision" << endl;
     cout << "3. Precontrato" << endl;

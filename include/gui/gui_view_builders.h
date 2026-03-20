@@ -25,6 +25,9 @@ struct TransferPreviewItem {
     std::string marketLabel;
     std::string expectedRole;
     std::string scoutingNote;
+    std::string competitionLabel;
+    std::string actionLabel;
+    std::string packageLabel;
     bool onShortlist = false;
     bool urgentNeed = false;
     int scoutingConfidence = 0;

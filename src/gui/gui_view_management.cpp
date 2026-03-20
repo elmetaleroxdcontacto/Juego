@@ -4,6 +4,7 @@
 
 #include "ai/ai_transfer_manager.h"
 #include "career/inbox_service.h"
+#include "career/manager_advice.h"
 #include "finance/finance_system.h"
 #include "transfers/negotiation_system.h"
 #include "utils/utils.h"
@@ -16,6 +17,7 @@ namespace gui_win32 {
 GuiPageModel buildTransfersModel(AppState& state) {
     GuiPageModel model;
     std::vector<std::string> alerts = buildAlertLines(state.career);
+    const auto actionLines = manager_advice::buildManagerActionLines(state.career, 3);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state.career, alerts);
@@ -45,7 +47,8 @@ GuiPageModel buildTransfersModel(AppState& state) {
                             "Filtro " + state.currentFilter + "\r\n"
                             "Pendientes " + std::to_string(state.career.pendingTransfers.size()) + "\r\n"
                             "Shortlist " + std::to_string(state.career.scoutingShortlist.size()) + "\r\n"
-                            "Red scouting " + (team.scoutingRegions.empty() ? std::string("-") : joinStringValues(team.scoutingRegions, ", "));
+                            "Red scouting " + (team.scoutingRegions.empty() ? std::string("-") : joinStringValues(team.scoutingRegions, ", ")) +
+                            (actionLines.empty() ? std::string() : "\r\nPlan corto: " + actionLines.front());
     model.primary.rows.push_back({"Necesidad", detectScoutingNeed(team), "Lectura del plantel actual"});
     model.primary.rows.push_back({"Presupuesto", formatMoneyValue(team.budget), "Define agresividad de mercado"});
     model.primary.rows.push_back({"Contratos cortos", std::to_string(std::count_if(team.players.begin(), team.players.end(), [](const Player& p) { return p.contractWeeks <= 12; })),
@@ -95,6 +98,9 @@ GuiPageModel buildTransfersModel(AppState& state) {
                    << " | Salario esperado " << formatMoneyValue(selectedPreview->expectedWage) << "\r\n";
             detail << "Radar " << selectedPreview->scoutingLabel
                    << " | Mercado " << selectedPreview->marketLabel << "\r\n";
+            detail << "Competencia " << selectedPreview->competitionLabel
+                   << " | Recomendacion " << selectedPreview->actionLabel << "\r\n";
+            detail << "Plan economico: " << selectedPreview->packageLabel << "\r\n";
             detail << "Lectura scouting: " << selectedPreview->scoutingNote << "\r\n";
         } else {
             detail << "Valor " << formatMoneyValue(player->value) << " | Salario " << formatMoneyValue(player->wage) << "\r\n";
@@ -113,6 +119,8 @@ GuiPageModel buildTransfersModel(AppState& state) {
 GuiPageModel buildFinancesModel(AppState& state) {
     GuiPageModel model;
     std::vector<std::string> alerts = buildAlertLines(state.career);
+    const auto actionLines = manager_advice::buildManagerActionLines(state.career, 4);
+    const auto storyLines = manager_advice::buildCareerStorylines(state.career, 2);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state.career, alerts);
@@ -170,12 +178,22 @@ GuiPageModel buildFinancesModel(AppState& state) {
                            "\r\nBonos variables " + formatMoneyValue(finance.bonusIncome) +
                            "\r\nBuffer de mercado " + formatMoneyValue(finance.transferBuffer) +
                            "\r\nRiesgo " + finance.riskLevel;
+    if (!actionLines.empty()) {
+        model.detail.content += "\r\n\r\nAcciones sugeridas";
+        for (const auto& line : actionLines) model.detail.content += "\r\n- " + line;
+    }
+    if (!storyLines.empty()) {
+        model.detail.content += "\r\n\r\nNarrativa";
+        for (const auto& line : storyLines) model.detail.content += "\r\n- " + line;
+    }
     return model;
 }
 
 GuiPageModel buildBoardModel(AppState& state) {
     GuiPageModel model;
     std::vector<std::string> alerts = buildAlertLines(state.career);
+    const auto actionLines = manager_advice::buildManagerActionLines(state.career, 4);
+    const auto storyLines = manager_advice::buildCareerStorylines(state.career, 3);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state.career, alerts);
@@ -193,6 +211,14 @@ GuiPageModel buildBoardModel(AppState& state) {
 
     model.summary.content = buildBoardSummaryService(state.career);
     model.detail.content = buildBoardSummaryService(state.career);
+    if (!actionLines.empty()) {
+        model.detail.content += "\r\n\r\nAcciones sugeridas";
+        for (const auto& line : actionLines) model.detail.content += "\r\n- " + line;
+    }
+    if (!storyLines.empty()) {
+        model.detail.content += "\r\n\r\nNarrativa de la semana";
+        for (const auto& line : storyLines) model.detail.content += "\r\n- " + line;
+    }
 
     if (state.career.myTeam) {
         model.primary.rows.push_back({"Puesto esperado", std::to_string(state.career.boardExpectedFinish), "Meta de temporada"});
@@ -223,6 +249,7 @@ GuiPageModel buildBoardModel(AppState& state) {
 GuiPageModel buildNewsModel(AppState& state) {
     GuiPageModel model;
     std::vector<std::string> alerts = buildAlertLines(state.career);
+    const auto storyLines = manager_advice::buildCareerStorylines(state.career, 4);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state.career, alerts);
@@ -261,8 +288,15 @@ GuiPageModel buildNewsModel(AppState& state) {
                             "\r\nScouting: " + std::to_string(state.career.scoutInbox.size()) +
                             "\r\nAsignaciones: " + std::to_string(state.career.scoutingAssignments.size()) +
                             "\r\nFiltro actual: " + state.currentFilter;
+    if (!storyLines.empty()) {
+        model.summary.content += "\r\nNarrativa activa: " + storyLines.front();
+    }
     model.detail.content = inbox_service::buildInboxDigest(state.career, 8) + "\r\n" +
                            lastMatchPanelText(state.career, 5, 8) + "\r\n" + dressingRoomPanelText(state.career, 4);
+    if (!storyLines.empty()) {
+        model.detail.content += "\r\n\r\nNarrativa de la semana";
+        for (const auto& line : storyLines) model.detail.content += "\r\n- " + line;
+    }
     return model;
 }
 

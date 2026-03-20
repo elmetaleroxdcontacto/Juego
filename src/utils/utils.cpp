@@ -25,7 +25,15 @@
 
 using namespace std;
 
-static std::mt19937 rng{std::random_device{}()};
+namespace {
+
+std::mt19937 makeFreshRng() {
+    return std::mt19937(std::random_device{}());
+}
+
+}  // namespace
+
+static std::mt19937 rng{makeFreshRng()};
 
 static bool isPathSeparator(char c) {
     return c == '/' || c == '\\';
@@ -97,6 +105,14 @@ int randInt(int minVal, int maxVal) {
 double rand01() {
     std::uniform_real_distribution<double> dist(0.0, 1.0);
     return dist(rng);
+}
+
+void setRandomSeed(unsigned int seed) {
+    rng.seed(seed);
+}
+
+void resetRandomSeed() {
+    rng = makeFreshRng();
 }
 
 string trim(const string& s) {

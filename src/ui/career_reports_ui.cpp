@@ -4,6 +4,9 @@
 #include "career/career_reports.h"
 #include "career/career_support.h"
 #include "career/inbox_service.h"
+#include "career/manager_advice.h"
+#include "career/match_center_service.h"
+#include "career/transfer_briefing.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -24,6 +27,14 @@ void printReport(const CareerReport& report) {
     cout << "\n" << formatCareerReport(report);
 }
 
+void printSection(const string& title, const vector<string>& lines) {
+    if (lines.empty()) return;
+    cout << "\n" << title << ":" << endl;
+    for (const auto& line : lines) {
+        cout << "- " << line << endl;
+    }
+}
+
 void printActiveScoutingAssignments(const Career& career) {
     if (career.scoutingAssignments.empty()) {
         cout << "No hay asignaciones activas." << endl;
@@ -37,6 +48,18 @@ void printActiveScoutingAssignments(const Career& career) {
              << " | conocimiento " << assignment.knowledgeLevel << "%"
              << " | resta " << assignment.weeksRemaining << " sem" << endl;
     }
+}
+
+vector<string> latestMatchDigest(const Career& career) {
+    vector<string> lines;
+    const MatchCenterView center = match_center_service::buildLastMatchCenter(career, 2, 3);
+    if (!center.available) return lines;
+
+    if (!center.scoreboard.empty()) lines.push_back(center.scoreboard);
+    if (!center.tacticalSummary.empty()) lines.push_back(center.tacticalSummary);
+    if (!center.fatigueSummary.empty()) lines.push_back(center.fatigueSummary);
+    if (!center.playerOfTheMatch.empty()) lines.push_back("Figura: " + center.playerOfTheMatch);
+    return lines;
 }
 
 }  // namespace
@@ -97,6 +120,13 @@ void displayNewsFeed(Career& career) {
             cout << "- " << career.newsFeed[i] << endl;
         }
     }
+
+    printSection("Acciones sugeridas", manager_advice::buildManagerActionLines(career, 4));
+    printSection("Narrativa de la semana", manager_advice::buildCareerStorylines(career, 3));
+    printSection("Pulso de mercado", transfer_briefing::buildMarketPulseLines(career, 3));
+    printSection("Lectura del ultimo partido", latestMatchDigest(career));
+    const MatchCenterView center = match_center_service::buildLastMatchCenter(career, 2, 3);
+    printSection("Ajustes inmediatos", center.recommendationLines);
 
     cout << "\n";
     printActiveScoutingAssignments(career);

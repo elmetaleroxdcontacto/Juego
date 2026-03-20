@@ -13,6 +13,8 @@ T clampValue(T value, T lo, T hi) {
 
 int randInt(int minVal, int maxVal);
 double rand01();
+void setRandomSeed(unsigned int seed);
+void resetRandomSeed();
 
 std::string trim(const std::string& s);
 std::string toLower(const std::string& s);

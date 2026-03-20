@@ -26,7 +26,10 @@ struct DataValidationReport {
 };
 
 struct ValidationSuiteSummary {
-    bool ok;
+    bool ok = false;
+    int logicFailureCount = 0;
+    int dataErrorCount = 0;
+    int dataWarningCount = 0;
     std::vector<std::string> lines;
 };
 

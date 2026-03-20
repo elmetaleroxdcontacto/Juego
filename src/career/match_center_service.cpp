@@ -21,6 +21,39 @@ string phaseLeadLabel(const MatchCenterSnapshot& snapshot) {
     return snapshot.phaseSummaries.front();
 }
 
+vector<string> buildRecommendationLines(const MatchCenterSnapshot& snapshot) {
+    vector<string> lines;
+    const int shotGap = snapshot.myShots - snapshot.oppShots;
+    const int shotOnTargetGap = snapshot.myShotsOnTarget - snapshot.oppShotsOnTarget;
+    const int xgGap = snapshot.myExpectedGoalsTenths - snapshot.oppExpectedGoalsTenths;
+    const int possessionGap = snapshot.myPossession - snapshot.oppPossession;
+
+    if (snapshot.myExpectedGoalsTenths <= 9 && snapshot.myShots <= 8) {
+        lines.push_back("Subir volumen ofensivo: faltaron ataques claros y remate final.");
+    } else if (snapshot.myExpectedGoalsTenths >= 14 && snapshot.myGoals < snapshot.oppGoals) {
+        lines.push_back("Mantener plan de ataque: el problema fue mas de definicion que de produccion.");
+    }
+    if (snapshot.oppExpectedGoalsTenths >= 14 || shotOnTargetGap <= -3) {
+        lines.push_back("Proteger mejor el area: el rival encontro demasiados tiros limpios.");
+    }
+    if (possessionGap <= -12) {
+        lines.push_back("Recuperar control del medio: el partido se jugo demasiado tiempo en campo propio.");
+    } else if (possessionGap >= 12 && xgGap < 0) {
+        lines.push_back("La posesion no alcanzo: conviene acelerar el ultimo tercio o atacar mas directo.");
+    }
+    if (shotGap >= 5 && snapshot.myGoals == 0) {
+        lines.push_back("Trabajar la finalizacion y el balon parado: llegaste, pero no convertiste.");
+    }
+    if (!snapshot.fatigueSummary.empty()) {
+        lines.push_back("Revisar carga postpartido: la lectura fisica sugiere gestionar mejor la semana.");
+    }
+    if (lines.empty()) {
+        lines.push_back("Partido equilibrado: el siguiente ajuste fino deberia salir de tu lectura del rival.");
+    }
+    if (lines.size() > 4) lines.resize(4);
+    return lines;
+}
+
 }  // namespace
 
 namespace match_center_service {
@@ -103,6 +136,7 @@ MatchCenterView buildLastMatchCenter(const Career& career,
     for (size_t i = 0; i < eventCount; ++i) {
         view.eventLines.push_back(career.lastMatchEvents[i]);
     }
+    view.recommendationLines = buildRecommendationLines(snapshot);
     return view;
 }
 
@@ -135,6 +169,10 @@ string formatLastMatchCenter(const Career& career,
     if (!view.eventLines.empty()) {
         out << "\r\nTimeline\r\n";
         for (const string& event : view.eventLines) out << "- " << event << "\r\n";
+    }
+    if (!view.recommendationLines.empty()) {
+        out << "\r\nAjustes sugeridos\r\n";
+        for (const string& line : view.recommendationLines) out << "- " << line << "\r\n";
     }
     return out.str();
 }

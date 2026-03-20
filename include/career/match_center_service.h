@@ -23,6 +23,7 @@ struct MatchCenterView {
     std::vector<MatchCenterMetric> metrics;
     std::vector<std::string> phaseLines;
     std::vector<std::string> eventLines;
+    std::vector<std::string> recommendationLines;
 };
 
 namespace match_center_service {
