@@ -1,5 +1,6 @@
 #include "simulation/match_engine_internal.h"
 
+#include "simulation/player_condition.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -308,6 +309,32 @@ int clutchModifier(const Team& team, const vector<int>& xi, bool keyMatch) {
     nerve += leaders * 2;
     if (keyMatch) nerve += 5;
     return clampInt((nerve / static_cast<int>(xi.size()) - 45) / 3, -4, 12);
+}
+
+int bestBenchReplacement(const Team& team, const vector<int>& activeXI, const string& targetPos) {
+    const vector<int> bench = team.getBenchIndices(7);
+    int bestIndex = -1;
+    int bestScore = -100000;
+    for (int idx : bench) {
+        if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
+        if (find(activeXI.begin(), activeXI.end(), idx) != activeXI.end()) continue;
+        const Player& player = team.players[static_cast<size_t>(idx)];
+        if (player.injured || player.matchesSuspended > 0) continue;
+
+        int score = player.skill * 4 + player.currentForm * 2 + player.consistency;
+        score += player.fitness * 2 + player.attack + player.defense;
+        score += positionFitScore(player, targetPos) * 4;
+        score += player_condition::readinessScore(player, team) / 2;
+        if (normalizePosition(player.position) == normalizePosition(targetPos)) score += 10;
+        if (playerHasTrait(player, "Versatil")) score += 6;
+        if (playerHasTrait(player, "Competidor")) score += 4;
+
+        if (score > bestScore) {
+            bestScore = score;
+            bestIndex = idx;
+        }
+    }
+    return bestIndex;
 }
 
 }  // namespace match_internal

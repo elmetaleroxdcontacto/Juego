@@ -1,5 +1,6 @@
 #include "development/training_impact_system.h"
 
+#include "simulation/player_condition.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -141,6 +142,9 @@ void applyWeeklyTrainingImpact(Team& team, bool congestedWeek) {
     const int scheduleLoad = averageLoad(schedule);
 
     for (auto& player : team.players) {
+        const int workload = player_condition::workloadRisk(player, team);
+        const int relapse = player_condition::relapseRisk(player, team);
+        const int stability = player_condition::developmentStability(player, team, congestedWeek);
         if (focus == "Recuperacion" && recoverySessions >= 2) {
             if (player.injured) {
                 player.injuryWeeks = max(0, player.injuryWeeks - (1 + max(0, team.medicalTeam - 60) / 18));
@@ -149,8 +153,11 @@ void applyWeeklyTrainingImpact(Team& team, bool congestedWeek) {
                     player.injuryType.clear();
                 }
             }
-            player.fatigueLoad = max(0, player.fatigueLoad - (8 + recoverySessions * 2 + fitnessBonus + medicalBonus));
-            player.fitness = clampInt(player.fitness + 3 + recoverySessions + facilityBonus + fitnessBonus + medicalBonus, 15, player.stamina);
+            player.fatigueLoad = max(0, player.fatigueLoad - (8 + recoverySessions * 2 + fitnessBonus + medicalBonus + workload / 18));
+            player.fitness = clampInt(player.fitness + 3 + recoverySessions + facilityBonus + fitnessBonus + medicalBonus +
+                                          max(0, 65 - relapse) / 20,
+                                      15,
+                                      player.stamina);
             player.moraleMomentum = clampInt(player.moraleMomentum + 1, -25, 25);
             continue;
         }
@@ -161,7 +168,8 @@ void applyWeeklyTrainingImpact(Team& team, bool congestedWeek) {
         recovery += tacticalSessions / 2 + analystBonus / 2;
         recovery += congestedWeek ? 1 : 0;
         recovery += (player.age <= 21) ? youthBonus / 2 : 0;
-        recovery -= max(0, player.fatigueLoad - 35) / 22;
+        recovery -= workload / 26;
+        recovery -= relapse / 40;
         recovery = max(1, recovery);
         player.fitness = clampInt(player.fitness + recovery, 15, player.stamina);
         player.fatigueLoad = max(0, player.fatigueLoad - max(2, recovery + recoverySessions));
@@ -187,13 +195,19 @@ void applyWeeklyTrainingImpact(Team& team, bool congestedWeek) {
         baseGrowth += attackSessions * 3 + defenseSessions * 3 + technicalSessions * 2 + tacticalSessions * 2 + analystBonus;
         if (normalizePosition(player.position) == "ARQ") baseGrowth += goalkeepingBonus;
         baseGrowth += setPieceSessions;
-        baseGrowth -= scheduleLoad + player.fatigueLoad / 14;
+        baseGrowth += stability / 10;
+        baseGrowth -= scheduleLoad + workload / 16 + relapse / 20;
         if (congestedWeek) baseGrowth -= 2;
+        const string normalized = normalizePosition(player.position);
+        if (player.developmentPlan == "Finalizacion" && normalized == "DEL") baseGrowth += 4;
+        else if (player.developmentPlan == "Defensa" && (normalized == "DEF" || normalized == "ARQ")) baseGrowth += 4;
+        else if (player.developmentPlan == "Creatividad" && normalized == "MED") baseGrowth += 4;
+        else if (player.developmentPlan == "Fisico") baseGrowth += 3;
+        else if (player.developmentPlan == "Liderazgo") baseGrowth += 2;
         baseGrowth = clampInt(baseGrowth, 5, 32);
 
         if (player.skill < player.potential && randInt(1, 100) <= baseGrowth) {
             player.skill = min(100, player.skill + 1);
-            const string normalized = normalizePosition(player.position);
             if ((attackSessions > defenseSessions && normalized != "ARQ") || normalized == "DEL") {
                 player.attack = min(100, player.attack + 1);
             }
@@ -214,8 +228,8 @@ void applyWeeklyTrainingImpact(Team& team, bool congestedWeek) {
         if (player.age <= 23) {
             int potentialShift = 0;
             if (player.matchesPlayed >= max(1, team.points / 6) || player.startsThisSeason >= 2) potentialShift += 1;
-            if (player.happiness >= 62 && player.fatigueLoad <= 30 && recoverySessions > 0) potentialShift += 1;
-            if (player.happiness <= 40 || player.fatigueLoad >= 70) potentialShift -= 1;
+            if (player.happiness >= 62 && workload <= 35 && recoverySessions > 0) potentialShift += 1;
+            if (player.happiness <= 40 || workload >= 70 || relapse >= 65) potentialShift -= 1;
             if (player.professionalism >= 74) potentialShift += 1;
             if (potentialShift >= 2 && randInt(1, 100) <= 10 + youthBonus * 2 + technicalSessions) {
                 player.potential = min(99, player.potential + 1);

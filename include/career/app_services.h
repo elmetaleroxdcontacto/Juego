@@ -39,6 +39,8 @@ struct ScoutingCandidate {
     int fitScore = 0;
     int bigMatches = 0;
     int confidence = 0;
+    int readinessScore = 0;
+    int medicalRisk = 0;
     long long marketValue = 0;
     long long salaryExpectation = 0;
     std::string riskLabel;

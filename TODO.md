@@ -2827,3 +2827,185 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 ### Siguiente paso natural
 
 - Si se quiere seguir con esta linea, lo mas valioso ahora seria llevar el mismo enfoque de modulo compartido a `src/career/app_services.cpp` para separar mejor mercado, scouting, inbox y decisiones del manager.
+
+## Auditoria del proyecto (2026-03-25 21:48:06 -03:00) - salud unificada, partido contextual, progreso mensual y mercado mas realista
+
+### Fecha y hora
+
+- 2026-03-25 21:48:06 -03:00
+
+### Lista de cambios realizados
+
+- Se creo el modulo publico `include/simulation/player_condition.h` y se reforzo `src/simulation/player_condition.cpp` para centralizar carga, recaida, readiness y severidad de lesion.
+- Lesiones, recuperacion, desarrollo, scouting, analitica y evaluacion de fichajes dejaron de usar formulas aisladas y ahora comparten el mismo modelo de salud del jugador.
+- El motor de partido ahora considera contexto real de marcador y disponibilidad:
+- `src/simulation/match_phase.cpp` ajusta urgencia, riesgo e intensidad segun ir ganando/perdiendo y segun hombres disponibles.
+- `src/simulation/match_event_generator.cpp` ya no deja a un lesionado “jugando igual”; una lesion puede forzar sustitucion real o dejar al equipo con menos hombres.
+- Se agrego mas profundidad ofensiva al match engine con seguimiento de balon parado tras interrupciones, para que corners/faltas generen segundas jugadas mas creibles.
+- `src/simulation/match_report.cpp` ahora explica mejor tramos de persecucion del marcador y desventajas de disponibilidad.
+- `src/simulation/match_context.cpp` incorpora readiness del jugador al snapshot colectivo para que el once refleje mejor su estado competitivo real.
+- Se creo el modulo nuevo `include/development/monthly_development.h` + `src/development/monthly_development.cpp`.
+- La progresion mensual salio de `src/career/week_simulation.cpp` y ahora vive en un sistema dedicado, con mejoras ligadas a:
+- estabilidad del entorno
+- minutos jugados
+- plan individual
+- estado fisico
+- infraestructura y staff
+- `src/development/training_impact_system.cpp` y `src/development/player_progression_system.cpp` fueron afinados para que carga, readiness y estabilidad afecten mejor crecimiento y recuperacion.
+- `src/engine/models.cpp` ahora genera jugadores mas variados por perfil y posicion, con roles, stamina, potencial y valoracion menos lineales.
+- Mercado y scouting quedaron mas profundos:
+- `src/ai/ai_transfer_manager.cpp` penaliza riesgo medico y valora readiness + upside real.
+- `src/career/app_services.cpp` agrega readiness y riesgo medico a informes de scouting.
+- `src/career/transfer_briefing.cpp` y `src/ui/market_ui.cpp` exponen mejor si un objetivo llega listo para competir o si arrastra riesgo fisico.
+- `CMakeLists.txt` ahora compila el nuevo modulo mensual y deja explicito `WIN32_EXECUTABLE` para `FootballManager`, reforzando que el `.exe` GUI no abra consola innecesaria en Windows.
+- Se ampliaron tests de regresion para cubrir:
+- urgencia tactica por marcador
+- sustitucion obligada por lesion
+- penalizacion de riesgo medico en mercado
+- progresion mensual modular
+
+### Archivos modificados
+
+- `CMakeLists.txt`
+- `include/career/app_services.h`
+- `include/career/transfer_briefing.h`
+- `include/development/monthly_development.h`
+- `include/simulation/match_engine_internal.h`
+- `include/simulation/match_event_generator.h`
+- `include/simulation/match_phase.h`
+- `include/simulation/match_types.h`
+- `include/simulation/player_condition.h`
+- `include/transfers/transfer_types.h`
+- `src/ai/ai_match_manager.cpp`
+- `src/ai/ai_transfer_manager.cpp`
+- `src/career/analytics_service.cpp`
+- `src/career/app_services.cpp`
+- `src/career/medical_service.cpp`
+- `src/career/transfer_briefing.cpp`
+- `src/career/week_simulation.cpp`
+- `src/development/monthly_development.cpp`
+- `src/development/player_progression_system.cpp`
+- `src/development/training_impact_system.cpp`
+- `src/engine/models.cpp`
+- `src/simulation/match_context.cpp`
+- `src/simulation/match_engine.cpp`
+- `src/simulation/match_event_generator.cpp`
+- `src/simulation/match_phase.cpp`
+- `src/simulation/match_postprocess.cpp`
+- `src/simulation/match_report.cpp`
+- `src/simulation/match_tactics.cpp`
+- `src/simulation/player_condition.cpp`
+- `src/ui/market_ui.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- Resultado:
+- `FootballManager` recompilo correctamente.
+- `FootballManagerCLI` volvio a chocar con el problema del entorno MinGW + OneDrive al enlazar `objects.a`; no fue un error de compilacion del codigo cambiado sino un bloqueo del linker en el directorio sincronizado.
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `build-cmake\\bin\\FootballManagerTests.exe` -> `All tests passed`
+
+### Mejoras futuras sugeridas
+
+- Seguir desmontando `src/career/app_services.cpp`, que ya mejoro por dentro pero sigue concentrando demasiadas responsabilidades.
+- Llevar las nuevas senales de readiness/riesgo medico a mas vistas GUI para que la profundidad agregada al scouting y mercado tambien se vea completa fuera del CLI.
+- Si el proyecto sigue compilando dentro de OneDrive, mover el build dir fuera de sincronizacion para evitar el bloqueo recurrente de `objects.a` al enlazar los targets CLI.
+
+## Auditoria del proyecto (2026-03-25 21:57:24 -03:00) - layout GUI menos amontonado y cabecera mas respirable
+
+### Lista de cambios realizados
+
+- Se rehizo la geometria principal de `src/gui/gui_layout.cpp` con constantes de layout para evitar seguir ajustando pixeles “a mano” en cada bloque.
+- La cabecera superior ahora tiene mas altura util, botones principales mas separados y tarjetas de resumen con mayor alto interno para que etiqueta y valor no se monten entre si.
+- Se redujo el peso visual de la tipografia base y de seccion para que la interfaz deje de verse tan apretada, especialmente en tarjetas, laterales y paneles de texto.
+- El menu lateral gano un poco de ancho y mas separacion vertical entre botones para que cada seccion respire mejor.
+- Los paneles del centro y la columna derecha ahora usan titulos mas altos, cuerpos con mas margen y una separacion consistente entre bloques.
+- Se corrigio tambien la distancia entre botones de accion de pagina y el primer bloque de contenido para que no queden chocando segun la vista activa.
+- La lista de noticias aumento su alto por item para mejorar legibilidad.
+
+### Archivos modificados
+
+- `src/gui/gui_layout.cpp`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager`
+- Resultado:
+- `FootballManager` recompilo correctamente y el ejecutable GUI actualizado quedo en `build-cmake\\bin\\FootballManager.exe`.
+
+### Mejoras futuras sugeridas
+
+- Hacer que la cabecera superior sea verdaderamente responsiva en resoluciones mas chicas, permitiendo que algunos controles pasen a una segunda fila si hace falta.
+- Afinar anchos por pantalla para que vistas como fichajes, noticias y cantera puedan usar layouts ligeramente distintos en vez de compartir una sola proporcion fija.
+- Reemplazar parte del texto largo de paneles vacios por tarjetas visuales o CTAs con iconografia ligera para mejorar onboarding sin saturar texto.
+
+## Auditoria del proyecto (2026-03-25 22:08:31 -03:00) - header responsivo, perfiles por pantalla y onboarding visual
+
+### Lista de cambios realizados
+
+- Se aplico una segunda fase fuerte sobre la GUI Windows para ejecutar las mejoras futuras sugeridas en la entrada anterior.
+- `src/gui/gui_layout.cpp` ahora usa perfiles de header y de pagina en vez de depender de una sola geometria fija para todas las vistas.
+- La cabecera superior paso a ser responsiva: en anchos menores puede separar campos y botones en mas filas, y las metricas superiores se redistribuyen en multiples columnas/filas segun el ancho disponible.
+- La columna lateral tambien responde al ancho de ventana con un rail mas compacto cuando hace falta.
+- Cada pagina principal ahora tiene proporciones propias para panel central y columna derecha, mejorando especialmente dashboard, fichajes, noticias, tacticas, finanzas y plantilla.
+- El estado vacio del dashboard se redisenio para parecer onboarding util y no un bloque de texto: ahora muestra pasos de arranque, acciones listas y una vista previa clara de lo que se desbloquea al iniciar carrera.
+- Se actualizaron etiquetas de panel amigables para reflejar los nuevos bloques de onboarding.
+- Se ajustaron tambien los botones del estado vacio (`Crear carrera`, `Abrir guardado`) para que funcionen como CTA mas claros.
+
+### Archivos modificados
+
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+- `src/gui/gui_view_overview.cpp`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager`
+- Resultado:
+- `FootballManager` recompilo correctamente y el ejecutable actualizado quedo en `build-cmake\\bin\\FootballManager.exe`.
+
+### Mejoras futuras sugeridas
+
+- Hacer que las tablas ajusten anchos de columna por contenido y por pagina para reducir scroll horizontal innecesario.
+- Incorporar escalado DPI mas explicito para que la GUI mantenga proporciones limpias en pantallas 125%/150%.
+- Explorar paneles owner-draw para tarjetas vacias y widgets resumen con mas identidad visual sin abandonar Win32 puro.
+
+## Auditoria del proyecto (2026-03-25 22:16:50 -03:00) - fullscreen, DPI awareness y tablas autoajustables
+
+### Lista de cambios realizados
+
+- Se aplico una nueva pasada sobre la GUI para ejecutar las mejoras futuras pendientes y hacer que el juego arranque ocupando toda la pantalla util.
+- `src/gui/gui.cpp` ahora habilita DPI awareness con fallback compatible para la toolchain actual, detecta DPI de la ventana y arranca `FootballManager` maximizado desde el inicio.
+- La ventana Win32 maneja `WM_DPICHANGED`, recrea fuentes, reaplica tipografia a controles y reajusta layout/columnas cuando cambia la escala del monitor.
+- `include/gui/gui_internal.h` y `src/gui/gui_layout.cpp` incorporan estado DPI y helpers para reconstruir fuentes y reaplicar tipografia sin depender de valores fijos.
+- El layout principal ahora escala mejor con DPI alto en espaciados, tarjetas, botones, paneles y alturas clave, en vez de solo cambiar el tamano de la fuente.
+- `src/gui/gui_shared.cpp` agrega autoajuste de columnas de `ListView` por contenido, encabezado y ancho visible del panel, reduciendo scroll horizontal innecesario.
+- `src/gui/gui_runtime.cpp` recalcula columnas visibles despues de refrescar la pagina y tambien cuando la ventana cambia de tamano.
+- El resultado es una GUI que se abre maximizada, usa mejor el espacio y se lee mejor tanto en fullscreen como en monitores con escalado de Windows.
+
+### Archivos modificados
+
+- `include/gui/gui_internal.h`
+- `src/gui/gui.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+- `src/gui/gui_shared.cpp`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager`
+- Resultado:
+- `FootballManager` recompilo correctamente y el ejecutable GUI actualizado quedo en `build-cmake\\bin\\FootballManager.exe`.
+- La compilacion dejo una advertencia previa en custom draw sobre comparacion signed/unsigned en `src/gui/gui_shared.cpp`, pero no bloqueo la build ni afecta el runtime de esta mejora.
+
+### Mejoras futuras sugeridas
+
+- Agregar un modo `F11` o alternador explicito para cambiar entre maximizado, ventana y fullscreen sin borde durante la ejecucion.
+- Afinar el reparto de ancho entre columnas “texto largo” y columnas numericas con reglas especificas por vista para mejorar todavia mas fichajes y noticias.
+- Profundizar la parte visual owner-draw con widgets KPI y tarjetas de resumen mas ricas en el dashboard sin abandonar Win32 puro.

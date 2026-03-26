@@ -39,6 +39,8 @@ void printTransferOption(const transfer_briefing::TransferOptionBrief& option, b
     cout << " | " << option.competitionLabel
          << " | " << option.actionLabel << endl;
     cout << "   " << option.packageLabel
+         << " | listo " << option.readinessScore
+         << " | riesgo " << option.medicalRisk
          << " | scouting " << option.scoutingConfidence << "%"
          << " | " << option.scoutingNote << endl;
 }

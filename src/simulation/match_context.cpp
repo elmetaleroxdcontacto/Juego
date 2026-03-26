@@ -3,6 +3,7 @@
 #include "simulation/fatigue_engine.h"
 #include "simulation/match_engine_internal.h"
 #include "simulation/morale_engine.h"
+#include "simulation/player_condition.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -55,6 +56,7 @@ TeamMatchSnapshot buildSnapshot(const Team& team,
         const Player& player = team.players[static_cast<size_t>(idx)];
         int playerAttack = player.attack;
         int playerDefense = player.defense;
+        const int readiness = player_condition::readinessScore(player, team);
         match_internal::applyRoleModifier(player, playerAttack, playerDefense);
         match_internal::applyIndividualInstructionModifier(player, team, playerAttack, playerDefense);
         match_internal::applyTraitModifier(player, playerAttack, playerDefense);
@@ -63,15 +65,15 @@ TeamMatchSnapshot buildSnapshot(const Team& team,
         const string pos = normalizePosition(player.position);
         attack += playerAttack;
         defense += playerDefense;
-        skill += player.skill;
+        skill += player.skill + readiness / 8;
         stamina += player.fitness;
         form += player.currentForm;
         morale += player.happiness / 2 + player.chemistry / 3;
         fatigue += max(0, 100 - player.fitness);
-        chanceCreation += player.attack / 2 + player.currentForm / 2 + player.chemistry / 3;
-        pressResistance += player.tacticalDiscipline + player.consistency / 2 + player.chemistry / 2;
-        defensiveShape += player.defense + player.tacticalDiscipline + player.chemistry / 2;
-        lineBreakThreat += player.attack + player.currentForm / 2 + player.versatility / 3;
+        chanceCreation += player.attack / 2 + player.currentForm / 2 + player.chemistry / 3 + readiness / 9;
+        pressResistance += player.tacticalDiscipline + player.consistency / 2 + player.chemistry / 2 + readiness / 8;
+        defensiveShape += player.defense + player.tacticalDiscipline + player.chemistry / 2 + readiness / 10;
+        lineBreakThreat += player.attack + player.currentForm / 2 + player.versatility / 3 + readiness / 10;
         setPieceThreat = max(setPieceThreat, player.setPieceSkill);
         pressingLoad += player.professionalism / 2 + player.stamina / 2 + player.currentForm / 3;
 

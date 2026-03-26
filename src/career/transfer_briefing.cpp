@@ -70,6 +70,8 @@ vector<TransferOptionBrief> buildTransferOptions(const Career& career,
             option.contractRunningOut = target.contractRunningOut;
             option.onShortlist = target.onShortlist;
             option.scoutingConfidence = target.scoutingConfidence;
+            option.readinessScore = target.readinessScore;
+            option.medicalRisk = target.medicalRisk;
             option.competitionLabel = manager_advice::buildTransferCompetitionLabel(career, seller, player, target);
             option.actionLabel = manager_advice::buildTransferActionLabel(career, seller, player, target);
             option.packageLabel = manager_advice::buildTransferPackageLabel(target);
@@ -170,7 +172,9 @@ vector<string> buildTransferOpportunityLines(const Career& career,
                       " | " + option.position +
                       " | " + option.actionLabel +
                       " | " + option.competitionLabel +
-                      " | " + option.packageLabel;
+                      " | " + option.packageLabel +
+                      " | listo " + to_string(option.readinessScore) +
+                      " | riesgo " + to_string(option.medicalRisk);
         if (option.onShortlist) line += " | shortlist";
         if (option.contractRunningOut) line += " | contrato corto";
         if (option.availableForLoan) line += " | cesion viable";

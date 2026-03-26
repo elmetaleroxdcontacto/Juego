@@ -2,6 +2,7 @@
 
 #include "ai/team_ai.h"
 #include "simulation/fatigue_engine.h"
+#include "simulation/match_engine_internal.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -14,23 +15,13 @@ bool isCautioned(const vector<string>& cautionedPlayers, const string& name) {
     return find(cautionedPlayers.begin(), cautionedPlayers.end(), name) != cautionedPlayers.end();
 }
 
-int substituteValue(const Team& team, int playerIndex, const string& targetPos) {
-    if (playerIndex < 0 || playerIndex >= static_cast<int>(team.players.size())) return -100000;
-    const Player& player = team.players[static_cast<size_t>(playerIndex)];
-    if (player.injured || player.matchesSuspended > 0) return -100000;
-    int score = player.skill * 4 + player.currentForm * 2 + player.fitness * 2 + player.consistency + player.attack + player.defense;
-    score += positionFitScore(player, targetPos) * 4;
-    return score;
-}
-
 bool applyBenchSubstitution(Team& team,
                             vector<int>& xi,
                             vector<int>& participants,
                             const vector<string>& cautionedPlayers,
                             int minute,
                             MatchTimeline& timeline) {
-    const vector<int> bench = team.getBenchIndices(7);
-    if (bench.empty() || xi.empty()) return false;
+    if (xi.empty()) return false;
 
     int playerOut = -1;
     int outSlot = -1;
@@ -49,17 +40,7 @@ bool applyBenchSubstitution(Team& team,
     if (playerOut < 0 || highestNeed < 10) return false;
 
     const string targetPos = normalizePosition(team.players[static_cast<size_t>(playerOut)].position);
-    int playerIn = -1;
-    int bestScore = -100000;
-    for (int idx : bench) {
-        if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
-        if (find(xi.begin(), xi.end(), idx) != xi.end()) continue;
-        const int score = substituteValue(team, idx, targetPos);
-        if (score > bestScore) {
-            bestScore = score;
-            playerIn = idx;
-        }
-    }
+    const int playerIn = match_internal::bestBenchReplacement(team, xi, targetPos);
     if (playerIn < 0) return false;
 
     xi[static_cast<size_t>(outSlot)] = playerIn;

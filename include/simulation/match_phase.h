@@ -27,6 +27,10 @@ MatchPhaseEvaluation evaluatePhase(const MatchSetup& setup,
                                    const TeamMatchSnapshot& awaySnapshot,
                                    int phaseIndex,
                                    int minuteStart,
-                                   int minuteEnd);
+                                   int minuteEnd,
+                                   int homeGoals = 0,
+                                   int awayGoals = 0,
+                                   int homePlayersAvailable = 11,
+                                   int awayPlayersAvailable = 11);
 
 }  // namespace match_phase

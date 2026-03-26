@@ -5,6 +5,61 @@
 
 namespace gui_win32 {
 
+namespace {
+
+using SetProcessDpiAwarenessContextFn = BOOL(WINAPI*)(HANDLE);
+using GetDpiForWindowFn = UINT(WINAPI*)(HWND);
+using SetProcessDpiAwareFn = BOOL(WINAPI*)();
+
+#ifndef WM_DPICHANGED
+#define WM_DPICHANGED 0x02E0
+#endif
+
+void enableHighDpiSupport() {
+    HMODULE user32 = GetModuleHandleW(L"user32.dll");
+    if (user32) {
+        auto setDpiContext = reinterpret_cast<SetProcessDpiAwarenessContextFn>(
+            GetProcAddress(user32, "SetProcessDpiAwarenessContext"));
+        if (setDpiContext && setDpiContext(reinterpret_cast<HANDLE>(-4))) {
+            return;
+        }
+        auto setDpiAware = reinterpret_cast<SetProcessDpiAwareFn>(GetProcAddress(user32, "SetProcessDPIAware"));
+        if (setDpiAware) {
+            setDpiAware();
+        }
+    }
+}
+
+UINT queryWindowDpi(HWND hwnd) {
+    HMODULE user32 = GetModuleHandleW(L"user32.dll");
+    if (user32) {
+        auto getDpiForWindow = reinterpret_cast<GetDpiForWindowFn>(GetProcAddress(user32, "GetDpiForWindow"));
+        if (getDpiForWindow) {
+            UINT dpi = getDpiForWindow(hwnd);
+            if (dpi != 0) return dpi;
+        }
+    }
+
+    HDC hdc = GetDC(hwnd ? hwnd : nullptr);
+    UINT dpi = hdc ? static_cast<UINT>(GetDeviceCaps(hdc, LOGPIXELSX)) : 96;
+    if (hdc) ReleaseDC(hwnd ? hwnd : nullptr, hdc);
+    return dpi == 0 ? 96 : dpi;
+}
+
+RECT primaryMonitorWorkArea() {
+    RECT rect{0, 0, 1600, 900};
+    POINT origin{0, 0};
+    HMONITOR monitor = MonitorFromPoint(origin, MONITOR_DEFAULTTOPRIMARY);
+    MONITORINFO info{};
+    info.cbSize = sizeof(info);
+    if (monitor && GetMonitorInfoW(monitor, &info)) {
+        rect = info.rcWork;
+    }
+    return rect;
+}
+
+}  // namespace
+
 LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     AppState* state = reinterpret_cast<AppState*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
 
@@ -17,12 +72,38 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
             return TRUE;
         }
         case WM_CREATE:
-            if (state) initializeInterface(*state);
+            if (state) {
+                state->dpi = queryWindowDpi(hwnd);
+                initializeInterface(*state);
+            }
             return 0;
         case WM_ERASEBKGND:
             return 1;
         case WM_SIZE:
-            if (state) layoutWindow(*state);
+            if (state) {
+                layoutWindow(*state);
+                autosizeCurrentLists(*state);
+            }
+            return 0;
+        case WM_DPICHANGED:
+            if (state) {
+                state->dpi = HIWORD(wParam) ? HIWORD(wParam) : queryWindowDpi(hwnd);
+                rebuildFonts(*state);
+                applyInterfaceFonts(*state);
+                auto* suggested = reinterpret_cast<const RECT*>(lParam);
+                if (suggested) {
+                    SetWindowPos(hwnd,
+                                 nullptr,
+                                 suggested->left,
+                                 suggested->top,
+                                 suggested->right - suggested->left,
+                                 suggested->bottom - suggested->top,
+                                 SWP_NOZORDER | SWP_NOACTIVATE);
+                }
+                layoutWindow(*state);
+                autosizeCurrentLists(*state);
+                InvalidateRect(hwnd, nullptr, TRUE);
+            }
             return 0;
         case WM_NOTIFY:
             if (!state) break;
@@ -223,6 +304,8 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
 }  // namespace gui_win32
 
 int runGuiApp() {
+    gui_win32::enableHighDpiSupport();
+
     INITCOMMONCONTROLSEX controls{};
     controls.dwSize = sizeof(controls);
     controls.dwICC = ICC_LISTVIEW_CLASSES | ICC_WIN95_CLASSES;
@@ -241,14 +324,15 @@ int runGuiApp() {
     windowClass.lpszClassName = L"FootballManagerGuiWindow";
     RegisterClassExW(&windowClass);
 
+    RECT workArea = gui_win32::primaryMonitorWorkArea();
     HWND window = CreateWindowExW(0,
                                   windowClass.lpszClassName,
                                   L"Football Manager",
-                                  WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-                                  CW_USEDEFAULT,
-                                  CW_USEDEFAULT,
-                                  1560,
-                                  980,
+                                  WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_MAXIMIZE,
+                                  workArea.left,
+                                  workArea.top,
+                                  workArea.right - workArea.left,
+                                  workArea.bottom - workArea.top,
                                   nullptr,
                                   nullptr,
                                   state.instance,
@@ -257,7 +341,7 @@ int runGuiApp() {
         return 1;
     }
 
-    ShowWindow(window, SW_SHOW);
+    ShowWindow(window, SW_MAXIMIZE);
     UpdateWindow(window);
 
     MSG msg{};

@@ -10,6 +10,11 @@
 
 namespace gui_win32 {
 
+int scaleByDpi(const AppState& state, int value) {
+    UINT dpi = state.dpi == 0 ? 96 : state.dpi;
+    return MulDiv(value, static_cast<int>(dpi), 96);
+}
+
 RECT childRectOnParent(HWND child, HWND parent) {
     RECT rect{};
     if (!child || !parent) return rect;
@@ -184,6 +189,53 @@ void resetListViewColumns(HWND list, const std::vector<std::pair<std::wstring, i
         column.cx = columns[i].second;
         column.iSubItem = static_cast<int>(i);
         SendMessageW(list, LVM_INSERTCOLUMNW, static_cast<WPARAM>(i), reinterpret_cast<LPARAM>(&column));
+    }
+}
+
+void autosizeListViewColumns(const AppState& state, HWND list, const std::vector<std::pair<std::wstring, int> >& columns) {
+    if (!list || columns.empty() || !IsWindow(list)) return;
+    RECT client{};
+    GetClientRect(list, &client);
+    int availableWidth = std::max(0, static_cast<int>(client.right - client.left - 4));
+    if (availableWidth <= 0) return;
+
+    std::vector<int> widths(columns.size(), 0);
+    std::vector<int> minWidths(columns.size(), 0);
+    int totalWidth = 0;
+    int totalMinWidth = 0;
+
+    for (size_t i = 0; i < columns.size(); ++i) {
+        SendMessageW(list, LVM_SETCOLUMNWIDTH, static_cast<WPARAM>(i), LVSCW_AUTOSIZE_USEHEADER);
+        int autoWidth = ListView_GetColumnWidth(list, static_cast<int>(i));
+        int preferredWidth = scaleByDpi(state, columns[i].second);
+        int minWidth = clampValue(preferredWidth * 70 / 100, scaleByDpi(state, 60), preferredWidth);
+        int width = std::max(autoWidth, minWidth);
+        widths[i] = width;
+        minWidths[i] = minWidth;
+        totalWidth += width;
+        totalMinWidth += minWidth;
+    }
+
+    if (totalWidth < availableWidth && !widths.empty()) {
+        widths.back() += availableWidth - totalWidth;
+    } else if (totalWidth > availableWidth && totalMinWidth < availableWidth) {
+        int overflow = totalWidth - availableWidth;
+        int shrinkable = totalWidth - totalMinWidth;
+        for (size_t i = 0; i < widths.size() && overflow > 0 && shrinkable > 0; ++i) {
+            int reducible = widths[i] - minWidths[i];
+            if (reducible <= 0) continue;
+            int reduction = std::max(1, reducible * overflow / shrinkable);
+            reduction = std::min(reduction, reducible);
+            widths[i] -= reduction;
+            overflow -= reduction;
+        }
+        if (overflow > 0 && !widths.empty()) {
+            widths.back() = std::max(minWidths.back(), widths.back() - overflow);
+        }
+    }
+
+    for (size_t i = 0; i < widths.size(); ++i) {
+        ListView_SetColumnWidth(list, static_cast<int>(i), widths[i]);
     }
 }
 

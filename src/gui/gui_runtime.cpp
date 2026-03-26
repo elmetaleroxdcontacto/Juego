@@ -62,6 +62,9 @@ std::string friendlyPanelTitle(const std::string& title) {
     if (title == "NewsDetail") return "Detalle";
     if (title == "AlertPanel") return "Alertas";
     if (title == "AlertPanel / NewsFeedPanel") return "Pulso del club";
+    if (title == "LaunchChecklistPanel") return "Arma tu partida";
+    if (title == "CareerActivationPanel") return "Acciones listas";
+    if (title == "ClubHubPreviewPanel") return "Que desbloqueas";
     return title;
 }
 
@@ -97,6 +100,18 @@ void renderListPanel(HWND label, HWND list, const ListPanelModel& model) {
     clearListView(list);
     for (const auto& row : model.rows) {
         addListViewRow(list, row);
+    }
+}
+
+void autosizeVisibleLists(AppState& state) {
+    if (state.tableList && IsWindowVisible(state.tableList)) {
+        autosizeListViewColumns(state, state.tableList, state.currentModel.primary.columns);
+    }
+    if (state.squadList && IsWindowVisible(state.squadList)) {
+        autosizeListViewColumns(state, state.squadList, state.currentModel.secondary.columns);
+    }
+    if (state.transferList && IsWindowVisible(state.transferList)) {
+        autosizeListViewColumns(state, state.transferList, state.currentModel.footer.columns);
     }
 }
 
@@ -220,7 +235,12 @@ void refreshCurrentPage(AppState& state) {
     ShowWindow(state.filterCombo, showFilter ? SW_SHOW : SW_HIDE);
 
     layoutWindow(state);
+    autosizeVisibleLists(state);
     if (state.window) InvalidateRect(state.window, nullptr, FALSE);
+}
+
+void autosizeCurrentLists(AppState& state) {
+    autosizeVisibleLists(state);
 }
 
 void refreshAll(AppState& state) {

@@ -12,6 +12,7 @@
 #include "career/team_management.h"
 #include "career/world_state_service.h"
 #include "competition.h"
+#include "development/monthly_development.h"
 #include "simulation.h"
 #include "transfers/negotiation_system.h"
 #include "transfers/transfer_market.h"
@@ -373,59 +374,19 @@ void updateSquadDynamics(Career& career, int pointsDelta) {
 void runMonthlyDevelopment(Career& career) {
     if (career.currentWeek <= 0 || career.currentWeek % 4 != 0) return;
     for (auto* team : career.activeTeams) {
-        int improved = 0;
-        int eliteImproved = 0;
-        for (auto& player : team->players) {
-            if (player.age > 21 || player.skill >= player.potential) continue;
-            int chance = 6 + max(0, team->youthCoach - 55) / 10 + max(0, team->trainingFacilityLevel - 1) * 2;
-            chance += max(0, player.professionalism - 55) / 15;
-            if (player.developmentPlan == "Finalizacion" || player.developmentPlan == "Creatividad" ||
-                player.developmentPlan == "Defensa" || player.developmentPlan == "Reflejos") {
-                chance += 2;
-            }
-            if (player.promisedRole == "Proyecto") chance += 2;
-            if (playerHasTrait(player, "Proyecto") || playerHasTrait(player, "Competidor")) chance += 2;
-            if (randInt(1, 100) > clampInt(chance, 4, 28)) continue;
-
-            int gain = 1;
-            if (player.age <= 19 && player.potential - player.skill >= 10 && randInt(1, 100) <= 28) gain++;
-            player.skill = min(100, player.skill + gain);
-            string normalizedPosition = normalizePosition(player.position);
-            if (normalizedPosition == "ARQ" || normalizedPosition == "DEF") {
-                player.defense = min(100, player.defense + 1);
-            } else if (normalizedPosition == "MED") {
-                player.attack = min(100, player.attack + 1);
-                player.defense = min(100, player.defense + 1);
-            } else {
-                player.attack = min(100, player.attack + 1);
-            }
-            if (player.developmentPlan == "Liderazgo") {
-                player.leadership = min(99, player.leadership + 1);
-                player.professionalism = min(99, player.professionalism + 1);
-            } else if (player.developmentPlan == "Creatividad") {
-                player.setPieceSkill = min(99, player.setPieceSkill + 1);
-            } else if (player.developmentPlan == "Fisico") {
-                player.stamina = min(100, player.stamina + 1);
-                player.fitness = min(player.stamina, player.fitness + 1);
-            }
-            improved++;
-            if (gain > 1) eliteImproved++;
-        }
-
-        int maxSquad = getCompetitionConfig(team->division).maxSquadSize;
-        if ((maxSquad <= 0 || static_cast<int>(team->players.size()) < maxSquad) &&
-            randInt(1, 100) <= 4 + team->youthFacilityLevel * 3) {
-            player_dev::addYouthPlayers(*team, 1);
-            if (team == career.myTeam) {
-                career.addNews("La cantera suma un nuevo prospecto desde la region " + team->youthRegion + ".");
-            }
-        }
-        if (team == career.myTeam && improved > 0) {
-            career.addNews("Informe juvenil: " + to_string(improved) + " jugador(es) joven(es) mejoran este mes.");
-            if (eliteImproved > 0) {
-                career.addNews("Informe de cantera: " + to_string(eliteImproved) +
+        const development::MonthlyDevelopmentSummary summary =
+            development::runMonthlyDevelopmentCycle(*team, career.currentWeek);
+        if (team == career.myTeam && summary.improvedPlayers > 0) {
+            career.addNews("Informe juvenil: " + to_string(summary.improvedPlayers) +
+                           " jugador(es) joven(es) mejoran este mes.");
+            if (summary.acceleratedProspects > 0) {
+                career.addNews("Informe de cantera: " + to_string(summary.acceleratedProspects) +
                                " prospecto(s) muestran una aceleracion especial.");
             }
+        }
+        if (team == career.myTeam && summary.newYouthPlayers > 0) {
+            career.addNews("La cantera suma " + to_string(summary.newYouthPlayers) +
+                           " nuevo(s) prospecto(s) desde la region " + team->youthRegion + ".");
         }
     }
 }

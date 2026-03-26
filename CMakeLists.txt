@@ -87,6 +87,7 @@ set(FM_TRANSFER_SOURCES
 )
 
 set(FM_DEVELOPMENT_SOURCES
+    src/development/monthly_development.cpp
     src/development/player_progression_system.cpp
     src/development/training_impact_system.cpp
     src/development/youth_generation_system.cpp
@@ -190,6 +191,9 @@ function(fm_configure_target target_name)
 endfunction()
 
 fm_configure_target(FootballManager)
+if(WIN32)
+    set_target_properties(FootballManager PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
 
 if(WIN32)
     add_executable(FootballManagerCLI

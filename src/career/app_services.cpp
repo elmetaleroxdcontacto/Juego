@@ -13,6 +13,7 @@
 #include "career/staff_service.h"
 #include "competition.h"
 #include "development/training_impact_system.h"
+#include "simulation/player_condition.h"
 #include "transfers/negotiation_system.h"
 #include "utils.h"
 
@@ -430,22 +431,31 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
             clampInt(26 + team.scoutingChief / 3 + analystBonus + (12 - error) * 3 + regionalFamiliarity + networkBonus +
                          max(0, fitScore - 70) / 4 - max(0, 55 - player.professionalism) / 6,
                      20, 94);
-        const string recommendation =
-            (player.potential >= team.getAverageSkill() + 8 && fitScore >= 85 && confidence >= 68)
-                ? "Objetivo prioritario"
-                : (player.age <= 21 && player.potential - player.skill >= 10)
-                      ? "Proyecto a seguir"
-                      : (player.contractWeeks <= 16
-                             ? "Oportunidad de mercado"
-                             : (player.consistency >= 66 && player.currentForm >= 60 ? "Listo para competir" : "Seguimiento"));
+        const int readinessScore = player_condition::readinessScore(player, *club);
+        const int medicalRisk = max(player_condition::workloadRisk(player, *club),
+                                    player_condition::relapseRisk(player, *club));
+        string recommendation = "Seguimiento";
+        if (medicalRisk >= 72) {
+            recommendation = "Revisar salud antes de avanzar";
+        } else if (player.potential >= team.getAverageSkill() + 8 && fitScore >= 85 && confidence >= 68 &&
+                   readinessScore >= 58) {
+            recommendation = "Objetivo prioritario";
+        } else if (player.age <= 21 && player.potential - player.skill >= 10) {
+            recommendation = "Proyecto a seguir";
+        } else if (player.contractWeeks <= 16) {
+            recommendation = "Oportunidad de mercado";
+        } else if (player.consistency >= 66 && player.currentForm >= 60 && readinessScore >= 60) {
+            recommendation = "Listo para competir";
+        }
         const string upsideBand =
             (player.potential - player.skill >= 12) ? "Techo alto"
                                                     : (player.potential - player.skill >= 6 ? "Margen medio" : "Techo corto");
         const long long salaryExpectation = max(player.wage, wageDemandFor(player));
-        const string riskLabel =
-            player.happiness <= 44 ? "riesgo de vestuario"
-                                   : (player.injuryHistory >= 4 ? "riesgo fisico"
-                                                                : (confidence <= 45 ? "informe verde" : "riesgo controlado"));
+        string riskLabel = "riesgo controlado";
+        if (medicalRisk >= 72) riskLabel = "riesgo fisico alto";
+        else if (medicalRisk >= 56) riskLabel = "riesgo fisico medio";
+        else if (player.happiness <= 44) riskLabel = "riesgo de vestuario";
+        else if (confidence <= 45) riskLabel = "informe verde";
 
         ScoutingCandidate candidate;
         candidate.playerName = player.name;
@@ -474,6 +484,8 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         candidate.fitScore = fitScore;
         candidate.bigMatches = player.bigMatches;
         candidate.confidence = confidence;
+        candidate.readinessScore = readinessScore;
+        candidate.medicalRisk = medicalRisk;
         candidate.marketValue = player.value;
         candidate.salaryExpectation = salaryExpectation;
         candidate.riskLabel = riskLabel;
@@ -490,6 +502,8 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
                       " | " + candidate.reportStage +
                       " | Conf " + to_string(confidence) +
                       " | Conocimiento " + to_string(candidate.knowledgeLevel) +
+                      " | Listo " + to_string(readinessScore) +
+                      " | Riesgo medico " + to_string(medicalRisk) +
                       " | Valor " + formatMoneyValue(player.value) +
                       " | Salario esp " + formatMoneyValue(salaryExpectation) +
                       " | Disponibilidad " + candidate.availabilityLabel +

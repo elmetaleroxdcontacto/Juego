@@ -78,6 +78,8 @@ struct MatchPhaseReport {
     int minuteStart = 0;
     int minuteEnd = 0;
     std::string dominantTeam;
+    int homePlayersAvailable = 11;
+    int awayPlayersAvailable = 11;
     int homePossessionShare = 50;
     int awayPossessionShare = 50;
     int homePossessionChains = 0;
@@ -89,6 +91,8 @@ struct MatchPhaseReport {
     int homeShotsGenerated = 0;
     int awayShotsGenerated = 0;
     double intensity = 1.0;
+    double homeUrgency = 0.0;
+    double awayUrgency = 0.0;
     double homeChanceProbability = 0.0;
     double awayChanceProbability = 0.0;
     double homeDefensiveRisk = 0.0;

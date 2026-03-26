@@ -24,7 +24,7 @@ GuiPageModel buildDashboardModel(AppState& state) {
     model.metrics = buildMetrics(state.career, alerts);
     model.infoLine = state.career.myTeam
         ? "Panorama inmediato del club: proximo rival, forma del plantel, clasificacion y focos de gestion."
-        : "No hay carrera activa. Crea una nueva partida para abrir el centro del club.";
+        : "Prepara la partida en tres pasos: division, club y manager.";
     model.summary.title = "UpcomingMatchWidget";
     model.primary = buildLeagueTableModel(state.career, "Grupo actual");
     model.secondary = buildTeamStatusModel(state.career);
@@ -34,24 +34,30 @@ GuiPageModel buildDashboardModel(AppState& state) {
     model.feed.lines = state.currentFilter == "Alertas" ? alerts : buildFeedLines(state.career, state.currentFilter == "Todo" ? "" : state.currentFilter);
 
     if (!state.career.myTeam) {
+        model.summary.title = "LaunchChecklistPanel";
+        model.detail.title = "CareerActivationPanel";
+        model.feed.title = "ClubHubPreviewPanel";
         model.summary.content =
-            "No hay carrera activa.\r\n\r\n"
-            "Crea una nueva partida o carga un guardado para abrir el centro del club.\r\n\r\n"
-            "Cuando empieces tendras acceso inmediato a:\r\n"
-            "- proximo partido\r\n"
-            "- estado del equipo\r\n"
-            "- tabla y noticias\r\n"
-            "- mercado, finanzas y cantera";
+            "Arma tu partida\r\n\r\n"
+            "[1] Escoge division\r\n"
+            "Define el universo competitivo y los clubes disponibles.\r\n\r\n"
+            "[2] Elige club\r\n"
+            "Decide si quieres proyecto joven, club vendedor o candidato.\r\n\r\n"
+            "[3] Nombra al manager\r\n"
+            "Ese perfil alimenta la reputacion y la narrativa de carrera.";
         model.detail.content =
-            "Empieza aqui\r\n\r\n"
-            "1. Elige una division.\r\n"
-            "2. Selecciona un club.\r\n"
-            "3. Escribe el nombre del manager.\r\n"
-            "4. Usa una de las acciones inferiores.";
+            "Acciones listas\r\n\r\n"
+            "Nueva partida\r\n"
+            "Crea una carrera desde cero con el club elegido.\r\n\r\n"
+            "Cargar\r\n"
+            "Retoma un guardado y vuelve directo al centro del club.\r\n\r\n"
+            "Validar\r\n"
+            "Revisa datos externos o reglas antes de jugar.";
         model.feed.lines.clear();
-        model.feed.lines.push_back("Sin noticias por ahora. Inicia una carrera para activar el mundo del club.");
-        model.feed.lines.push_back("Sugerencia: un club pequeno deja ver mejor cantera, sueldos y rotacion.");
-        model.feed.lines.push_back("Sugerencia: usa Validar si cambiaste datos externos o reglas de competicion.");
+        model.feed.lines.push_back("[Centro del club] Partido, clasificacion, estado fisico y alertas en una sola vista.");
+        model.feed.lines.push_back("[Gestion] Mercado, contratos, finanzas, scouting y cantera se desbloquean al iniciar.");
+        model.feed.lines.push_back("[Recomendacion] Un club pequeno muestra mejor el impacto de cantera, sueldos y rotacion.");
+        model.feed.lines.push_back("[Chequeo] Usa Validar si tocaste datos externos o reglas de competicion.");
         return model;
     }
 

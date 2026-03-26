@@ -3,6 +3,7 @@
 #include "development/player_progression_system.h"
 #include "simulation/match_engine_internal.h"
 #include "simulation/morale_engine.h"
+#include "simulation/player_condition.h"
 #include "simulation/simulation.h"
 #include "utils/utils.h"
 
@@ -79,23 +80,7 @@ void applyNamedInjuries(Team& team, const vector<string>& injuredNames) {
     for (const string& name : injuredNames) {
         for (auto& player : team.players) {
             if (player.name != name || player.injured) continue;
-            player.injured = true;
-            player.injuryHistory++;
-            player.fatigueLoad = clampInt(player.fatigueLoad + 12, 0, 100);
-            int roll = randInt(1, 100);
-            if (roll <= 45) {
-                player.injuryType = "Sobrecarga";
-                player.injuryWeeks = randInt(1, 2);
-            } else if (roll <= 72) {
-                player.injuryType = "Muscular";
-                player.injuryWeeks = randInt(2, 5);
-            } else if (roll <= 90) {
-                player.injuryType = "Ligamentos";
-                player.injuryWeeks = randInt(5, 10);
-            } else {
-                player.injuryType = "Fractura";
-                player.injuryWeeks = randInt(8, 14);
-            }
+            player_condition::applyInjury(player, team, 1);
             break;
         }
     }

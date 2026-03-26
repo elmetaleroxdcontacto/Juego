@@ -50,6 +50,12 @@ MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch, 
     TeamRuntimeState awayState{away, setup.away.xi, setup.away.xi, {}, {}, {}, {}};
     MatchStats stats;
     MatchTimeline timeline;
+    timeline.events.reserve(96);
+    timeline.phases.reserve(kPhases.size());
+    homeState.participants.reserve(16);
+    awayState.participants.reserve(16);
+    homeState.goals.reserve(6);
+    awayState.goals.reserve(6);
     int homePossAccumulator = 0;
 
     for (size_t phaseIndex = 0; phaseIndex < kPhases.size(); ++phaseIndex) {
@@ -90,7 +96,11 @@ MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch, 
                                                                           awaySnapshot,
                                                                           static_cast<int>(phaseIndex),
                                                                           minuteStart,
-                                                                          minuteEnd);
+                                                                          minuteEnd,
+                                                                          stats.homeGoals,
+                                                                          stats.awayGoals,
+                                                                          static_cast<int>(homeState.xi.size()),
+                                                                          static_cast<int>(awayState.xi.size()));
         phase = phaseEval.report;
         phase.homeTacticalChange = homeTacticalChange;
         phase.awayTacticalChange = awayTacticalChange;
@@ -169,6 +179,7 @@ MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch, 
 
         match_event_generator::maybeInjure(homeState.team,
                                            homeState.xi,
+                                           homeState.participants,
                                            phase.injuryRisk,
                                            minuteStart,
                                            minuteEnd,
@@ -176,6 +187,7 @@ MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch, 
                                            data.homeInjuredPlayers);
         match_event_generator::maybeInjure(awayState.team,
                                            awayState.xi,
+                                           awayState.participants,
                                            phase.injuryRisk,
                                            minuteStart,
                                            minuteEnd,

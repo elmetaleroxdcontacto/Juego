@@ -17,13 +17,16 @@
 #include "career/world_state_service.h"
 #include "competition/competition.h"
 #include "competition/league_registry.h"
+#include "development/monthly_development.h"
 #include "development/training_impact_system.h"
 #include "engine/models.h"
 #include "io/io.h"
 #include "simulation/match_context.h"
 #include "simulation/match_engine_internal.h"
 #include "simulation/match_engine.h"
+#include "simulation/match_event_generator.h"
 #include "simulation/match_phase.h"
+#include "simulation/player_condition.h"
 #include "simulation/simulation.h"
 #include "transfers/negotiation_system.h"
 #include "transfers/transfer_market.h"
@@ -31,6 +34,7 @@
 #include "validators/validators.h"
 
 #include <algorithm>
+#include <cstddef>
 #include <exception>
 #include <cstdio>
 #include <fstream>
@@ -1329,6 +1333,132 @@ void testTransferBriefingBuildsActionableMarketView() {
            "Las oportunidades resumidas deben incluir el paquete economico recomendado.");
 }
 
+void testLateDeficitRaisesUrgencyInMatchPhase() {
+    Team home = makeTeam("Urgencia Local", "primera division", 71, 3, 3, "Balanced", "Equilibrado", 780000);
+    Team away = makeTeam("Urgencia Visitante", "primera division", 71, 3, 3, "Balanced", "Equilibrado", 780000);
+
+    setRandomSeed(20260325);
+    const MatchSetup setup = match_context::buildMatchSetup(home, away, false, false);
+    setRandomSeed(4242);
+    const MatchPhaseEvaluation even =
+        match_phase::evaluatePhase(setup, home, away, setup.home, setup.away, 5, 76, 90, 0, 0, 11, 11);
+    setRandomSeed(4242);
+    const MatchPhaseEvaluation chasing =
+        match_phase::evaluatePhase(setup, home, away, setup.home, setup.away, 5, 76, 90, 0, 1, 11, 11);
+    resetRandomSeed();
+
+    expect(chasing.report.homeUrgency > even.report.homeUrgency,
+           "Ir perdiendo al final debe aumentar la urgencia del local.");
+    expect(chasing.homeAttack >= even.homeAttack || chasing.homeAttacks >= even.homeAttacks,
+           "El contexto de remontada debe empujar el volumen ofensivo.");
+    expect(chasing.report.homeDefensiveRisk >= even.report.homeDefensiveRisk,
+           "Empujar el resultado debe venir con mas riesgo defensivo.");
+}
+
+void testMatchInjuryTriggersRealReplacement() {
+    Team team = makeTeam("Lesionados FC", "primera division", 70, 4, 4, "Pressing", "Contra-presion", 820000);
+    Team opponent = makeTeam("Rival Control", "primera division", 69, 3, 3, "Balanced", "Equilibrado", 810000);
+    (void)opponent;
+
+    vector<int> activeXI = team.getStartingXIIndices();
+    expect(!activeXI.empty(), "La prueba de lesion necesita once inicial.");
+    const int riskyIndex = activeXI.front();
+    team.players[static_cast<size_t>(riskyIndex)].fitness = 34;
+    team.players[static_cast<size_t>(riskyIndex)].fatigueLoad = 88;
+    team.players[static_cast<size_t>(riskyIndex)].injuryHistory = 5;
+    ensurePlayerProfile(team.players[static_cast<size_t>(riskyIndex)], true);
+
+    vector<int> participants = activeXI;
+    MatchTimeline timeline;
+    vector<string> injuredPlayers;
+
+    setRandomSeed(20260325);
+    match_event_generator::maybeInjure(team, activeXI, participants, 1.0, 30, 45, timeline, injuredPlayers);
+    resetRandomSeed();
+
+    expect(!injuredPlayers.empty(), "El motor debe registrar la lesion forzada.");
+    expect(find(activeXI.begin(), activeXI.end(), riskyIndex) == activeXI.end(),
+           "El jugador lesionado no debe seguir activo en el XI.");
+    expect(participants.size() >= 12,
+           "Una lesion con banca disponible debe registrar un reemplazo.");
+    expect(any_of(timeline.events.begin(), timeline.events.end(), [](const MatchEvent& event) {
+               return event.type == MatchEventType::Substitution;
+           }),
+           "La cronologia debe reflejar el cambio obligado por lesion.");
+}
+
+void testTransferEvaluationPenalizesMedicalRisk() {
+    Career career;
+    Team buyer = makeTeam("Comprador Saludable", "primera division", 72, 3, 3, "Balanced", "Equilibrado", 900000);
+    Team seller = makeTeam("Vendedor Test", "primera division", 68, 3, 3, "Balanced", "Equilibrado", 700000);
+    const ClubTransferStrategy strategy = ai_transfer_manager::buildClubTransferStrategy(career, buyer);
+
+    Player healthy = makePlayer("Creador Sano", "MED", 74, 84, 23, 76, 78);
+    healthy.contractWeeks = 40;
+    healthy.value = 420000;
+    healthy.releaseClause = 820000;
+    healthy.wage = 17000;
+
+    Player risky = healthy;
+    risky.name = "Creador Fragil";
+    risky.fitness = 44;
+    risky.fatigueLoad = 82;
+    risky.injuryHistory = 5;
+    ensurePlayerProfile(risky, true);
+
+    const TransferTarget healthyTarget = ai_transfer_manager::evaluateTarget(career, buyer, seller, healthy, strategy);
+    const TransferTarget riskyTarget = ai_transfer_manager::evaluateTarget(career, buyer, seller, risky, strategy);
+
+    expect(riskyTarget.medicalRisk > healthyTarget.medicalRisk,
+           "El target fragil debe reflejar mas riesgo medico.");
+    expect(riskyTarget.totalScore < healthyTarget.totalScore,
+           "El mercado debe penalizar perfiles con mayor riesgo fisico.");
+}
+
+void testMonthlyDevelopmentCycleImprovesStableProspects() {
+    Team team = makeTeam("Cantera Pro", "primera division", 67, 3, 3, "Balanced", "Equilibrado", 860000);
+    team.youthCoach = 82;
+    team.trainingFacilityLevel = 4;
+    team.youthFacilityLevel = 4;
+    team.performanceAnalyst = 78;
+    team.assistantCoach = 76;
+
+    vector<int> originalSkills;
+    originalSkills.reserve(team.players.size());
+    for (size_t i = 0; i < team.players.size(); ++i) {
+        Player& player = team.players[i];
+        if (i < 4) {
+            player.age = 18 + static_cast<int>(i % 2);
+            player.skill = 60 + static_cast<int>(i);
+            player.potential = player.skill + 16;
+            player.professionalism = 82;
+            player.happiness = 72;
+            player.matchesPlayed = 6;
+            player.startsThisSeason = 4;
+            player.currentForm = 68;
+            player.fatigueLoad = 18;
+            player.fitness = 78;
+            player.developmentPlan = (i % 2 == 0) ? "Creatividad" : "Finalizacion";
+            applyPositionStats(player);
+            ensurePlayerProfile(player, true);
+        }
+        originalSkills.push_back(player.skill);
+    }
+
+    setRandomSeed(20260325);
+    const development::MonthlyDevelopmentSummary summary = development::runMonthlyDevelopmentCycle(team, 20);
+    resetRandomSeed();
+
+    const bool anyImproved = any_of(team.players.begin(), team.players.end(), [&](const Player& player) {
+        const ptrdiff_t index = &player - team.players.data();
+        return index >= 0 && index < static_cast<ptrdiff_t>(originalSkills.size()) &&
+               player.skill > originalSkills[static_cast<size_t>(index)];
+    });
+
+    expect(summary.improvedPlayers > 0 && anyImproved,
+           "La progresion mensual debe empujar al menos a un prospecto estable.");
+}
+
 void testMatchCenterAddsRecommendedAdjustments() {
     Career career;
     career.lastMatchAnalysis = "Partido denso y largo.";
@@ -1442,6 +1572,10 @@ int main() {
         {"analytics_inbox_blocks", testAnalyticsAndInboxServicesProduceUsefulBlocks},
         {"manager_advice", testManagerAdviceHighlightsUrgentActions},
         {"transfer_briefing", testTransferBriefingBuildsActionableMarketView},
+        {"late_match_urgency", testLateDeficitRaisesUrgencyInMatchPhase},
+        {"injury_replacement", testMatchInjuryTriggersRealReplacement},
+        {"transfer_medical_risk", testTransferEvaluationPenalizesMedicalRisk},
+        {"monthly_development", testMonthlyDevelopmentCycleImprovesStableProspects},
         {"match_center_adjustments", testMatchCenterAddsRecommendedAdjustments},
         {"ignored_archived_folders", testIgnoredArchivedFoldersConfigSuppressesKnownWarnings},
         {"teams_txt_folder_aliases", testTeamsTxtFolderAliasesDoNotTriggerOrphanWarnings},

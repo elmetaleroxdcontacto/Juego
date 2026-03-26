@@ -1,6 +1,7 @@
 #include "ai/ai_transfer_manager.h"
 
 #include "finance/finance_system.h"
+#include "simulation/player_condition.h"
 #include "transfers/negotiation_system.h"
 #include "utils/utils.h"
 
@@ -36,6 +37,8 @@ ClubTransferStrategy buildClubTransferStrategy(const Career& career, const Team&
     if (team.transferPolicy == "Vender antes de comprar") strategy.maxTargets = min(strategy.maxTargets, 3);
     strategy.maxTransferBudget = finance_system::calculateTransferBuffer(team);
     strategy.maxWageBudget = max(20000LL, finance_system::calculateWeeklyPayroll(team) / 4);
+    strategy.averageStarterSkill = team.getAverageSkill();
+    strategy.prestigeScore = teamPrestigeScore(team);
     strategy.priorityPositions = squad.priorityPositions;
     strategy.thinPositions = squad.thinPositions;
     strategy.youthCoverPositions = squad.youthCoverPositions;
@@ -63,14 +66,22 @@ TransferTarget evaluateTarget(const Career& career,
     target.squadNeedScore = ai_squad_planner::positionNeedScore(buyer, normalizePosition(player.position));
     target.onShortlist = onScoutingShortlist(career, seller, player);
     target.urgentNeed = find(strategy.thinPositions.begin(), strategy.thinPositions.end(), normalizePosition(player.position)) != strategy.thinPositions.end();
+    target.readinessScore = player_condition::readinessScore(player, seller);
+    target.medicalRisk = max(player_condition::workloadRisk(player, seller),
+                             player_condition::relapseRisk(player, seller));
+    target.upsideScore = max(0, player.potential - player.skill) +
+                         player_condition::developmentStability(player, seller, false) / 5;
     target.fitScore = player.skill * 3 + player.potential * 2 - player.age * 2 + target.squadNeedScore;
     if (strategy.youthFocus) target.fitScore += max(0, 24 - player.age) * 3 + max(0, player.potential - player.skill) * 2;
     if (strategy.promotionPush) target.fitScore += player.skill * 2 + max(0, player.currentForm - 55);
-    if (strategy.needsStarter && player.skill >= buyer.getAverageSkill()) target.fitScore += 12;
+    if (strategy.needsStarter && player.skill >= strategy.averageStarterSkill) target.fitScore += 12;
     if (strategy.trustYouthCover && player.age <= 21) target.fitScore += 8;
     if (target.contractRunningOut) target.fitScore += 8;
     if (target.urgentNeed) target.fitScore += 10;
     if (target.onShortlist) target.fitScore += 6;
+    target.fitScore += target.readinessScore / 6;
+    target.fitScore += target.upsideScore / 7;
+    target.fitScore -= target.medicalRisk / 7;
 
     const long long loyaltyExpectation = max(15000LL, target.expectedWage * 2);
     const long long totalCost = target.expectedFee + target.expectedAgentFee + loyaltyExpectation + target.expectedWage * 8;
@@ -78,9 +89,11 @@ TransferTarget evaluateTarget(const Career& career,
     else if (target.availableForLoan && target.expectedWage <= strategy.maxWageBudget) target.affordabilityScore = 16;
     else if (target.expectedFee + target.expectedAgentFee <= strategy.maxTransferBudget * 12 / 10) target.affordabilityScore = 8;
     else target.affordabilityScore = -12;
+    if (target.medicalRisk >= 72) target.affordabilityScore -= 8;
+    else if (target.medicalRisk >= 56) target.affordabilityScore -= 3;
 
-    target.competitionScore = clampInt(max(0, player.potential - buyer.getAverageSkill()) / 4 +
-                                           max(0, teamPrestigeScore(seller) - teamPrestigeScore(buyer) + 4),
+    target.competitionScore = clampInt(max(0, player.potential - strategy.averageStarterSkill) / 4 +
+                                           max(0, teamPrestigeScore(seller) - strategy.prestigeScore + 4),
                                        0, 28);
     target.scoutingConfidence = clampInt(36 + buyer.scoutingChief / 2 + (target.onShortlist ? 14 : 0) +
                                              (target.contractRunningOut ? 8 : 0) + (target.availableForLoan ? 5 : 0),
@@ -101,6 +114,16 @@ TransferTarget evaluateTarget(const Career& career,
     } else if (buyer.transferPolicy == "Vender antes de comprar") {
         target.scoutingNote += " | el club vigila mucho el coste total";
     }
+    if (target.medicalRisk >= 72) {
+        target.scoutingNote += " | riesgo fisico alto";
+    } else if (target.medicalRisk >= 56) {
+        target.scoutingNote += " | requiere control medico";
+    }
+    if (target.readinessScore >= 68) {
+        target.scoutingNote += " | listo para competir";
+    } else if (target.readinessScore <= 48) {
+        target.scoutingNote += " | necesita puesta a punto";
+    }
     if (buyer.headCoachStyle == "Presion" && playerHasTrait(player, "Presiona")) target.fitScore += 6;
 
     string reason;
@@ -109,7 +132,8 @@ TransferTarget evaluateTarget(const Career& career,
     }
 
     target.totalScore = target.fitScore * 0.55 + target.potentialScore * 0.18 +
-                        target.affordabilityScore * 2.1 + target.scoutingConfidence * 0.08 -
+                        target.affordabilityScore * 2.1 + target.scoutingConfidence * 0.08 +
+                        target.readinessScore * 0.10 - target.medicalRisk * 0.09 + target.upsideScore * 0.12 -
                         target.competitionScore * 0.22 + (target.availableForLoan ? 6.0 : 0.0) +
                         (target.contractRunningOut ? 4.0 : 0.0) + (target.onShortlist ? 5.0 : 0.0);
     return target;

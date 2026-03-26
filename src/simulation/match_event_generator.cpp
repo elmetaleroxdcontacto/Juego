@@ -1,6 +1,8 @@
 #include "simulation/match_event_generator.h"
 
+#include "simulation/match_engine_internal.h"
 #include "simulation/match_event_resolver.h"
+#include "simulation/player_condition.h"
 #include "simulation/match_resolution.h"
 #include "simulation/tactics_engine.h"
 #include "utils/utils.h"
@@ -18,8 +20,8 @@ int pickPhysicalRiskPlayer(const Team& team, const vector<int>& activeXI) {
     for (int idx : activeXI) {
         if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
         const Player& player = team.players[static_cast<size_t>(idx)];
-        int score = (100 - player.fitness) * 2 + max(0, player.age - 29) * 3 + player.injuryHistory * 4;
-        if (playerHasTrait(player, "Fragil")) score += 10;
+        int score = player_condition::workloadRisk(player, team) + player_condition::relapseRisk(player, team) / 2;
+        score += max(0, player.age - 29) * 2;
         if (score > bestScore) {
             bestScore = score;
             bestIndex = idx;
@@ -30,6 +32,41 @@ int pickPhysicalRiskPlayer(const Team& team, const vector<int>& activeXI) {
 
 void removeActivePlayer(vector<int>& activeXI, int playerIndex) {
     activeXI.erase(remove(activeXI.begin(), activeXI.end(), playerIndex), activeXI.end());
+}
+
+bool replaceInjuredPlayer(Team& team,
+                          vector<int>& activeXI,
+                          vector<int>& participants,
+                          int playerIndex,
+                          int minute,
+                          MatchTimeline& timeline) {
+    if (playerIndex < 0 || playerIndex >= static_cast<int>(team.players.size())) return false;
+    const string targetPos = normalizePosition(team.players[static_cast<size_t>(playerIndex)].position);
+    const int replacement = match_internal::bestBenchReplacement(team, activeXI, targetPos);
+    if (replacement < 0) {
+        removeActivePlayer(activeXI, playerIndex);
+        return false;
+    }
+
+    for (int& idx : activeXI) {
+        if (idx == playerIndex) {
+            idx = replacement;
+            break;
+        }
+    }
+    if (find(participants.begin(), participants.end(), replacement) == participants.end()) {
+        participants.push_back(replacement);
+    }
+
+    MatchEvent sub;
+    sub.minute = clampInt(minute + 1, 1, 90);
+    sub.teamName = team.name;
+    sub.playerName = team.players[static_cast<size_t>(replacement)].name;
+    sub.type = MatchEventType::Substitution;
+    sub.description = team.players[static_cast<size_t>(playerIndex)].name + " sale lesionado; entra " +
+                      team.players[static_cast<size_t>(replacement)].name;
+    timeline.events.push_back(sub);
+    return true;
 }
 
 }  // namespace
@@ -65,7 +102,7 @@ void playPhaseSequences(Team& attacking,
                                                      defendingSnapshot.pressingLoad / 420.0 +
                                                      defensiveRisk * 0.08,
                                                  0.16, 0.82);
-    const double chanceReachProbability = clampValue(
+    const double baseChanceReachProbability = clampValue(
         0.08 + static_cast<double>(chanceCount + 1) / static_cast<double>(max(1, attackCount + 3)) +
             attackingEdge * 0.0025 + transitionThreat * 0.10 + defensiveRisk * 0.08 + attackingSecurity * 0.03 +
             attackingSnapshot.finishingQuality / 420.0 - defendingSnapshot.defensiveShape / 620.0,
@@ -73,6 +110,8 @@ void playPhaseSequences(Team& attacking,
 
     for (int i = 0; i < attackCount; ++i) {
         const int minute = randInt(minuteStart, minuteEnd);
+        const double sequenceChanceReachProbability =
+            clampValue(baseChanceReachProbability + (i < chanceCount ? 0.10 : -0.04), 0.06, 0.76);
         const bool directTransition = attacking.tactics == "Counter" ||
                                       attacking.matchInstruction == "Juego directo" ||
                                       rand01() <= clampValue(0.18 + transitionThreat * 0.45, 0.10, 0.62);
@@ -95,7 +134,7 @@ void playPhaseSequences(Team& attacking,
                                                : attacking.name + " madura el ataque en campo rival";
         match_stats::pushEvent(timeline, stats, buildUp);
 
-        if (rand01() > chanceReachProbability) {
+        if (rand01() > sequenceChanceReachProbability) {
             MatchEvent interruption;
             interruption.minute = minute;
             interruption.teamName = rand01() <= 0.55 ? defending.name : attacking.name;
@@ -111,6 +150,58 @@ void playPhaseSequences(Team& attacking,
                 interruption.description = defending.name + " recupera y obliga a reiniciar la posesion";
             }
             match_stats::pushEvent(timeline, stats, interruption);
+
+            const double setPieceFollowUp =
+                clampValue(0.04 + attackingSnapshot.setPieceThreat / 260.0 +
+                               max(0.0, attackingEdge) * 0.003 +
+                               (interruption.type == MatchEventType::Foul ? 0.06 : 0.0),
+                           0.04,
+                           0.26);
+            if (rand01() <= setPieceFollowUp) {
+                MatchEvent setPiece;
+                setPiece.minute = clampInt(minute + 1, minuteStart, minuteEnd);
+                setPiece.teamName = attacking.name;
+                setPiece.type = MatchEventType::Corner;
+                setPiece.description = attacking.name + " aprovecha la accion para cargar el area a balon parado";
+                if (attackingIsHome) setPiece.impact.homeCornersDelta = 1;
+                else setPiece.impact.awayCornersDelta = 1;
+                match_stats::pushEvent(timeline, stats, setPiece);
+
+                ChanceResolutionInput setPieceInput;
+                setPieceInput.minute = clampInt(setPiece.minute + 1, minuteStart, minuteEnd);
+                setPieceInput.bigChance = false;
+                setPieceInput.attackingTeamIsHome = attackingIsHome;
+                setPieceInput.chanceQuality =
+                    clampValue(0.07 + attackingSnapshot.setPieceThreat / 520.0 +
+                                   attackingSnapshot.finishingQuality / 780.0 -
+                                   defendingSnapshot.goalkeeperPower / 1200.0,
+                               0.06,
+                               0.24);
+                setPieceInput.attackingEdge = attackingEdge / 2.0;
+                setPieceInput.defensivePressure = max(0.10, defendingSnapshot.defensePower / 220.0);
+                setPieceInput.finishingSupport = attackingSnapshot.finishingQuality / 120.0;
+                setPieceInput.goalkeeperQuality = defendingSnapshot.goalkeeperPower / 100.0;
+
+                ChanceResolutionOutput setPieceOutput =
+                    match_event_resolver::resolveChance(attacking, defending, attackingXI, defendingXI, setPieceInput);
+                match_stats::pushEvent(timeline, stats, setPieceOutput.attemptEvent);
+                for (const MatchEvent& event : setPieceOutput.outcomeEvents) {
+                    match_stats::pushEvent(timeline, stats, event);
+                }
+                if (setPieceOutput.scored && setPieceOutput.shooterIndex >= 0 &&
+                    setPieceOutput.shooterIndex < static_cast<int>(attacking.players.size())) {
+                    GoalContribution contribution;
+                    contribution.minute = setPieceInput.minute;
+                    contribution.scorerName = attacking.players[static_cast<size_t>(setPieceOutput.shooterIndex)].name;
+                    if (setPieceOutput.assisterIndex >= 0 &&
+                        setPieceOutput.assisterIndex < static_cast<int>(attacking.players.size()) &&
+                        setPieceOutput.assisterIndex != setPieceOutput.shooterIndex) {
+                        contribution.assisterName =
+                            attacking.players[static_cast<size_t>(setPieceOutput.assisterIndex)].name;
+                    }
+                    goals.push_back(contribution);
+                }
+            }
             continue;
         }
 
@@ -218,16 +309,25 @@ void registerDiscipline(Team& team,
     match_stats::pushEvent(timeline, stats, yellow);
 }
 
-void maybeInjure(const Team& team,
-                 const vector<int>& activeXI,
+void maybeInjure(Team& team,
+                 vector<int>& activeXI,
+                 vector<int>& participants,
                  double injuryRisk,
                  int minuteStart,
                  int minuteEnd,
                  MatchTimeline& timeline,
                  vector<string>& injuredPlayers) {
-    if (rand01() > injuryRisk) return;
+    if (activeXI.empty()) return;
     const int idx = pickPhysicalRiskPlayer(team, activeXI);
     if (idx < 0 || idx >= static_cast<int>(team.players.size())) return;
+    const Player& player = team.players[static_cast<size_t>(idx)];
+    const double triggerChance =
+        clampValue(injuryRisk +
+                       player_condition::workloadRisk(player, team) / 350.0 +
+                       player_condition::relapseRisk(player, team) / 520.0,
+                   0.04,
+                   0.36);
+    if (rand01() > triggerChance) return;
     const string playerName = team.players[static_cast<size_t>(idx)].name;
     if (find(injuredPlayers.begin(), injuredPlayers.end(), playerName) != injuredPlayers.end()) return;
 
@@ -239,6 +339,7 @@ void maybeInjure(const Team& team,
     event.type = MatchEventType::Injury;
     event.description = playerName + " acusa un problema fisico por el desgaste";
     timeline.events.push_back(event);
+    replaceInjuredPlayer(team, activeXI, participants, idx, event.minute, timeline);
 }
 
 }  // namespace match_event_generator

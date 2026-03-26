@@ -19,6 +19,9 @@ struct TransferTarget {
     int affordabilityScore = 0;
     int scoutingConfidence = 0;
     int competitionScore = 0;
+    int readinessScore = 0;
+    int medicalRisk = 0;
+    int upsideScore = 0;
     long long expectedAgentFee = 0;
     bool onShortlist = false;
     bool urgentNeed = false;
@@ -81,6 +84,8 @@ struct ClubTransferStrategy {
     int maxTargets = 0;
     long long maxTransferBudget = 0;
     long long maxWageBudget = 0;
+    int averageStarterSkill = 0;
+    int prestigeScore = 0;
     std::vector<std::string> priorityPositions;
     std::vector<std::string> thinPositions;
     std::vector<std::string> youthCoverPositions;

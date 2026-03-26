@@ -123,6 +123,7 @@ struct GuiPageModel {
 struct AppState {
     HINSTANCE instance = nullptr;
     HWND window = nullptr;
+    UINT dpi = 96;
     HFONT font = nullptr;
     HFONT titleFont = nullptr;
     HFONT sectionFont = nullptr;
@@ -244,10 +245,12 @@ std::string listViewText(HWND list, int row, int subItem);
 void clearListView(HWND list);
 void addListViewRow(HWND list, const std::vector<std::string>& values);
 void resetListViewColumns(HWND list, const std::vector<std::pair<std::wstring, int> >& columns);
+void autosizeListViewColumns(const AppState& state, HWND list, const std::vector<std::pair<std::wstring, int> >& columns);
 void drawRoundedPanel(HDC hdc, const RECT& rect, COLORREF fill, COLORREF border, int radius = 16);
 void drawPitchOverlay(HDC hdc, const RECT& rect);
 void drawSectionHeader(HDC hdc, const RECT& rect, const std::wstring& title);
 void drawStatBar(HDC hdc, const RECT& rect, const std::wstring& label, int value, int maxValue, COLORREF accent);
+int scaleByDpi(const AppState& state, int value);
 
 GuiPage pageForControlId(int id);
 bool isPageButtonId(int id);
@@ -256,6 +259,8 @@ bool isUpgradeButtonId(int id);
 bool isActionButtonId(int id);
 
 void initializeInterface(AppState& state);
+void rebuildFonts(AppState& state);
+void applyInterfaceFonts(AppState& state);
 void layoutWindow(AppState& state);
 void paintWindowChrome(AppState& state, HDC hdc);
 void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem);
@@ -270,6 +275,7 @@ void setStatus(AppState& state, const std::string& text);
 void setCurrentPage(AppState& state, GuiPage page);
 void refreshAll(AppState& state);
 void refreshCurrentPage(AppState& state);
+void autosizeCurrentLists(AppState& state);
 void handleFilterChange(AppState& state);
 void handleListSelectionChange(AppState& state, int controlId);
 void handleListColumnClick(AppState& state, const NMLISTVIEW& view);

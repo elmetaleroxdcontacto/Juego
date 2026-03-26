@@ -24,6 +24,8 @@ struct TransferOptionBrief {
     bool contractRunningOut = false;
     bool onShortlist = false;
     int scoutingConfidence = 0;
+    int readinessScore = 0;
+    int medicalRisk = 0;
     std::string competitionLabel;
     std::string actionLabel;
     std::string packageLabel;

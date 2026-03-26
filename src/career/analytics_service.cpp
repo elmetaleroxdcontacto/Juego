@@ -1,5 +1,6 @@
 #include "career/analytics_service.h"
 
+#include "simulation/player_condition.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -49,7 +50,7 @@ TeamAnalyticsSnapshot buildTeamAnalyticsSnapshot(const Career& career, const Tea
         snapshot.setPieceThreat += player.setPieceSkill / 3;
         snapshot.aerialThreat += (player.defense + player.attack + player.leadership) / 6;
         if (player.contractWeeks <= 18) snapshot.contractRisk++;
-        if (player.fatigueLoad >= 55 || player.fitness <= 58) snapshot.fatigueRisk++;
+        if (player_condition::workloadRisk(player, team) >= 55) snapshot.fatigueRisk++;
         if (player.age <= 21 && player.potential >= player.skill + 8) snapshot.youthUpside++;
         if (player.startsThisSeason >= max(1, career.currentWeek / 3)) snapshot.roleBalance += 2;
         if (player.promisedRole == "Titular" && player.startsThisSeason == 0) snapshot.roleBalance -= 2;

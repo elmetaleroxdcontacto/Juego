@@ -77,6 +77,10 @@ MatchReport buildReport(const MatchSetup& setup,
     int awayFatigueLoad = 0;
     int homeLateFatigue = 0;
     int awayLateFatigue = 0;
+    int homeChasingPhases = 0;
+    int awayChasingPhases = 0;
+    int homeShortHandedPhases = 0;
+    int awayShortHandedPhases = 0;
     int tacticalChanges = 0;
     int homeTotalAttacks = 0;
     int awayTotalAttacks = 0;
@@ -88,6 +92,10 @@ MatchReport buildReport(const MatchSetup& setup,
         if (phase.dominantTeam == home.name) homeDominantPhases++;
         else if (phase.dominantTeam == away.name) awayDominantPhases++;
         if (phase.homeTacticalChange || phase.awayTacticalChange) tacticalChanges++;
+        if (phase.homeUrgency > phase.awayUrgency + 0.06) homeChasingPhases++;
+        if (phase.awayUrgency > phase.homeUrgency + 0.06) awayChasingPhases++;
+        if (phase.homePlayersAvailable < phase.awayPlayersAvailable) homeShortHandedPhases++;
+        if (phase.awayPlayersAvailable < phase.homePlayersAvailable) awayShortHandedPhases++;
         homeFatigueLoad += phase.homeFatigueGain;
         awayFatigueLoad += phase.awayFatigueGain;
         if (i >= 4) {
@@ -106,6 +114,12 @@ MatchReport buildReport(const MatchSetup& setup,
              << ", ataques " << phase.homeAttacks << "-" << phase.awayAttacks
              << ", remates " << phase.homeShotsGenerated << "-" << phase.awayShotsGenerated
              << ", riesgo " << formatDouble2(phase.homeDefensiveRisk) << "-" << formatDouble2(phase.awayDefensiveRisk);
+        if (phase.homePlayersAvailable != phase.awayPlayersAvailable) {
+            line << ", hombres " << phase.homePlayersAvailable << "-" << phase.awayPlayersAvailable;
+        }
+        if (phase.homeUrgency >= 0.10 || phase.awayUrgency >= 0.10) {
+            line << ", empuje " << formatDouble2(phase.homeUrgency) << "-" << formatDouble2(phase.awayUrgency);
+        }
         if (phase.homeTacticalChange || phase.awayTacticalChange) {
             line << ", ajustes tacticos";
         }
@@ -174,6 +188,16 @@ MatchReport buildReport(const MatchSetup& setup,
         riskStory = away.name + " se expuso mas cuando debio correr hacia atras.";
     } else {
         riskStory = "Los riesgos defensivos estuvieron bastante equilibrados.";
+    }
+    if (homeShortHandedPhases > awayShortHandedPhases) {
+        riskStory += " " + home.name + " paso mas tiempo con inferioridad numerica o reajustes por disponibilidad.";
+    } else if (awayShortHandedPhases > homeShortHandedPhases) {
+        riskStory += " " + away.name + " jugo varios tramos con menos disponibilidad real.";
+    }
+    if (homeChasingPhases > awayChasingPhases) {
+        riskStory += " " + home.name + " tuvo que empujar el marcador durante buena parte del cierre.";
+    } else if (awayChasingPhases > homeChasingPhases) {
+        riskStory += " " + away.name + " acelero mas al verse por detras o bajo presion.";
     }
     string fatigueOverlay;
     if (report.fatigueImpact.homeLateDrop && report.tacticalImpact.homePressingLoad > report.tacticalImpact.awayPressingLoad + 1.0) {

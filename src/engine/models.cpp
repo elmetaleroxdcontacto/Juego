@@ -388,39 +388,80 @@ vector<string> generatePlayerTraits(const Player& p, bool youth) {
 
 Player makeRandomPlayer(const string& position, int skillMin, int skillMax, int ageMin, int ageMax) {
     Player p;
+    const string normalized = normalizePosition(position);
+    const int boundedMin = min(skillMin, skillMax);
+    const int boundedMax = max(skillMin, skillMax);
+    const int profileRoll = randInt(1, 100);
+    const bool highCeiling = randInt(1, 100) <= 18;
     p.name = "Jugador" + to_string(randInt(1000, 9999));
-    p.position = position;
-    p.skill = randInt(skillMin, skillMax);
-    p.potential = clampInt(p.skill + randInt(0, 12), p.skill, 95);
+    p.position = normalized;
+    p.skill = randInt(boundedMin, boundedMax);
     p.age = randInt(ageMin, ageMax);
-    p.stamina = clampInt(p.skill + randInt(-5, 5), 30, 99);
-    p.fitness = p.stamina;
-    if (position == "ARQ") {
-        p.attack = clampInt(p.skill - 30, 10, 70);
-        p.defense = clampInt(p.skill + 10, 30, 99);
-    } else if (position == "DEF") {
-        p.attack = clampInt(p.skill - 10, 20, 90);
-        p.defense = clampInt(p.skill + 10, 30, 99);
-    } else if (position == "MED") {
-        p.attack = clampInt(p.skill, 25, 99);
-        p.defense = clampInt(p.skill, 25, 99);
+    const int potentialFloor = p.age <= 18 ? 6 : (p.age <= 21 ? 4 : 1);
+    int potentialTop = p.age <= 18 ? 16 : (p.age <= 21 ? 12 : 7);
+    if (highCeiling) potentialTop += 5;
+    p.potential = clampInt(p.skill + randInt(potentialFloor, potentialTop), p.skill, 97);
+
+    if (normalized == "ARQ") {
+        const bool sweeperKeeper = profileRoll >= 78;
+        p.attack = clampInt(p.skill - 34 + (sweeperKeeper ? 6 : 0) + randInt(-3, 3), 8, 74);
+        p.defense = clampInt(p.skill + 12 + (sweeperKeeper ? 2 : 4) + randInt(-3, 4), 30, 99);
+        p.stamina = clampInt(p.skill - 3 + randInt(-6, 4), 28, 92);
+        p.setPieceSkill = clampInt(p.skill - 12 + randInt(-5, 6), 15, 80);
+        p.role = sweeperKeeper ? "SweeperKeeper" : "Tradicional";
+        p.developmentPlan = "Reflejos";
+    } else if (normalized == "DEF") {
+        const bool wingBack = profileRoll >= 68;
+        p.attack = clampInt(p.skill - 12 + (wingBack ? 10 : 1) + randInt(-4, 4), 20, 92);
+        p.defense = clampInt(p.skill + 10 + (wingBack ? -2 : 5) + randInt(-4, 4), 30, 99);
+        p.stamina = clampInt(p.skill + (wingBack ? 8 : 2) + randInt(-5, 5), 35, 99);
+        p.setPieceSkill = clampInt(p.skill - 4 + randInt(-6, 6), 20, 92);
+        p.role = wingBack ? "Carrilero" : (profileRoll <= 24 ? "Stopper" : "BallPlaying");
+        p.developmentPlan = wingBack ? "Fisico" : "Defensa";
+    } else if (normalized == "MED") {
+        const bool creator = profileRoll <= 38;
+        const bool holder = profileRoll >= 76;
+        p.attack = clampInt(p.skill + (creator ? 8 : holder ? -4 : 2) + randInt(-5, 5), 25, 99);
+        p.defense = clampInt(p.skill + (creator ? -2 : holder ? 8 : 2) + randInt(-5, 5), 25, 99);
+        p.stamina = clampInt(p.skill + (holder ? 4 : 2) + randInt(-6, 6), 35, 99);
+        p.setPieceSkill = clampInt(p.skill + (creator ? 10 : 2) + randInt(-6, 8), 25, 99);
+        p.role = creator ? "Organizador" : (holder ? "Pivote" : "BoxToBox");
+        p.developmentPlan = creator ? "Creatividad" : (holder ? "Defensa" : "Fisico");
     } else {
-        p.attack = clampInt(p.skill + 10, 30, 99);
-        p.defense = clampInt(p.skill - 10, 20, 90);
+        const bool pressingForward = profileRoll <= 26;
+        const bool targetMan = profileRoll >= 78;
+        p.attack = clampInt(p.skill + 12 + (pressingForward ? 1 : targetMan ? 3 : 6) + randInt(-4, 5), 30, 99);
+        p.defense = clampInt(p.skill - 14 + (pressingForward ? 8 : targetMan ? 2 : 0) + randInt(-4, 4), 16, 88);
+        p.stamina = clampInt(p.skill + (pressingForward ? 7 : targetMan ? 2 : 0) + randInt(-6, 5), 35, 99);
+        p.setPieceSkill = clampInt(p.skill - 1 + randInt(-6, 8), 20, 96);
+        p.role = pressingForward ? "Pressing" : (targetMan ? "Objetivo" : "Poacher");
+        p.developmentPlan = pressingForward ? "Fisico" : "Finalizacion";
     }
-    p.value = static_cast<long long>(p.skill) * 10000;
-    p.wage = static_cast<long long>(p.skill) * 150 + randInt(0, 800);
+
+    p.fitness = p.stamina;
+    p.value = max(20000LL,
+                  static_cast<long long>(p.skill) * 9000LL +
+                      static_cast<long long>(max(0, p.potential - p.skill)) * 7000LL -
+                      static_cast<long long>(max(0, p.age - 28)) * 4000LL);
+    p.wage = max(1500LL,
+                 static_cast<long long>(p.skill) * 140 +
+                     static_cast<long long>(max(0, p.potential - p.skill)) * 30 +
+                     randInt(0, 900));
     p.releaseClause = max(50000LL, p.value * (18 + randInt(0, 8)) / 10);
-    p.setPieceSkill = clampInt(p.skill + randInt(-8, 8), 25, 99);
-    p.leadership = clampInt(35 + randInt(0, 45), 1, 99);
-    p.professionalism = clampInt(40 + randInt(0, 45), 1, 99);
+    p.leadership = clampInt(28 + p.age + randInt(-10, 18), 1, 99);
+    p.professionalism = clampInt(34 + p.age + randInt(-8, 18) + (highCeiling ? 4 : 0), 1, 99);
     p.ambition = clampInt(35 + randInt(0, 50), 1, 99);
+    p.consistency = clampInt(28 + p.age + p.professionalism / 6 + randInt(-10, 12), 1, 99);
+    p.bigMatches = clampInt(24 + p.ambition / 3 + p.age / 2 + randInt(-10, 10), 1, 99);
     p.happiness = clampInt(55 + randInt(-10, 20), 1, 99);
     p.chemistry = clampInt(45 + randInt(0, 35), 1, 99);
+    p.currentForm = clampInt(46 + p.skill / 5 + randInt(-8, 8), 1, 99);
+    p.tacticalDiscipline = clampInt(34 + p.professionalism / 2 + randInt(-8, 8), 1, 99);
+    p.versatility = clampInt(24 + p.stamina / 3 + (normalized == "MED" ? 10 : 0) + randInt(-8, 10), 1, 99);
     p.moraleMomentum = randInt(-2, 4);
     p.fatigueLoad = randInt(0, 8);
     p.unhappinessWeeks = 0;
-    p.desiredStarts = (p.skill >= skillMax - 5) ? 3 : 1;
+    p.desiredStarts = (p.skill >= boundedMax - 4) ? 3 : (p.skill >= boundedMax - 8 ? 2 : 1);
     p.startsThisSeason = 0;
     p.wantsToLeave = false;
     p.onLoan = false;
@@ -440,9 +481,8 @@ Player makeRandomPlayer(const string& position, int skillMin, int skillMax, int 
     p.matchesPlayed = 0;
     p.lastTrainedSeason = -1;
     p.lastTrainedWeek = -1;
-    p.role = defaultRoleForPosition(position);
-    p.roleDuty = defaultDutyForRole(p.role, position);
-    p.promisedPosition = position;
+    p.roleDuty = defaultDutyForRole(p.role, normalized);
+    p.promisedPosition = normalized;
     ensurePlayerProfile(p, true);
     return p;
 }

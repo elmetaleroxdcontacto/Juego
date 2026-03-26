@@ -38,8 +38,9 @@ void registerDiscipline(Team& team,
                         std::vector<std::string>& yellowCardPlayers,
                         std::vector<std::string>& redCardPlayers);
 
-void maybeInjure(const Team& team,
-                 const std::vector<int>& activeXI,
+void maybeInjure(Team& team,
+                 std::vector<int>& activeXI,
+                 std::vector<int>& participants,
                  double injuryRisk,
                  int minuteStart,
                  int minuteEnd,

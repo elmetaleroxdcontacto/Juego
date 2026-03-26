@@ -1,5 +1,6 @@
 #include "career/medical_service.h"
 
+#include "simulation/player_condition.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -10,8 +11,12 @@ using namespace std;
 namespace {
 
 string workloadRecommendation(const Player& player, const Team& team) {
+    const int workload = player_condition::workloadRisk(player, team);
+    const int relapse = player_condition::relapseRisk(player, team);
+    const int readiness = player_condition::readinessScore(player, team);
     if (player.injured) return "Tratamiento y reintegro progresivo";
-    if (player.fatigueLoad >= 75 || player.fitness <= 56) return "Reducir carga y reservar proximo partido";
+    if (workload >= 78 || relapse >= 72) return "Reducir carga y reservar proximo partido";
+    if (readiness <= 45) return "Rotacion inmediata y bloque de recuperacion";
     if (player.injuryHistory >= 4 && team.medicalTeam <= 62) return "Seguimiento diario por riesgo de recaida";
     if (player.matchesSuspended > 0) return "Usar semana para recuperacion especifica";
     return "Carga controlada";
@@ -28,8 +33,8 @@ vector<MedicalStatus> buildMedicalStatuses(const Team& team) {
         status.playerName = player.name;
         status.unavailable = player.injured || player.matchesSuspended > 0;
         status.weeksOut = player.injured ? player.injuryWeeks : 0;
-        status.workloadRisk = clampInt(player.fatigueLoad + max(0, 70 - player.fitness) + max(0, player.age - 30) * 2, 0, 99);
-        status.relapseRisk = clampInt(player.injuryHistory * 12 + max(0, 65 - team.medicalTeam) + (player.injured ? 18 : 0) + player.fatigueLoad / 3, 0, 99);
+        status.workloadRisk = player_condition::workloadRisk(player, team);
+        status.relapseRisk = player_condition::relapseRisk(player, team);
         status.diagnosis = player.injured ? player.injuryType : (status.workloadRisk >= 65 ? "Sobrecarga" : "Disponible");
         status.recommendation = workloadRecommendation(player, team);
         if (player.injured || status.workloadRisk >= 50 || status.relapseRisk >= 45) {
