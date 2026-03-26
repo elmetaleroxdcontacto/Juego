@@ -35,6 +35,15 @@ GameDifficulty nextDifficulty(GameDifficulty current) {
     return GameDifficulty::Normal;
 }
 
+SimulationSpeed nextSimulationSpeed(SimulationSpeed current) {
+    switch (current) {
+        case SimulationSpeed::Relaxed: return SimulationSpeed::Standard;
+        case SimulationSpeed::Standard: return SimulationSpeed::Rapid;
+        case SimulationSpeed::Rapid: return SimulationSpeed::Relaxed;
+    }
+    return SimulationSpeed::Standard;
+}
+
 SimulationMode nextSimulationMode(SimulationMode current) {
     return current == SimulationMode::Fast ? SimulationMode::Detailed : SimulationMode::Fast;
 }
@@ -64,6 +73,27 @@ string difficultyDescription(GameDifficulty difficulty) {
     return "Balance estandar entre presion, presupuesto y exigencia competitiva.";
 }
 
+string simulationSpeedLabel(SimulationSpeed speed) {
+    switch (speed) {
+        case SimulationSpeed::Relaxed: return "Pausada";
+        case SimulationSpeed::Standard: return "Normal";
+        case SimulationSpeed::Rapid: return "Rapida";
+    }
+    return "Normal";
+}
+
+string simulationSpeedDescription(SimulationSpeed speed) {
+    switch (speed) {
+        case SimulationSpeed::Relaxed:
+            return "Pensada para revisar decisiones con mas calma y contexto entre pasos.";
+        case SimulationSpeed::Standard:
+            return "Equilibrio entre ritmo de juego y lectura de reportes.";
+        case SimulationSpeed::Rapid:
+            return "Prioriza avanzar mas rapido por menus y simulaciones sin tocar la logica base.";
+    }
+    return "Equilibrio entre ritmo de juego y lectura de reportes.";
+}
+
 string simulationModeLabel(SimulationMode mode) {
     switch (mode) {
         case SimulationMode::Fast: return "Rapido";
@@ -85,6 +115,7 @@ string simulationModeDescription(SimulationMode mode) {
 string settingsSummary(const GameSettings& settings) {
     return "Volumen " + volumeLabel(settings.volume) +
            " | Dificultad " + difficultyLabel(settings.difficulty) +
+           " | Velocidad " + simulationSpeedLabel(settings.simulationSpeed) +
            " | Simulacion " + simulationModeLabel(settings.simulationMode);
 }
 
@@ -98,6 +129,10 @@ void cycleVolume(GameSettings& settings) {
 
 void cycleDifficulty(GameSettings& settings) {
     settings.difficulty = nextDifficulty(settings.difficulty);
+}
+
+void cycleSimulationSpeed(GameSettings& settings) {
+    settings.simulationSpeed = nextSimulationSpeed(settings.simulationSpeed);
 }
 
 void cycleSimulationMode(GameSettings& settings) {

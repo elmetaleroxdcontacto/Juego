@@ -1261,9 +1261,14 @@ void testGameSettingsCycleAndDifficultyImpact() {
     game_settings::cycleDifficulty(settings);
     expect(settings.difficulty == GameDifficulty::Challenging,
            "La dificultad debe avanzar al siguiente nivel.");
+    game_settings::cycleSimulationSpeed(settings);
+    expect(settings.simulationSpeed == SimulationSpeed::Rapid,
+           "La velocidad de simulacion debe avanzar al siguiente ritmo previsto.");
     game_settings::cycleSimulationMode(settings);
     expect(settings.simulationMode == SimulationMode::Fast,
            "El modo de simulacion debe alternar entre detallado y rapido.");
+    expect(game_settings::settingsSummary(settings).find("Velocidad") != string::npos,
+           "El resumen de configuracion debe incluir la velocidad de simulacion.");
 
     Career career;
     career.boardConfidence = 52;

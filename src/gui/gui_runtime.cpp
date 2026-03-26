@@ -13,12 +13,12 @@ GuiPageModel buildModel(AppState& state);
 namespace {
 
 std::string friendlyPanelTitle(const std::string& title) {
-    if (title == "FrontMenuWelcome") return "Menu principal";
-    if (title == "FrontMenuConfig") return "Configuracion activa";
-    if (title == "FrontMenuActions") return "Acciones";
-    if (title == "SettingsOverview") return "Ajustes base";
+    if (title == "FrontMenuOverview") return "Panorama de arranque";
+    if (title == "FrontMenuProfile") return "Perfil del manager";
+    if (title == "FrontMenuRoadmap") return "Hoja de ruta";
+    if (title == "SettingsDesk") return "Cabina de ajustes";
     if (title == "SettingsImpact") return "Impacto";
-    if (title == "SettingsChecklist") return "Resumen";
+    if (title == "SettingsReturn") return "Retorno y estado";
     if (title == "DashboardPanel") return "Centro del club";
     if (title == "LeagueTableView") return "Clasificacion";
     if (title == "MatchSummaryPanel") return "Proximo encuentro";

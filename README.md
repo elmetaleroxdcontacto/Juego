@@ -4,6 +4,7 @@ Simulador de gestion futbolistica en C++ inspirado en la profundidad de juegos t
 
 El proyecto ya es jugable y hoy combina tres capas que trabajan juntas:
 
+- frontend inicial `Chilean Footballito` con menu principal y configuraciones compartidas
 - simulacion de partidos con fases, contexto tactico, xG, riesgo y fatiga
 - modo carrera con directiva, finanzas, scouting, contratos, cantera y staff
 - GUI Win32 para jugar sin consola, mas una CLI para validacion y depuracion
@@ -39,6 +40,8 @@ El proyecto ya es jugable y hoy combina tres capas que trabajan juntas:
 
 ### GUI Win32
 
+- menu de inicio con presentacion tipo dashboard y `Chilean Footballito` como portada central
+- portada Win32 con `Jugar`, `Configuraciones`, chips de estado y roadmap visual para futuras opciones
 - `FootballManager.exe` sin consola innecesaria
 - arranque maximizado con soporte DPI
 - boton y `F11` para alternar ventana, maximizado y fullscreen sin borde
@@ -101,6 +104,8 @@ cmd /c build.bat
 .\build-cmake\bin\FootballManagerCLI.exe
 ```
 
+La CLI abre primero el frontend textual `Chilean Footballito`, con paneles ASCII, navegacion por `W/S`, `Enter`, numeros y acceso al submenu de configuraciones.
+
 ### Validacion de datos y proyecto
 
 ```powershell
@@ -159,6 +164,7 @@ tools/
 - `src/winmain.cpp`: entrada GUI en Windows
 - `src/main.cpp`: entrada consola
 - `src/engine/game_controller.cpp`: seleccion de GUI, CLI o validacion
+- `src/engine/front_menu.cpp`: frontend compartido para el menu principal y configuraciones
 
 ## Documentacion adicional
 

@@ -70,6 +70,7 @@ enum ControlId {
     IDC_MENU_BACK_BUTTON,
     IDC_MENU_VOLUME_BUTTON,
     IDC_MENU_DIFFICULTY_BUTTON,
+    IDC_MENU_SPEED_BUTTON,
     IDC_MENU_SIMULATION_BUTTON,
     IDC_EMPTY_NEW_BUTTON,
     IDC_EMPTY_LOAD_BUTTON,
@@ -182,6 +183,7 @@ struct AppState {
     DWORD restoreExStyle = 0;
     HFONT font = nullptr;
     HFONT titleFont = nullptr;
+    HFONT heroFont = nullptr;
     HFONT sectionFont = nullptr;
     HFONT monoFont = nullptr;
     HBRUSH backgroundBrush = nullptr;
@@ -235,6 +237,7 @@ struct AppState {
     HWND menuBackButton = nullptr;
     HWND menuVolumeButton = nullptr;
     HWND menuDifficultyButton = nullptr;
+    HWND menuSpeedButton = nullptr;
     HWND menuSimulationButton = nullptr;
     HWND emptyNewButton = nullptr;
     HWND emptyLoadButton = nullptr;
@@ -373,6 +376,7 @@ void openFrontendMenu(AppState& state);
 void openSettingsMenu(AppState& state);
 void cycleFrontendVolume(AppState& state);
 void cycleFrontendDifficulty(AppState& state);
+void cycleFrontendSimulationSpeed(AppState& state);
 void cycleFrontendSimulationMode(AppState& state);
 
 }  // namespace gui_win32

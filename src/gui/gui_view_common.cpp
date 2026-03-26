@@ -105,8 +105,8 @@ std::vector<DashboardMetric> buildMetrics(const AppState& state, const std::vect
             {"Titulo", game_settings::gameTitle(), kThemeAccentBlue},
             {"Volumen", game_settings::volumeLabel(state.settings.volume), kThemeAccentGreen},
             {"Dificultad", game_settings::difficultyLabel(state.settings.difficulty), kThemeAccent},
-            {"Simulacion", game_settings::simulationModeLabel(state.settings.simulationMode), kThemeAccentBlue},
-            {"Estado", state.currentPage == GuiPage::MainMenu ? "Menu principal" : "Configurando", kThemeWarning}
+            {"Velocidad", game_settings::simulationSpeedLabel(state.settings.simulationSpeed), kThemeWarning},
+            {"Simulacion", game_settings::simulationModeLabel(state.settings.simulationMode), kThemeAccentBlue}
         };
     }
     if (!career.myTeam) {

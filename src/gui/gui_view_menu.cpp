@@ -12,41 +12,40 @@ GuiPageModel buildMainMenuModel(AppState& state) {
     GuiPageModel model;
     model.title = game_settings::gameTitle();
     model.breadcrumb = "Inicio > Menu principal";
-    model.infoLine = "Arranque principal del juego. Entra a Jugar para abrir el flujo normal o revisa Configuraciones antes de empezar.";
-    model.summary.title = "FrontMenuWelcome";
-    model.detail.title = "FrontMenuConfig";
-    model.feed.title = "FrontMenuActions";
+    model.infoLine = "Portada principal del manager. La experiencia comparte frontend entre GUI y consola sin romper el flujo real.";
+    model.summary.title = "FrontMenuOverview";
+    model.detail.title = "FrontMenuProfile";
+    model.feed.title = "FrontMenuRoadmap";
     model.metrics = {
-        {"Titulo", game_settings::gameTitle(), kThemeAccentBlue},
-        {"Volumen", game_settings::volumeLabel(state.settings.volume), kThemeAccentGreen},
+        {"Perfil", "Portada", kThemeAccentBlue},
         {"Dificultad", game_settings::difficultyLabel(state.settings.difficulty), kThemeAccent},
-        {"Simulacion", game_settings::simulationModeLabel(state.settings.simulationMode), kThemeAccentBlue},
-        {"Estado", "Menu principal", kThemeWarning}
+        {"Velocidad", game_settings::simulationSpeedLabel(state.settings.simulationSpeed), kThemeWarning},
+        {"Modo", game_settings::simulationModeLabel(state.settings.simulationMode), kThemeAccentBlue},
+        {"Audio", game_settings::volumeLabel(state.settings.volume), kThemeAccentGreen}
     };
 
     model.summary.content =
-        "Bienvenido a Chilean Footballito\r\n\r\n"
-        "Desde aqui puedes entrar al flujo principal del juego sin saltarte ningun paso del frontend.\r\n\r\n"
-        "[Jugar]\r\n"
-        "- abre el centro del club y el flujo normal actual\r\n"
-        "- mantiene intactas las pantallas de carrera, fichajes, tacticas y noticias\r\n\r\n"
-        "[Configuraciones]\r\n"
-        "- ajusta volumen, dificultad y modo de simulacion\r\n"
-        "- deja el proyecto listo antes de empezar una carrera";
+        "Panorama de arranque\r\n\r\n"
+        "Jugar abre el flujo real del proyecto: dashboard, club, carrera, mercado, tacticas y noticias.\r\n\r\n"
+        "Configuraciones abre la cabina inicial para dejar lista la partida antes de entrar.\r\n\r\n"
+        "La portada esta pensada como base escalable para seguir creciendo hacia continuar, cargar, creditos y perfil.";
 
     std::ostringstream detail;
-    detail << "Perfil de juego actual\r\n\r\n";
+    detail << "Perfil del manager\r\n\r\n";
     detail << "Volumen: " << game_settings::volumeLabel(state.settings.volume) << "\r\n";
     detail << "Dificultad: " << game_settings::difficultyLabel(state.settings.difficulty) << "\r\n";
     detail << game_settings::difficultyDescription(state.settings.difficulty) << "\r\n\r\n";
+    detail << "Velocidad de simulacion: " << game_settings::simulationSpeedLabel(state.settings.simulationSpeed) << "\r\n";
+    detail << game_settings::simulationSpeedDescription(state.settings.simulationSpeed) << "\r\n\r\n";
     detail << "Modo de simulacion: " << game_settings::simulationModeLabel(state.settings.simulationMode) << "\r\n";
     detail << game_settings::simulationModeDescription(state.settings.simulationMode) << "\r\n\r\n";
-    detail << "Pulsa Jugar para abrir el flujo normal del juego.";
+    detail << "Preparado para abrir el centro del club sin perder la configuracion actual.";
     model.detail.content = detail.str();
 
     model.feed.lines = {
-        "Jugar -> entra al dashboard y al flujo normal del juego.",
-        "Configuraciones -> abre el menu de ajustes iniciales.",
+        "Estado actual: frontend listo para una experiencia tipo manager game.",
+        "Navegacion GUI: Tab, Enter, flechas y Esc desde configuraciones.",
+        "Preparado para futuro: Continuar, Cargar, Creditos y salir al escritorio.",
         "F11 sigue disponible para alternar modos de pantalla en cualquier momento."
     };
     return model;
@@ -56,42 +55,47 @@ GuiPageModel buildSettingsPageModel(AppState& state) {
     GuiPageModel model;
     model.title = "Configuraciones";
     model.breadcrumb = "Inicio > Configuraciones";
-    model.infoLine = "Ajustes basicos listos para crecer: volumen, dificultad y modo de simulacion.";
-    model.summary.title = "SettingsOverview";
+    model.infoLine = "Cabina inicial de ajustes. Cambia el tono del juego antes de entrar al centro del club.";
+    model.summary.title = "SettingsDesk";
     model.detail.title = "SettingsImpact";
-    model.feed.title = "SettingsChecklist";
+    model.feed.title = "SettingsReturn";
     model.metrics = {
         {"Volumen", game_settings::volumeLabel(state.settings.volume), kThemeAccentGreen},
         {"Dificultad", game_settings::difficultyLabel(state.settings.difficulty), kThemeAccent},
-        {"Simulacion", game_settings::simulationModeLabel(state.settings.simulationMode), kThemeAccentBlue},
-        {"Audio", "Simulado", kThemeWarning},
+        {"Velocidad", game_settings::simulationSpeedLabel(state.settings.simulationSpeed), kThemeWarning},
+        {"Modo", game_settings::simulationModeLabel(state.settings.simulationMode), kThemeAccentBlue},
         {"Estado", "Listo", kThemeAccentGreen}
     };
 
     model.summary.content =
-        "Ajustes disponibles\r\n\r\n"
+        "Cabina de ajustes\r\n\r\n"
         "[Volumen]\r\n"
         "Se mantiene como control de frontend aunque el juego aun no tenga audio real.\r\n\r\n"
         "[Dificultad]\r\n"
         "Afecta el arranque de nuevas carreras y el contexto del proyecto.\r\n\r\n"
+        "[Velocidad de simulacion]\r\n"
+        "Define el ritmo percibido del frontend y deja lista la estructura para futuras animaciones o pausas.\r\n\r\n"
         "[Modo de simulacion]\r\n"
         "Controla si el juego prioriza una lectura rapida o una salida mas detallada.";
 
     std::ostringstream detail;
-    detail << "Impacto actual\r\n\r\n";
+    detail << "Impacto sobre la experiencia\r\n\r\n";
     detail << "Volumen: " << game_settings::volumeLabel(state.settings.volume) << "\r\n";
     detail << "Dificultad: " << game_settings::difficultyLabel(state.settings.difficulty) << "\r\n";
     detail << game_settings::difficultyDescription(state.settings.difficulty) << "\r\n\r\n";
+    detail << "Velocidad: " << game_settings::simulationSpeedLabel(state.settings.simulationSpeed) << "\r\n";
+    detail << game_settings::simulationSpeedDescription(state.settings.simulationSpeed) << "\r\n\r\n";
     detail << "Simulacion: " << game_settings::simulationModeLabel(state.settings.simulationMode) << "\r\n";
     detail << game_settings::simulationModeDescription(state.settings.simulationMode) << "\r\n\r\n";
-    detail << "Usa los botones del centro para ir ciclando cada valor.";
+    detail << "Usa los botones del centro para ir ciclando cada valor y vuelve limpio al menu principal.";
     model.detail.content = detail.str();
 
     model.feed.lines = {
         std::string("Volumen actual: ") + game_settings::volumeLabel(state.settings.volume),
         std::string("Dificultad actual: ") + game_settings::difficultyLabel(state.settings.difficulty),
-        std::string("Simulacion actual: ") + game_settings::simulationModeLabel(state.settings.simulationMode),
-        "Volver te devuelve al menu principal sin perder los cambios."
+        std::string("Velocidad actual: ") + game_settings::simulationSpeedLabel(state.settings.simulationSpeed),
+        std::string("Modo actual: ") + game_settings::simulationModeLabel(state.settings.simulationMode),
+        "Volver te devuelve al menu principal sin perder cambios."
     };
     return model;
 }

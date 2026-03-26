@@ -124,16 +124,16 @@ int GameController::run(int argc, char* argv[]) {
 int GameController::runConsoleApp() {
     configureConsoleEncoding();
     engine_.initialize();
+    MenuController menu(settings_);
 
     while (true) {
-        MainMenuScreen menu(settings_);
-        const FrontMenuAction action = menu.prompt();
+        const FrontMenuAction action = menu.runMainMenu();
         if (action == FrontMenuAction::Exit) {
             cout << "Saliendo del juego." << endl;
             break;
         }
         if (action == FrontMenuAction::Settings) {
-            SettingsMenuScreen(settings_).run();
+            menu.runSettingsMenu();
             continue;
         }
         runConsoleGameHub();

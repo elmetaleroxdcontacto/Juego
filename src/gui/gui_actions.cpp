@@ -208,9 +208,9 @@ void simulateWeek(AppState& state) {
     if (!state.career.myTeam) return;
     syncManagerNameFromUi(state);
     setStatus(state,
-              game_settings::isDetailedSimulation(state.settings)
-                  ? "Simulando semana en modo detallado..."
-                  : "Simulando semana en modo rapido...");
+              "Simulando semana en modo " +
+                  game_settings::simulationModeLabel(state.settings.simulationMode) +
+                  " a velocidad " + game_settings::simulationSpeedLabel(state.settings.simulationSpeed) + "...");
     UpdateWindow(state.window);
     ServiceResult result = simulateCareerWeekService(state.career);
     syncCombosFromCareer(state);
@@ -340,11 +340,13 @@ void runUpgradeAction(AppState& state, ClubUpgrade upgrade, const std::string& t
 void openFrontendMenu(AppState& state) {
     setCurrentPage(state, GuiPage::MainMenu);
     setStatus(state, "Menu principal listo. Entra a Jugar o revisa Configuraciones.");
+    if (state.menuPlayButton) SetFocus(state.menuPlayButton);
 }
 
 void openSettingsMenu(AppState& state) {
     setCurrentPage(state, GuiPage::Settings);
-    setStatus(state, "Configuraciones abiertas. Ajusta volumen, dificultad y simulacion.");
+    setStatus(state, "Configuraciones abiertas. Ajusta volumen, dificultad, velocidad y simulacion.");
+    if (state.menuVolumeButton) SetFocus(state.menuVolumeButton);
 }
 
 void cycleFrontendVolume(AppState& state) {
@@ -357,6 +359,12 @@ void cycleFrontendDifficulty(AppState& state) {
     game_settings::cycleDifficulty(state.settings);
     refreshCurrentPage(state);
     setStatus(state, "Dificultad actual: " + game_settings::difficultyLabel(state.settings.difficulty) + ".");
+}
+
+void cycleFrontendSimulationSpeed(AppState& state) {
+    game_settings::cycleSimulationSpeed(state.settings);
+    refreshCurrentPage(state);
+    setStatus(state, "Velocidad actual: " + game_settings::simulationSpeedLabel(state.settings.simulationSpeed) + ".");
 }
 
 void cycleFrontendSimulationMode(AppState& state) {

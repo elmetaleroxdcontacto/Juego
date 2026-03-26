@@ -648,7 +648,8 @@ bool isPageButtonId(int id) {
 bool isPrimaryButtonId(int id) {
     return id == IDC_NEW_CAREER_BUTTON || id == IDC_SIMULATE_BUTTON || id == IDC_BUY_BUTTON ||
            id == IDC_RENEW_BUTTON || id == IDC_SCOUT_BUTTON || id == IDC_PAGE_DASHBOARD_BUTTON ||
-           id == IDC_EMPTY_NEW_BUTTON || id == IDC_EMPTY_LOAD_BUTTON || id == IDC_EMPTY_VALIDATE_BUTTON;
+           id == IDC_EMPTY_NEW_BUTTON || id == IDC_EMPTY_LOAD_BUTTON || id == IDC_EMPTY_VALIDATE_BUTTON ||
+           id == IDC_MENU_PLAY_BUTTON;
 }
 
 bool isUpgradeButtonId(int id) {
@@ -669,7 +670,8 @@ static bool isActivePageButton(const AppState& state, int id) {
 }
 
 static bool usesButtonBadge(int id) {
-    return isPageButtonId(id) || id == IDC_DISPLAY_MODE_BUTTON;
+    return isPageButtonId(id) || id == IDC_DISPLAY_MODE_BUTTON || id == IDC_MENU_PLAY_BUTTON ||
+           id == IDC_MENU_SETTINGS_BUTTON || id == IDC_MENU_BACK_BUTTON;
 }
 
 static DisplayMode displayModeForButton(const AppState& state) {
@@ -698,6 +700,28 @@ static wchar_t pageButtonGlyph(int id) {
     }
 }
 
+static bool isFrontMenuButtonId(int id) {
+    return id == IDC_MENU_PLAY_BUTTON || id == IDC_MENU_SETTINGS_BUTTON || id == IDC_MENU_BACK_BUTTON ||
+           id == IDC_MENU_VOLUME_BUTTON || id == IDC_MENU_DIFFICULTY_BUTTON ||
+           id == IDC_MENU_SPEED_BUTTON || id == IDC_MENU_SIMULATION_BUTTON;
+}
+
+static bool isFrontMenuSettingButtonId(int id) {
+    return id == IDC_MENU_VOLUME_BUTTON || id == IDC_MENU_DIFFICULTY_BUTTON ||
+           id == IDC_MENU_SPEED_BUTTON || id == IDC_MENU_SIMULATION_BUTTON;
+}
+
+static wchar_t buttonBadgeGlyph(int id, DisplayMode displayMode) {
+    if (id == IDC_DISPLAY_MODE_BUTTON) {
+        return displayMode == DisplayMode::BorderlessFullscreen ? L'W'
+             : (displayMode == DisplayMode::MaximizedWindow ? L'F' : L'M');
+    }
+    if (id == IDC_MENU_PLAY_BUTTON) return L'J';
+    if (id == IDC_MENU_SETTINGS_BUTTON) return L'C';
+    if (id == IDC_MENU_BACK_BUTTON) return L'V';
+    return pageButtonGlyph(id);
+}
+
 void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     if (!drawItem) return;
     HDC hdc = drawItem->hDC;
@@ -706,6 +730,7 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     bool pressed = (drawItem->itemState & ODS_SELECTED) != 0;
     bool disabled = (drawItem->itemState & ODS_DISABLED) != 0;
     bool activePage = isActivePageButton(state, id);
+    bool focused = GetFocus() == drawItem->hwndItem || (drawItem->itemState & ODS_FOCUS) != 0;
 
     COLORREF fill = kThemePanelAlt;
     COLORREF border = RGB(40, 62, 77);
@@ -714,6 +739,20 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     if (isPageButtonId(id)) {
         fill = RGB(14, 24, 32);
         border = RGB(35, 56, 69);
+    } else if (id == IDC_MENU_PLAY_BUTTON) {
+        fill = RGB(18, 75, 56);
+        border = RGB(71, 180, 128);
+    } else if (id == IDC_MENU_SETTINGS_BUTTON) {
+        fill = RGB(20, 46, 78);
+        border = RGB(90, 149, 224);
+    } else if (id == IDC_MENU_BACK_BUTTON) {
+        fill = RGB(29, 39, 48);
+        border = RGB(88, 112, 128);
+    } else if (isFrontMenuSettingButtonId(id)) {
+        fill = RGB(15, 31, 42);
+        border = id == IDC_MENU_DIFFICULTY_BUTTON ? kThemeAccent
+               : (id == IDC_MENU_SPEED_BUTTON ? kThemeWarning
+                                              : (id == IDC_MENU_SIMULATION_BUTTON ? kThemeAccentBlue : kThemeAccentGreen));
     } else if (id == IDC_DISPLAY_MODE_BUTTON) {
         fill = displayMode == DisplayMode::BorderlessFullscreen
             ? RGB(24, 58, 80)
@@ -745,14 +784,35 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
         border = RGB(48, 55, 62);
         text = RGB(103, 111, 118);
     }
+    if (focused && !disabled) {
+        border = RGB(235, 221, 176);
+    }
 
-    drawRoundedPanel(hdc, rect, fill, border, 12);
+    drawRoundedPanel(hdc, rect, fill, border, isFrontMenuButtonId(id) ? 16 : 12);
 
     RECT accentRect = rect;
-    accentRect.right = accentRect.left + 4;
-    HBRUSH accentBrush = CreateSolidBrush(activePage ? kThemeAccent : (isPrimaryButtonId(id) ? kThemeAccentGreen : border));
+    accentRect.right = accentRect.left + (isFrontMenuButtonId(id) ? 6 : 4);
+    COLORREF accentColor = activePage ? kThemeAccent : (isPrimaryButtonId(id) ? kThemeAccentGreen : border);
+    if (id == IDC_MENU_SETTINGS_BUTTON) accentColor = kThemeAccentBlue;
+    if (id == IDC_MENU_BACK_BUTTON) accentColor = RGB(108, 131, 145);
+    if (id == IDC_MENU_DIFFICULTY_BUTTON) accentColor = kThemeAccent;
+    if (id == IDC_MENU_SPEED_BUTTON) accentColor = kThemeWarning;
+    if (id == IDC_MENU_SIMULATION_BUTTON) accentColor = kThemeAccentBlue;
+    HBRUSH accentBrush = CreateSolidBrush(accentColor);
     FillRect(hdc, &accentRect, accentBrush);
     DeleteObject(accentBrush);
+
+    if (focused && !disabled) {
+        RECT focusRect = rect;
+        InflateRect(&focusRect, -4, -4);
+        HPEN focusPen = CreatePen(PS_SOLID, 1, RGB(238, 224, 170));
+        HGDIOBJ oldPen = SelectObject(hdc, focusPen);
+        HGDIOBJ oldBrush = SelectObject(hdc, GetStockObject(HOLLOW_BRUSH));
+        RoundRect(hdc, focusRect.left, focusRect.top, focusRect.right, focusRect.bottom, 12, 12);
+        SelectObject(hdc, oldPen);
+        SelectObject(hdc, oldBrush);
+        DeleteObject(focusPen);
+    }
 
     wchar_t textBuffer[128]{};
     GetWindowTextW(drawItem->hwndItem, textBuffer, static_cast<int>(sizeof(textBuffer) / sizeof(textBuffer[0])));
@@ -774,10 +834,7 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
                      id == IDC_DISPLAY_MODE_BUTTON ? RGB(10, 24, 35)
                                                    : (activePage ? RGB(34, 27, 8) : RGB(225, 234, 239)));
         HGDIOBJ oldBadgeFont = SelectObject(hdc, state.sectionFont ? state.sectionFont : state.font);
-        const wchar_t glyph = id == IDC_DISPLAY_MODE_BUTTON
-            ? (displayMode == DisplayMode::BorderlessFullscreen ? L'W'
-                                                                : (displayMode == DisplayMode::MaximizedWindow ? L'F' : L'M'))
-            : pageButtonGlyph(id);
+        const wchar_t glyph = buttonBadgeGlyph(id, displayMode);
         wchar_t iconText[2]{glyph, L'\0'};
         DrawTextW(hdc, iconText, -1, &badgeText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
         SelectObject(hdc, oldBadgeFont);
@@ -789,7 +846,10 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     if (pressed) OffsetRect(&textRect, 0, 1);
     SetBkMode(hdc, TRANSPARENT);
     SetTextColor(hdc, text);
-    HGDIOBJ oldFont = SelectObject(hdc, state.font ? state.font : static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT)));
+    HGDIOBJ oldFont = SelectObject(hdc,
+                                   isFrontMenuButtonId(id)
+                                       ? (state.sectionFont ? state.sectionFont : state.font)
+                                       : (state.font ? state.font : static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT))));
     DrawTextW(hdc,
               textBuffer,
               -1,

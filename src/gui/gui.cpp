@@ -232,6 +232,106 @@ void executeInsightAction(AppState& state, InsightAction action) {
     }
 }
 
+std::vector<HWND> activeFrontMenuButtons(const AppState& state) {
+    if (state.currentPage == GuiPage::MainMenu) {
+        return {state.menuPlayButton, state.menuSettingsButton};
+    }
+    if (state.currentPage == GuiPage::Settings) {
+        return {state.menuVolumeButton, state.menuDifficultyButton, state.menuSpeedButton, state.menuSimulationButton, state.menuBackButton};
+    }
+    return {};
+}
+
+void focusFrontMenuButton(const std::vector<HWND>& buttons, int index) {
+    if (buttons.empty()) return;
+    const int count = static_cast<int>(buttons.size());
+    index = (index % count + count) % count;
+    for (int attempts = 0; attempts < count; ++attempts) {
+        HWND candidate = buttons[static_cast<size_t>((index + attempts) % count)];
+        if (candidate && IsWindowVisible(candidate) && IsWindowEnabled(candidate)) {
+            SetFocus(candidate);
+            return;
+        }
+    }
+}
+
+bool moveFrontMenuFocus(const AppState& state, int delta) {
+    const std::vector<HWND> buttons = activeFrontMenuButtons(state);
+    if (buttons.empty()) return false;
+
+    HWND focused = GetFocus();
+    int current = 0;
+    for (size_t i = 0; i < buttons.size(); ++i) {
+        if (buttons[i] == focused) {
+            current = static_cast<int>(i);
+            break;
+        }
+    }
+    focusFrontMenuButton(buttons, current + delta);
+    return true;
+}
+
+bool clickFrontMenuButton(HWND button) {
+    if (!button || !IsWindowVisible(button) || !IsWindowEnabled(button)) return false;
+    SendMessageW(button, BM_CLICK, 0, 0);
+    return true;
+}
+
+bool handleFrontMenuKey(AppState& state, WPARAM key) {
+    if (!isFrontMenuPage(state.currentPage)) return false;
+
+    switch (key) {
+        case VK_LEFT:
+        case VK_UP:
+            return moveFrontMenuFocus(state, -1);
+        case VK_RIGHT:
+        case VK_DOWN:
+        case VK_TAB:
+            return moveFrontMenuFocus(state, 1);
+        case VK_HOME:
+            focusFrontMenuButton(activeFrontMenuButtons(state), 0);
+            return true;
+        case VK_END: {
+            const std::vector<HWND> buttons = activeFrontMenuButtons(state);
+            focusFrontMenuButton(buttons, static_cast<int>(buttons.size()) - 1);
+            return true;
+        }
+        case VK_RETURN:
+        case VK_SPACE:
+            return clickFrontMenuButton(GetFocus());
+        case 'J':
+            return state.currentPage == GuiPage::MainMenu && clickFrontMenuButton(state.menuPlayButton);
+        case 'C':
+            return state.currentPage == GuiPage::MainMenu && clickFrontMenuButton(state.menuSettingsButton);
+        case 'D':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuDifficultyButton);
+        case 'R':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuSpeedButton);
+        case 'M':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuSimulationButton);
+        case 'V':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuVolumeButton);
+        case 'B':
+        case VK_ESCAPE:
+            if (state.currentPage == GuiPage::Settings) return clickFrontMenuButton(state.menuBackButton);
+            return false;
+        case '1':
+            if (state.currentPage == GuiPage::MainMenu) return clickFrontMenuButton(state.menuPlayButton);
+            return clickFrontMenuButton(state.menuVolumeButton);
+        case '2':
+            if (state.currentPage == GuiPage::MainMenu) return clickFrontMenuButton(state.menuSettingsButton);
+            return clickFrontMenuButton(state.menuDifficultyButton);
+        case '3':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuSpeedButton);
+        case '4':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuSimulationButton);
+        case '5':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuBackButton);
+        default:
+            return false;
+    }
+}
+
 }  // namespace
 
 void cycleDisplayMode(AppState& state) {
@@ -459,6 +559,9 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 case IDC_MENU_DIFFICULTY_BUTTON:
                     cycleFrontendDifficulty(*state);
                     return 0;
+                case IDC_MENU_SPEED_BUTTON:
+                    cycleFrontendSimulationSpeed(*state);
+                    return 0;
                 case IDC_MENU_SIMULATION_BUTTON:
                     cycleFrontendSimulationMode(*state);
                     return 0;
@@ -526,6 +629,14 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                     break;
             }
             break;
+        case WM_KEYDOWN:
+            if (state && isFrontMenuPage(state->currentPage) && wParam == VK_ESCAPE) {
+                if (state->currentPage == GuiPage::Settings) {
+                    openFrontendMenu(*state);
+                    return 0;
+                }
+            }
+            break;
         case WM_PAINT:
             if (state) {
                 PAINTSTRUCT paint{};
@@ -539,6 +650,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
             if (state) {
                 if (state->font) DeleteObject(state->font);
                 if (state->titleFont) DeleteObject(state->titleFont);
+                if (state->heroFont) DeleteObject(state->heroFont);
                 if (state->sectionFont) DeleteObject(state->sectionFont);
                 if (state->monoFont) DeleteObject(state->monoFont);
                 if (state->backgroundBrush) DeleteObject(state->backgroundBrush);
@@ -547,6 +659,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 if (state->inputBrush) DeleteObject(state->inputBrush);
                 state->font = nullptr;
                 state->titleFont = nullptr;
+                state->heroFont = nullptr;
                 state->sectionFont = nullptr;
                 state->monoFont = nullptr;
                 state->backgroundBrush = nullptr;
@@ -611,6 +724,9 @@ int runGuiApp(const GameSettings& settings) {
     while (GetMessageW(&msg, nullptr, 0, 0) > 0) {
         if (msg.message == WM_KEYDOWN && msg.wParam == VK_F11 && (msg.lParam & (1u << 30)) == 0) {
             gui_win32::cycleDisplayMode(state);
+            continue;
+        }
+        if (msg.message == WM_KEYDOWN && gui_win32::handleFrontMenuKey(state, msg.wParam)) {
             continue;
         }
         TranslateMessage(&msg);

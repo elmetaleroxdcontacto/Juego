@@ -3417,3 +3417,90 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Crear notas de version o `CHANGELOG` para resumir entregas grandes de forma mas visible en el repositorio.
 - Persistir configuraciones del frontend entre sesiones y conectarlas a guardado/carga.
 - Seguir empujando el parecido a Football Manager con mas narrativa semanal, staff avanzado y ajustes del rival en vivo.
+
+## Auditoria del proyecto (2026-03-26 11:06:31 -03:00) - frontend principal mas profesional y escalable
+
+### Cambios realizados
+
+- Se rehizo la base del frontend de arranque para que `Chilean Footballito` tenga un menu principal mas cercano a un videojuego real, con una arquitectura modular compartida entre consola y GUI.
+- En consola se reemplazo el flujo minimo por un `MenuController` con pantallas separadas, opciones modeladas, navegacion por `W/S`, `Enter`, numeros y atajos, manteniendo `Jugar` y `Configuraciones` como entradas principales.
+- Se amplio `GameSettings` con `velocidad de simulacion`, ademas de volumen, dificultad y modo de simulacion, dejando una estructura central lista para futuras expansiones y reutilizada por GUI y CLI.
+- La GUI Win32 recibio un submenu de configuraciones mas completo con cuatro ajustes, foco visual para botones, soporte de teclado con `Tab`/`Enter`, salida con `Esc` desde configuraciones y estilos diferenciados para el frontend.
+- Se reforzo la presentacion del menu en la GUI con botones owner-draw mas claros, resaltado por foco para la opcion seleccionada y textos de apoyo que explican el flujo inicial del juego.
+- Se actualizo la documentacion para reflejar el frontend inicial, la navegacion de consola y el nuevo set de configuraciones disponibles.
+
+### Archivos modificados
+
+- `README.md`
+- `TODO.md`
+- `include/engine/front_menu.h`
+- `include/engine/game_settings.h`
+- `include/gui/gui_internal.h`
+- `src/engine/front_menu.cpp`
+- `src/engine/game_controller.cpp`
+- `src/engine/game_settings.cpp`
+- `src/gui/gui.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_shared.cpp`
+- `src/gui/gui_view_common.cpp`
+- `src/gui/gui_view_menu.cpp`
+- `tests/project_tests.cpp`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe` compilaron correctamente con el frontend profesionalizado y la nueva capa de settings.
+- La suite automatizada termino con `All tests passed`.
+
+### Mejoras futuras sugeridas
+
+- Persistir `GameSettings` en archivo para conservar volumen, dificultad, velocidad y modo entre sesiones.
+- Agregar opciones futuras ya preparadas por la arquitectura como `Continuar`, `Cargar partida`, `Creditos` y `Salir` tambien en la GUI.
+- Conectar `velocidad de simulacion` a animaciones, pausas, transiciones y timing real de la interfaz para que deje de ser solo estructural.
+
+## Auditoria del proyecto (2026-03-26 11:16:52 -03:00) - portada tipo manager game y menu mas elegante
+
+### Resumen de cambios realizados
+
+- Se profundizo el frontend inicial para que `Chilean Footballito` se sienta mas cercano a la portada de un manager game serio desde el primer frame, sin romper el flujo real ya existente.
+- En consola se separaron mejor responsabilidades con `MenuRenderer`, `MenuActionHandler` y `MenuController`, dejando el menu principal mas limpio, con paneles ASCII, estados visibles y base lista para crecer.
+- La GUI Win32 recibio una portada mas fuerte visualmente: hero title central, subtitulo editorial, chips de estado, roadmap visual para futuras opciones y paneles mejor jerarquizados.
+- Se agrego navegacion por flechas, `Enter`, numeros y atajos directos dentro del front menu GUI, para que no dependa solo de `Tab` o del mouse.
+- El submenu de configuraciones se mantuvo integrado al flujo real del juego y ahora muestra mejor el impacto de dificultad, velocidad, modo y volumen placeholder.
+- Se reforzo la documentacion del proyecto para reflejar que el frontend inicial ya funciona como una portada de simulador de gestion y no como una simple lista de opciones.
+
+### Archivos creados o modificados
+
+- `README.md`
+- `TODO.md`
+- `include/engine/front_menu.h`
+- `include/engine/game_settings.h`
+- `include/gui/gui_internal.h`
+- `src/engine/front_menu.cpp`
+- `src/engine/game_controller.cpp`
+- `src/engine/game_settings.cpp`
+- `src/gui/gui.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+- `src/gui/gui_shared.cpp`
+- `src/gui/gui_view_common.cpp`
+- `src/gui/gui_view_menu.cpp`
+- `tests/project_tests.cpp`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe` compilaron correctamente tras la nueva portada y la refactorizacion del menu.
+- La suite automatizada termino con `All tests passed`.
+
+### Mejoras futuras sugeridas
+
+- Conectar la portada con opciones futuras reales como `Continuar`, `Cargar partida`, `Creditos` y `Salir` sin tocar la arquitectura base creada.
+- Persistir en disco el ultimo perfil de configuracion y usarlo para recordar dificultad, velocidad, modo y volumen al abrir el juego.
+- Llevar la misma identidad visual del front menu a pantallas futuras como carga, perfil de usuario y selecciones previas al inicio de carrera.
