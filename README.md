@@ -42,7 +42,7 @@ El proyecto ya es jugable y hoy combina tres capas que trabajan juntas:
 
 - menu de inicio con presentacion tipo dashboard y `Chilean Footballito` como portada central
 - portada Win32 con `Jugar`, `Configuraciones`, chips de estado y roadmap visual para futuras opciones
-- reproduccion opcional del tema local `Los Miserables - El Crack  Video Oficial (HD Remastered).mp3` mientras la portada principal esta activa
+- reproduccion del tema versionado `Los Miserables - El Crack  Video Oficial (HD Remastered).mp3` mientras la portada principal esta activa
 - `FootballManager.exe` sin consola innecesaria
 - arranque maximizado con soporte DPI
 - boton y `F11` para alternar ventana, maximizado y fullscreen sin borde

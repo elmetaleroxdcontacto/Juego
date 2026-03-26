@@ -3597,3 +3597,29 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Convertir la franja `Continuar / Nueva partida / Cargar / Creditos` en tarjetas realmente interactivas para que dejen de ser solo anticipos visuales.
 - Ajustar la portada segun ancho y alto de ventana con presets especificos para pantallas mas pequenas y ultraanchas.
 - Reemplazar parte del texto descriptivo por pequenos KPI visuales o tarjetas de estado para dar aun mas sensacion de dashboard de manager.
+
+## Auditoria del proyecto (2026-03-26 11:44:29 -03:00) - asset de audio versionado en el repositorio
+
+### Resumen de cambios realizados
+
+- Se agrego al repositorio el archivo `Los Miserables - El Crack  Video Oficial (HD Remastered).mp3` para que la musica de la portada principal ya no dependa solo de un asset local no trackeado.
+- Se actualizo la documentacion para reflejar que el tema del menu principal queda versionado dentro del proyecto y acompana la experiencia inicial de `Chilean Footballito`.
+- La subida de este asset se realizo apoyandose en tu confirmacion explicita de que el audio puede distribuirse como dominio publico.
+
+### Archivos creados o modificados
+
+- `Los Miserables - El Crack  Video Oficial (HD Remastered).mp3`
+- `README.md`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- `Get-Item "Los Miserables - El Crack  Video Oficial (HD Remastered).mp3" | Select-Object Name,Length,LastWriteTime`
+- Resultado:
+- El archivo existe en la raiz del proyecto y quedo listo para ser versionado junto al frontend actual.
+
+### Mejoras futuras sugeridas
+
+- Mover los assets de audio a una carpeta dedicada como `assets/audio/` para separar binarios multimedia del codigo fuente.
+- Agregar metadatos o un manifiesto de assets que documente origen, licencia y uso previsto de cada recurso audiovisual.
+- Permitir seleccionar entre varios temas de menu desde configuraciones si en el futuro se versionan mas pistas.
