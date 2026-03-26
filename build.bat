@@ -15,12 +15,12 @@ set "GAME_ARGS=%*"
 set "TARGET_NAME=FootballManager"
 set "CXX=g++"
 set "FALLBACK_CXXFLAGS=-std=c++17 -static -Iinclude -Isrc"
-set "FALLBACK_LDFLAGS=-std=c++17 -static -lcomctl32 -lgdi32"
+set "FALLBACK_LDFLAGS=-std=c++17 -static -lcomctl32 -lgdi32 -lwinmm"
 
 if /i "%~1"=="--cli" set "TARGET_NAME=FootballManagerCLI"
 if /i "%~1"=="--validate" set "TARGET_NAME=FootballManagerCLI"
 if /i "%TARGET_NAME%"=="FootballManagerCLI" set "OUTPUT=%ROOT_DIR%\FootballManagerCLI.exe"
-if /i "%TARGET_NAME%"=="FootballManager" set "FALLBACK_LDFLAGS=-std=c++17 -static -mwindows -lcomctl32 -lgdi32"
+if /i "%TARGET_NAME%"=="FootballManager" set "FALLBACK_LDFLAGS=-std=c++17 -static -mwindows -lcomctl32 -lgdi32 -lwinmm"
 
 if /i "%FM_FORCE_FALLBACK%"=="1" goto :legacy_build
 

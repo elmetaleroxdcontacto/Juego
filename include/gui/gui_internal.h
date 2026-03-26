@@ -195,6 +195,10 @@ struct AppState {
     GameSettings settings;
     bool suppressComboEvents = false;
     bool suppressFilterEvents = false;
+    bool menuMusicOpened = false;
+    bool menuMusicPlaying = false;
+    bool menuMusicMissingReported = false;
+    std::wstring menuMusicPath;
     GuiPage currentPage = GuiPage::Dashboard;
     std::string currentFilter = "Todo";
     GameSetupState gameSetup;

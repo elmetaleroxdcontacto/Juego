@@ -136,6 +136,7 @@ set(FM_GUI_SOURCES)
 set(FM_GUI_ENTRY_SOURCES ${FM_CONSOLE_ENTRY_SOURCES})
 if(WIN32)
     list(APPEND FM_GUI_SOURCES
+        src/gui/gui_audio.cpp
         src/gui/gui.cpp
         src/gui/gui_actions.cpp
         src/gui/gui_layout.cpp
@@ -179,7 +180,7 @@ function(fm_configure_target target_name)
     )
 
     if(WIN32)
-        target_link_libraries(${target_name} PRIVATE comctl32 gdi32)
+        target_link_libraries(${target_name} PRIVATE comctl32 gdi32 winmm)
     endif()
 
     if(MSVC)

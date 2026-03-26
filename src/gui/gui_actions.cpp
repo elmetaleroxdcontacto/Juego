@@ -1,4 +1,5 @@
 #include "gui/gui_internal.h"
+#include "gui/gui_audio.h"
 
 #ifdef _WIN32
 
@@ -351,6 +352,7 @@ void openSettingsMenu(AppState& state) {
 
 void cycleFrontendVolume(AppState& state) {
     game_settings::cycleVolume(state.settings);
+    refreshMenuMusicVolume(state);
     refreshCurrentPage(state);
     setStatus(state, "Volumen ajustado a " + game_settings::volumeLabel(state.settings.volume) + ".");
 }

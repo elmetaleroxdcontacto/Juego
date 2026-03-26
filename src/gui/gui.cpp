@@ -1,4 +1,5 @@
 #include "gui/gui.h"
+#include "gui/gui_audio.h"
 #include "gui/gui_internal.h"
 
 #ifdef _WIN32
@@ -648,6 +649,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
             break;
         case WM_DESTROY:
             if (state) {
+                shutdownMenuMusic(*state);
                 if (state->font) DeleteObject(state->font);
                 if (state->titleFont) DeleteObject(state->titleFont);
                 if (state->heroFont) DeleteObject(state->heroFont);

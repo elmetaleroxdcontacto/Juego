@@ -25,13 +25,11 @@ GuiPageModel buildMainMenuModel(AppState& state) {
     };
 
     model.summary.content =
-        "Panorama de arranque\r\n\r\n"
         "Jugar abre el flujo real del proyecto: dashboard, club, carrera, mercado, tacticas y noticias.\r\n\r\n"
         "Configuraciones abre la cabina inicial para dejar lista la partida antes de entrar.\r\n\r\n"
         "La portada esta pensada como base escalable para seguir creciendo hacia continuar, cargar, creditos y perfil.";
 
     std::ostringstream detail;
-    detail << "Perfil del manager\r\n\r\n";
     detail << "Volumen: " << game_settings::volumeLabel(state.settings.volume) << "\r\n";
     detail << "Dificultad: " << game_settings::difficultyLabel(state.settings.difficulty) << "\r\n";
     detail << game_settings::difficultyDescription(state.settings.difficulty) << "\r\n\r\n";
@@ -68,7 +66,6 @@ GuiPageModel buildSettingsPageModel(AppState& state) {
     };
 
     model.summary.content =
-        "Cabina de ajustes\r\n\r\n"
         "[Volumen]\r\n"
         "Se mantiene como control de frontend aunque el juego aun no tenga audio real.\r\n\r\n"
         "[Dificultad]\r\n"
@@ -79,7 +76,6 @@ GuiPageModel buildSettingsPageModel(AppState& state) {
         "Controla si el juego prioriza una lectura rapida o una salida mas detallada.";
 
     std::ostringstream detail;
-    detail << "Impacto sobre la experiencia\r\n\r\n";
     detail << "Volumen: " << game_settings::volumeLabel(state.settings.volume) << "\r\n";
     detail << "Dificultad: " << game_settings::difficultyLabel(state.settings.difficulty) << "\r\n";
     detail << game_settings::difficultyDescription(state.settings.difficulty) << "\r\n\r\n";

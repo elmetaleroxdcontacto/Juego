@@ -1,5 +1,7 @@
 ﻿#include "gui/gui_internal.h"
 
+#include "gui/gui_audio.h"
+
 #ifdef _WIN32
 
 #include "utils/utils.h"
@@ -320,6 +322,7 @@ void refreshCurrentPage(AppState& state) {
     check_game_ready(state);
     refreshFilterComboOptions(state);
     state.currentModel = buildModel(state);
+    syncMenuMusicForPage(state);
     state.insightHotspots.clear();
     bool dashboardEmptyState = state.currentPage == GuiPage::Dashboard && !state.career.myTeam;
     const bool frontMenuPage = isFrontMenuPage(state.currentPage);

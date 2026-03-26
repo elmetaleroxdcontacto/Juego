@@ -925,10 +925,11 @@ void layoutWindow(AppState& state) {
         const int shellLeft = padding + s(30);
         const int shellTop = padding + s(26);
         const int shellWidth = std::max(s(820), static_cast<int>(client.right - shellLeft * 2));
-        const int buttonTop = shellTop + s(170);
+        const int buttonTop = shellTop + s(214);
         const int primaryWidth = clampValue(shellWidth / 2 - s(24), s(220), s(300));
         const int primaryGap = s(16);
-        const int panelsTop = buttonTop + s(64);
+        const int controlBlockHeight = state.currentPage == GuiPage::MainMenu ? s(42) : s(220);
+        const int panelsTop = buttonTop + controlBlockHeight + s(28);
         const int leftWidth = std::max(s(360), shellWidth * 52 / 100);
         const int rightWidth = shellWidth - leftWidth - s(18);
         const int summaryHeight = std::max(s(230), static_cast<int>(client.bottom - panelsTop - s(100)));

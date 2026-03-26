@@ -3504,3 +3504,96 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Conectar la portada con opciones futuras reales como `Continuar`, `Cargar partida`, `Creditos` y `Salir` sin tocar la arquitectura base creada.
 - Persistir en disco el ultimo perfil de configuracion y usarlo para recordar dificultad, velocidad, modo y volumen al abrir el juego.
 - Llevar la misma identidad visual del front menu a pantallas futuras como carga, perfil de usuario y selecciones previas al inicio de carrera.
+
+## Auditoria del proyecto (2026-03-26 11:32:37 -03:00) - musica del menu principal con mp3 local
+
+### Resumen de cambios realizados
+
+- Se agrego un modulo de audio Win32 especifico para el frontend del juego, aislado del resto de la GUI para no mezclar reproduccion multimedia con layout o acciones.
+- El archivo local `Los Miserables - El Crack  Video Oficial (HD Remastered).mp3` ahora se busca automaticamente y se reproduce en bucle cuando la pantalla activa es el `MainMenu`.
+- La musica se detiene y reinicia limpia al salir de la portada principal, evitando que siga sonando dentro del dashboard, configuraciones u otras pantallas.
+- El volumen del frontend ahora actualiza la sesion de musica del menu cuando el track esta abierto, aprovechando la capa de `GameSettings` ya existente.
+- La build Win32 fue actualizada para enlazar `winmm`, dejando la reproduccion lista sin agregar dependencias externas nuevas.
+- Se actualizo la documentacion para reflejar que la portada puede reproducir el tema local del repositorio mientras esta activa.
+
+### Archivos creados o modificados
+
+- `CMakeLists.txt`
+- `README.md`
+- `TODO.md`
+- `include/gui/gui_audio.h`
+- `include/gui/gui_internal.h`
+- `src/gui/gui_audio.cpp`
+- `src/gui/gui.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_runtime.cpp`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe` compilaron correctamente con el nuevo modulo de audio del menu.
+- La suite automatizada termino con `All tests passed`.
+
+### Mejoras futuras sugeridas
+
+- Persistir la preferencia de musica del menu para poder activarla o silenciarla desde configuraciones.
+- Sustituir el control actual por una pequena capa de audio mas completa con mute, fade-in y fade-out al entrar o salir del menu.
+- Agregar una opcion visual en configuraciones que permita elegir entre reproducir el tema solo en portada o tambien en otras pantallas del frontend.
+
+## Auditoria del proyecto (2026-03-26 11:33:50 -03:00) - compatibilidad de build.bat con menu y audio
+
+### Resumen de cambios realizados
+
+- Se verifico que `build.bat` compila el proyecto actual usando la ruta principal con CMake y que el ejecutable resultante incluye el frontend nuevo, la portada GUI y la musica del menu.
+- Se corrigio la ruta `fallback` del propio `build.bat` para enlazar tambien `winmm`, evitando que la reproduccion del mp3 falle cuando la compilacion no use CMake.
+- Se confirmo que el script sigue dejando el ejecutable actualizado en `build-cmake\\bin\\FootballManager.exe` cuando compila por CMake.
+
+### Archivos creados o modificados
+
+- `TODO.md`
+- `build.bat`
+
+### Verificacion ejecutada
+
+- `FM_SKIP_RUN=1`
+- `build.bat`
+- Resultado:
+- El script compilo correctamente usando CMake.
+- La salida generada fue `build-cmake\\bin\\FootballManager.exe`.
+
+### Mejoras futuras sugeridas
+
+- Hacer que `build.bat` tambien tenga un paso opcional para compilar y correr `FootballManagerTests`.
+- Mostrar en el propio script si se uso la ruta CMake o la ruta fallback con un resumen final mas detallado.
+- Permitir flags explicitos para compilar GUI, CLI o tests desde el mismo `build.bat`.
+
+## Auditoria del proyecto (2026-03-26 11:36:52 -03:00) - limpieza visual de portada y espaciado del menu principal
+
+### Resumen de cambios realizados
+
+- Se corrigio el layout de la portada GUI para que la franja superior de accesos futuros no invada el mismo espacio que usan los botones principales `Jugar` y `Configuraciones`.
+- El bloque interactivo del frontend ahora reserva altura distinta segun la pantalla: menu principal con CTA compactos y configuraciones con stack completo de ajustes, evitando solapes con los paneles inferiores.
+- Se limpiaron los textos del menu principal y de configuraciones para que los paneles no repitan dentro del cuerpo el mismo titulo que ya se muestra en la cabecera del widget.
+- Se recompilo la GUI y la CLI con el ajuste visual, manteniendo compatibilidad con la arquitectura actual del frontend.
+
+### Archivos creados o modificados
+
+- `TODO.md`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_view_menu.cpp`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe` compilaron correctamente despues del ajuste de espaciado.
+- La suite automatizada termino con `All tests passed`.
+
+### Mejoras futuras sugeridas
+
+- Convertir la franja `Continuar / Nueva partida / Cargar / Creditos` en tarjetas realmente interactivas para que dejen de ser solo anticipos visuales.
+- Ajustar la portada segun ancho y alto de ventana con presets especificos para pantallas mas pequenas y ultraanchas.
+- Reemplazar parte del texto descriptivo por pequenos KPI visuales o tarjetas de estado para dar aun mas sensacion de dashboard de manager.
