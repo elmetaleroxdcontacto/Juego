@@ -9,12 +9,12 @@
 using namespace std;
 
 void displayMainMenu() {
-    cout << "\n=== Football Manager Game ===" << endl;
+    cout << "\n=== Centro de juego ===" << endl;
     cout << "1. Modo Carrera" << endl;
     cout << "2. Iniciar Juego Rapido" << endl;
     cout << "3. Modo Copa" << endl;
     cout << "4. Validar sistema" << endl;
-    cout << "5. Salir" << endl;
+    cout << "5. Volver al menu principal" << endl;
 }
 
 void displayGameMenu() {

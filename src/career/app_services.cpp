@@ -1,5 +1,6 @@
 #include "app_services.h"
 
+#include "ai/ai_transfer_manager.h"
 #include "career/season_flow_controller.h"
 #include "career/career_reports.h"
 #include "career/career_runtime.h"
@@ -178,6 +179,17 @@ string scoutingHiddenRiskLabel(const Player& player, int confidence) {
     if (risk >= 5) return "Riesgo alto";
     if (risk >= 3) return "Riesgo medio";
     return "Riesgo controlado";
+}
+
+int scoutingAssignmentBoost(const Career& career, const Team& seller, const string& focusPos) {
+    int boost = 0;
+    const string normalizedFocus = normalizePosition(focusPos);
+    for (const auto& assignment : career.scoutingAssignments) {
+        if (!assignment.region.empty() && assignment.region != "Todas" && assignment.region != seller.youthRegion) continue;
+        if (!assignment.focusPosition.empty() && normalizePosition(assignment.focusPosition) != normalizedFocus) continue;
+        boost = max(boost, assignment.knowledgeLevel / 5 + max(0, 4 - assignment.weeksRemaining) * 2);
+    }
+    return clampInt(boost, 0, 24);
 }
 
 string nextStaffHireName(const Team& team, const string& roleLabel, int currentLevel) {
@@ -401,9 +413,11 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         const Player& a = clubA.players[static_cast<size_t>(left.second)];
         const Player& b = clubB.players[static_cast<size_t>(right.second)];
         int fitA = a.potential + a.professionalism / 2 + a.currentForm / 2 +
-                   positionFitScore(a, session.resolvedFocusPosition) + (hasScoutingCoverage(team, clubA.youthRegion) ? 6 : 0);
+                   positionFitScore(a, session.resolvedFocusPosition) + (hasScoutingCoverage(team, clubA.youthRegion) ? 6 : 0) +
+                   scoutingAssignmentBoost(career, clubA, session.resolvedFocusPosition);
         int fitB = b.potential + b.professionalism / 2 + b.currentForm / 2 +
-                   positionFitScore(b, session.resolvedFocusPosition) + (hasScoutingCoverage(team, clubB.youthRegion) ? 6 : 0);
+                   positionFitScore(b, session.resolvedFocusPosition) + (hasScoutingCoverage(team, clubB.youthRegion) ? 6 : 0) +
+                   scoutingAssignmentBoost(career, clubB, session.resolvedFocusPosition);
         if (fitA != fitB) return fitA > fitB;
         return a.skill > b.skill;
     });
@@ -427,9 +441,10 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         const bool coveredRegion = hasScoutingCoverage(team, club->youthRegion);
         const int regionalFamiliarity = club->youthRegion == team.youthRegion ? 8 : 0;
         const int networkBonus = coveredRegion ? world_state_service::worldRuleValue("scouting_network_bonus", 8) : -6;
+        const int assignmentBoost = scoutingAssignmentBoost(career, *club, session.resolvedFocusPosition);
         const int confidence =
             clampInt(26 + team.scoutingChief / 3 + analystBonus + (12 - error) * 3 + regionalFamiliarity + networkBonus +
-                         max(0, fitScore - 70) / 4 - max(0, 55 - player.professionalism) / 6,
+                         max(0, fitScore - 70) / 4 - max(0, 55 - player.professionalism) / 6 + assignmentBoost,
                      20, 94);
         const int readinessScore = player_condition::readinessScore(player, *club);
         const int medicalRisk = max(player_condition::workloadRisk(player, *club),
@@ -437,6 +452,8 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         string recommendation = "Seguimiento";
         if (medicalRisk >= 72) {
             recommendation = "Revisar salud antes de avanzar";
+        } else if (confidence >= 82 && assignmentBoost >= 10 && fitScore >= 85) {
+            recommendation = "Objetivo listo para oferta";
         } else if (player.potential >= team.getAverageSkill() + 8 && fitScore >= 85 && confidence >= 68 &&
                    readinessScore >= 58) {
             recommendation = "Objetivo prioritario";
@@ -473,6 +490,7 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
         candidate.availabilityLabel = availabilityLabel(player);
         candidate.agentLabel = agentProfileLabel(player);
         candidate.reportStage = scoutingReportStage(confidence, hasScoutingCoverage(team, club->youthRegion));
+        if (assignmentBoost >= 10) candidate.reportStage += " | dossier regional";
         candidate.hiddenRiskLabel = scoutingHiddenRiskLabel(player, confidence);
         candidate.knowledgeLevel = clampInt(confidence + (hasScoutingCoverage(team, club->youthRegion) ? 8 : -4), 25, 99);
         candidate.secondaryPositions = player.secondaryPositions;
@@ -512,6 +530,7 @@ ScoutingSessionResult runScoutingSessionService(Career& career, const string& re
                       " | " + upsideBand +
                       " | Riesgo visible " + riskLabel +
                       " | Riesgo oculto " + candidate.hiddenRiskLabel +
+                      (assignmentBoost > 0 ? " | Dossier " + to_string(assignmentBoost) : string()) +
                       " | Rasgos " + joinStringValues(player.traits, ", ") +
                       " | Perfil " + personalityLabel(player);
         session.service.messages.push_back("- " + note);
@@ -1240,6 +1259,7 @@ ServiceResult followShortlistService(Career& career) {
     result.ok = true;
     result.messages.push_back("Seguimiento de shortlist completado. Costo " + formatMoneyValue(cost) + ".");
     int error = clampInt(8 - team.scoutingChief / 18, 1, 5);
+    const ClubTransferStrategy strategy = ai_transfer_manager::buildClubTransferStrategy(career, team);
 
     for (const auto& item : career.scoutingShortlist) {
         auto fields = splitByDelimiter(item, '|');
@@ -1249,6 +1269,7 @@ ServiceResult followShortlistService(Career& career) {
         int sellerIdx = team_mgmt::playerIndexByName(*seller, fields[1]);
         if (sellerIdx < 0) continue;
         const Player& player = seller->players[static_cast<size_t>(sellerIdx)];
+        const TransferTarget target = ai_transfer_manager::evaluateTarget(career, team, *seller, player, strategy);
         long long salaryExpectation = max(player.wage, wageDemandFor(player));
         string note = "[Seguimiento] " + player.name + " | " + seller->name +
                       " | Hab " + to_string(clampInt(player.skill - error, 1, 99)) + "-" +
@@ -1262,8 +1283,13 @@ ServiceResult followShortlistService(Career& career) {
                       " | Sec " + (player.secondaryPositions.empty() ? string("-") : joinStringValues(player.secondaryPositions, "/")) +
                       " | Forma " + playerFormLabel(player) +
                       " | Fiabilidad " + playerReliabilityLabel(player) +
+                      " | Conf " + to_string(target.scoutingConfidence) +
+                      " | Listo " + to_string(target.readinessScore) +
+                      " | Riesgo medico " + to_string(target.medicalRisk) +
+                      " | Mercado " + formatMoneyValue(target.expectedFee + target.expectedAgentFee) +
                       " | Rasgos " + joinStringValues(player.traits, ", ") +
-                      " | Perfil " + personalityLabel(player);
+                      " | Perfil " + personalityLabel(player) +
+                      " | Nota " + target.scoutingNote;
         result.messages.push_back("- " + note);
         career.scoutInbox.push_back(note);
     }

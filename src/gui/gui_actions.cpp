@@ -2,6 +2,8 @@
 
 #ifdef _WIN32
 
+#include "engine/game_settings.h"
+
 #include <sstream>
 
 namespace gui_win32 {
@@ -152,6 +154,10 @@ void startNewCareer(AppState& state) {
                                               state.gameSetup.division,
                                               state.gameSetup.club,
                                               state.gameSetup.manager);
+    if (result.ok) {
+        game_settings::applyNewCareerDifficulty(state.career, state.settings);
+        result.messages.push_back("Configuracion aplicada: " + game_settings::settingsSummary(state.settings) + ".");
+    }
     if (!result.ok) {
         std::string message = result.messages.empty() ? "No se pudo iniciar la carrera." : result.messages.front();
         MessageBoxW(state.window, utf8ToWide(message).c_str(), L"Football Manager", MB_OK | MB_ICONWARNING);
@@ -201,7 +207,10 @@ void saveCareer(AppState& state) {
 void simulateWeek(AppState& state) {
     if (!state.career.myTeam) return;
     syncManagerNameFromUi(state);
-    setStatus(state, "Simulando semana...");
+    setStatus(state,
+              game_settings::isDetailedSimulation(state.settings)
+                  ? "Simulando semana en modo detallado..."
+                  : "Simulando semana en modo rapido...");
     UpdateWindow(state.window);
     ServiceResult result = simulateCareerWeekService(state.career);
     syncCombosFromCareer(state);
@@ -326,6 +335,34 @@ void runFollowShortlistAction(AppState& state) {
 void runUpgradeAction(AppState& state, ClubUpgrade upgrade, const std::string& title) {
     ServiceResult result = upgradeClubService(state.career, upgrade);
     finalizeAction(state, result, title);
+}
+
+void openFrontendMenu(AppState& state) {
+    setCurrentPage(state, GuiPage::MainMenu);
+    setStatus(state, "Menu principal listo. Entra a Jugar o revisa Configuraciones.");
+}
+
+void openSettingsMenu(AppState& state) {
+    setCurrentPage(state, GuiPage::Settings);
+    setStatus(state, "Configuraciones abiertas. Ajusta volumen, dificultad y simulacion.");
+}
+
+void cycleFrontendVolume(AppState& state) {
+    game_settings::cycleVolume(state.settings);
+    refreshCurrentPage(state);
+    setStatus(state, "Volumen ajustado a " + game_settings::volumeLabel(state.settings.volume) + ".");
+}
+
+void cycleFrontendDifficulty(AppState& state) {
+    game_settings::cycleDifficulty(state.settings);
+    refreshCurrentPage(state);
+    setStatus(state, "Dificultad actual: " + game_settings::difficultyLabel(state.settings.difficulty) + ".");
+}
+
+void cycleFrontendSimulationMode(AppState& state) {
+    game_settings::cycleSimulationMode(state.settings);
+    refreshCurrentPage(state);
+    setStatus(state, "Modo de simulacion actual: " + game_settings::simulationModeLabel(state.settings.simulationMode) + ".");
 }
 
 }  // namespace gui_win32

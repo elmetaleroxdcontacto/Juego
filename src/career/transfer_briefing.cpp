@@ -123,6 +123,8 @@ vector<string> buildMarketPulseLines(const Career& career, size_t limit) {
 
     const Team& team = *career.myTeam;
     const ClubTransferStrategy strategy = ai_transfer_manager::buildClubTransferStrategy(career, team);
+    const auto preContracts = buildPreContractOptions(career, strategy.weakestPosition, 3);
+    const auto loans = buildLoanOptions(career, strategy.weakestPosition, 3);
 
     pushUniqueLine(lines,
                    "Necesidad principal: " + (strategy.weakestPosition.empty() ? string("MED") : strategy.weakestPosition) +
@@ -155,6 +157,22 @@ vector<string> buildMarketPulseLines(const Career& career, size_t limit) {
                        "Shortlist activa: " + to_string(career.scoutingShortlist.size()) +
                            " objetivo(s) ya seguidos; actualizar informes puede bajar riesgo antes de ofertar.");
     }
+    if (!preContracts.empty()) {
+        pushUniqueLine(lines,
+                       "Ventana contractual: " + preContracts.front().playerName + " y otros " +
+                           to_string(max(0, static_cast<int>(preContracts.size()) - 1)) +
+                           " caso(s) ya permiten pensar en precontrato.");
+    }
+    if (!loans.empty() && (strategy.needsLiquidity || team.budget < max(180000LL, team.sponsorWeekly * 4))) {
+        pushUniqueLine(lines,
+                       "Ruta de cesion: " + loans.front().playerName +
+                           " aparece como solucion de corto plazo sin romper la caja.");
+    }
+    if (!strategy.saleCandidates.empty()) {
+        pushUniqueLine(lines,
+                       "Espacio salarial: vender a " + joinOrDash(strategy.saleCandidates) +
+                           " puede abrir margen para una llegada mas fuerte.");
+    }
 
     if (lines.empty()) {
         pushUniqueLine(lines, "Mercado sin tension especial: toca revisar oportunidades, no reaccionar por impulso.");
@@ -175,6 +193,8 @@ vector<string> buildTransferOpportunityLines(const Career& career,
                       " | " + option.packageLabel +
                       " | listo " + to_string(option.readinessScore) +
                       " | riesgo " + to_string(option.medicalRisk);
+        if (option.scoutingConfidence >= 78) line += " | informe fuerte";
+        else if (option.scoutingConfidence <= 54) line += " | informe verde";
         if (option.onShortlist) line += " | shortlist";
         if (option.contractRunningOut) line += " | contrato corto";
         if (option.availableForLoan) line += " | cesion viable";

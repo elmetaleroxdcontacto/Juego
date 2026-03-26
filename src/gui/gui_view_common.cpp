@@ -52,6 +52,8 @@ std::string setupStatusLabel(const AppState& state) {
 
 std::string pageTitleFor(GuiPage page) {
     switch (page) {
+        case GuiPage::MainMenu: return game_settings::gameTitle();
+        case GuiPage::Settings: return "Configuraciones";
         case GuiPage::Dashboard: return "Resumen del club";
         case GuiPage::Squad: return "Plantilla";
         case GuiPage::Tactics: return "Tacticas";
@@ -67,6 +69,8 @@ std::string pageTitleFor(GuiPage page) {
 }
 
 std::string breadcrumbFor(GuiPage page) {
+    if (page == GuiPage::MainMenu) return "Inicio > Menu principal";
+    if (page == GuiPage::Settings) return "Inicio > Configuraciones";
     return "Club > " + pageTitleFor(page);
 }
 
@@ -96,6 +100,15 @@ std::string boardStatusLabel(int confidence) {
 
 std::vector<DashboardMetric> buildMetrics(const AppState& state, const std::vector<std::string>& alerts) {
     const Career& career = state.career;
+    if (state.currentPage == GuiPage::MainMenu || state.currentPage == GuiPage::Settings) {
+        return {
+            {"Titulo", game_settings::gameTitle(), kThemeAccentBlue},
+            {"Volumen", game_settings::volumeLabel(state.settings.volume), kThemeAccentGreen},
+            {"Dificultad", game_settings::difficultyLabel(state.settings.difficulty), kThemeAccent},
+            {"Simulacion", game_settings::simulationModeLabel(state.settings.simulationMode), kThemeAccentBlue},
+            {"Estado", state.currentPage == GuiPage::MainMenu ? "Menu principal" : "Configurando", kThemeWarning}
+        };
+    }
     if (!career.myTeam) {
         const Team* setupTeam = selectedSetupTeam(state);
         const bool hasDivision = !state.gameSetup.division.empty();

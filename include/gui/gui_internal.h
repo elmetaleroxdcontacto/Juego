@@ -3,6 +3,7 @@
 #ifdef _WIN32
 
 #include "career/app_services.h"
+#include "engine/game_settings.h"
 #include "career/career_reports.h"
 #include "engine/models.h"
 
@@ -64,12 +65,20 @@ enum ControlId {
     IDC_PAGE_YOUTH_BUTTON,
     IDC_PAGE_BOARD_BUTTON,
     IDC_PAGE_NEWS_BUTTON,
+    IDC_MENU_PLAY_BUTTON,
+    IDC_MENU_SETTINGS_BUTTON,
+    IDC_MENU_BACK_BUTTON,
+    IDC_MENU_VOLUME_BUTTON,
+    IDC_MENU_DIFFICULTY_BUTTON,
+    IDC_MENU_SIMULATION_BUTTON,
     IDC_EMPTY_NEW_BUTTON,
     IDC_EMPTY_LOAD_BUTTON,
     IDC_EMPTY_VALIDATE_BUTTON
 };
 
 enum class GuiPage {
+    MainMenu,
+    Settings,
     Dashboard,
     Squad,
     Tactics,
@@ -181,6 +190,7 @@ struct AppState {
     HBRUSH inputBrush = nullptr;
 
     Career career;
+    GameSettings settings;
     bool suppressComboEvents = false;
     bool suppressFilterEvents = false;
     GuiPage currentPage = GuiPage::Dashboard;
@@ -220,6 +230,12 @@ struct AppState {
     HWND youthButton = nullptr;
     HWND boardButton = nullptr;
     HWND newsButton = nullptr;
+    HWND menuPlayButton = nullptr;
+    HWND menuSettingsButton = nullptr;
+    HWND menuBackButton = nullptr;
+    HWND menuVolumeButton = nullptr;
+    HWND menuDifficultyButton = nullptr;
+    HWND menuSimulationButton = nullptr;
     HWND emptyNewButton = nullptr;
     HWND emptyLoadButton = nullptr;
     HWND emptyValidateButton = nullptr;
@@ -318,6 +334,7 @@ void paintWindowChrome(AppState& state, HDC hdc);
 void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem);
 LRESULT handleListCustomDraw(AppState& state, LPNMHDR header);
 void cycleDisplayMode(AppState& state);
+bool isFrontMenuPage(GuiPage page);
 
 std::string selectedDivisionId(const AppState& state);
 void fillDivisionCombo(AppState& state, const std::string& selectedId = std::string());
@@ -352,6 +369,11 @@ void runInstructionAction(AppState& state);
 void runShortlistAction(AppState& state);
 void runFollowShortlistAction(AppState& state);
 void runUpgradeAction(AppState& state, ClubUpgrade upgrade, const std::string& title);
+void openFrontendMenu(AppState& state);
+void openSettingsMenu(AppState& state);
+void cycleFrontendVolume(AppState& state);
+void cycleFrontendDifficulty(AppState& state);
+void cycleFrontendSimulationMode(AppState& state);
 
 }  // namespace gui_win32
 

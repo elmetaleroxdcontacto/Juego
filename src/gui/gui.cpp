@@ -443,6 +443,25 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 case IDC_DISPLAY_MODE_BUTTON:
                     cycleDisplayMode(*state);
                     return 0;
+                case IDC_MENU_PLAY_BUTTON:
+                    setCurrentPage(*state, GuiPage::Dashboard);
+                    setStatus(*state, "Flujo principal abierto. Ya puedes crear o cargar una carrera.");
+                    return 0;
+                case IDC_MENU_SETTINGS_BUTTON:
+                    openSettingsMenu(*state);
+                    return 0;
+                case IDC_MENU_BACK_BUTTON:
+                    openFrontendMenu(*state);
+                    return 0;
+                case IDC_MENU_VOLUME_BUTTON:
+                    cycleFrontendVolume(*state);
+                    return 0;
+                case IDC_MENU_DIFFICULTY_BUTTON:
+                    cycleFrontendDifficulty(*state);
+                    return 0;
+                case IDC_MENU_SIMULATION_BUTTON:
+                    cycleFrontendSimulationMode(*state);
+                    return 0;
                 case IDC_EMPTY_NEW_BUTTON:
                     startNewCareer(*state);
                     return 0;
@@ -546,7 +565,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
 
 }  // namespace gui_win32
 
-int runGuiApp() {
+int runGuiApp(const GameSettings& settings) {
     gui_win32::enableHighDpiSupport();
 
     INITCOMMONCONTROLSEX controls{};
@@ -556,6 +575,7 @@ int runGuiApp() {
 
     gui_win32::AppState state;
     state.instance = GetModuleHandleW(nullptr);
+    state.settings = settings;
 
     WNDCLASSEXW windowClass{};
     windowClass.cbSize = sizeof(windowClass);
@@ -570,7 +590,7 @@ int runGuiApp() {
     RECT workArea = gui_win32::primaryMonitorWorkArea();
     HWND window = CreateWindowExW(0,
                                   windowClass.lpszClassName,
-                                  L"Football Manager",
+                                  L"Chilean Footballito",
                                   WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_MAXIMIZE,
                                   workArea.left,
                                   workArea.top,
@@ -602,7 +622,7 @@ int runGuiApp() {
 
 #else
 
-int runGuiApp() {
+int runGuiApp(const GameSettings&) {
     return 1;
 }
 

@@ -5,7 +5,9 @@
 #include "ai/ai_squad_planner.h"
 #include "career/analytics_service.h"
 #include "career/dressing_room_service.h"
+#include "career/inbox_service.h"
 #include "career/manager_advice.h"
+#include "career/staff_service.h"
 #include "career/career_support.h"
 #include "utils/utils.h"
 
@@ -99,6 +101,7 @@ GuiPageModel buildDashboardModel(AppState& state) {
     Team& team = *state.career.myTeam;
     const DressingRoomSnapshot dressing = dressing_room_service::buildSnapshot(team, state.career.currentWeek);
     const bool congestedWeek = isCongestedWeek(state.career);
+    const auto hubLines = inbox_service::buildPriorityInboxLines(state.career, 5);
     int injured = 0;
     int lowMorale = 0;
     for (const auto& player : team.players) {
@@ -121,6 +124,13 @@ GuiPageModel buildDashboardModel(AppState& state) {
     if (!storyLines.empty()) {
         out << "Clima de la semana\r\n";
         for (const auto& line : storyLines) out << "- " << line << "\r\n";
+        out << "\r\n";
+    }
+    if (!hubLines.empty()) {
+        out << "Centro del manager\r\n";
+        for (size_t i = 0; i < hubLines.size() && i < 3; ++i) {
+            out << "- " << hubLines[i] << "\r\n";
+        }
         out << "\r\n";
     }
     out << "Microciclo\r\n" << trainingSchedulePreview(team, congestedWeek) << "\r\n\r\n";
@@ -153,6 +163,7 @@ GuiPageModel buildDashboardModel(AppState& state) {
         detail << "\r\nNarrativa de la semana\r\n";
         for (const auto& line : storyLines) detail << "- " << line << "\r\n";
     }
+    detail << "\r\n" << staff_service::buildStaffRecommendationDigest(state.career, 4);
     detail << "\r\n" << dressingRoomPanelText(state.career, 4);
     model.detail.content = detail.str();
     return model;

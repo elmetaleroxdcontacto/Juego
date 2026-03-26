@@ -1,6 +1,7 @@
 #pragma once
 
 #include "engine/game_engine.h"
+#include "engine/game_settings.h"
 
 #include <cstddef>
 
@@ -11,10 +12,12 @@ public:
 private:
     void showLoadWarnings() const;
     int runConsoleApp();
+    void runConsoleGameHub();
     void runCareerMode();
     void runQuickGame();
     void pauseForContinue() const;
 
     GameEngine engine_;
+    GameSettings settings_;
     mutable std::size_t lastLoadWarningSignature_ = 0;
 };

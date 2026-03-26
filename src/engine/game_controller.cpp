@@ -1,5 +1,6 @@
 #include "engine/game_controller.h"
 
+#include "engine/front_menu.h"
 #include "gui.h"
 #include "io.h"
 #include "ui.h"
@@ -113,7 +114,7 @@ int GameController::run(int argc, char* argv[]) {
     }
 
 #ifdef _WIN32
-    return runGuiApp();
+    return runGuiApp(settings_);
 #else
     return runConsoleApp();
 #endif
@@ -123,13 +124,31 @@ int GameController::run(int argc, char* argv[]) {
 int GameController::runConsoleApp() {
     configureConsoleEncoding();
     engine_.initialize();
-    showLoadWarnings();
 
+    while (true) {
+        MainMenuScreen menu(settings_);
+        const FrontMenuAction action = menu.prompt();
+        if (action == FrontMenuAction::Exit) {
+            cout << "Saliendo del juego." << endl;
+            break;
+        }
+        if (action == FrontMenuAction::Settings) {
+            SettingsMenuScreen(settings_).run();
+            continue;
+        }
+        runConsoleGameHub();
+    }
+
+    return 0;
+}
+
+void GameController::runConsoleGameHub() {
+    showLoadWarnings();
     while (true) {
         displayMainMenu();
         int mainChoice = readInt("Elige una opcion: ", 1, 5);
         if (mainChoice == 5) {
-            cout << "Saliendo del juego." << endl;
+            cout << "Volviendo al menu principal." << endl;
             break;
         }
 
@@ -144,13 +163,12 @@ int GameController::runConsoleApp() {
             cout << (result == 0 ? "Validacion completada sin fallas." : "Validacion con fallas detectadas.") << endl;
         }
     }
-
-    return 0;
 }
 
 void GameController::runCareerMode() {
     Career& career = engine_.career();
     cout << "\n=== Modo Carrera ===" << endl;
+    cout << "Configuracion activa: " << game_settings::settingsSummary(settings_) << endl;
     cout << "\nOpciones de Carrera:" << endl;
     cout << "1. Continuar Carrera" << endl;
     cout << "2. Nueva Carrera" << endl;
@@ -191,6 +209,10 @@ void GameController::runCareerMode() {
         const string managerName = readLine("Nombre del manager (Enter para 'Manager'): ");
         ServiceResult startResult =
             engine_.startCareer(divisionId, teams[static_cast<size_t>(teamChoice - 1)]->name, managerName);
+        if (startResult.ok) {
+            game_settings::applyNewCareerDifficulty(career, settings_);
+            startResult.messages.push_back("Configuracion aplicada: " + game_settings::settingsSummary(settings_) + ".");
+        }
         for (const auto& message : startResult.messages) cout << message << endl;
         careerStarted = startResult.ok && career.myTeam;
     } else {
@@ -241,6 +263,7 @@ void GameController::runCareerMode() {
 
 void GameController::runQuickGame() {
     Career& career = engine_.career();
+    cout << "\nConfiguracion activa: " << game_settings::settingsSummary(settings_) << endl;
     if (career.divisions.empty()) {
         cout << "No se encontraron divisiones disponibles." << endl;
         return;
@@ -286,7 +309,10 @@ void GameController::runQuickGame() {
             case 2: addPlayer(myTeam); break;
             case 3: trainPlayer(myTeam); break;
             case 4: changeTactics(myTeam); break;
-            case 5: engine_.runQuickMatch(myTeam, opponent, true); break;
+            case 5:
+                game_settings::applyQuickMatchDifficulty(myTeam, opponent, settings_);
+                engine_.runQuickMatch(myTeam, opponent, game_settings::isDetailedSimulation(settings_));
+                break;
             case 6: {
                 string fname = readLine("Ingresa ruta de archivo o carpeta del equipo: ");
                 if (!loadTeamFromFile(fname, myTeam)) {

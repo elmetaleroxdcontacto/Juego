@@ -17,5 +17,7 @@ struct InboxEntry {
 std::vector<InboxEntry> buildCombinedInbox(const Career& career, std::size_t limit = 12);
 std::vector<std::string> buildInboxSummaryLines(const Career& career, std::size_t limit = 8);
 std::string buildInboxDigest(const Career& career, std::size_t limit = 6);
+std::vector<std::string> buildPriorityInboxLines(const Career& career, std::size_t limit = 8);
+std::string buildManagerHubDigest(const Career& career, std::size_t limit = 8);
 
 }  // namespace inbox_service

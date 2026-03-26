@@ -4,6 +4,7 @@
 #include "career/career_reports.h"
 #include "career/career_support.h"
 #include "career/dressing_room_service.h"
+#include "career/staff_service.h"
 
 #include <algorithm>
 
@@ -109,6 +110,12 @@ vector<string> buildManagerActionLines(const Career& career, size_t limit) {
         pushUniqueLine(lines,
                        "Parte medico exigente: prepara rotacion porque hay " + to_string(injured) + " lesionado(s).");
     }
+    const auto staffAlerts = staff_service::buildStaffRecommendations(career, 2);
+    for (const auto& alert : staffAlerts) {
+        if (alert.urgency < 55) continue;
+        pushUniqueLine(lines,
+                       alert.staffRole + ": " + alert.suggestedAction);
+    }
     if (lines.empty()) {
         pushUniqueLine(lines, "Semana estable: puedes empujar desarrollo, scouting y preparacion del proximo rival.");
     }
@@ -148,6 +155,12 @@ vector<string> buildCareerStorylines(const Career& career, size_t limit) {
         pushUniqueLine(lines,
                        "La identidad de " + team.name + " puede apoyarse en cantera: hay " +
                            to_string(youthCount) + " proyecto(s) juveniles listos para empujar.");
+    }
+    if (!team.clubStyle.empty()) {
+        pushUniqueLine(lines, "La identidad de club hoy pasa por " + team.clubStyle + ".");
+    }
+    if (!team.youthIdentity.empty()) {
+        pushUniqueLine(lines, "La politica formativa del club se lee como " + team.youthIdentity + ".");
     }
     if (!career.history.empty()) {
         const SeasonHistoryEntry& last = career.history.back();

@@ -1,5 +1,6 @@
 #include "transfers/negotiation_system.h"
 
+#include "career/dressing_room_service.h"
 #include "career/career_reports.h"
 #include "utils.h"
 
@@ -197,7 +198,26 @@ int clubAppealScore(const Career& career, const Team& team) {
     else if (team.division == "primera b") score += 4;
     score += clampInt(team.fanBase / 6, 0, 14);
     score += clampInt(team.trainingFacilityLevel * 2 + team.youthFacilityLevel, 0, 14);
+    score += clampInt(team.performanceAnalyst / 12 + team.assistantCoach / 14, 0, 10);
     return clampInt(score, 20, 99);
+}
+
+int projectAppealAdjustment(const Career& career, const Team& buyer, const Player& player) {
+    int adjustment = 0;
+    const DressingRoomSnapshot dressing = dressing_room_service::buildSnapshot(buyer, career.currentWeek);
+    if (dressing.climate == "Fuerte") adjustment += 5;
+    else if (dressing.climate == "Tenso") adjustment -= 6;
+    if (dressing.promiseRiskCount >= 2) adjustment -= 4;
+    if (buyer.youthIdentity == "Cantera estructurada" && player.age <= 21) adjustment += 7;
+    if (buyer.transferPolicy == "Cantera y valor futuro" && player.age <= 22) adjustment += 5;
+    if (buyer.headCoachStyle == "Intensidad" && playerHasTrait(player, "Presiona")) adjustment += 4;
+    if (buyer.clubStyle == "Ataque por bandas" &&
+        (normalizePosition(player.position) == "DEF" || normalizePosition(player.position) == "DEL")) {
+        adjustment += 3;
+    }
+    if (buyer.clubStyle == "Bloque ordenado" && normalizePosition(player.position) == "DEF") adjustment += 3;
+    if (buyer.jobSecurity < 40) adjustment -= 3;
+    return adjustment;
 }
 
 bool playerRejectsMove(const Career& career,
@@ -206,7 +226,7 @@ bool playerRejectsMove(const Career& career,
                        const Player& player,
                        NegotiationPromise promise,
                        string& reason) {
-    int appeal = clubAppealScore(career, buyer);
+    int appeal = clubAppealScore(career, buyer) + projectAppealAdjustment(career, buyer, player);
     int threshold = teamPrestigeScore(seller) + player.ambition / 4 + agentDifficulty(player) / 6;
     if (promise == NegotiationPromise::Starter) appeal += 8;
     else if (promise == NegotiationPromise::Rotation) appeal += 3;
@@ -221,6 +241,8 @@ bool playerRejectsMove(const Career& career,
         reason = player.name + " rechaza la propuesta por la diferencia de reputacion entre clubes.";
     } else if (squadCompetitionAtRole(buyer, player) >= 3) {
         reason = player.name + " no ve claro el espacio competitivo sin una promesa mas fuerte.";
+    } else if (dressing_room_service::buildSnapshot(buyer, career.currentWeek).climate == "Tenso") {
+        reason = player.name + " detecta un vestuario inestable y pide mas garantias antes de aceptar.";
     } else {
         reason = "El agente de " + player.name + " considera insuficiente el proyecto deportivo.";
     }
@@ -285,6 +307,7 @@ long long negotiatedWageDemand(const Career& career,
     long long wage = max(player.wage, static_cast<long long>(wageDemandFor(player) *
                                                              negotiationWageFactor(profile) *
                                                              promiseWageFactor(promise)));
+    const int projectAdjustment = projectAppealAdjustment(career, buyer, player);
     wage = wage * (100 + agentDifficulty(player) / 14) / 100;
     if (competingClubPresent) wage = wage * 106 / 100;
     if (teamPrestigeScore(buyer) + 4 < teamPrestigeScore(seller)) wage = wage * 103 / 100;
@@ -292,6 +315,8 @@ long long negotiatedWageDemand(const Career& career,
     if (promise == NegotiationPromise::Prospect && player.age <= 21) wage = wage * 97 / 100;
     if (buyer.debt > buyer.sponsorWeekly * 18) wage = wage * 102 / 100;
     if (clubAppealScore(career, buyer) > clubAppealScore(career, seller) + 10) wage = wage * 97 / 100;
+    if (projectAdjustment >= 8) wage = wage * 96 / 100;
+    else if (projectAdjustment <= -6) wage = wage * 105 / 100;
     return max(player.wage, wage);
 }
 

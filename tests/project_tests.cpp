@@ -20,6 +20,7 @@
 #include "development/monthly_development.h"
 #include "development/training_impact_system.h"
 #include "engine/models.h"
+#include "engine/game_settings.h"
 #include "io/io.h"
 #include "simulation/match_context.h"
 #include "simulation/match_engine_internal.h"
@@ -1252,6 +1253,71 @@ void testAnalyticsAndInboxServicesProduceUsefulBlocks() {
            "El inbox combinado debe resumir canal y contenido.");
 }
 
+void testGameSettingsCycleAndDifficultyImpact() {
+    GameSettings settings;
+    settings.volume = 70;
+    expect(game_settings::nextVolume(settings.volume) == 75,
+           "El volumen debe ciclar al siguiente escalon previsto.");
+    game_settings::cycleDifficulty(settings);
+    expect(settings.difficulty == GameDifficulty::Challenging,
+           "La dificultad debe avanzar al siguiente nivel.");
+    game_settings::cycleSimulationMode(settings);
+    expect(settings.simulationMode == SimulationMode::Fast,
+           "El modo de simulacion debe alternar entre detallado y rapido.");
+
+    Career career;
+    career.boardConfidence = 52;
+    career.managerReputation = 50;
+    career.allTeams.push_back(makeTeam("Proyecto Ligero", "primera division", 68, 3, 3, "Balanced", "Equilibrado", 600000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Proyecto Ligero");
+    expect(career.myTeam != nullptr, "La prueba de settings necesita club usuario.");
+
+    const long long baseBudget = career.myTeam->budget;
+    settings.difficulty = GameDifficulty::Accessible;
+    game_settings::applyNewCareerDifficulty(career, settings);
+
+    expect(career.myTeam->budget > baseBudget,
+           "La dificultad accesible debe dar algo mas de aire economico al arranque.");
+    expect(career.boardConfidence > 52,
+           "La dificultad accesible debe mejorar el respaldo inicial de la directiva.");
+}
+
+void testManagerHubDigestCombinesStaffAndAgenda() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 7;
+    career.boardConfidence = 33;
+    career.boardMonthlyObjective = "Entrar a puestos altos";
+    career.boardMonthlyTarget = 3;
+    career.boardMonthlyProgress = 1;
+    career.allTeams.push_back(makeTeam("Hub FC", "primera division", 69, 4, 4, "Pressing", "Contra-presion", 180000));
+    career.allTeams.push_back(makeTeam("Radar Sur", "primera division", 67, 2, 2, "Defensive", "Bloque bajo", 640000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Hub FC");
+    expect(career.myTeam != nullptr, "La prueba del hub necesita club usuario.");
+
+    career.myTeam->morale = 44;
+    career.myTeam->debt = 420000;
+    career.myTeam->players[0].contractWeeks = 8;
+    career.myTeam->players[0].fitness = 53;
+    career.myTeam->players[0].fatigueLoad = 76;
+    career.myTeam->players[1].happiness = 39;
+    career.scoutingShortlist.push_back("Radar Sur|" + career.findTeamByName("Radar Sur")->players[0].name);
+    career.addInboxItem("La directiva pide reaccion inmediata.", "Directiva");
+
+    const auto priority = inbox_service::buildPriorityInboxLines(career, 6);
+    const string digest = inbox_service::buildManagerHubDigest(career, 6);
+
+    expect(!priority.empty(), "El hub del manager debe producir lineas priorizadas.");
+    expect(joinLines(priority).find("Staff |") != string::npos,
+           "El hub debe mezclar alertas del staff.");
+    expect(joinLines(priority).find("Agenda |") != string::npos,
+           "El hub debe mezclar acciones del manager.");
+    expect(digest.find("Centro del manager") != string::npos && digest.find("Staff |") != string::npos,
+           "El digest del hub debe quedar legible para GUI e inbox.");
+}
+
 void testManagerAdviceHighlightsUrgentActions() {
     Career career;
     career.currentSeason = 2;
@@ -1353,6 +1419,34 @@ void testLateDeficitRaisesUrgencyInMatchPhase() {
            "El contexto de remontada debe empujar el volumen ofensivo.");
     expect(chasing.report.homeDefensiveRisk >= even.report.homeDefensiveRisk,
            "Empujar el resultado debe venir con mas riesgo defensivo.");
+}
+
+void testMatchInstructionsShapeChanceProfiles() {
+    Team wide = makeTeam("Bandas FC", "primera division", 71, 3, 3, "Balanced", "Por bandas", 780000);
+    wide.width = 5;
+    Team patient = wide;
+    patient.name = "Pausa FC";
+    patient.matchInstruction = "Pausar juego";
+    patient.width = 3;
+    Team opponent = makeTeam("Rival Medio", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 760000);
+
+    setRandomSeed(20260326);
+    const MatchSetup wideSetup = match_context::buildMatchSetup(wide, opponent, false, false);
+    setRandomSeed(20260326);
+    const MatchSetup patientSetup = match_context::buildMatchSetup(patient, opponent, false, false);
+
+    setRandomSeed(7777);
+    const MatchPhaseEvaluation wideEval =
+        match_phase::evaluatePhase(wideSetup, wide, opponent, wideSetup.home, wideSetup.away, 2, 31, 45, 0, 0, 11, 11);
+    setRandomSeed(7777);
+    const MatchPhaseEvaluation patientEval =
+        match_phase::evaluatePhase(patientSetup, patient, opponent, patientSetup.home, patientSetup.away, 2, 31, 45, 0, 0, 11, 11);
+    resetRandomSeed();
+
+    expect(wideEval.report.homeChanceProbability > patientEval.report.homeChanceProbability,
+           "Atacar por bandas debe generar mas probabilidad de ocasiones que pausar el juego.");
+    expect(wideEval.homeAttacks >= patientEval.homeAttacks,
+           "El plan por bandas debe sostener al menos el mismo volumen ofensivo.");
 }
 
 void testMatchInjuryTriggersRealReplacement() {
@@ -1543,6 +1637,7 @@ int main() {
         {"runtime_load_validation", testRuntimeValidationFlagsBrokenLoadedSquad},
         {"startup_data_validation", testStartupValidationSummaryExposesExternalAudit},
         {"competition_group_table", testCompetitionGroupTableScopesActiveGroup},
+        {"game_settings_cycle", testGameSettingsCycleAndDifficultyImpact},
         {"transfer_affordability", testTransferEvaluationPenalizesUnaffordableDeals},
         {"transfer_shortlist", testTransferShortlistRewardsScoutedNeed},
         {"squad_sale_candidates", testSquadPlannerFlagsUnusedSeniorSaleCandidates},
@@ -1570,9 +1665,11 @@ int main() {
         {"configured_world_data", testConfiguredWorldDataLoads},
         {"league_registry_data", testLeagueRegistryLoadsConfiguredData},
         {"analytics_inbox_blocks", testAnalyticsAndInboxServicesProduceUsefulBlocks},
+        {"manager_hub_digest", testManagerHubDigestCombinesStaffAndAgenda},
         {"manager_advice", testManagerAdviceHighlightsUrgentActions},
         {"transfer_briefing", testTransferBriefingBuildsActionableMarketView},
         {"late_match_urgency", testLateDeficitRaisesUrgencyInMatchPhase},
+        {"instruction_chance_profiles", testMatchInstructionsShapeChanceProfiles},
         {"injury_replacement", testMatchInjuryTriggersRealReplacement},
         {"transfer_medical_risk", testTransferEvaluationPenalizesMedicalRisk},
         {"monthly_development", testMonthlyDevelopmentCycleImprovesStableProspects},

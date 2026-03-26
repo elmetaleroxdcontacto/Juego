@@ -46,7 +46,9 @@ set(FM_COMPETITION_SOURCES
 
 set(FM_ENGINE_SOURCES
     src/engine/career_state.cpp
+    src/engine/front_menu.cpp
     src/engine/game_engine.cpp
+    src/engine/game_settings.cpp
     src/engine/league_table.cpp
     src/engine/models.cpp
     src/engine/team_selection.cpp
@@ -140,6 +142,7 @@ if(WIN32)
         src/gui/gui_runtime.cpp
         src/gui/gui_shared.cpp
         src/gui/gui_view_common.cpp
+        src/gui/gui_view_menu.cpp
         src/gui/gui_view_competition.cpp
         src/gui/gui_view_management.cpp
         src/gui/gui_view_overview.cpp

@@ -74,6 +74,8 @@ ListPanelModel buildTransferPipelineModel(const Career& career);
 std::vector<TransferPreviewItem> buildTransferTargets(const Career& career, const std::string& filter);
 
 GuiPageModel buildDashboardModel(AppState& state);
+GuiPageModel buildMainMenuModel(AppState& state);
+GuiPageModel buildSettingsPageModel(AppState& state);
 GuiPageModel buildSquadModel(AppState& state, bool youthOnly);
 GuiPageModel buildTacticsModel(AppState& state);
 GuiPageModel buildCalendarModel(AppState& state);

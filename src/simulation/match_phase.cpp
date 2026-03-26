@@ -29,6 +29,77 @@ double availabilityFactor(int playersAvailable) {
     return clampValue(1.0 - max(0, 11 - playersAvailable) * 0.08, 0.70, 1.00);
 }
 
+double instructionPossessionTilt(const Team& team) {
+    if (team.matchInstruction == "Pausar juego") return 2.6;
+    if (team.matchInstruction == "Por bandas") return 1.6;
+    if (team.matchInstruction == "Laterales altos") return 1.0;
+    if (team.matchInstruction == "Juego directo") return -1.9;
+    if (team.matchInstruction == "Bloque bajo") return -3.0;
+    if (team.matchInstruction == "Presion final") return -0.4;
+    return 0.0;
+}
+
+double instructionIntensityModifier(const Team& team) {
+    if (team.matchInstruction == "Presion final") return 0.09;
+    if (team.matchInstruction == "Contra-presion") return 0.07;
+    if (team.matchInstruction == "Laterales altos") return 0.03;
+    if (team.matchInstruction == "Pausar juego") return -0.11;
+    if (team.matchInstruction == "Bloque bajo") return -0.06;
+    return 0.0;
+}
+
+double instructionAttackModifier(const Team& team, const TeamMatchSnapshot& snapshot) {
+    double modifier = 0.0;
+    if (team.matchInstruction == "Por bandas") {
+        modifier += 0.05 + snapshot.tacticalProfile.width * 0.03;
+    } else if (team.matchInstruction == "Laterales altos") {
+        modifier += 0.05;
+    } else if (team.matchInstruction == "Juego directo") {
+        modifier += 0.06 + snapshot.tacticalProfile.directness * 0.05;
+    } else if (team.matchInstruction == "Balon parado") {
+        modifier += 0.03 + snapshot.setPieceThreat / 1400.0;
+    } else if (team.matchInstruction == "Presion final") {
+        modifier += 0.06;
+    } else if (team.matchInstruction == "Pausar juego") {
+        modifier -= 0.05;
+    } else if (team.matchInstruction == "Bloque bajo") {
+        modifier -= 0.03;
+    }
+    return clampValue(modifier, -0.10, 0.18);
+}
+
+double instructionDefenseModifier(const Team& team) {
+    double modifier = 0.0;
+    if (team.matchInstruction == "Bloque bajo") modifier += 0.08;
+    if (team.matchInstruction == "Pausar juego") modifier += 0.05;
+    if (team.matchInstruction == "Laterales altos") modifier -= 0.06;
+    if (team.matchInstruction == "Por bandas") modifier -= 0.03;
+    if (team.matchInstruction == "Presion final") modifier -= 0.06;
+    if (team.matchInstruction == "Contra-presion") modifier -= 0.03;
+    return clampValue(modifier, -0.10, 0.10);
+}
+
+double instructionChanceBias(const Team& team, const TeamMatchSnapshot& snapshot) {
+    double bias = 0.0;
+    if (team.matchInstruction == "Balon parado") bias += 0.05 + snapshot.setPieceThreat / 1800.0;
+    if (team.matchInstruction == "Por bandas") bias += 0.04 + snapshot.tacticalProfile.width * 0.02;
+    if (team.matchInstruction == "Juego directo") bias += 0.04 + snapshot.tacticalProfile.directness * 0.02;
+    if (team.matchInstruction == "Laterales altos") bias += 0.03;
+    if (team.matchInstruction == "Pausar juego") bias -= 0.03;
+    return clampValue(bias, -0.06, 0.14);
+}
+
+double instructionRiskBias(const Team& team) {
+    double bias = 0.0;
+    if (team.matchInstruction == "Laterales altos") bias += 0.05;
+    if (team.matchInstruction == "Presion final") bias += 0.06;
+    if (team.matchInstruction == "Contra-presion") bias += 0.03;
+    if (team.matchInstruction == "Juego directo") bias += 0.02;
+    if (team.matchInstruction == "Bloque bajo") bias -= 0.05;
+    if (team.matchInstruction == "Pausar juego") bias -= 0.04;
+    return clampValue(bias, -0.08, 0.08);
+}
+
 }  // namespace
 
 namespace match_phase {
@@ -56,6 +127,16 @@ MatchPhaseEvaluation evaluatePhase(const MatchSetup& setup,
 
     const double homeAvailability = availabilityFactor(homePlayersAvailable);
     const double awayAvailability = availabilityFactor(awayPlayersAvailable);
+    const double homePossessionTilt = instructionPossessionTilt(home);
+    const double awayPossessionTilt = instructionPossessionTilt(away);
+    const double homeAttackMod = instructionAttackModifier(home, homeSnapshot);
+    const double awayAttackMod = instructionAttackModifier(away, awaySnapshot);
+    const double homeDefenseMod = instructionDefenseModifier(home);
+    const double awayDefenseMod = instructionDefenseModifier(away);
+    const double homeChanceBias = instructionChanceBias(home, homeSnapshot);
+    const double awayChanceBias = instructionChanceBias(away, awaySnapshot);
+    const double homeRiskBias = instructionRiskBias(home);
+    const double awayRiskBias = instructionRiskBias(away);
 
     const int homePossessionShare = clampInt(
         static_cast<int>(round(50.0 + (homeSnapshot.midfieldControl - awaySnapshot.midfieldControl) / 4.4 +
@@ -65,6 +146,7 @@ MatchPhaseEvaluation evaluatePhase(const MatchSetup& setup,
                                    10.0 +
                                (homeSnapshot.tacticalCompatibility - awaySnapshot.tacticalCompatibility) * 8.0 +
                                (phase.homeUrgency - phase.awayUrgency) * 18.0 +
+                               (homePossessionTilt - awayPossessionTilt) +
                                (awayPlayersAvailable - homePlayersAvailable) * 2.5)),
         34, 66);
     const int awayPossessionShare = 100 - homePossessionShare;
@@ -74,6 +156,8 @@ MatchPhaseEvaluation evaluatePhase(const MatchSetup& setup,
                                             (homeSnapshot.tacticalProfile.pressing + awaySnapshot.tacticalProfile.pressing) *
                                                 0.14 -
                                             fatigueDrag +
+                                            instructionIntensityModifier(home) +
+                                            instructionIntensityModifier(away) +
                                             abs(phase.homeUrgency - phase.awayUrgency) * 0.12 +
                                             (abs(homeGoals - awayGoals) <= 1 && phaseIndex >= 3 ? 0.03 : 0.0),
                                         0.86, 1.42);
@@ -91,31 +175,32 @@ MatchPhaseEvaluation evaluatePhase(const MatchSetup& setup,
                    homeSnapshot.chanceCreation * 0.32 +
                    homeSnapshot.lineBreakThreat * 0.18 +
                    homeSnapshot.tacticalAdvantage * 18.0) *
-                      setup.context.homeAdvantage * setup.context.weatherModifier * homeAvailability * homeIntent);
+                      setup.context.homeAdvantage * setup.context.weatherModifier * homeAvailability * homeIntent *
+                      (1.0 + homeAttackMod));
     const double awayAttack =
         max(12.0, (awaySnapshot.attackPower * awaySnapshot.moraleFactor * awaySnapshot.fatigueFactor +
                    awaySnapshot.chanceCreation * 0.32 +
                    awaySnapshot.lineBreakThreat * 0.18 +
                    awaySnapshot.tacticalAdvantage * 18.0) *
-                      setup.context.weatherModifier * awayAvailability * awayIntent);
+                      setup.context.weatherModifier * awayAvailability * awayIntent * (1.0 + awayAttackMod));
     const double homeDefense =
         max(10.0, homeSnapshot.defensePower * (0.95 + homeSnapshot.fatigueFactor * 0.07) +
                       homeSnapshot.defensiveShape * 0.22 +
                       tactics_engine::defensiveSecurityWeight(homeSnapshot.tacticalProfile) * 14.0) *
-        homeAvailability * (1.0 - max(0.0, phase.homeUrgency) * 0.08) * homeProtection;
+        homeAvailability * (1.0 - max(0.0, phase.homeUrgency) * 0.08) * homeProtection * (1.0 + homeDefenseMod);
     const double awayDefense =
         max(10.0, awaySnapshot.defensePower * (0.95 + awaySnapshot.fatigueFactor * 0.07) +
                       awaySnapshot.defensiveShape * 0.22 +
                       tactics_engine::defensiveSecurityWeight(awaySnapshot.tacticalProfile) * 14.0) *
-        awayAvailability * (1.0 - max(0.0, phase.awayUrgency) * 0.08) * awayProtection;
+        awayAvailability * (1.0 - max(0.0, phase.awayUrgency) * 0.08) * awayProtection * (1.0 + awayDefenseMod);
 
     const double homeOpportunity = match_resolution::opportunityProbability(
         homeAttack, awayDefense, homePossessionShare / 100.0,
-        0.95 + homeSnapshot.tacticalProfile.mentality * 0.10 + max(0.0, phase.homeUrgency) * 0.18,
+        0.95 + homeSnapshot.tacticalProfile.mentality * 0.10 + max(0.0, phase.homeUrgency) * 0.18 + homeChanceBias,
         intensity);
     const double awayOpportunity = match_resolution::opportunityProbability(
         awayAttack, homeDefense, awayPossessionShare / 100.0,
-        0.95 + awaySnapshot.tacticalProfile.mentality * 0.10 + max(0.0, phase.awayUrgency) * 0.18,
+        0.95 + awaySnapshot.tacticalProfile.mentality * 0.10 + max(0.0, phase.awayUrgency) * 0.18 + awayChanceBias,
         intensity);
 
     phase.dominantTeam = homePossessionShare >= awayPossessionShare ? home.name : away.name;
@@ -130,6 +215,7 @@ MatchPhaseEvaluation evaluatePhase(const MatchSetup& setup,
                                              homeSnapshot.defensiveShape / 900.0 +
                                              max(0.0, static_cast<double>(home.defensiveLine - 3)) * 0.04 +
                                              max(0.0, phase.homeUrgency) * 0.10 +
+                                             homeRiskBias +
                                              max(0, 11 - homePlayersAvailable) * 0.04 -
                                              max(0.0, -phase.homeUrgency) * 0.05,
                                          0.05, 0.72);
@@ -139,6 +225,7 @@ MatchPhaseEvaluation evaluatePhase(const MatchSetup& setup,
                                              awaySnapshot.defensiveShape / 900.0 +
                                              max(0.0, static_cast<double>(away.defensiveLine - 3)) * 0.04 +
                                              max(0.0, phase.awayUrgency) * 0.10 +
+                                             awayRiskBias +
                                              max(0, 11 - awayPlayersAvailable) * 0.04 -
                                              max(0.0, -phase.awayUrgency) * 0.05,
                                          0.05, 0.72);
@@ -209,14 +296,14 @@ MatchPhaseEvaluation evaluatePhase(const MatchSetup& setup,
         awayDefense,
         phase.awayDefensiveRisk,
         homeSnapshot.setPieceThreat,
-        homeSnapshot.fatigueFactor);
+        clampValue(homeSnapshot.fatigueFactor + homeChanceBias, 0.72, 1.18));
     const double awayChanceRate = match_resolution::shotCreationProbability(
         awaySnapshot.chanceCreation,
         awaySnapshot.finishingQuality,
         homeDefense,
         phase.homeDefensiveRisk,
         awaySnapshot.setPieceThreat,
-        awaySnapshot.fatigueFactor);
+        clampValue(awaySnapshot.fatigueFactor + awayChanceBias, 0.72, 1.18));
 
     evaluation.homeAttack = homeAttack;
     evaluation.awayAttack = awayAttack;

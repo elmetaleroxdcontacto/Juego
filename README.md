@@ -1,75 +1,57 @@
 # Football Manager Chile Simulator
 
-Simulador de gestion futbolistica en C++ centrado en carreras de largo plazo, simulacion de partidos, mercado de fichajes y progreso de club dentro de la estructura chilena.
+Simulador de gestion futbolistica en C++ inspirado en la profundidad de juegos tipo Football Manager, con foco en carrera, scouting, vestuario, mercado y motor de partido.
 
-El proyecto ya es jugable y en esta etapa prioriza tres cosas:
+El proyecto ya es jugable y hoy combina tres capas que trabajan juntas:
 
-- una arquitectura modular que permita seguir creciendo sin rehacer todo
-- una simulacion mas coherente entre tactica, moral, fatiga, salud y resultados
-- una GUI Win32 mas clara, usable y estable para jugar sin depender de la consola
+- simulacion de partidos con fases, contexto tactico, xG, riesgo y fatiga
+- modo carrera con directiva, finanzas, scouting, contratos, cantera y staff
+- GUI Win32 para jugar sin consola, mas una CLI para validacion y depuracion
 
-## Estado actual
+## Que trae hoy
 
-El repositorio esta en desarrollo activo, pero ya incluye una base funcional bastante amplia:
+### Carrera y gestion
 
-- modo carrera con multiples divisiones chilenas
-- simulacion semanal de temporada
-- motor de partidos modular
-- fichajes, renovaciones, precontratos y shortlist
-- progresion de jugadores y cantera
-- lesiones, fatiga, moral y contexto competitivo
-- finanzas, objetivos de directiva y reportes
-- interfaz grafica Win32 y modo consola
-- validacion de datos y suite de tests automatizados
+- multiples divisiones chilenas
+- calendario semanal y transicion de temporada
+- objetivos de directiva y confianza del cargo
+- finanzas, deuda, sponsor, salarios e infraestructura
+- mercado con shortlist, scouting, precontratos, cesiones y negociacion estructurada
+- desarrollo mensual, progresion juvenil y manejo de carga
+- vestuario con moral, promesas, tension social y reuniones de plantel
 
-## Lo mas importante que ya trae
+### Profundidad tipo Football Manager
 
-### Simulacion
+- mesa de staff con recomendaciones semanales priorizadas
+- centro del manager con agenda, scouting, mercado e inbox combinado
+- scouting por cobertura regional, foco posicional y confianza de informe
+- lectura de proyecto de club en negociaciones: estilo, cantera, politica, clima interno y seguridad del cargo
+- dashboard con contexto de rival, microciclo, decisiones sugeridas y narrativa semanal
 
-- contexto previo al partido
-- fases de partido y eventos tipados
-- impacto de tactica, presion, moral y fatiga
-- estadisticas y postproceso del encuentro
-- ajustes en vivo del match center
-- consecuencias medicas y deportivas tras el partido
+### Motor de partido
 
-### Gestion de club
-
-- carrera por divisiones chilenas
-- plantel, once titular e instrucciones
-- scouting, seguimiento y radar de mercado
-- renovaciones, ventas y precontratos
-- presupuesto, salarios e infraestructura
-- confianza de directiva y objetivos mensuales
-
-### Desarrollo de jugadores
-
-- generacion y manejo de cantera
-- progresion mensual
-- impacto del entrenamiento
-- condicion del jugador unificada
-- lesiones y riesgo medico integrados en la toma de decisiones
+- contexto previo al partido y snapshots de cada equipo
+- partido dividido en seis fases estructuradas
+- posesion, progresiones, ataques, ocasiones, xG y eventos tipados
+- influencia de tactica, instruccion de partido, moral, disponibilidad y fatiga
+- lesiones con cambio forzado real
+- reportes post partido con explicacion tactica y recomendaciones
 
 ### GUI Win32
 
-- ejecutable GUI sin consola innecesaria
-- arranque maximizado y soporte DPI
-- modo de pantalla por boton y `F11`
-- ciclo entre ventana restaurada, maximizado y fullscreen sin borde
-- dashboard con tarjetas KPI e insights contextuales
-- tarjetas clicables para abrir scouting, finanzas, directiva y otras vistas
-- tablas con autosize por contexto y memoria visual por vista
+- `FootballManager.exe` sin consola innecesaria
+- arranque maximizado con soporte DPI
+- boton y `F11` para alternar ventana, maximizado y fullscreen sin borde
+- dashboard owner-draw con KPIs e insights clicables
+- tablas con autosize por vista y suavizado entre refrescos
 
 ## Ejecutables
 
-Con CMake en Windows se generan estos binarios:
+Los binarios principales quedan en `build-cmake/bin/`:
 
-- `build-cmake/bin/FootballManager.exe`
-  - version GUI principal
-- `build-cmake/bin/FootballManagerCLI.exe`
-  - version consola
-- `build-cmake/bin/FootballManagerTests.exe`
-  - suite de pruebas
+- `FootballManager.exe`: version GUI principal
+- `FootballManagerCLI.exe`: version consola
+- `FootballManagerTests.exe`: suite automatizada
 
 ## Requisitos
 
@@ -79,9 +61,9 @@ Con CMake en Windows se generan estos binarios:
 - MinGW con `g++`
 - `mingw32-make`
 
-### Linux u otros entornos
+### Otros entornos
 
-El proyecto puede compilar con CMake tambien fuera de Windows, pero la GUI Win32 es especifica de Windows. En esos casos el flujo principal cae en el modo consola.
+El proyecto puede compilarse tambien fuera de Windows con CMake, pero la GUI actual es Win32. En esos casos el flujo principal es la CLI.
 
 ## Compilacion
 
@@ -89,33 +71,19 @@ El proyecto puede compilar con CMake tambien fuera de Windows, pero la GUI Win32
 
 ```powershell
 cmake -S . -B build-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++
-cmake --build build-cmake --config Release --target FootballManager
-```
-
-Para compilar tambien CLI y tests:
-
-```powershell
 cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests
 ```
 
-### Opcion rapida en Windows: `build.bat`
+### Opcion rapida en Windows
 
 ```powershell
 build.bat
 ```
 
-No ejecutar automaticamente al terminar:
+Si solo quieres compilar sin ejecutar automaticamente:
 
 ```powershell
 $env:FM_SKIP_RUN='1'
-cmd /c build.bat
-```
-
-Forzar fallback directo con `g++` si el arbol de CMake esta inestable:
-
-```powershell
-$env:FM_SKIP_RUN='1'
-$env:FM_FORCE_FALLBACK='1'
 cmd /c build.bat
 ```
 
@@ -133,158 +101,78 @@ cmd /c build.bat
 .\build-cmake\bin\FootballManagerCLI.exe
 ```
 
-Tambien puedes lanzar el modo consola desde el binario principal:
-
-```powershell
-.\build-cmake\bin\FootballManager.exe --cli
-```
-
-## Validacion
-
-La validacion del proyecto se ejecuta por CLI:
+### Validacion de datos y proyecto
 
 ```powershell
 .\build-cmake\bin\FootballManagerCLI.exe --validate
 ```
 
-El flujo de aplicacion tambien soporta:
-
-```powershell
-.\build-cmake\bin\FootballManager.exe --validate
-```
-
 ## Tests
 
-Compilar los tests:
+Compilar y ejecutar:
 
 ```powershell
 cmake --build build-cmake --config Release --target FootballManagerTests
-```
-
-Ejecutarlos directamente:
-
-```powershell
 .\build-cmake\bin\FootballManagerTests.exe
 ```
 
-O usar `ctest`:
+La suite valida, entre otras cosas:
 
-```powershell
-ctest --test-dir build-cmake --output-on-failure
-```
-
-La suite actual cubre, entre otras cosas:
-
-- validacion de datos y carga inicial
-- estructura del match engine
-- fatiga tactica y urgencia competitiva
-- mercado, shortlist y negociacion
-- lesiones, riesgo medico y reemplazos
-- progreso mensual y servicios de carrera
-- guardado/carga y transicion de temporada
+- integridad de datos y carga inicial
+- estructura del motor de partido
+- urgencia competitiva, fatiga y perfil tactico
+- scouting, shortlist y negociacion
+- riesgo medico y reemplazos por lesion
+- desarrollo mensual y servicios de carrera
+- guardado, carga y transicion de temporada
 
 ## Arquitectura
 
-### Capas principales
+### Modulos principales
 
-- `engine`
-  - flujo principal del juego, estado de carrera y modelos base
-- `simulation`
-  - contexto de partido, fases, eventos, resolucion, estadisticas y postproceso
-- `career`
-  - servicios de carrera, reportes, inbox, desarrollo, temporada y world state
-- `ai`
-  - gestion de partido, planificacion de plantilla y evaluacion de mercado
-- `transfers`
-  - mercado, negociacion y tipos de transferencia
-- `development`
-  - progresion, entrenamiento, cantera y desarrollo mensual
-- `finance`
-  - caja, masa salarial y proyeccion semanal
-- `gui`
-  - layout, runtime, acciones y vistas de la GUI Win32
-- `ui`
-  - flujo legado/consola y pantallas de texto
-- `io`
-  - carga, guardado y serializacion
-- `validators`
-  - validacion de datos y consistencia de proyecto
+- `engine`: estado base, modelos y controlador del juego
+- `simulation`: contexto de partido, fases, eventos, resolucion y reportes
+- `career`: servicios de carrera, inbox, staff, narrativas, semana y mundo
+- `ai`: planificacion de plantilla, ajustes CPU y evaluacion de mercado
+- `transfers`: mercado, tipos y negociacion
+- `development`: entrenamiento, progresion y cantera
+- `finance`: proyecciones y buffer economico
+- `gui`: runtime, layout, acciones y vistas Win32
+- `ui`: flujo de consola y pantallas de texto
+- `io`: guardado, carga y serializacion
+- `validators`: chequeos de integridad y arranque
 
 ### Estructura del repo
 
 ```text
 include/
 src/
+tests/
 data/
 docs/
-tests/
 saves/
 tools/
 ```
 
-### Carpetas de datos
-
-Actualmente la base jugable sigue viviendo principalmente en:
-
-- `data/LigaChilena/`
-
-Ademas existe una capa de configuracion mas estructurada para seguir desacoplando datos del codigo:
-
-- `data/configs/`
-- `data/leagues/`
-- `data/teams/`
-- `data/players/`
-
 ## Flujo de entrada
 
-### En Windows
-
-- `src/winmain.cpp` entra por GUI
-- `src/main.cpp` entra por consola
-- `src/engine/game_controller.cpp` decide si abrir GUI, CLI o validacion
-
-### Objetivo de esa separacion
-
-Permite mantener:
-
-- la GUI como capa de presentacion
-- la consola como fallback funcional
-- los servicios de carrera y simulacion reutilizables sin depender de una UI concreta
+- `src/winmain.cpp`: entrada GUI en Windows
+- `src/main.cpp`: entrada consola
+- `src/engine/game_controller.cpp`: seleccion de GUI, CLI o validacion
 
 ## Documentacion adicional
 
 - [Arquitectura](docs/ARCHITECTURE.md)
 - [Roadmap](docs/ROADMAP.md)
-- [Limpieza de datos](docs/data_cleanup_report.md)
+- [Reporte de limpieza de datos](docs/data_cleanup_report.md)
 
-## Roadmap cercano
+## Roadmap natural
 
-- mejorar accesibilidad e interaccion de la GUI
-- seguir separando codigo grande que aun concentra demasiada logica
-- profundizar negociaciones, historial y memoria de temporada
-- expandir base de datos externa para facilitar modding
-- reforzar analiticas, scouting y feedback tactico
-
-## Contribuir
-
-Las contribuciones son bienvenidas, especialmente en:
-
-- C++ y arquitectura
-- simulacion de partidos
-- interfaces Win32 / UX
-- datos de equipos, ligas y jugadores
-- validacion, testing y balance
-
-Flujo sugerido:
-
-1. haz un fork del repositorio
-2. crea una rama tematica
-3. realiza tus cambios
-4. valida build y tests
-5. abre un Pull Request
+- seguir profundizando el motor de partido con mas lectura rival y balon parado
+- ampliar staff y networking del mercado con mas memoria del mundo
+- enriquecer cantera, intake juvenil y narrativa de largo plazo
+- pulir la GUI con mas widgets de comparacion y centros de informacion
 
 ## Repositorio
 
-GitHub:
-
-https://github.com/elmetaleroxdcontacto/Juego
+GitHub: https://github.com/elmetaleroxdcontacto/Juego

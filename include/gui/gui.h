@@ -1,3 +1,5 @@
 #pragma once
 
-int runGuiApp();
+#include "engine/game_settings.h"
+
+int runGuiApp(const GameSettings& settings);

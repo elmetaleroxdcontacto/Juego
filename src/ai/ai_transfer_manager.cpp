@@ -16,6 +16,29 @@ bool onScoutingShortlist(const Career& career, const Team& seller, const Player&
     return find(career.scoutingShortlist.begin(), career.scoutingShortlist.end(), entry) != career.scoutingShortlist.end();
 }
 
+int assignmentKnowledgeBoost(const Career& career, const Team& seller, const Player& player) {
+    int boost = 0;
+    const string normalizedPos = normalizePosition(player.position);
+    for (const auto& assignment : career.scoutingAssignments) {
+        if (!assignment.region.empty() && assignment.region != "Todas" && assignment.region != seller.youthRegion) continue;
+        if (!assignment.focusPosition.empty() && normalizePosition(assignment.focusPosition) != normalizedPos) continue;
+        boost = max(boost, assignment.knowledgeLevel / 4 + max(0, assignment.weeksRemaining - 1) * 2);
+    }
+    return clampInt(boost, 0, 22);
+}
+
+int projectStyleFit(const Team& buyer, const Player& player) {
+    int fit = 0;
+    if (buyer.headCoachStyle == "Intensidad" && playerHasTrait(player, "Presiona")) fit += 8;
+    if (buyer.headCoachStyle == "Transicion" && normalizePosition(player.position) == "DEL") fit += 5;
+    if (buyer.clubStyle == "Ataque por bandas" && (normalizePosition(player.position) == "DEF" || normalizePosition(player.position) == "DEL")) fit += 4;
+    if (buyer.clubStyle == "Bloque ordenado" && normalizePosition(player.position) == "DEF") fit += 5;
+    if (buyer.youthIdentity == "Cantera estructurada" && player.age <= 21) fit += 8;
+    if (buyer.transferPolicy == "Cantera y valor futuro" && player.age <= 22) fit += 6;
+    if (buyer.transferPolicy == "Competir por titulares hechos" && player.skill >= buyer.getAverageSkill()) fit += 5;
+    return fit;
+}
+
 }  // namespace
 
 namespace ai_transfer_manager {
@@ -72,6 +95,8 @@ TransferTarget evaluateTarget(const Career& career,
     target.upsideScore = max(0, player.potential - player.skill) +
                          player_condition::developmentStability(player, seller, false) / 5;
     target.fitScore = player.skill * 3 + player.potential * 2 - player.age * 2 + target.squadNeedScore;
+    const int assignmentBoost = assignmentKnowledgeBoost(career, seller, player);
+    const int styleFit = projectStyleFit(buyer, player);
     if (strategy.youthFocus) target.fitScore += max(0, 24 - player.age) * 3 + max(0, player.potential - player.skill) * 2;
     if (strategy.promotionPush) target.fitScore += player.skill * 2 + max(0, player.currentForm - 55);
     if (strategy.needsStarter && player.skill >= strategy.averageStarterSkill) target.fitScore += 12;
@@ -79,6 +104,7 @@ TransferTarget evaluateTarget(const Career& career,
     if (target.contractRunningOut) target.fitScore += 8;
     if (target.urgentNeed) target.fitScore += 10;
     if (target.onShortlist) target.fitScore += 6;
+    target.fitScore += styleFit;
     target.fitScore += target.readinessScore / 6;
     target.fitScore += target.upsideScore / 7;
     target.fitScore -= target.medicalRisk / 7;
@@ -96,13 +122,17 @@ TransferTarget evaluateTarget(const Career& career,
                                            max(0, teamPrestigeScore(seller) - strategy.prestigeScore + 4),
                                        0, 28);
     target.scoutingConfidence = clampInt(36 + buyer.scoutingChief / 2 + (target.onShortlist ? 14 : 0) +
-                                             (target.contractRunningOut ? 8 : 0) + (target.availableForLoan ? 5 : 0),
+                                             (target.contractRunningOut ? 8 : 0) + (target.availableForLoan ? 5 : 0) +
+                                             assignmentBoost,
                                          35, 92);
     target.scoutingNote = target.onShortlist
                               ? "seguimiento activo"
                               : target.contractRunningOut ? "ventana contractual"
                                                           : target.availableForLoan ? "opcion de prestamo"
                                                                                     : "perfil general";
+    if (assignmentBoost > 0) {
+        target.scoutingNote += " | cobertura especifica";
+    }
     if (target.expectedAgentFee >= max(12000LL, target.expectedFee / 5)) {
         target.scoutingNote += " | agente exigente";
     }
@@ -113,6 +143,11 @@ TransferTarget evaluateTarget(const Career& career,
         target.scoutingNote += " | encaja con politica juvenil";
     } else if (buyer.transferPolicy == "Vender antes de comprar") {
         target.scoutingNote += " | el club vigila mucho el coste total";
+    }
+    if (styleFit >= 8) {
+        target.scoutingNote += " | encaje fuerte con el proyecto";
+    } else if (styleFit >= 4) {
+        target.scoutingNote += " | encaje tactico razonable";
     }
     if (target.medicalRisk >= 72) {
         target.scoutingNote += " | riesgo fisico alto";
@@ -135,7 +170,8 @@ TransferTarget evaluateTarget(const Career& career,
                         target.affordabilityScore * 2.1 + target.scoutingConfidence * 0.08 +
                         target.readinessScore * 0.10 - target.medicalRisk * 0.09 + target.upsideScore * 0.12 -
                         target.competitionScore * 0.22 + (target.availableForLoan ? 6.0 : 0.0) +
-                        (target.contractRunningOut ? 4.0 : 0.0) + (target.onShortlist ? 5.0 : 0.0);
+                        (target.contractRunningOut ? 4.0 : 0.0) + (target.onShortlist ? 5.0 : 0.0) + styleFit * 0.35 +
+                        assignmentBoost * 0.18;
     return target;
 }
 

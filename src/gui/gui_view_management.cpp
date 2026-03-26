@@ -250,6 +250,7 @@ GuiPageModel buildNewsModel(AppState& state) {
     GuiPageModel model;
     std::vector<std::string> alerts = buildAlertLines(state.career);
     const auto storyLines = manager_advice::buildCareerStorylines(state.career, 4);
+    const auto hubLines = inbox_service::buildPriorityInboxLines(state.career, 12);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state, alerts);
@@ -275,8 +276,15 @@ GuiPageModel buildNewsModel(AppState& state) {
         model.primary.rows.push_back({type, line});
     }
 
-    for (const auto& entry : inbox_service::buildCombinedInbox(state.career, 18)) {
-        model.secondary.rows.push_back({entry.channel, entry.text});
+    for (const auto& line : hubLines) {
+        std::string channel = "Centro";
+        std::string detail = line;
+        const std::size_t separator = line.find(" | ");
+        if (separator != std::string::npos) {
+            channel = line.substr(0, separator);
+            detail = line.substr(separator + 3);
+        }
+        model.secondary.rows.push_back({channel, detail});
     }
     if (model.secondary.rows.empty()) model.secondary.rows.push_back({"Inbox", "Sin novedades recientes"});
 
@@ -288,10 +296,13 @@ GuiPageModel buildNewsModel(AppState& state) {
                             "\r\nScouting: " + std::to_string(state.career.scoutInbox.size()) +
                             "\r\nAsignaciones: " + std::to_string(state.career.scoutingAssignments.size()) +
                             "\r\nFiltro actual: " + state.currentFilter;
+    if (!hubLines.empty()) {
+        model.summary.content += "\r\nPrioridad: " + hubLines.front();
+    }
     if (!storyLines.empty()) {
         model.summary.content += "\r\nNarrativa activa: " + storyLines.front();
     }
-    model.detail.content = inbox_service::buildInboxDigest(state.career, 8) + "\r\n" +
+    model.detail.content = inbox_service::buildManagerHubDigest(state.career, 8) + "\r\n" +
                            lastMatchPanelText(state.career, 5, 8) + "\r\n" + dressingRoomPanelText(state.career, 4);
     if (!storyLines.empty()) {
         model.detail.content += "\r\n\r\nNarrativa de la semana";

@@ -2,6 +2,7 @@
 
 #ifdef _WIN32
 
+#include "engine/game_settings.h"
 #include "finance/finance_system.h"
 #include "utils/utils.h"
 
@@ -112,6 +113,9 @@ HeaderLayoutProfile buildHeaderLayout(const RECT& client) {
 
 PageLayoutProfile buildPageLayoutProfile(GuiPage page) {
     switch (page) {
+        case GuiPage::MainMenu:
+        case GuiPage::Settings:
+            return {360, 320, 52, 360, 220, 220, 160, 148, 140};
         case GuiPage::Dashboard:
             return {340, 300, 56, 348, 226, 166, 160, 148, 132};
         case GuiPage::Squad:
@@ -733,6 +737,33 @@ void showActionButtonsForPage(AppState& state) {
     }
 }
 
+void setMenuButtonsVisible(AppState& state, bool visible) {
+    const int showMode = visible ? SW_SHOW : SW_HIDE;
+    ShowWindow(state.menuPlayButton, showMode);
+    ShowWindow(state.menuSettingsButton, showMode);
+    ShowWindow(state.menuBackButton, showMode);
+    ShowWindow(state.menuVolumeButton, showMode);
+    ShowWindow(state.menuDifficultyButton, showMode);
+    ShowWindow(state.menuSimulationButton, showMode);
+}
+
+void updateFrontendMenuButtonLabels(AppState& state) {
+    if (state.menuPlayButton) setWindowTextUtf8(state.menuPlayButton, "Jugar");
+    if (state.menuSettingsButton) setWindowTextUtf8(state.menuSettingsButton, "Configuraciones");
+    if (state.menuBackButton) setWindowTextUtf8(state.menuBackButton, "Volver");
+    if (state.menuVolumeButton) {
+        setWindowTextUtf8(state.menuVolumeButton, "Volumen: " + game_settings::volumeLabel(state.settings.volume));
+    }
+    if (state.menuDifficultyButton) {
+        setWindowTextUtf8(state.menuDifficultyButton,
+                          "Dificultad: " + game_settings::difficultyLabel(state.settings.difficulty));
+    }
+    if (state.menuSimulationButton) {
+        setWindowTextUtf8(state.menuSimulationButton,
+                          "Simulacion: " + game_settings::simulationModeLabel(state.settings.simulationMode));
+    }
+}
+
 }  // namespace
 
 void rebuildFonts(AppState& state) {
@@ -783,10 +814,12 @@ void applyInterfaceFonts(AppState& state) {
     const std::array<HWND, 3> tablePanels = {state.tableList, state.squadList, state.transferList};
     for (HWND hwnd : tablePanels) setControlFont(hwnd, state.font);
 
-    const std::array<HWND, 19> buttons = {
+    const std::array<HWND, 25> buttons = {
         state.newCareerButton, state.loadButton, state.saveButton, state.simulateButton, state.validateButton, state.displayModeButton,
         state.dashboardButton, state.squadButton, state.tacticsButton, state.calendarButton, state.leagueButton,
         state.transfersButton, state.financesButton, state.youthButton, state.boardButton, state.newsButton,
+        state.menuPlayButton, state.menuSettingsButton, state.menuBackButton, state.menuVolumeButton,
+        state.menuDifficultyButton, state.menuSimulationButton,
         state.emptyNewButton, state.emptyLoadButton, state.emptyValidateButton
     };
     for (HWND hwnd : buttons) setControlFont(hwnd, state.font);
@@ -840,6 +873,113 @@ void layoutWindow(AppState& state) {
     const int tableWidth = contentWidth - summaryWidth - padding;
     const int topPanelHeight = s(pageLayout.topPanelHeight);
     const int midPanelHeight = s(pageLayout.midPanelHeight);
+    const bool frontMenuPage = isFrontMenuPage(state.currentPage);
+
+    const std::array<HWND, 5> topControls = {
+        state.divisionCombo, state.teamCombo, state.managerEdit, state.filterCombo, state.displayModeButton
+    };
+    const std::array<HWND, 5> topLabels = {
+        state.divisionLabel, state.teamLabel, state.managerLabel, state.filterLabel, state.managerHelpLabel
+    };
+    const std::array<HWND, 10> navButtons = {
+        state.dashboardButton, state.squadButton, state.tacticsButton, state.calendarButton, state.leagueButton,
+        state.transfersButton, state.financesButton, state.youthButton, state.boardButton, state.newsButton
+    };
+    const std::array<HWND, 4> headerButtons = {
+        state.newCareerButton, state.loadButton, state.saveButton, state.simulateButton
+    };
+
+    if (frontMenuPage) {
+        for (HWND hwnd : topControls) ShowWindow(hwnd, SW_HIDE);
+        for (HWND hwnd : topLabels) ShowWindow(hwnd, SW_HIDE);
+        for (HWND hwnd : navButtons) ShowWindow(hwnd, SW_HIDE);
+        for (HWND hwnd : headerButtons) ShowWindow(hwnd, SW_HIDE);
+        ShowWindow(state.validateButton, SW_HIDE);
+
+        showActionButtonsForPage(state);
+        setMenuButtonsVisible(state, true);
+        updateFrontendMenuButtonLabels(state);
+        ShowWindow(state.emptyNewButton, SW_HIDE);
+        ShowWindow(state.emptyLoadButton, SW_HIDE);
+        ShowWindow(state.emptyValidateButton, SW_HIDE);
+
+        ShowWindow(state.tableLabel, SW_HIDE);
+        ShowWindow(state.tableList, SW_HIDE);
+        ShowWindow(state.squadLabel, SW_HIDE);
+        ShowWindow(state.squadList, SW_HIDE);
+        ShowWindow(state.transferLabel, SW_HIDE);
+        ShowWindow(state.transferList, SW_HIDE);
+
+        const int shellLeft = padding + s(30);
+        const int shellTop = padding + s(26);
+        const int shellWidth = std::max(s(820), static_cast<int>(client.right - shellLeft * 2));
+        const int titleLeft = shellLeft + s(20);
+        const int titleWidth = shellWidth - s(40);
+        const int topSectionTop = shellTop + s(12);
+        const int buttonTop = shellTop + s(124);
+        const int primaryWidth = clampValue(shellWidth / 2 - s(24), s(220), s(300));
+        const int primaryGap = s(16);
+        const int panelsTop = buttonTop + s(64);
+        const int leftWidth = std::max(s(360), shellWidth * 52 / 100);
+        const int rightWidth = shellWidth - leftWidth - s(18);
+        const int summaryHeight = std::max(s(230), static_cast<int>(client.bottom - panelsTop - s(100)));
+        const int detailHeight = std::max(s(170), (summaryHeight - s(40)) / 2);
+
+        MoveWindow(state.breadcrumbLabel, titleLeft, topSectionTop, titleWidth, s(22), TRUE);
+        MoveWindow(state.pageTitleLabel, titleLeft, topSectionTop + s(28), titleWidth, s(40), TRUE);
+        MoveWindow(state.infoLabel, titleLeft, topSectionTop + s(76), titleWidth, s(24), TRUE);
+
+        MoveWindow(state.summaryLabel, shellLeft + s(16), panelsTop, leftWidth, s(kPanelLabelHeight), TRUE);
+        MoveWindow(state.summaryEdit, shellLeft + s(16), panelsTop + s(kPanelBodyOffset), leftWidth, summaryHeight, TRUE);
+        MoveWindow(state.detailLabel, shellLeft + s(34) + leftWidth, panelsTop, rightWidth, s(kPanelLabelHeight), TRUE);
+        MoveWindow(state.detailEdit, shellLeft + s(34) + leftWidth, panelsTop + s(kPanelBodyOffset), rightWidth, detailHeight, TRUE);
+        const int feedTop = panelsTop + detailHeight + s(44);
+        MoveWindow(state.newsLabel, shellLeft + s(34) + leftWidth, feedTop, rightWidth, s(kPanelLabelHeight), TRUE);
+        MoveWindow(state.newsList, shellLeft + s(34) + leftWidth, feedTop + s(kPanelBodyOffset), rightWidth, summaryHeight - detailHeight - s(18), TRUE);
+
+        if (state.currentPage == GuiPage::MainMenu) {
+            MoveWindow(state.menuPlayButton,
+                       shellLeft + s(16),
+                       buttonTop,
+                       primaryWidth,
+                       s(42),
+                       TRUE);
+            MoveWindow(state.menuSettingsButton,
+                       shellLeft + s(16) + primaryWidth + primaryGap,
+                       buttonTop,
+                       primaryWidth,
+                       s(42),
+                       TRUE);
+            ShowWindow(state.menuPlayButton, SW_SHOW);
+            ShowWindow(state.menuSettingsButton, SW_SHOW);
+            ShowWindow(state.menuBackButton, SW_HIDE);
+            ShowWindow(state.menuVolumeButton, SW_HIDE);
+            ShowWindow(state.menuDifficultyButton, SW_HIDE);
+            ShowWindow(state.menuSimulationButton, SW_HIDE);
+        } else {
+            const int settingsWidth = clampValue(shellWidth - s(32), s(400), s(760));
+            MoveWindow(state.menuVolumeButton, shellLeft + s(16), buttonTop, settingsWidth, s(38), TRUE);
+            MoveWindow(state.menuDifficultyButton, shellLeft + s(16), buttonTop + s(46), settingsWidth, s(38), TRUE);
+            MoveWindow(state.menuSimulationButton, shellLeft + s(16), buttonTop + s(92), settingsWidth, s(38), TRUE);
+            MoveWindow(state.menuBackButton, shellLeft + s(16), buttonTop + s(138), s(180), s(36), TRUE);
+            ShowWindow(state.menuPlayButton, SW_HIDE);
+            ShowWindow(state.menuSettingsButton, SW_HIDE);
+            ShowWindow(state.menuBackButton, SW_SHOW);
+            ShowWindow(state.menuVolumeButton, SW_SHOW);
+            ShowWindow(state.menuDifficultyButton, SW_SHOW);
+            ShowWindow(state.menuSimulationButton, SW_SHOW);
+        }
+
+        MoveWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20), TRUE);
+        return;
+    }
+
+    for (HWND hwnd : topControls) ShowWindow(hwnd, SW_SHOW);
+    for (HWND hwnd : topLabels) ShowWindow(hwnd, SW_SHOW);
+    for (HWND hwnd : navButtons) ShowWindow(hwnd, SW_SHOW);
+    for (HWND hwnd : headerButtons) ShowWindow(hwnd, SW_SHOW);
+    ShowWindow(state.validateButton, SW_SHOW);
+    setMenuButtonsVisible(state, false);
 
     const int primaryButtonHeight = s(kHeaderButtonHeight);
     const int buttonGap = s(10);
@@ -1057,12 +1197,22 @@ void initializeInterface(AppState& state) {
     state.simulateButton = createControl(state, 0, L"BUTTON", L"Simular", buttonStyle, 0, 0, 126, 28, state.window, IDC_SIMULATE_BUTTON);
     state.validateButton = createControl(state, 0, L"BUTTON", L"Auditar", buttonStyle, 0, 0, 92, 28, state.window, IDC_VALIDATE_BUTTON);
     state.displayModeButton = createControl(state, 0, L"BUTTON", L"Pantalla F11", buttonStyle, 0, 0, 154, 28, state.window, IDC_DISPLAY_MODE_BUTTON);
+    state.menuPlayButton = createControl(state, 0, L"BUTTON", L"Jugar", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_PLAY_BUTTON);
+    state.menuSettingsButton = createControl(state, 0, L"BUTTON", L"Configuraciones", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_SETTINGS_BUTTON);
+    state.menuBackButton = createControl(state, 0, L"BUTTON", L"Volver", buttonStyle, 0, 0, 140, 34, state.window, IDC_MENU_BACK_BUTTON);
+    state.menuVolumeButton = createControl(state, 0, L"BUTTON", L"Volumen: 70%", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_VOLUME_BUTTON);
+    state.menuDifficultyButton = createControl(state, 0, L"BUTTON", L"Dificultad: Normal", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_DIFFICULTY_BUTTON);
+    state.menuSimulationButton = createControl(state, 0, L"BUTTON", L"Simulacion: Detallado", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_SIMULATION_BUTTON);
     state.emptyNewButton = createControl(state, 0, L"BUTTON", L"Crear carrera", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_NEW_BUTTON);
     state.emptyLoadButton = createControl(state, 0, L"BUTTON", L"Abrir guardado", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_LOAD_BUTTON);
     state.emptyValidateButton = createControl(state, 0, L"BUTTON", L"Validar datos", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_VALIDATE_BUTTON);
     ShowWindow(state.emptyNewButton, SW_HIDE);
     ShowWindow(state.emptyLoadButton, SW_HIDE);
     ShowWindow(state.emptyValidateButton, SW_HIDE);
+    ShowWindow(state.menuBackButton, SW_HIDE);
+    ShowWindow(state.menuVolumeButton, SW_HIDE);
+    ShowWindow(state.menuDifficultyButton, SW_HIDE);
+    ShowWindow(state.menuSimulationButton, SW_HIDE);
 
     state.dashboardButton = createControl(state, 0, L"BUTTON", L"Inicio", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_DASHBOARD_BUTTON);
     state.squadButton = createControl(state, 0, L"BUTTON", L"Plantilla", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_SQUAD_BUTTON);
@@ -1124,10 +1274,10 @@ void initializeInterface(AppState& state) {
     state.career.initializeLeague();
     fillDivisionCombo(state, state.gameSetup.division);
     fillTeamCombo(state, state.gameSetup.division, state.gameSetup.club);
-    setCurrentPage(state, GuiPage::Dashboard);
+    setCurrentPage(state, GuiPage::MainMenu);
     layoutWindow(state);
     refreshAll(state);
-    setStatus(state, "GUI lista. Usa el boton o F11 para recorrer ventana, maximizado y fullscreen.");
+    setStatus(state, "Menu principal listo. Entra a Jugar o abre Configuraciones.");
 }
 
 void paintWindowChrome(AppState& state, HDC hdc) {
@@ -1137,6 +1287,24 @@ void paintWindowChrome(AppState& state, HDC hdc) {
     const HeaderLayoutProfile header = buildHeaderLayout(client);
     FillRect(hdc, &client, state.backgroundBrush ? state.backgroundBrush : static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
     state.insightHotspots.clear();
+
+    if (isFrontMenuPage(state.currentPage)) {
+        RECT hero{ s(18), s(18), client.right - s(18), client.bottom - s(44) };
+        drawRoundedPanel(hdc, hero, RGB(9, 22, 30), RGB(36, 62, 76), s(28));
+
+        RECT titleBand{hero.left + s(14), hero.top + s(14), hero.right - s(14), hero.top + s(118)};
+        drawRoundedPanel(hdc, titleBand, RGB(11, 28, 37), RGB(44, 76, 94), s(20));
+
+        RECT summaryCard = expandedRect(childRectOnParent(state.summaryEdit, state.window), s(8), s(24));
+        RECT detailCard = expandedRect(childRectOnParent(state.detailEdit, state.window), s(8), s(24));
+        RECT newsCard = expandedRect(childRectOnParent(state.newsList, state.window), s(8), s(24));
+        RECT statusCard = expandedRect(childRectOnParent(state.statusLabel, state.window), s(6), s(8));
+        if (IsWindowVisible(state.summaryEdit)) drawRoundedPanel(hdc, summaryCard, kThemePanel, RGB(40, 64, 79), s(18));
+        if (IsWindowVisible(state.detailEdit)) drawRoundedPanel(hdc, detailCard, RGB(15, 27, 37), RGB(44, 72, 90), s(18));
+        if (IsWindowVisible(state.newsList)) drawRoundedPanel(hdc, newsCard, RGB(15, 27, 37), RGB(44, 72, 90), s(18));
+        drawRoundedPanel(hdc, statusCard, RGB(11, 23, 31), RGB(39, 65, 79), s(12));
+        return;
+    }
 
     RECT topBar{0, 0, client.right, s(header.topBarHeight) - s(10)};
     FillRect(hdc, &topBar, state.headerBrush ? state.headerBrush : state.backgroundBrush);

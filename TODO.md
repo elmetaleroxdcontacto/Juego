@@ -3253,3 +3253,167 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Llevar la misma checklist guiada a un modal o wizard opcional para usuarios nuevos que prefieran creacion paso a paso fuera del dashboard principal.
 - Anadir mensajes contextuales mas ricos por division y club, por ejemplo objetivo deportivo, presupuesto esperado y nivel de presion antes de crear la carrera.
 - Hacer que el dashboard de setup recuerde la ultima division explorada entre sesiones, sin autoarrancar la carrera hasta que la checklist vuelva a quedar valida.
+
+## Auditoria del proyecto (2026-03-26 10:22:05 -03:00) - hub del manager, staff semanal, partido mas contextual y README alineado
+
+### Cambios realizados
+
+- Se profundizo la capa tipo Football Manager con una `mesa de staff` real: ahora el juego genera recomendaciones semanales priorizadas del asistente, preparador, medico, scouting, juveniles, analista y direccion deportiva.
+- Se creo un `hub del manager` que mezcla prioridades de staff, agenda del DT, pulso de mercado e inbox combinado para que el dashboard y la vista de noticias muestren decisiones utiles y no solo texto suelto.
+- La simulacion semanal ahora despacha briefing del staff al inbox y a noticias, conectando clima de vestuario, estado fisico, contratos, scouting y directiva con el flujo real de la carrera.
+- El motor de mercado gano mas profundidad en scouting y negociacion: la IA ya considera cobertura de asignaciones, encaje con el proyecto, identidad del club y clima interno al valorar objetivos y cerrar traspasos.
+- El motor de partido quedo mas coherente con la instruccion elegida: `Por bandas`, `Laterales altos`, `Balon parado`, `Juego directo`, `Pausar juego`, `Bloque bajo`, `Contra-presion` y `Presion final` afectan mejor posesion, intensidad, riesgo y tipo de ocasiones.
+- La generacion de eventos del partido ahora describe mejor el patron de ataque y potencia jugadas coherentes con la instruccion, especialmente ataques por fuera, cargas de laterales y acciones de balon parado.
+- La GUI del dashboard y noticias ahora expone el `Centro del manager` y el digest del staff para que esas capas se vean al ejecutar el juego, no solo en codigo.
+- Se ampliaron los tests automaticos para cubrir el hub del manager y el efecto real de instrucciones de partido sobre el perfil de ocasiones.
+- Se rehizo `README.md` para dejarlo alineado con el estado real del proyecto, la arquitectura actual, la GUI Win32 y las mecanicas profundas ya integradas.
+
+### Archivos modificados
+
+- `README.md`
+- `include/career/inbox_service.h`
+- `include/career/staff_service.h`
+- `src/ai/ai_transfer_manager.cpp`
+- `src/career/app_services.cpp`
+- `src/career/inbox_service.cpp`
+- `src/career/manager_advice.cpp`
+- `src/career/staff_service.cpp`
+- `src/career/transfer_briefing.cpp`
+- `src/career/week_simulation.cpp`
+- `src/gui/gui_view_management.cpp`
+- `src/gui/gui_view_overview.cpp`
+- `src/simulation/match_event_generator.cpp`
+- `src/simulation/match_phase.cpp`
+- `src/transfers/negotiation_system.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe` compilaron correctamente.
+- La suite automatizada termino con `All tests passed`.
+
+### Mejoras futuras sugeridas
+
+- Llevar el hub del manager a una vista propia con bandejas separadas para staff, scouting, directiva, prensa y mercado.
+- Profundizar las negociaciones con promesas especificas por rol, minutos, competicion y clausulas de salida.
+- Seguir enriqueciendo el motor de partido con patrones por zona, ajustes del rival durante el encuentro y mas detalle en balon parado.
+
+## Auditoria del proyecto (2026-03-26 10:47:27 -03:00) - menu principal Chilean Footballito y configuraciones integradas
+
+### Cambios realizados
+
+- Se agrego un menu principal completo y funcional con el titulo `Chilean Footballito`, visible antes de entrar al flujo normal del juego.
+- En consola ahora existe un frontend real de arranque con dos opciones principales: `Jugar` y `Configuraciones`, mas salida limpia del juego.
+- `Jugar` abre el flujo normal ya existente del proyecto sin romper el menu de carrera, juego rapido, copa ni validacion.
+- `Configuraciones` permite ajustar opciones base desde el frontend: `Volumen`, `Dificultad` y `Modo de simulacion`.
+- Se creo una capa compartida de configuracion con `GameSettings`, etiquetas, helpers de ciclo y aplicacion basica de dificultad para evitar logica duplicada entre consola y GUI.
+- La dificultad ya tiene efecto inicial real: al crear carrera modifica un poco el contexto de arranque del proyecto, y en juego rapido ajusta el contexto del partido.
+- El modo de simulacion ahora se integra al flujo actual: en consola controla si el partido rapido va en modo detallado o rapido, y en GUI informa el estilo de simulacion activo al lanzar la semana.
+- En la GUI Win32 se integro un menu de inicio propio dentro del runtime actual, no como ventana aparte: arranca en `Menu principal`, muestra `Chilean Footballito`, y desde ahi deja entrar a `Jugar` o `Configuraciones`.
+- La pantalla de configuraciones de GUI reutiliza el mismo estado compartido y permite ciclar volumen, dificultad y modo de simulacion sin salir del frontend.
+- Se cambio el titulo de la consola Windows a `Chilean Footballito` y el titulo de la ventana GUI tambien se actualizo para mantener consistencia.
+- Se ampliaron los tests para cubrir el ciclo de settings y el impacto base de dificultad.
+
+### Archivos modificados
+
+- `CMakeLists.txt`
+- `include/engine/front_menu.h`
+- `include/engine/game_controller.h`
+- `include/engine/game_settings.h`
+- `include/gui/gui.h`
+- `include/gui/gui_internal.h`
+- `include/gui/gui_view_builders.h`
+- `src/engine/front_menu.cpp`
+- `src/engine/game_controller.cpp`
+- `src/engine/game_settings.cpp`
+- `src/gui/gui.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+- `src/gui/gui_view_common.cpp`
+- `src/gui/gui_view_menu.cpp`
+- `src/gui/gui_views.cpp`
+- `src/main.cpp`
+- `src/ui/ui.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe` compilaron correctamente con el nuevo frontend de menu.
+- La suite automatizada termino con `All tests passed`.
+
+### Mejoras futuras sugeridas
+
+- Persistir `GameSettings` en disco para que volumen, dificultad y modo de simulacion sobrevivan entre sesiones.
+- Expandir el frontend inicial con opciones extra como `Continuar`, `Cargar guardado` y `Salir al escritorio` directamente desde la GUI.
+- Llevar el menu de configuraciones a una capa de opciones mas amplia con accesibilidad, idioma, velocidad de texto y preferencias visuales.
+
+## Auditoria del proyecto (2026-03-26 10:56:36 -03:00) - publicacion de cambios en GitHub
+
+### Cambios realizados
+
+- Se preparo la entrega completa para publicacion en GitHub con todos los cambios profundos acumulados en simulacion, manager hub, scouting, GUI y menu principal.
+- La entrega incluye el nuevo frontend `Chilean Footballito`, las configuraciones base compartidas entre consola y GUI, y la integracion del menu antes del flujo normal del juego.
+- Tambien quedan incluidos los cambios previos de profundidad tipo Football Manager: mesa de staff, centro del manager, mejoras de scouting/negociacion y mayor peso de instrucciones de partido.
+- Se dejo registrada esta publicacion dentro de `TODO.md` para mantener el historial append-only del proyecto.
+
+### Archivos modificados
+
+- `CMakeLists.txt`
+- `README.md`
+- `TODO.md`
+- `include/career/inbox_service.h`
+- `include/career/staff_service.h`
+- `include/engine/front_menu.h`
+- `include/engine/game_controller.h`
+- `include/engine/game_settings.h`
+- `include/gui/gui.h`
+- `include/gui/gui_internal.h`
+- `include/gui/gui_view_builders.h`
+- `src/ai/ai_transfer_manager.cpp`
+- `src/career/app_services.cpp`
+- `src/career/inbox_service.cpp`
+- `src/career/manager_advice.cpp`
+- `src/career/staff_service.cpp`
+- `src/career/transfer_briefing.cpp`
+- `src/career/week_simulation.cpp`
+- `src/engine/front_menu.cpp`
+- `src/engine/game_controller.cpp`
+- `src/engine/game_settings.cpp`
+- `src/gui/gui.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+- `src/gui/gui_view_common.cpp`
+- `src/gui/gui_view_management.cpp`
+- `src/gui/gui_view_menu.cpp`
+- `src/gui/gui_view_overview.cpp`
+- `src/gui/gui_views.cpp`
+- `src/main.cpp`
+- `src/simulation/match_event_generator.cpp`
+- `src/simulation/match_phase.cpp`
+- `src/transfers/negotiation_system.cpp`
+- `src/ui/ui.cpp`
+- `tests/project_tests.cpp`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- Los binarios `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe` compilaron correctamente.
+- La suite automatizada termino con `All tests passed`.
+
+### Mejoras futuras sugeridas
+
+- Crear notas de version o `CHANGELOG` para resumir entregas grandes de forma mas visible en el repositorio.
+- Persistir configuraciones del frontend entre sesiones y conectarlas a guardado/carga.
+- Seguir empujando el parecido a Football Manager con mas narrativa semanal, staff avanzado y ajustes del rival en vivo.

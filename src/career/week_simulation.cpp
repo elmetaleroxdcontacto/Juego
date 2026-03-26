@@ -9,6 +9,7 @@
 #include "career/season_transition.h"
 #include "career/career_support.h"
 #include "career/player_development.h"
+#include "career/staff_service.h"
 #include "career/team_management.h"
 #include "career/world_state_service.h"
 #include "competition.h"
@@ -445,6 +446,26 @@ void updateShortlistAlerts(Career& career) {
         }
     }
     career.scoutingShortlist = active;
+}
+
+void dispatchWeeklyStaffBriefing(Career& career) {
+    if (!career.myTeam) return;
+    const auto recommendations = staff_service::buildStaffRecommendations(career, 4);
+    if (recommendations.empty()) return;
+
+    for (size_t i = 0; i < recommendations.size() && i < 2; ++i) {
+        const auto& recommendation = recommendations[i];
+        career.addInboxItem(recommendation.staffRole + " | " + recommendation.severity + " | " +
+                                recommendation.summary + " | Accion: " + recommendation.suggestedAction,
+                            "Staff");
+    }
+
+    const auto& headline = recommendations.front();
+    if (headline.urgency >= 48) {
+        career.addNews("Mesa del staff: " + headline.staffRole + " avisa que " + headline.summary +
+                       " Accion sugerida: " + headline.suggestedAction);
+    }
+    emitUiMessage("[Staff] " + headline.staffRole + " | " + headline.summary);
 }
 
 const Player* leadingForward(const Team& team) {
@@ -1074,6 +1095,7 @@ void simulateCareerWeek(Career& career) {
     career.updateBoardConfidence();
     updateManagerReputation(career);
     if (career.myTeam) ensureTeamIdentity(*career.myTeam);
+    dispatchWeeklyStaffBriefing(career);
     weeklyDashboard(career);
     applyClubEvent(career);
 

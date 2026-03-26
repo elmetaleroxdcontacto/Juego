@@ -13,6 +13,12 @@ GuiPageModel buildModel(AppState& state);
 namespace {
 
 std::string friendlyPanelTitle(const std::string& title) {
+    if (title == "FrontMenuWelcome") return "Menu principal";
+    if (title == "FrontMenuConfig") return "Configuracion activa";
+    if (title == "FrontMenuActions") return "Acciones";
+    if (title == "SettingsOverview") return "Ajustes base";
+    if (title == "SettingsImpact") return "Impacto";
+    if (title == "SettingsChecklist") return "Resumen";
     if (title == "DashboardPanel") return "Centro del club";
     if (title == "LeagueTableView") return "Clasificacion";
     if (title == "MatchSummaryPanel") return "Proximo encuentro";
@@ -72,6 +78,9 @@ std::string friendlyPanelTitle(const std::string& title) {
 
 std::vector<std::string> filterOptionsForPage(GuiPage page) {
     switch (page) {
+        case GuiPage::MainMenu:
+        case GuiPage::Settings:
+            return {};
         case GuiPage::Dashboard: return {"Todo", "Alertas", "Lesiones", "Contratos"};
         case GuiPage::Squad: return {"Todos", "XI", "ARQ", "DEF", "MED", "DEL", "Lesionados"};
         case GuiPage::Tactics: return {"Balanceado", "Presion alta", "Bloque bajo"};
@@ -154,6 +163,14 @@ bool hasAvailableTeams(const AppState& state, const std::string& divisionId) {
         return team.division == divisionId;
     });
 }
+
+}  // namespace
+
+bool isFrontMenuPage(GuiPage page) {
+    return page == GuiPage::MainMenu || page == GuiPage::Settings;
+}
+
+namespace {
 
 void syncSetupButtonsAndHints(AppState& state) {
     const bool hasCareer = state.career.myTeam != nullptr;
@@ -305,6 +322,7 @@ void refreshCurrentPage(AppState& state) {
     state.currentModel = buildModel(state);
     state.insightHotspots.clear();
     bool dashboardEmptyState = state.currentPage == GuiPage::Dashboard && !state.career.myTeam;
+    const bool frontMenuPage = isFrontMenuPage(state.currentPage);
 
     setWindowTextUtf8(state.pageTitleLabel, state.currentModel.title);
     setWindowTextUtf8(state.breadcrumbLabel, state.currentModel.breadcrumb);
@@ -336,13 +354,13 @@ void refreshCurrentPage(AppState& state) {
     renderListPanel(state.transferLabel, state.transferList, state.currentModel.footer);
     renderFeed(state.newsList, state.currentModel.feed.lines);
 
-    bool showTable = state.currentPage != GuiPage::Tactics && !dashboardEmptyState;
+    bool showTable = !frontMenuPage && state.currentPage != GuiPage::Tactics && !dashboardEmptyState;
     bool showTableLabel = showTable;
-    bool showSquad = !dashboardEmptyState;
+    bool showSquad = !frontMenuPage && !dashboardEmptyState;
     bool showSquadLabel = showSquad;
-    bool showFooter = !dashboardEmptyState;
+    bool showFooter = !frontMenuPage && !dashboardEmptyState;
     bool showFooterLabel = showFooter;
-    bool showFilter = !dashboardEmptyState;
+    bool showFilter = !frontMenuPage && !dashboardEmptyState;
     ShowWindow(state.tableList, showTable ? SW_SHOW : SW_HIDE);
     ShowWindow(state.tableLabel, showTableLabel ? SW_SHOW : SW_HIDE);
     ShowWindow(state.squadList, showSquad ? SW_SHOW : SW_HIDE);

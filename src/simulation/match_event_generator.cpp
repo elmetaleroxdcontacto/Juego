@@ -34,6 +34,41 @@ void removeActivePlayer(vector<int>& activeXI, int playerIndex) {
     activeXI.erase(remove(activeXI.begin(), activeXI.end(), playerIndex), activeXI.end());
 }
 
+string progressionDescription(const Team& team, bool directTransition) {
+    if (team.matchInstruction == "Por bandas") return team.name + " cambia de ritmo y rompe por fuera";
+    if (team.matchInstruction == "Laterales altos") return team.name + " empuja con los laterales y gana altura";
+    if (team.matchInstruction == "Balon parado") return team.name + " fuerza una accion de pelota quieta";
+    if (team.matchInstruction == "Pausar juego") return team.name + " cocina la jugada con paciencia";
+    return directTransition ? team.name + " gana metros con una ruptura directa"
+                            : team.name + " progresa entre lineas";
+}
+
+string buildUpDescription(const Team& team, bool directTransition) {
+    if (team.matchInstruction == "Por bandas") return team.name + " ensancha el campo y busca el centro";
+    if (team.matchInstruction == "Laterales altos") return team.name + " carga el area con sus laterales";
+    if (team.matchInstruction == "Balon parado") return team.name + " inclina el juego para forzar una falta lateral";
+    if (team.matchInstruction == "Pausar juego") return team.name + " pausa y vuelve a circular en campo rival";
+    return directTransition ? team.name + " acelera la transicion"
+                            : team.name + " madura el ataque en campo rival";
+}
+
+double instructionSetPieceBoost(const Team& team, const TeamMatchSnapshot& snapshot) {
+    double boost = snapshot.setPieceThreat / 420.0;
+    if (team.matchInstruction == "Balon parado") boost += 0.11;
+    if (team.matchInstruction == "Laterales altos" || team.matchInstruction == "Por bandas") boost += 0.04;
+    if (team.matchInstruction == "Pausar juego") boost -= 0.02;
+    return clampValue(boost, 0.02, 0.34);
+}
+
+double instructionBigChanceBoost(const Team& team, const TeamMatchSnapshot& snapshot) {
+    double boost = 0.0;
+    if (team.matchInstruction == "Juego directo") boost += 0.06 + snapshot.tacticalProfile.directness * 0.04;
+    if (team.matchInstruction == "Por bandas") boost += 0.04 + snapshot.tacticalProfile.width * 0.03;
+    if (team.matchInstruction == "Laterales altos") boost += 0.03;
+    if (team.matchInstruction == "Pausar juego") boost -= 0.03;
+    return clampValue(boost, -0.04, 0.16);
+}
+
 bool replaceInjuredPlayer(Team& team,
                           vector<int>& activeXI,
                           vector<int>& participants,
@@ -102,6 +137,8 @@ void playPhaseSequences(Team& attacking,
                                                      defendingSnapshot.pressingLoad / 420.0 +
                                                      defensiveRisk * 0.08,
                                                  0.16, 0.82);
+    const double setPieceBoost = instructionSetPieceBoost(attacking, attackingSnapshot);
+    const double bigChanceBoost = instructionBigChanceBoost(attacking, attackingSnapshot);
     const double baseChanceReachProbability = clampValue(
         0.08 + static_cast<double>(chanceCount + 1) / static_cast<double>(max(1, attackCount + 3)) +
             attackingEdge * 0.0025 + transitionThreat * 0.10 + defensiveRisk * 0.08 + attackingSecurity * 0.03 +
@@ -121,8 +158,7 @@ void playPhaseSequences(Team& attacking,
             progression.minute = max(minuteStart, minute - 2);
             progression.teamName = attacking.name;
             progression.type = MatchEventType::Progression;
-            progression.description = directTransition ? attacking.name + " gana metros con una ruptura directa"
-                                                       : attacking.name + " progresa entre lineas";
+            progression.description = progressionDescription(attacking, directTransition);
             match_stats::pushEvent(timeline, stats, progression);
         }
 
@@ -130,8 +166,7 @@ void playPhaseSequences(Team& attacking,
         buildUp.minute = max(minuteStart, minute - 1);
         buildUp.teamName = attacking.name;
         buildUp.type = directTransition ? MatchEventType::Counterattack : MatchEventType::AttackBuildUp;
-        buildUp.description = directTransition ? attacking.name + " acelera la transicion"
-                                               : attacking.name + " madura el ataque en campo rival";
+        buildUp.description = buildUpDescription(attacking, directTransition);
         match_stats::pushEvent(timeline, stats, buildUp);
 
         if (rand01() > sequenceChanceReachProbability) {
@@ -154,6 +189,7 @@ void playPhaseSequences(Team& attacking,
             const double setPieceFollowUp =
                 clampValue(0.04 + attackingSnapshot.setPieceThreat / 260.0 +
                                max(0.0, attackingEdge) * 0.003 +
+                               setPieceBoost +
                                (interruption.type == MatchEventType::Foul ? 0.06 : 0.0),
                            0.04,
                            0.26);
@@ -162,7 +198,9 @@ void playPhaseSequences(Team& attacking,
                 setPiece.minute = clampInt(minute + 1, minuteStart, minuteEnd);
                 setPiece.teamName = attacking.name;
                 setPiece.type = MatchEventType::Corner;
-                setPiece.description = attacking.name + " aprovecha la accion para cargar el area a balon parado";
+                setPiece.description = attacking.matchInstruction == "Balon parado"
+                                           ? attacking.name + " activa una rutina preparada a balon parado"
+                                           : attacking.name + " aprovecha la accion para cargar el area a balon parado";
                 if (attackingIsHome) setPiece.impact.homeCornersDelta = 1;
                 else setPiece.impact.awayCornersDelta = 1;
                 match_stats::pushEvent(timeline, stats, setPiece);
@@ -173,6 +211,7 @@ void playPhaseSequences(Team& attacking,
                 setPieceInput.attackingTeamIsHome = attackingIsHome;
                 setPieceInput.chanceQuality =
                     clampValue(0.07 + attackingSnapshot.setPieceThreat / 520.0 +
+                                   setPieceBoost * 0.45 +
                                    attackingSnapshot.finishingQuality / 780.0 -
                                    defendingSnapshot.goalkeeperPower / 1200.0,
                                0.06,
@@ -207,7 +246,7 @@ void playPhaseSequences(Team& attacking,
 
         const bool bigChance =
             rand01() <= clampValue(0.10 + max(0.0, attackingEdge) * 0.018 + transitionThreat * 0.12 -
-                                       defensiveRisk * 0.05,
+                                       defensiveRisk * 0.05 + bigChanceBoost,
                                    0.10, 0.42);
 
         ChanceResolutionInput input;
@@ -217,6 +256,7 @@ void playPhaseSequences(Team& attacking,
         input.chanceQuality = clampValue(0.06 + attackingEdge * 0.010 + bigChance * 0.18 +
                                              transitionThreat * 0.12 -
                                              tactics_engine::defensiveSecurityWeight(defendingSnapshot.tacticalProfile) * 0.05 +
+                                             bigChanceBoost * 0.22 +
                                              attackingSnapshot.finishingQuality / 500.0 -
                                              defendingSnapshot.goalkeeperPower / 950.0,
                                          0.05, 0.52);
