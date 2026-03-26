@@ -1,6 +1,7 @@
 #include "engine/models.h"
 
 #include "competition/competition.h"
+#include "competition/league_registry.h"
 #include "io/io.h"
 #include "utils/utils.h"
 #include "validators/validators.h"
@@ -208,8 +209,9 @@ void Career::initializeLeague(bool forceReload) {
 
 vector<Team*> Career::getDivisionTeams(const string& id) {
     vector<Team*> out;
+    const string canonicalId = canonicalDivisionId(id);
     for (auto& team : allTeams) {
-        if (team.division == id) out.push_back(&team);
+        if (canonicalDivisionId(team.division) == canonicalId) out.push_back(&team);
     }
     return out;
 }
@@ -245,11 +247,11 @@ void Career::buildSchedule() {
 }
 
 void Career::setActiveDivision(const string& id) {
-    activeDivision = id;
-    activeTeams = getDivisionTeams(id);
+    activeDivision = canonicalDivisionId(id);
+    activeTeams = getDivisionTeams(activeDivision);
     leagueTable.clear();
-    leagueTable.title = divisionDisplay(id);
-    leagueTable.ruleId = id;
+    leagueTable.title = divisionDisplay(activeDivision);
+    leagueTable.ruleId = activeDivision;
     for (Team* team : activeTeams) leagueTable.addTeam(team);
     leagueTable.sortTable();
     groupNorthIdx.clear();

@@ -235,10 +235,31 @@ void executeInsightAction(AppState& state, InsightAction action) {
 
 std::vector<HWND> activeFrontMenuButtons(const AppState& state) {
     if (state.currentPage == GuiPage::MainMenu) {
-        return {state.menuPlayButton, state.menuSettingsButton};
+        return {
+            state.menuContinueButton,
+            state.menuPlayButton,
+            state.menuLoadButton,
+            state.menuSettingsButton,
+            state.menuCreditsButton,
+            state.menuExitButton
+        };
     }
     if (state.currentPage == GuiPage::Settings) {
-        return {state.menuVolumeButton, state.menuDifficultyButton, state.menuSpeedButton, state.menuSimulationButton, state.menuBackButton};
+        return {
+            state.menuVolumeButton,
+            state.menuDifficultyButton,
+            state.menuSpeedButton,
+            state.menuSimulationButton,
+            state.menuLanguageButton,
+            state.menuTextSpeedButton,
+            state.menuVisualButton,
+            state.menuMusicModeButton,
+            state.menuAudioFadeButton,
+            state.menuBackButton
+        };
+    }
+    if (state.currentPage == GuiPage::Credits) {
+        return {state.menuBackButton};
     }
     return {};
 }
@@ -300,33 +321,65 @@ bool handleFrontMenuKey(AppState& state, WPARAM key) {
         case VK_RETURN:
         case VK_SPACE:
             return clickFrontMenuButton(GetFocus());
+        case 'T':
+            return state.currentPage == GuiPage::MainMenu && clickFrontMenuButton(state.menuContinueButton);
         case 'J':
             return state.currentPage == GuiPage::MainMenu && clickFrontMenuButton(state.menuPlayButton);
         case 'C':
             return state.currentPage == GuiPage::MainMenu && clickFrontMenuButton(state.menuSettingsButton);
+        case 'L':
+            return state.currentPage == GuiPage::MainMenu && clickFrontMenuButton(state.menuLoadButton);
+        case 'R':
+            return state.currentPage == GuiPage::MainMenu && clickFrontMenuButton(state.menuCreditsButton);
+        case 'X':
+            return state.currentPage == GuiPage::MainMenu && clickFrontMenuButton(state.menuExitButton);
         case 'D':
             return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuDifficultyButton);
-        case 'R':
+        case 'S':
             return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuSpeedButton);
         case 'M':
             return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuSimulationButton);
         case 'V':
             return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuVolumeButton);
+        case 'I':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuLanguageButton);
+        case 'P':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuVisualButton);
+        case 'U':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuMusicModeButton);
+        case 'F':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuAudioFadeButton);
         case 'B':
         case VK_ESCAPE:
-            if (state.currentPage == GuiPage::Settings) return clickFrontMenuButton(state.menuBackButton);
+            if (state.currentPage == GuiPage::Settings || state.currentPage == GuiPage::Credits) {
+                return clickFrontMenuButton(state.menuBackButton);
+            }
             return false;
         case '1':
-            if (state.currentPage == GuiPage::MainMenu) return clickFrontMenuButton(state.menuPlayButton);
+            if (state.currentPage == GuiPage::MainMenu) return clickFrontMenuButton(state.menuContinueButton);
             return clickFrontMenuButton(state.menuVolumeButton);
         case '2':
-            if (state.currentPage == GuiPage::MainMenu) return clickFrontMenuButton(state.menuSettingsButton);
+            if (state.currentPage == GuiPage::MainMenu) return clickFrontMenuButton(state.menuPlayButton);
             return clickFrontMenuButton(state.menuDifficultyButton);
         case '3':
+            if (state.currentPage == GuiPage::MainMenu) return clickFrontMenuButton(state.menuLoadButton);
             return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuSpeedButton);
         case '4':
+            if (state.currentPage == GuiPage::MainMenu) return clickFrontMenuButton(state.menuSettingsButton);
             return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuSimulationButton);
         case '5':
+            if (state.currentPage == GuiPage::MainMenu) return clickFrontMenuButton(state.menuCreditsButton);
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuLanguageButton);
+        case '6':
+            if (state.currentPage == GuiPage::MainMenu) return clickFrontMenuButton(state.menuExitButton);
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuTextSpeedButton);
+        case '7':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuVisualButton);
+        case '8':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuMusicModeButton);
+        case '9':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuAudioFadeButton);
+        case '0':
             return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuBackButton);
         default:
             return false;
@@ -544,12 +597,24 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 case IDC_DISPLAY_MODE_BUTTON:
                     cycleDisplayMode(*state);
                     return 0;
+                case IDC_MENU_CONTINUE_BUTTON:
+                    continueCareer(*state);
+                    return 0;
                 case IDC_MENU_PLAY_BUTTON:
-                    setCurrentPage(*state, GuiPage::Dashboard);
+                    queuePageTransition(*state, GuiPage::Dashboard);
                     setStatus(*state, "Flujo principal abierto. Ya puedes crear o cargar una carrera.");
                     return 0;
                 case IDC_MENU_SETTINGS_BUTTON:
                     openSettingsMenu(*state);
+                    return 0;
+                case IDC_MENU_LOAD_BUTTON:
+                    loadCareer(*state);
+                    return 0;
+                case IDC_MENU_CREDITS_BUTTON:
+                    openCreditsPage(*state);
+                    return 0;
+                case IDC_MENU_EXIT_BUTTON:
+                    DestroyWindow(state->window);
                     return 0;
                 case IDC_MENU_BACK_BUTTON:
                     openFrontendMenu(*state);
@@ -565,6 +630,21 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                     return 0;
                 case IDC_MENU_SIMULATION_BUTTON:
                     cycleFrontendSimulationMode(*state);
+                    return 0;
+                case IDC_MENU_LANGUAGE_BUTTON:
+                    cycleFrontendLanguage(*state);
+                    return 0;
+                case IDC_MENU_TEXT_SPEED_BUTTON:
+                    cycleFrontendTextSpeed(*state);
+                    return 0;
+                case IDC_MENU_VISUAL_BUTTON:
+                    cycleFrontendVisualProfile(*state);
+                    return 0;
+                case IDC_MENU_MUSICMODE_BUTTON:
+                    cycleFrontendMenuMusicMode(*state);
+                    return 0;
+                case IDC_MENU_AUDIOFADE_BUTTON:
+                    toggleFrontendAudioFade(*state);
                     return 0;
                 case IDC_EMPTY_NEW_BUTTON:
                     startNewCareer(*state);
@@ -630,9 +710,16 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                     break;
             }
             break;
+        case kGuiPageTransitionMessage:
+            if (state) {
+                state->pageChangeQueued = false;
+                setCurrentPage(*state, static_cast<GuiPage>(static_cast<int>(wParam)));
+                return 0;
+            }
+            break;
         case WM_KEYDOWN:
             if (state && isFrontMenuPage(state->currentPage) && wParam == VK_ESCAPE) {
-                if (state->currentPage == GuiPage::Settings) {
+                if (state->currentPage == GuiPage::Settings || state->currentPage == GuiPage::Credits) {
                     openFrontendMenu(*state);
                     return 0;
                 }
@@ -680,7 +767,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
 
 }  // namespace gui_win32
 
-int runGuiApp(const GameSettings& settings) {
+int runGuiApp(GameSettings& settings) {
     gui_win32::enableHighDpiSupport();
 
     INITCOMMONCONTROLSEX controls{};
@@ -735,12 +822,13 @@ int runGuiApp(const GameSettings& settings) {
         DispatchMessageW(&msg);
     }
 
+    settings = state.settings;
     return static_cast<int>(msg.wParam);
 }
 
 #else
 
-int runGuiApp(const GameSettings&) {
+int runGuiApp(GameSettings&) {
     return 1;
 }
 

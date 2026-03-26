@@ -76,6 +76,7 @@ std::vector<TransferPreviewItem> buildTransferTargets(const Career& career, cons
 GuiPageModel buildDashboardModel(AppState& state);
 GuiPageModel buildMainMenuModel(AppState& state);
 GuiPageModel buildSettingsPageModel(AppState& state);
+GuiPageModel buildCreditsPageModel(AppState& state);
 GuiPageModel buildSquadModel(AppState& state, bool youthOnly);
 GuiPageModel buildTacticsModel(AppState& state);
 GuiPageModel buildCalendarModel(AppState& state);

@@ -11,10 +11,15 @@ public:
 
 private:
     void showLoadWarnings() const;
+    void loadPersistedSettings();
+    void savePersistedSettings() const;
     int runConsoleApp();
     void runConsoleGameHub();
     void runCareerMode();
+    void runCareerLoop();
     void runQuickGame();
+    bool loadCareerForResume(bool forceReloadFromDisk);
+    bool createNewCareerFromConsole();
     void pauseForContinue() const;
 
     GameEngine engine_;

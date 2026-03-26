@@ -1,10 +1,10 @@
-# Football Manager Chile Simulator
+# Chilean Footballito
 
 Simulador de gestion futbolistica en C++ inspirado en la profundidad de juegos tipo Football Manager, con foco en carrera, scouting, vestuario, mercado y motor de partido.
 
 El proyecto ya es jugable y hoy combina tres capas que trabajan juntas:
 
-- frontend inicial `Chilean Footballito` con menu principal y configuraciones compartidas
+- frontend inicial `Chilean Footballito` con portada, `Continuar`, `Jugar`, `Cargar guardado`, `Creditos` y configuraciones compartidas
 - simulacion de partidos con fases, contexto tactico, xG, riesgo y fatiga
 - modo carrera con directiva, finanzas, scouting, contratos, cantera y staff
 - GUI Win32 para jugar sin consola, mas una CLI para validacion y depuracion
@@ -41,13 +41,15 @@ El proyecto ya es jugable y hoy combina tres capas que trabajan juntas:
 ### GUI Win32
 
 - menu de inicio con presentacion tipo dashboard y `Chilean Footballito` como portada central
-- portada Win32 con `Jugar`, `Configuraciones`, chips de estado y roadmap visual para futuras opciones
-- reproduccion del tema versionado `Los Miserables - El Crack  Video Oficial (HD Remastered).mp3` mientras la portada principal esta activa
+- portada Win32 con `Continuar`, `Jugar`, `Cargar guardado`, `Configuraciones`, `Creditos` y `Salir`
+- configuraciones persistentes entre sesiones para volumen, dificultad, velocidad, idioma, texto, perfil visual y musica del frontend
+- reproduccion del tema versionado `assets/audio/Los Miserables - El Crack  Video Oficial (HD Remastered).mp3` mientras la portada principal o el frontend activo lo permiten
 - `FootballManager.exe` sin consola innecesaria
 - arranque maximizado con soporte DPI
 - boton y `F11` para alternar ventana, maximizado y fullscreen sin borde
 - dashboard owner-draw con KPIs e insights clicables
 - tablas con autosize por vista y suavizado entre refrescos
+- cambio de pagina diferido con cache basica para vistas pesadas como `Fichajes`, `Finanzas` y `Noticias`
 
 ## Ejecutables
 
@@ -91,6 +93,18 @@ $env:FM_SKIP_RUN='1'
 cmd /c build.bat
 ```
 
+### Flags utiles de `build.bat`
+
+```powershell
+build.bat --gui
+build.bat --cli
+build.bat --tests --run-tests
+build.bat --all --run-tests
+build.bat --validate
+```
+
+El script ahora informa si uso la ruta CMake o la fallback, que targets compilo y donde quedaron los binarios.
+
 ## Ejecucion
 
 ### GUI
@@ -130,7 +144,7 @@ La suite valida, entre otras cosas:
 - scouting, shortlist y negociacion
 - riesgo medico y reemplazos por lesion
 - desarrollo mensual y servicios de carrera
-- guardado, carga y transicion de temporada
+- guardado, carga, migracion de saves legacy y transicion de temporada
 
 ## Arquitectura
 
@@ -166,12 +180,16 @@ tools/
 - `src/main.cpp`: entrada consola
 - `src/engine/game_controller.cpp`: seleccion de GUI, CLI o validacion
 - `src/engine/front_menu.cpp`: frontend compartido para el menu principal y configuraciones
+- `src/engine/game_settings.cpp`: persistencia de configuraciones del frontend
+- `src/gui/gui_audio.cpp`: musica del menu, manifiesto de assets y fade de audio
 
 ## Documentacion adicional
 
 - [Arquitectura](docs/ARCHITECTURE.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Reporte de limpieza de datos](docs/data_cleanup_report.md)
+- [Changelog](CHANGELOG.md)
+- [Audio del frontend](assets/audio/README.md)
 
 ## Roadmap natural
 

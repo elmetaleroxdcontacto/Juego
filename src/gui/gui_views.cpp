@@ -8,6 +8,7 @@ GuiPageModel buildModel(AppState& state) {
     switch (state.currentPage) {
         case GuiPage::MainMenu: return buildMainMenuModel(state);
         case GuiPage::Settings: return buildSettingsPageModel(state);
+        case GuiPage::Credits: return buildCreditsPageModel(state);
         case GuiPage::Dashboard: return buildDashboardModel(state);
         case GuiPage::Squad: return buildSquadModel(state, false);
         case GuiPage::Tactics: return buildTacticsModel(state);

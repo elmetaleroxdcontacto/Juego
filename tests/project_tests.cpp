@@ -21,6 +21,7 @@
 #include "development/training_impact_system.h"
 #include "engine/models.h"
 #include "engine/game_settings.h"
+#include "io/save_serialization.h"
 #include "io/io.h"
 #include "simulation/match_context.h"
 #include "simulation/match_engine_internal.h"
@@ -61,6 +62,16 @@ string joinLines(const vector<string>& lines) {
         out << lines[i];
     }
     return out.str();
+}
+
+string replaceAllCopy(string text, const string& needle, const string& replacement) {
+    if (needle.empty()) return text;
+    size_t pos = 0;
+    while ((pos = text.find(needle, pos)) != string::npos) {
+        text.replace(pos, needle.size(), replacement);
+        pos += replacement.size();
+    }
+    return text;
 }
 
 Player makePlayer(const string& name,
@@ -1288,6 +1299,92 @@ void testGameSettingsCycleAndDifficultyImpact() {
            "La dificultad accesible debe mejorar el respaldo inicial de la directiva.");
 }
 
+void testGameSettingsPersistenceAndFrontendScope() {
+    const string settingsPath = "saves/test_game_settings.cfg";
+    std::remove(settingsPath.c_str());
+
+    GameSettings original;
+    original.volume = 25;
+    original.difficulty = GameDifficulty::Challenging;
+    original.simulationSpeed = SimulationSpeed::Relaxed;
+    original.simulationMode = SimulationMode::Fast;
+    original.language = UiLanguage::English;
+    original.textSpeed = TextSpeed::Rapid;
+    original.visualProfile = VisualProfile::HighContrast;
+    original.menuMusicMode = MenuMusicMode::FrontendPages;
+    original.menuAudioFade = false;
+    original.menuThemeId = "el-crack";
+
+    expect(game_settings::saveToDisk(original, settingsPath),
+           "La configuracion del frontend debe persistirse en disco.");
+
+    GameSettings loaded;
+    loaded.volume = 100;
+    loaded.difficulty = GameDifficulty::Accessible;
+    loaded.simulationSpeed = SimulationSpeed::Rapid;
+    loaded.simulationMode = SimulationMode::Detailed;
+    loaded.language = UiLanguage::Spanish;
+    loaded.textSpeed = TextSpeed::Relaxed;
+    loaded.visualProfile = VisualProfile::Broadcast;
+    loaded.menuMusicMode = MenuMusicMode::Off;
+    loaded.menuAudioFade = true;
+    loaded.menuThemeId = "otro";
+
+    expect(game_settings::loadFromDisk(loaded, settingsPath),
+           "La configuracion persistida debe volver a cargarse.");
+    expect(loaded.volume == 25, "El volumen debe sobrevivir entre sesiones.");
+    expect(loaded.difficulty == GameDifficulty::Challenging, "La dificultad persistida debe restaurarse.");
+    expect(loaded.simulationSpeed == SimulationSpeed::Relaxed, "La velocidad persistida debe restaurarse.");
+    expect(loaded.simulationMode == SimulationMode::Fast, "El modo de simulacion persistido debe restaurarse.");
+    expect(loaded.language == UiLanguage::English, "El idioma persistido debe restaurarse.");
+    expect(loaded.textSpeed == TextSpeed::Rapid, "La velocidad de texto persistida debe restaurarse.");
+    expect(loaded.visualProfile == VisualProfile::HighContrast, "El perfil visual persistido debe restaurarse.");
+    expect(loaded.menuMusicMode == MenuMusicMode::FrontendPages, "El alcance de musica persistido debe restaurarse.");
+    expect(!loaded.menuAudioFade, "La preferencia de fade de audio debe sobrevivir entre sesiones.");
+    expect(game_settings::shouldPlayMenuMusic(loaded, false, true),
+           "El modo de musica extendido debe habilitar audio en otras pantallas del frontend.");
+    expect(!game_settings::shouldPlayMenuMusic(loaded, false, false),
+           "El audio del menu no debe salir del frontend.");
+    expect(game_settings::uiPulseDelayMs(loaded) > game_settings::pageTransitionDelayMs(loaded),
+           "El pulso general debe ser mas lento que la transicion de pagina.");
+
+    std::remove(settingsPath.c_str());
+}
+
+void testLegacyDivisionIdentifiersCanonicalizeOnLoad() {
+    Career original;
+    original.currentSeason = 3;
+    original.currentWeek = 11;
+    original.managerName = "Moises";
+    original.boardConfidence = 61;
+    original.allTeams.push_back(makeTeam("Audax Italiano", "primera division", 71, 3, 3, "Balanced", "Equilibrado", 700000));
+    original.allTeams.push_back(makeTeam("Rival Clasico", "primera division", 68, 2, 2, "Defensive", "Bloque bajo", 620000));
+    original.setActiveDivision("primera division");
+    original.myTeam = original.findTeamByName("Audax Italiano");
+    expect(original.myTeam != nullptr, "La prueba de migracion de divisiones necesita club controlado.");
+
+    ostringstream encoded;
+    expect(save_serialization::serializeCareer(encoded, original),
+           "La carrera base debe serializarse antes de simular un save legacy.");
+
+    string legacySave = replaceAllCopy(encoded.str(), "primera division", "Primera Division");
+    istringstream input(legacySave);
+    Career loaded;
+    loaded.saveFile = "saves/legacy_division_test.txt";
+    expect(save_serialization::deserializeCareer(input, loaded),
+           "El cargador debe aceptar identificadores legacy de division.");
+    expect(loaded.activeDivision == "primera division",
+           "La division activa debe migrarse al ID canonico.");
+    expect(!loaded.divisions.empty() && loaded.divisions.front().id == "primera division",
+           "La lista de divisiones cargadas debe reconstruirse con IDs canonicos.");
+    expect(std::all_of(loaded.allTeams.begin(), loaded.allTeams.end(), [](const Team& team) {
+               return team.division == "primera division";
+           }),
+           "Los equipos del save legacy deben quedar normalizados al ID canonico.");
+    expect(loaded.myTeam != nullptr && loaded.myTeam->division == "primera division",
+           "El club usuario debe mantener la division canonica tras la migracion.");
+}
+
 void testManagerHubDigestCombinesStaffAndAgenda() {
     Career career;
     career.currentSeason = 2;
@@ -1643,6 +1740,7 @@ int main() {
         {"startup_data_validation", testStartupValidationSummaryExposesExternalAudit},
         {"competition_group_table", testCompetitionGroupTableScopesActiveGroup},
         {"game_settings_cycle", testGameSettingsCycleAndDifficultyImpact},
+        {"game_settings_persistence", testGameSettingsPersistenceAndFrontendScope},
         {"transfer_affordability", testTransferEvaluationPenalizesUnaffordableDeals},
         {"transfer_shortlist", testTransferShortlistRewardsScoutedNeed},
         {"squad_sale_candidates", testSquadPlannerFlagsUnusedSeniorSaleCandidates},
@@ -1685,6 +1783,7 @@ int main() {
         {"save_backup", testSaveCareerCreatesBackup},
         {"simulate_match_state", testSimulateMatchAppliesPostProcessState},
         {"save_load_roundtrip", testSaveLoadRoundTripPreservesCareerState},
+        {"legacy_division_ids", testLegacyDivisionIdentifiersCanonicalizeOnLoad},
         {"loader_fallback", testLoadTeamFromDirectoryFallsBackAndResolvesRawPositions},
     };
 

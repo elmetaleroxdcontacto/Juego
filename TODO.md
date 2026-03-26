@@ -3623,3 +3623,127 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Mover los assets de audio a una carpeta dedicada como `assets/audio/` para separar binarios multimedia del codigo fuente.
 - Agregar metadatos o un manifiesto de assets que documente origen, licencia y uso previsto de cada recurso audiovisual.
 - Permitir seleccionar entre varios temas de menu desde configuraciones si en el futuro se versionan mas pistas.
+
+## Auditoria del proyecto (2026-03-26 11:49:54 -03:00) - cambio de paginas mas estable entre modulos pesados
+
+### Resumen de cambios realizados
+
+- Se endurecio el refresco de paginas Win32 para evitar que cambios de vista como `Fichajes -> Finanzas` disparen redibujados intermedios y den sensacion de interfaz pegada o solapada.
+- Se agrego un bloqueo de refresco reentrante en el estado global de GUI, evitando que notificaciones de listas durante la reconstruccion de la vista lancen un segundo `refresh` encima del primero.
+- Se incorporo una suspension temporal de redraw sobre los paneles principales mientras se actualizan textos, listas, layout y autosize, para que la pagina aparezca ya armada y no en estados intermedios.
+- Se protegieron los handlers de seleccion y ordenado de listas para que ignoren eventos artificiales mientras la pantalla se esta rehaciendo.
+
+### Archivos creados o modificados
+
+- `TODO.md`
+- `include/gui/gui_internal.h`
+- `src/gui/gui_runtime.cpp`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManagerCLI FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- `Get-Process FootballManager -ErrorAction SilentlyContinue | Select-Object Id,ProcessName,StartTime`
+- Resultado:
+- `FootballManagerCLI.exe` y `FootballManagerTests.exe` compilaron correctamente con el nuevo blindaje del cambio de paginas.
+- La suite automatizada termino con `All tests passed`.
+- El relink de `FootballManager.exe` quedo bloqueado por un proceso abierto (`FootballManager`, PID 21104), no por un error del codigo.
+
+### Mejoras futuras sugeridas
+
+- Añadir una pequena traza de rendimiento por pagina para medir tiempo de construccion de `Transfers`, `Finances` y `News` y detectar vistas pesadas con datos reales.
+- Pasar el cambio de pagina a un flujo diferido con cola de mensajes si en el futuro la GUI incorpora vistas aun mas grandes o costosas.
+- Cachear algunos modelos o columnas de listas que no cambian entre refreshes para recortar aun mas el trabajo visual en navegacion rapida.
+
+## Auditoria del proyecto (2026-03-26 11:55:10 -03:00) - cabecera de carrera sincronizada con division real del club
+
+### Resumen de cambios realizados
+
+- Se corrigio la cabecera superior para que no vuelva a mostrar una carrera activa con club cargado pero `Division` vacia en el combo.
+- La GUI ahora resuelve la division real desde varias fuentes estables: `gameSetup`, `activeDivision`, `myTeam->division` y, si hace falta, el propio nombre del club cargado.
+- Se agrego una normalizacion robusta para aceptar tanto IDs internos de division como nombres visibles guardados en saves mas viejos, evitando que el combo quede sin seleccion por diferencias de formato.
+- El saneo de cabecera se engancho al refresco de pagina, de modo que al navegar entre modulos la GUI recompone sola el bloque `Division / Club / Manager` si detecta datos desalineados.
+
+### Archivos creados o modificados
+
+- `TODO.md`
+- `src/gui/gui_runtime.cpp`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe` compilaron correctamente con la correccion de sincronizacion de cabecera.
+- La suite automatizada termino con `All tests passed`.
+
+### Mejoras futuras sugeridas
+
+- Deshabilitar o convertir en solo lectura los combos de `Division` y `Club` cuando ya existe una carrera activa, para separar mejor setup inicial de navegacion normal.
+- Mostrar un pequeño badge con la division resuelta en la cabecera para dejar mas claro el contexto competitivo actual.
+- Migrar automaticamente saves legacy a IDs canonicos de division al cargarlos, para que esta reparacion deje de depender del frontend.
+
+## Auditoria del proyecto (2026-03-26 12:36:35 -03:00) - frontend persistente, audio ordenado, saves canonicos y build mas fuerte
+
+### Resumen de cambios realizados
+
+- Se aplicaron las mejoras pendientes del frontend de `Chilean Footballito`: ahora GUI y CLI comparten un menu inicial mas completo con `Continuar`, `Jugar`, `Cargar guardado`, `Configuraciones`, `Creditos` y `Salir`, sin crear flujos paralelos.
+- `GameSettings` quedo persistente en disco mediante `saves/game_settings.cfg`, sumando idioma, velocidad de texto, perfil visual, alcance de musica del frontend y fade de audio, ademas de volumen, dificultad, velocidad y modo de simulacion.
+- La portada y configuraciones Win32 quedaron alineadas con la nueva arquitectura: nuevos botones owner-draw, foco correcto, estados habilitados o deshabilitados segun exista carrera/guardado y timing de transicion conectado a los settings.
+- Se fortalecio la GUI pesada con las mejoras sugeridas de rendimiento: traza de tiempo por pagina, cola diferida de cambio de pagina y cache de modelos para `Transfers`, `Finances` y `News`.
+- Se movio la musica del menu a `assets/audio/`, se agrego un manifiesto `menu_themes.csv` y una documentacion propia del asset para separar mejor multimedia, metadatos y codigo fuente.
+- El audio del frontend ahora soporta alcance configurable (`Solo portada` o `Todo el frontend`) y fade-in/fade-out real, usando la configuracion persistida.
+- La reparacion de divisiones dejo de depender solo del frontend: los saves legacy ahora migran automaticamente nombres visibles de division a IDs canonicos al cargar, se reconstruye la lista de divisiones presentes y `Career::setActiveDivision()` trabaja sobre valores normalizados.
+- `build.bat` se rehizo para aceptar flags explicitos (`--gui`, `--cli`, `--tests`, `--all`, `--run-tests`, `--validate`), mostrar un resumen final de ruta/targets y dejar el flujo de compilacion alineado con CMake.
+- Se agrego `CHANGELOG.md` y se actualizo `README.md` para reflejar el frontend real, la persistencia de configuraciones, la nueva organizacion de audio y los comandos de compilacion actuales.
+
+### Archivos creados o modificados
+
+- `TODO.md`
+- `README.md`
+- `CHANGELOG.md`
+- `build.bat`
+- `assets/audio/README.md`
+- `assets/audio/menu_themes.csv`
+- `assets/audio/Los Miserables - El Crack  Video Oficial (HD Remastered).mp3`
+- `include/competition/league_registry.h`
+- `include/engine/front_menu.h`
+- `include/engine/game_controller.h`
+- `include/engine/game_settings.h`
+- `include/gui/gui.h`
+- `include/gui/gui_internal.h`
+- `include/gui/gui_view_builders.h`
+- `src/competition/league_registry.cpp`
+- `src/engine/career_state.cpp`
+- `src/engine/front_menu.cpp`
+- `src/engine/game_controller.cpp`
+- `src/engine/game_settings.cpp`
+- `src/gui/gui.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_audio.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+- `src/gui/gui_shared.cpp`
+- `src/gui/gui_view_common.cpp`
+- `src/gui/gui_view_menu.cpp`
+- `src/gui/gui_views.cpp`
+- `src/io/save_serialization.cpp`
+- `tests/project_tests.cpp`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- `$env:FM_SKIP_RUN='1'; .\\build.bat --all --run-tests`
+- `Get-Item '.\\assets\\audio\\Los Miserables - El Crack  Video Oficial (HD Remastered).mp3' | Select-Object Name,Length,LastWriteTime`
+- Resultado:
+- `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe` compilaron correctamente con el frontend persistente, la migracion canonica de divisiones y la reorganizacion de audio.
+- La suite automatizada termino con `All tests passed`, incluyendo pruebas nuevas de persistencia de settings y carga de saves legacy con division visible.
+- `build.bat` confirmo la ruta CMake, los targets `FootballManager FootballManagerCLI FootballManagerTests` y el resumen final esperado sin ejecutar el juego por `FM_SKIP_RUN=1`.
+- El asset musical quedo movido y visible en `assets/audio/`.
+
+### Mejoras futuras sugeridas
+
+- Exponer un selector real de `tema del menu` en GUI y CLI cuando existan varias pistas versionadas en `assets/audio/menu_themes.csv`.
+- Mostrar la traza de rendimiento por pagina en un overlay o panel tecnico opcional para diagnosticar cuellos de botella sin depender solo del status bar.
+- Seguir expandiendo el frontend con pantallas reales de perfil, carga visual de partida y preferencias de video/resolucion usando la misma arquitectura persistente.

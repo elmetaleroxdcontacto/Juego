@@ -3,7 +3,9 @@
 #include "utils/utils.h"
 
 #include <algorithm>
+#include <cctype>
 #include <set>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -34,6 +36,30 @@ struct LeagueRegistryCache {
 LeagueRegistryCache& registryCache() {
     static LeagueRegistryCache cache;
     return cache;
+}
+
+string normalizeDivisionToken(const string& raw) {
+    string out;
+    out.reserve(raw.size());
+    bool lastWasSpace = true;
+    for (unsigned char ch : raw) {
+        if (std::isalnum(ch)) {
+            out.push_back(static_cast<char>(std::tolower(ch)));
+            lastWasSpace = false;
+        } else if (!lastWasSpace) {
+            out.push_back(' ');
+            lastWasSpace = true;
+        }
+    }
+    return trim(out);
+}
+
+bool matchesDivisionAlias(const DivisionInfo& division, const string& normalizedRaw) {
+    if (normalizedRaw.empty()) return false;
+    if (normalizeDivisionToken(division.id) == normalizedRaw) return true;
+    if (normalizeDivisionToken(division.display) == normalizedRaw) return true;
+    if (normalizeDivisionToken(pathFilename(division.folder)) == normalizedRaw) return true;
+    return false;
 }
 
 void ensureRegistryLoaded() {
@@ -113,9 +139,27 @@ string registeredCompetitionRulesPath() {
     return registryCache().competitionRulesPath;
 }
 
+string canonicalDivisionId(const string& raw) {
+    ensureRegistryLoaded();
+    const string normalized = normalizeDivisionToken(raw);
+    if (normalized.empty()) return string();
+    for (const auto& division : registryCache().divisions) {
+        if (matchesDivisionAlias(division, normalized)) return division.id;
+    }
+    return normalized;
+}
+
+bool isRegisteredDivisionId(const string& raw) {
+    ensureRegistryLoaded();
+    const string canonical = canonicalDivisionId(raw);
+    return std::any_of(registryCache().divisions.begin(), registryCache().divisions.end(), [&](const DivisionInfo& division) {
+        return division.id == canonical;
+    });
+}
+
 string divisionDisplayName(const string& id) {
     ensureRegistryLoaded();
-    const string normalized = toLower(trim(id));
+    const string normalized = canonicalDivisionId(id);
     for (const auto& division : registryCache().divisions) {
         if (division.id == normalized) return division.display;
     }

@@ -2,6 +2,8 @@
 
 #ifdef _WIN32
 
+#include "utils/utils.h"
+
 #include <mmsystem.h>
 
 #include <sstream>
@@ -12,7 +14,17 @@ namespace gui_win32 {
 namespace {
 
 constexpr wchar_t kMenuMusicAlias[] = L"cf_menu_music";
-constexpr wchar_t kMenuMusicFileName[] = L"Los Miserables - El Crack  Video Oficial (HD Remastered).mp3";
+constexpr wchar_t kLegacyMenuMusicFileName[] = L"Los Miserables - El Crack  Video Oficial (HD Remastered).mp3";
+constexpr char kThemeManifestPath[] = "assets/audio/menu_themes.csv";
+
+struct MenuThemeAsset {
+    std::string id;
+    std::string fileName;
+    std::string title;
+    std::string license;
+    std::string usage;
+    std::string notes;
+};
 
 bool fileExists(const std::wstring& path) {
     DWORD attributes = GetFileAttributesW(path.c_str());
@@ -32,7 +44,7 @@ std::wstring directoryOf(const std::wstring& path) {
     return path.substr(0, slash);
 }
 
-std::wstring joinPath(const std::wstring& base, const std::wstring& child) {
+std::wstring joinWidePath(const std::wstring& base, const std::wstring& child) {
     if (base.empty()) return child;
     if (base.back() == L'\\' || base.back() == L'/') return base + child;
     return base + L"\\" + child;
@@ -52,14 +64,91 @@ std::wstring currentDirectoryPath() {
     return std::wstring(buffer, buffer + length);
 }
 
-std::wstring resolveMenuMusicPath() {
+bool sendMci(const std::wstring& command) {
+    return mciSendStringW(command.c_str(), nullptr, 0, nullptr) == 0;
+}
+
+std::vector<std::string> manifestCandidates() {
+    return {
+        kThemeManifestPath,
+        joinPath("..", kThemeManifestPath),
+        joinPath("..", joinPath("..", kThemeManifestPath))
+    };
+}
+
+std::vector<MenuThemeAsset> loadThemeManifest() {
+    std::vector<MenuThemeAsset> themes;
+    std::vector<std::string> lines;
+    std::string manifestPath;
+    for (const auto& candidate : manifestCandidates()) {
+        if (readTextFileLines(candidate, lines)) {
+            manifestPath = candidate;
+            break;
+        }
+    }
+
+    if (manifestPath.empty()) {
+        themes.push_back({"el-crack",
+                          "assets/audio/Los Miserables - El Crack  Video Oficial (HD Remastered).mp3",
+                          "El Crack",
+                          "Dominio publico (segun confirmacion del usuario)",
+                          "Frontend principal",
+                          "Fallback integrado cuando no aparece el manifiesto."});
+        return themes;
+    }
+
+    for (size_t i = 1; i < lines.size(); ++i) {
+        const std::string line = trim(lines[i]);
+        if (line.empty()) continue;
+        const std::vector<std::string> cols = splitCsvLine(line);
+        if (cols.size() < 6) continue;
+        MenuThemeAsset asset;
+        asset.id = toLower(trim(cols[0]));
+        asset.fileName = trim(cols[1]);
+        asset.title = trim(cols[2]);
+        asset.license = trim(cols[3]);
+        asset.usage = trim(cols[4]);
+        asset.notes = trim(cols[5]);
+        if (!asset.id.empty() && !asset.fileName.empty()) themes.push_back(asset);
+    }
+
+    if (themes.empty()) {
+        themes.push_back({"el-crack",
+                          "assets/audio/Los Miserables - El Crack  Video Oficial (HD Remastered).mp3",
+                          "El Crack",
+                          "Dominio publico (segun confirmacion del usuario)",
+                          "Frontend principal",
+                          "Fallback integrado cuando el manifiesto queda vacio."});
+    }
+    return themes;
+}
+
+const MenuThemeAsset* themeForSettings(const AppState& state, const std::vector<MenuThemeAsset>& themes) {
+    const std::string desired = toLower(trim(state.settings.menuThemeId));
+    for (const auto& theme : themes) {
+        if (theme.id == desired) return &theme;
+    }
+    return themes.empty() ? nullptr : &themes.front();
+}
+
+std::wstring resolveThemePath(const AppState& state) {
+    const std::vector<MenuThemeAsset> themes = loadThemeManifest();
+    const MenuThemeAsset* theme = themeForSettings(state, themes);
+    if (!theme) return std::wstring();
+
     const std::wstring exeDir = executableDirectory();
     const std::wstring cwd = currentDirectoryPath();
+    const std::wstring wideFile = utf8ToWide(theme->fileName);
     const std::vector<std::wstring> candidates = {
-        joinPath(cwd, kMenuMusicFileName),
-        joinPath(exeDir, kMenuMusicFileName),
-        canonicalPath(joinPath(exeDir, std::wstring(L"..\\") + kMenuMusicFileName)),
-        canonicalPath(joinPath(exeDir, std::wstring(L"..\\..\\") + kMenuMusicFileName))
+        canonicalPath(utf8ToWide(theme->fileName)),
+        canonicalPath(joinWidePath(cwd, wideFile)),
+        canonicalPath(joinWidePath(exeDir, wideFile)),
+        canonicalPath(joinWidePath(exeDir, utf8ToWide(std::string("..\\") + theme->fileName))),
+        canonicalPath(joinWidePath(exeDir, utf8ToWide(std::string("..\\..\\") + theme->fileName))),
+        joinWidePath(cwd, kLegacyMenuMusicFileName),
+        joinWidePath(exeDir, kLegacyMenuMusicFileName),
+        canonicalPath(joinWidePath(exeDir, std::wstring(L"..\\") + kLegacyMenuMusicFileName)),
+        canonicalPath(joinWidePath(exeDir, std::wstring(L"..\\..\\") + kLegacyMenuMusicFileName))
     };
 
     for (const auto& candidate : candidates) {
@@ -70,8 +159,42 @@ std::wstring resolveMenuMusicPath() {
     return std::wstring();
 }
 
-bool sendMci(const std::wstring& command) {
-    return mciSendStringW(command.c_str(), nullptr, 0, nullptr) == 0;
+int volumeToMciScale(const AppState&, int volume) {
+    const int clamped = game_settings::clampVolume(volume);
+    return (clamped * 1000) / 100;
+}
+
+void setDeviceVolume(AppState& state, int volume) {
+    if (!state.menuMusicOpened) return;
+    std::wostringstream command;
+    command << L"setaudio " << kMenuMusicAlias << L" volume to " << volumeToMciScale(state, volume);
+    if (sendMci(command.str())) {
+        state.menuMusicAppliedVolume = game_settings::clampVolume(volume);
+    }
+}
+
+void fadeDeviceVolume(AppState& state, int targetVolume) {
+    if (!state.menuMusicOpened) return;
+    const int clampedTarget = game_settings::clampVolume(targetVolume);
+    if (!state.settings.menuAudioFade || state.menuMusicAppliedVolume < 0) {
+        setDeviceVolume(state, clampedTarget);
+        return;
+    }
+
+    const int current = state.menuMusicAppliedVolume;
+    if (current == clampedTarget) return;
+    const int stepDelay = game_settings::audioFadeStepDelayMs(state.settings);
+    if (stepDelay <= 0) {
+        setDeviceVolume(state, clampedTarget);
+        return;
+    }
+
+    const int direction = clampedTarget > current ? 1 : -1;
+    for (int volume = current; volume != clampedTarget; volume += direction * 10) {
+        const int next = direction > 0 ? std::min(volume + 10, clampedTarget) : std::max(volume - 10, clampedTarget);
+        setDeviceVolume(state, next);
+        Sleep(static_cast<DWORD>(stepDelay));
+    }
 }
 
 void closeMenuMusicDevice(AppState& state) {
@@ -80,30 +203,31 @@ void closeMenuMusicDevice(AppState& state) {
     }
     state.menuMusicOpened = false;
     state.menuMusicPlaying = false;
+    state.menuMusicAppliedVolume = -1;
 }
 
-int volumeToMciScale(const AppState& state) {
-    const int clamped = game_settings::clampVolume(state.settings.volume);
-    return (clamped * 1000) / 100;
-}
-
-void applyMenuMusicVolume(AppState& state) {
-    if (!state.menuMusicOpened) return;
-    std::wostringstream command;
-    command << L"setaudio " << kMenuMusicAlias << L" volume to " << volumeToMciScale(state);
-    sendMci(command.str());
+void stopMenuMusic(AppState& state) {
+    if (!state.menuMusicOpened || !state.menuMusicPlaying) return;
+    if (state.settings.menuAudioFade) fadeDeviceVolume(state, 0);
+    sendMci(L"stop " + std::wstring(kMenuMusicAlias));
+    sendMci(L"seek " + std::wstring(kMenuMusicAlias) + L" to start");
+    state.menuMusicPlaying = false;
 }
 
 void ensureMenuMusicOpened(AppState& state) {
-    if (state.menuMusicOpened) return;
-    if (state.menuMusicPath.empty()) {
-        state.menuMusicPath = resolveMenuMusicPath();
-    }
-    if (state.menuMusicPath.empty()) {
+    const std::wstring desiredPath = resolveThemePath(state);
+    if (desiredPath.empty()) {
         state.menuMusicMissingReported = true;
         return;
     }
 
+    if (state.menuMusicOpened && canonicalPath(state.menuMusicPath) != canonicalPath(desiredPath)) {
+        closeMenuMusicDevice(state);
+    }
+
+    if (state.menuMusicOpened) return;
+
+    state.menuMusicPath = desiredPath;
     std::wstring openCommand = L"open \"" + state.menuMusicPath + L"\" type mpegvideo alias " + std::wstring(kMenuMusicAlias);
     if (!sendMci(openCommand)) {
         state.menuMusicMissingReported = true;
@@ -112,37 +236,39 @@ void ensureMenuMusicOpened(AppState& state) {
     }
 
     state.menuMusicOpened = true;
-    applyMenuMusicVolume(state);
+    state.menuMusicAppliedVolume = -1;
+    setDeviceVolume(state, state.settings.menuAudioFade ? 0 : state.settings.volume);
 }
 
 }  // namespace
 
 void syncMenuMusicForPage(AppState& state) {
-    const bool shouldPlay = state.currentPage == GuiPage::MainMenu;
+    const bool onMainMenu = state.currentPage == GuiPage::MainMenu;
+    const bool onFrontendPage = isFrontMenuPage(state.currentPage);
+    const bool shouldPlay = game_settings::shouldPlayMenuMusic(state.settings, onMainMenu, onFrontendPage);
     if (!shouldPlay) {
-        if (state.menuMusicOpened && state.menuMusicPlaying) {
-            sendMci(L"stop " + std::wstring(kMenuMusicAlias));
-            sendMci(L"seek " + std::wstring(kMenuMusicAlias) + L" to start");
-            state.menuMusicPlaying = false;
-        }
+        stopMenuMusic(state);
         return;
     }
 
     ensureMenuMusicOpened(state);
-    if (!state.menuMusicOpened || state.menuMusicPlaying) return;
-
-    applyMenuMusicVolume(state);
-    if (sendMci(L"play " + std::wstring(kMenuMusicAlias) + L" repeat")) {
-        state.menuMusicPlaying = true;
+    if (!state.menuMusicOpened) return;
+    if (!state.menuMusicPlaying) {
+        if (state.settings.menuAudioFade) setDeviceVolume(state, 0);
+        if (sendMci(L"play " + std::wstring(kMenuMusicAlias) + L" repeat")) {
+            state.menuMusicPlaying = true;
+        }
     }
+    fadeDeviceVolume(state, state.settings.volume);
 }
 
 void refreshMenuMusicVolume(AppState& state) {
     if (!state.menuMusicOpened) return;
-    applyMenuMusicVolume(state);
+    fadeDeviceVolume(state, state.settings.volume);
 }
 
 void shutdownMenuMusic(AppState& state) {
+    stopMenuMusic(state);
     closeMenuMusicDevice(state);
 }
 

@@ -115,6 +115,7 @@ PageLayoutProfile buildPageLayoutProfile(GuiPage page) {
     switch (page) {
         case GuiPage::MainMenu:
         case GuiPage::Settings:
+        case GuiPage::Credits:
             return {360, 320, 52, 360, 220, 220, 160, 148, 140};
         case GuiPage::Dashboard:
             return {340, 300, 56, 348, 226, 166, 160, 148, 132};
@@ -739,18 +740,31 @@ void showActionButtonsForPage(AppState& state) {
 
 void setMenuButtonsVisible(AppState& state, bool visible) {
     const int showMode = visible ? SW_SHOW : SW_HIDE;
+    ShowWindow(state.menuContinueButton, showMode);
     ShowWindow(state.menuPlayButton, showMode);
     ShowWindow(state.menuSettingsButton, showMode);
+    ShowWindow(state.menuLoadButton, showMode);
+    ShowWindow(state.menuCreditsButton, showMode);
+    ShowWindow(state.menuExitButton, showMode);
     ShowWindow(state.menuBackButton, showMode);
     ShowWindow(state.menuVolumeButton, showMode);
     ShowWindow(state.menuDifficultyButton, showMode);
     ShowWindow(state.menuSpeedButton, showMode);
     ShowWindow(state.menuSimulationButton, showMode);
+    ShowWindow(state.menuLanguageButton, showMode);
+    ShowWindow(state.menuTextSpeedButton, showMode);
+    ShowWindow(state.menuVisualButton, showMode);
+    ShowWindow(state.menuMusicModeButton, showMode);
+    ShowWindow(state.menuAudioFadeButton, showMode);
 }
 
 void updateFrontendMenuButtonLabels(AppState& state) {
+    if (state.menuContinueButton) setWindowTextUtf8(state.menuContinueButton, "Continuar");
     if (state.menuPlayButton) setWindowTextUtf8(state.menuPlayButton, "Jugar");
     if (state.menuSettingsButton) setWindowTextUtf8(state.menuSettingsButton, "Configuraciones");
+    if (state.menuLoadButton) setWindowTextUtf8(state.menuLoadButton, "Cargar guardado");
+    if (state.menuCreditsButton) setWindowTextUtf8(state.menuCreditsButton, "Creditos");
+    if (state.menuExitButton) setWindowTextUtf8(state.menuExitButton, "Salir");
     if (state.menuBackButton) setWindowTextUtf8(state.menuBackButton, "Volver");
     if (state.menuVolumeButton) {
         setWindowTextUtf8(state.menuVolumeButton, "Volumen: " + game_settings::volumeLabel(state.settings.volume));
@@ -766,6 +780,26 @@ void updateFrontendMenuButtonLabels(AppState& state) {
     if (state.menuSimulationButton) {
         setWindowTextUtf8(state.menuSimulationButton,
                           "Simulacion: " + game_settings::simulationModeLabel(state.settings.simulationMode));
+    }
+    if (state.menuLanguageButton) {
+        setWindowTextUtf8(state.menuLanguageButton,
+                          "Idioma: " + game_settings::languageLabel(state.settings.language));
+    }
+    if (state.menuTextSpeedButton) {
+        setWindowTextUtf8(state.menuTextSpeedButton,
+                          "Texto: " + game_settings::textSpeedLabel(state.settings.textSpeed));
+    }
+    if (state.menuVisualButton) {
+        setWindowTextUtf8(state.menuVisualButton,
+                          "Visual: " + game_settings::visualProfileLabel(state.settings.visualProfile));
+    }
+    if (state.menuMusicModeButton) {
+        setWindowTextUtf8(state.menuMusicModeButton,
+                          "Musica: " + game_settings::menuMusicModeLabel(state.settings.menuMusicMode));
+    }
+    if (state.menuAudioFadeButton) {
+        setWindowTextUtf8(state.menuAudioFadeButton,
+                          "Audio: " + game_settings::menuAudioFadeLabel(state.settings.menuAudioFade));
     }
 }
 
@@ -823,12 +857,15 @@ void applyInterfaceFonts(AppState& state) {
     const std::array<HWND, 3> tablePanels = {state.tableList, state.squadList, state.transferList};
     for (HWND hwnd : tablePanels) setControlFont(hwnd, state.font);
 
-    const std::array<HWND, 26> buttons = {
+    const std::array<HWND, 35> buttons = {
         state.newCareerButton, state.loadButton, state.saveButton, state.simulateButton, state.validateButton, state.displayModeButton,
         state.dashboardButton, state.squadButton, state.tacticsButton, state.calendarButton, state.leagueButton,
         state.transfersButton, state.financesButton, state.youthButton, state.boardButton, state.newsButton,
-        state.menuPlayButton, state.menuSettingsButton, state.menuBackButton, state.menuVolumeButton,
+        state.menuContinueButton, state.menuPlayButton, state.menuSettingsButton, state.menuLoadButton,
+        state.menuCreditsButton, state.menuExitButton, state.menuBackButton, state.menuVolumeButton,
         state.menuDifficultyButton, state.menuSpeedButton, state.menuSimulationButton,
+        state.menuLanguageButton, state.menuTextSpeedButton, state.menuVisualButton,
+        state.menuMusicModeButton, state.menuAudioFadeButton,
         state.emptyNewButton, state.emptyLoadButton, state.emptyValidateButton
     };
     for (HWND hwnd : buttons) setControlFont(hwnd, state.font);
@@ -925,12 +962,16 @@ void layoutWindow(AppState& state) {
         const int shellLeft = padding + s(30);
         const int shellTop = padding + s(26);
         const int shellWidth = std::max(s(820), static_cast<int>(client.right - shellLeft * 2));
+        const bool compactFrontMenu = state.settings.visualProfile == VisualProfile::Compact ||
+                                      client.right < s(1380) || client.bottom < s(920);
+        const bool ultraWideFrontMenu = client.right > s(2140);
         const int buttonTop = shellTop + s(214);
-        const int primaryWidth = clampValue(shellWidth / 2 - s(24), s(220), s(300));
+        const int primaryWidth = clampValue(shellWidth / 2 - s(24), s(220), ultraWideFrontMenu ? s(340) : s(300));
         const int primaryGap = s(16);
-        const int controlBlockHeight = state.currentPage == GuiPage::MainMenu ? s(42) : s(220);
+        const int controlBlockHeight = state.currentPage == GuiPage::MainMenu ? s(compactFrontMenu ? 108 : 92)
+                                                                              : s(state.currentPage == GuiPage::Settings ? 242 : 64);
         const int panelsTop = buttonTop + controlBlockHeight + s(28);
-        const int leftWidth = std::max(s(360), shellWidth * 52 / 100);
+        const int leftWidth = std::max(s(compactFrontMenu ? 320 : 360), shellWidth * (ultraWideFrontMenu ? 48 : 52) / 100);
         const int rightWidth = shellWidth - leftWidth - s(18);
         const int summaryHeight = std::max(s(230), static_cast<int>(client.bottom - panelsTop - s(100)));
         const int detailHeight = std::max(s(170), (summaryHeight - s(40)) / 2);
@@ -944,39 +985,95 @@ void layoutWindow(AppState& state) {
         MoveWindow(state.newsList, shellLeft + s(34) + leftWidth, feedTop + s(kPanelBodyOffset), rightWidth, summaryHeight - detailHeight - s(18), TRUE);
 
         if (state.currentPage == GuiPage::MainMenu) {
+            const int secondaryTop = buttonTop + s(50);
+            const int secondaryGap = s(12);
+            const int secondaryCount = 4;
+            const int secondaryWidth = std::max(s(132),
+                                                static_cast<int>((shellWidth - s(32) - secondaryGap * (secondaryCount - 1)) / secondaryCount));
+            MoveWindow(state.menuContinueButton, shellLeft + s(16), buttonTop, primaryWidth, s(42), TRUE);
             MoveWindow(state.menuPlayButton,
-                       shellLeft + s(16),
-                       buttonTop,
-                       primaryWidth,
-                       s(42),
-                       TRUE);
-            MoveWindow(state.menuSettingsButton,
                        shellLeft + s(16) + primaryWidth + primaryGap,
                        buttonTop,
                        primaryWidth,
                        s(42),
                        TRUE);
+            MoveWindow(state.menuSettingsButton, shellLeft + s(16), secondaryTop, secondaryWidth, s(40), TRUE);
+            MoveWindow(state.menuLoadButton, shellLeft + s(16) + (secondaryWidth + secondaryGap), secondaryTop, secondaryWidth, s(40), TRUE);
+            MoveWindow(state.menuCreditsButton,
+                       shellLeft + s(16) + (secondaryWidth + secondaryGap) * 2,
+                       secondaryTop,
+                       secondaryWidth,
+                       s(40),
+                       TRUE);
+            MoveWindow(state.menuExitButton,
+                       shellLeft + s(16) + (secondaryWidth + secondaryGap) * 3,
+                       secondaryTop,
+                       secondaryWidth,
+                       s(40),
+                       TRUE);
+            ShowWindow(state.menuContinueButton, SW_SHOW);
             ShowWindow(state.menuPlayButton, SW_SHOW);
             ShowWindow(state.menuSettingsButton, SW_SHOW);
+            ShowWindow(state.menuLoadButton, SW_SHOW);
+            ShowWindow(state.menuCreditsButton, SW_SHOW);
+            ShowWindow(state.menuExitButton, SW_SHOW);
             ShowWindow(state.menuBackButton, SW_HIDE);
             ShowWindow(state.menuVolumeButton, SW_HIDE);
             ShowWindow(state.menuDifficultyButton, SW_HIDE);
             ShowWindow(state.menuSpeedButton, SW_HIDE);
             ShowWindow(state.menuSimulationButton, SW_HIDE);
-        } else {
-            const int settingsWidth = clampValue(shellWidth - s(32), s(400), s(760));
+            ShowWindow(state.menuLanguageButton, SW_HIDE);
+            ShowWindow(state.menuTextSpeedButton, SW_HIDE);
+            ShowWindow(state.menuVisualButton, SW_HIDE);
+            ShowWindow(state.menuMusicModeButton, SW_HIDE);
+            ShowWindow(state.menuAudioFadeButton, SW_HIDE);
+        } else if (state.currentPage == GuiPage::Settings) {
+            const int settingsWidth = clampValue((shellWidth - s(44)) / 2, s(280), s(420));
+            const int rightColumnLeft = shellLeft + s(28) + settingsWidth;
             MoveWindow(state.menuVolumeButton, shellLeft + s(16), buttonTop, settingsWidth, s(38), TRUE);
-            MoveWindow(state.menuDifficultyButton, shellLeft + s(16), buttonTop + s(46), settingsWidth, s(38), TRUE);
-            MoveWindow(state.menuSpeedButton, shellLeft + s(16), buttonTop + s(92), settingsWidth, s(38), TRUE);
-            MoveWindow(state.menuSimulationButton, shellLeft + s(16), buttonTop + s(138), settingsWidth, s(38), TRUE);
-            MoveWindow(state.menuBackButton, shellLeft + s(16), buttonTop + s(184), s(180), s(36), TRUE);
+            MoveWindow(state.menuDifficultyButton, rightColumnLeft, buttonTop, settingsWidth, s(38), TRUE);
+            MoveWindow(state.menuSpeedButton, shellLeft + s(16), buttonTop + s(46), settingsWidth, s(38), TRUE);
+            MoveWindow(state.menuSimulationButton, rightColumnLeft, buttonTop + s(46), settingsWidth, s(38), TRUE);
+            MoveWindow(state.menuLanguageButton, shellLeft + s(16), buttonTop + s(92), settingsWidth, s(38), TRUE);
+            MoveWindow(state.menuTextSpeedButton, rightColumnLeft, buttonTop + s(92), settingsWidth, s(38), TRUE);
+            MoveWindow(state.menuVisualButton, shellLeft + s(16), buttonTop + s(138), settingsWidth, s(38), TRUE);
+            MoveWindow(state.menuMusicModeButton, rightColumnLeft, buttonTop + s(138), settingsWidth, s(38), TRUE);
+            MoveWindow(state.menuAudioFadeButton, shellLeft + s(16), buttonTop + s(184), settingsWidth, s(38), TRUE);
+            MoveWindow(state.menuBackButton, rightColumnLeft, buttonTop + s(184), settingsWidth, s(36), TRUE);
+            ShowWindow(state.menuContinueButton, SW_HIDE);
             ShowWindow(state.menuPlayButton, SW_HIDE);
             ShowWindow(state.menuSettingsButton, SW_HIDE);
+            ShowWindow(state.menuLoadButton, SW_HIDE);
+            ShowWindow(state.menuCreditsButton, SW_HIDE);
+            ShowWindow(state.menuExitButton, SW_HIDE);
             ShowWindow(state.menuBackButton, SW_SHOW);
             ShowWindow(state.menuVolumeButton, SW_SHOW);
             ShowWindow(state.menuDifficultyButton, SW_SHOW);
             ShowWindow(state.menuSpeedButton, SW_SHOW);
             ShowWindow(state.menuSimulationButton, SW_SHOW);
+            ShowWindow(state.menuLanguageButton, SW_SHOW);
+            ShowWindow(state.menuTextSpeedButton, SW_SHOW);
+            ShowWindow(state.menuVisualButton, SW_SHOW);
+            ShowWindow(state.menuMusicModeButton, SW_SHOW);
+            ShowWindow(state.menuAudioFadeButton, SW_SHOW);
+        } else {
+            MoveWindow(state.menuBackButton, shellLeft + s(16), buttonTop, s(220), s(38), TRUE);
+            ShowWindow(state.menuContinueButton, SW_HIDE);
+            ShowWindow(state.menuPlayButton, SW_HIDE);
+            ShowWindow(state.menuSettingsButton, SW_HIDE);
+            ShowWindow(state.menuLoadButton, SW_HIDE);
+            ShowWindow(state.menuCreditsButton, SW_HIDE);
+            ShowWindow(state.menuExitButton, SW_HIDE);
+            ShowWindow(state.menuBackButton, SW_SHOW);
+            ShowWindow(state.menuVolumeButton, SW_HIDE);
+            ShowWindow(state.menuDifficultyButton, SW_HIDE);
+            ShowWindow(state.menuSpeedButton, SW_HIDE);
+            ShowWindow(state.menuSimulationButton, SW_HIDE);
+            ShowWindow(state.menuLanguageButton, SW_HIDE);
+            ShowWindow(state.menuTextSpeedButton, SW_HIDE);
+            ShowWindow(state.menuVisualButton, SW_HIDE);
+            ShowWindow(state.menuMusicModeButton, SW_HIDE);
+            ShowWindow(state.menuAudioFadeButton, SW_HIDE);
         }
 
         MoveWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20), TRUE);
@@ -1209,24 +1306,42 @@ void initializeInterface(AppState& state) {
     state.simulateButton = createControl(state, 0, L"BUTTON", L"Simular", buttonStyle, 0, 0, 126, 28, state.window, IDC_SIMULATE_BUTTON);
     state.validateButton = createControl(state, 0, L"BUTTON", L"Auditar", buttonStyle, 0, 0, 92, 28, state.window, IDC_VALIDATE_BUTTON);
     state.displayModeButton = createControl(state, 0, L"BUTTON", L"Pantalla F11", buttonStyle, 0, 0, 154, 28, state.window, IDC_DISPLAY_MODE_BUTTON);
+    state.menuContinueButton = createControl(state, 0, L"BUTTON", L"Continuar", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_CONTINUE_BUTTON);
     state.menuPlayButton = createControl(state, 0, L"BUTTON", L"Jugar", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_PLAY_BUTTON);
     state.menuSettingsButton = createControl(state, 0, L"BUTTON", L"Configuraciones", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_SETTINGS_BUTTON);
+    state.menuLoadButton = createControl(state, 0, L"BUTTON", L"Cargar guardado", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_LOAD_BUTTON);
+    state.menuCreditsButton = createControl(state, 0, L"BUTTON", L"Creditos", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_CREDITS_BUTTON);
+    state.menuExitButton = createControl(state, 0, L"BUTTON", L"Salir", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_EXIT_BUTTON);
     state.menuBackButton = createControl(state, 0, L"BUTTON", L"Volver", buttonStyle, 0, 0, 140, 34, state.window, IDC_MENU_BACK_BUTTON);
     state.menuVolumeButton = createControl(state, 0, L"BUTTON", L"Volumen: 70%", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_VOLUME_BUTTON);
     state.menuDifficultyButton = createControl(state, 0, L"BUTTON", L"Dificultad: Normal", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_DIFFICULTY_BUTTON);
     state.menuSpeedButton = createControl(state, 0, L"BUTTON", L"Velocidad: Normal", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_SPEED_BUTTON);
     state.menuSimulationButton = createControl(state, 0, L"BUTTON", L"Simulacion: Detallado", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_SIMULATION_BUTTON);
+    state.menuLanguageButton = createControl(state, 0, L"BUTTON", L"Idioma: Espanol", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_LANGUAGE_BUTTON);
+    state.menuTextSpeedButton = createControl(state, 0, L"BUTTON", L"Texto: Normal", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_TEXT_SPEED_BUTTON);
+    state.menuVisualButton = createControl(state, 0, L"BUTTON", L"Visual: Editorial", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_VISUAL_BUTTON);
+    state.menuMusicModeButton = createControl(state, 0, L"BUTTON", L"Musica: Solo portada", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_MUSICMODE_BUTTON);
+    state.menuAudioFadeButton = createControl(state, 0, L"BUTTON", L"Audio: Fade activo", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_AUDIOFADE_BUTTON);
     state.emptyNewButton = createControl(state, 0, L"BUTTON", L"Crear carrera", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_NEW_BUTTON);
     state.emptyLoadButton = createControl(state, 0, L"BUTTON", L"Abrir guardado", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_LOAD_BUTTON);
     state.emptyValidateButton = createControl(state, 0, L"BUTTON", L"Validar datos", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_VALIDATE_BUTTON);
     ShowWindow(state.emptyNewButton, SW_HIDE);
     ShowWindow(state.emptyLoadButton, SW_HIDE);
     ShowWindow(state.emptyValidateButton, SW_HIDE);
+    ShowWindow(state.menuContinueButton, SW_HIDE);
     ShowWindow(state.menuBackButton, SW_HIDE);
+    ShowWindow(state.menuLoadButton, SW_HIDE);
+    ShowWindow(state.menuCreditsButton, SW_HIDE);
+    ShowWindow(state.menuExitButton, SW_HIDE);
     ShowWindow(state.menuVolumeButton, SW_HIDE);
     ShowWindow(state.menuDifficultyButton, SW_HIDE);
     ShowWindow(state.menuSpeedButton, SW_HIDE);
     ShowWindow(state.menuSimulationButton, SW_HIDE);
+    ShowWindow(state.menuLanguageButton, SW_HIDE);
+    ShowWindow(state.menuTextSpeedButton, SW_HIDE);
+    ShowWindow(state.menuVisualButton, SW_HIDE);
+    ShowWindow(state.menuMusicModeButton, SW_HIDE);
+    ShowWindow(state.menuAudioFadeButton, SW_HIDE);
 
     state.dashboardButton = createControl(state, 0, L"BUTTON", L"Inicio", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_DASHBOARD_BUTTON);
     state.squadButton = createControl(state, 0, L"BUTTON", L"Plantilla", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_SQUAD_BUTTON);
@@ -1292,7 +1407,7 @@ void initializeInterface(AppState& state) {
     layoutWindow(state);
     refreshAll(state);
     setStatus(state, "Menu principal listo. Entra a Jugar o abre Configuraciones.");
-    if (state.menuPlayButton) SetFocus(state.menuPlayButton);
+    if (state.menuContinueButton) SetFocus(state.menuContinueButton);
 }
 
 void paintWindowChrome(AppState& state, HDC hdc) {
@@ -1304,11 +1419,20 @@ void paintWindowChrome(AppState& state, HDC hdc) {
     state.insightHotspots.clear();
 
     if (isFrontMenuPage(state.currentPage)) {
+        const bool highContrastFrontend = state.settings.visualProfile == VisualProfile::HighContrast;
         RECT hero{ s(18), s(18), client.right - s(18), client.bottom - s(44) };
-        drawRoundedPanel(hdc, hero, RGB(9, 22, 30), RGB(36, 62, 76), s(28));
+        drawRoundedPanel(hdc,
+                         hero,
+                         highContrastFrontend ? RGB(6, 18, 25) : RGB(9, 22, 30),
+                         highContrastFrontend ? RGB(86, 132, 158) : RGB(36, 62, 76),
+                         s(28));
 
         RECT titleBand{hero.left + s(14), hero.top + s(14), hero.right - s(14), hero.top + s(156)};
-        drawRoundedPanel(hdc, titleBand, RGB(11, 28, 37), RGB(44, 76, 94), s(20));
+        drawRoundedPanel(hdc,
+                         titleBand,
+                         highContrastFrontend ? RGB(8, 28, 38) : RGB(11, 28, 37),
+                         highContrastFrontend ? RGB(104, 164, 196) : RGB(44, 76, 94),
+                         s(20));
 
         RECT accentLine{titleBand.left + s(22), titleBand.top + s(18), titleBand.left + s(118), titleBand.top + s(24)};
         HBRUSH accentBrush = CreateSolidBrush(kThemeAccent);
@@ -1338,8 +1462,10 @@ void paintWindowChrome(AppState& state, HDC hdc) {
         SelectObject(hdc, state.font ? state.font : static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT)));
         SetTextColor(hdc, RGB(188, 209, 220));
         const wchar_t* subtitleText = state.currentPage == GuiPage::MainMenu
-            ? L"Portada del manager: entra al juego real o ajusta la partida antes del primer paso."
-            : L"Cabina de configuracion: define el tono del proyecto antes de abrir el centro del club.";
+            ? L"Portada del manager: continua, carga, configura o entra al juego real desde un solo frontend."
+            : (state.currentPage == GuiPage::Settings
+                ? L"Cabina de configuracion: audio, accesibilidad, timing y perfil visual comparten persistencia."
+                : L"Creditos y hoja tecnica del proyecto, con la misma identidad visual del frontend principal.");
         DrawTextW(hdc, subtitleText, -1, &subtitleRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
 
         auto drawChip = [&](const RECT& area, const std::wstring& label, COLORREF fill, COLORREF border) {
@@ -1358,7 +1484,7 @@ void paintWindowChrome(AppState& state, HDC hdc) {
             {utf8ToWide("Dificultad " + game_settings::difficultyLabel(state.settings.difficulty)), kThemeAccent},
             {utf8ToWide("Velocidad " + game_settings::simulationSpeedLabel(state.settings.simulationSpeed)), kThemeWarning},
             {utf8ToWide("Modo " + game_settings::simulationModeLabel(state.settings.simulationMode)), kThemeAccentBlue},
-            {utf8ToWide("Audio " + game_settings::volumeLabel(state.settings.volume)), kThemeAccentGreen}
+            {utf8ToWide("Musica " + game_settings::menuMusicModeLabel(state.settings.menuMusicMode)), kThemeAccentGreen}
         };
         for (size_t i = 0; i < chips.size(); ++i) {
             RECT chipRect{
@@ -1368,25 +1494,6 @@ void paintWindowChrome(AppState& state, HDC hdc) {
                 navRect.top + chipHeight
             };
             drawChip(chipRect, chips[i].first, RGB(15, 32, 43), chips[i].second);
-        }
-
-        RECT futureStrip{hero.left + s(22), titleBand.bottom + s(14), hero.right - s(22), titleBand.bottom + s(48)};
-        const int futureGap = s(10);
-        const int futureWidth = std::max(s(112), static_cast<int>((futureStrip.right - futureStrip.left - futureGap * 3) / 4));
-        const wchar_t* futureLabels[4] = {L"Continuar", L"Nueva partida", L"Cargar", L"Creditos"};
-        for (int i = 0; i < 4; ++i) {
-            RECT pill{
-                futureStrip.left + i * (futureWidth + futureGap),
-                futureStrip.top,
-                futureStrip.left + i * (futureWidth + futureGap) + futureWidth,
-                futureStrip.bottom
-            };
-            drawRoundedPanel(hdc, pill, RGB(12, 24, 33), RGB(33, 54, 65), s(12));
-            RECT pillText = pill;
-            pillText.left += s(10);
-            pillText.right -= s(10);
-            SetTextColor(hdc, RGB(151, 167, 177));
-            DrawTextW(hdc, futureLabels[i], -1, &pillText, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
         }
 
         RECT summaryCard = expandedRect(childRectOnParent(state.summaryEdit, state.window), s(8), s(24));

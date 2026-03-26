@@ -1,18 +1,27 @@
 #pragma once
 
 #include "engine/game_settings.h"
+#include "engine/models.h"
 
 #include <string>
 #include <vector>
 
 enum class FrontMenuAction {
     None,
+    ContinueCareer,
     Play,
+    LoadCareer,
     Settings,
+    Credits,
     CycleVolume,
     CycleDifficulty,
     CycleSimulationSpeed,
     CycleSimulationMode,
+    CycleLanguage,
+    CycleTextSpeed,
+    CycleVisualProfile,
+    CycleMenuMusicMode,
+    ToggleMenuAudioFade,
     Back,
     Exit
 };
@@ -39,7 +48,24 @@ public:
 
 class MainMenuScreen final : public MenuScreen {
 public:
-    explicit MainMenuScreen(const GameSettings& settings);
+    MainMenuScreen(const GameSettings& settings, const Career& career);
+
+    std::string headline() const override;
+    std::string sectionTitle() const override;
+    std::string subtitle() const override;
+    std::string helperText() const override;
+    std::vector<std::string> statusLines() const override;
+    std::vector<std::string> roadmapLines() const override;
+    std::vector<MenuOption> options() const override;
+
+private:
+    const GameSettings& settings_;
+    const Career& career_;
+};
+
+class SettingsMenuScreen final : public MenuScreen {
+public:
+    explicit SettingsMenuScreen(const GameSettings& settings);
 
     std::string headline() const override;
     std::string sectionTitle() const override;
@@ -53,9 +79,9 @@ private:
     const GameSettings& settings_;
 };
 
-class SettingsMenuScreen final : public MenuScreen {
+class CreditsMenuScreen final : public MenuScreen {
 public:
-    explicit SettingsMenuScreen(const GameSettings& settings);
+    explicit CreditsMenuScreen(const GameSettings& settings);
 
     std::string headline() const override;
     std::string sectionTitle() const override;
@@ -96,10 +122,11 @@ private:
 
 class MenuController {
 public:
-    explicit MenuController(GameSettings& settings);
+    MenuController(GameSettings& settings, Career& career);
 
     FrontMenuAction runMainMenu();
     void runSettingsMenu();
+    void runCreditsMenu();
 
 private:
     FrontMenuAction readScreenAction(const MenuScreen& screen, int& selectedIndex, bool allowExitShortcut) const;
@@ -110,6 +137,7 @@ private:
                                FrontMenuAction& action) const;
 
     GameSettings& settings_;
+    Career& career_;
     MenuRenderer renderer_;
     MenuActionHandler actionHandler_;
 };

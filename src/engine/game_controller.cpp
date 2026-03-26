@@ -44,6 +44,14 @@ void configureConsoleEncoding() {
 
 }  // namespace
 
+void GameController::loadPersistedSettings() {
+    game_settings::loadFromDisk(settings_);
+}
+
+void GameController::savePersistedSettings() const {
+    game_settings::saveToDisk(settings_);
+}
+
 void GameController::showLoadWarnings() const {
     const auto& warnings = engine_.career().loadWarnings;
     if (warnings.empty()) return;
@@ -103,20 +111,31 @@ void GameController::pauseForContinue() const {
 }
 
 int GameController::run(int argc, char* argv[]) {
+    loadPersistedSettings();
     if (argc > 1 && string(argv[1]) == "--validate") {
-        return runValidationSuite(true);
+        const int result = runValidationSuite(true);
+        savePersistedSettings();
+        return result;
     }
 #ifdef FM_CONSOLE_DEFAULT
-    return runConsoleApp();
+    const int result = runConsoleApp();
+    savePersistedSettings();
+    return result;
 #else
     if (argc > 1 && string(argv[1]) == "--cli") {
-        return runConsoleApp();
+        const int result = runConsoleApp();
+        savePersistedSettings();
+        return result;
     }
 
 #ifdef _WIN32
-    return runGuiApp(settings_);
+    const int result = runGuiApp(settings_);
+    savePersistedSettings();
+    return result;
 #else
-    return runConsoleApp();
+    const int result = runConsoleApp();
+    savePersistedSettings();
+    return result;
 #endif
 #endif
 }
@@ -124,7 +143,7 @@ int GameController::run(int argc, char* argv[]) {
 int GameController::runConsoleApp() {
     configureConsoleEncoding();
     engine_.initialize();
-    MenuController menu(settings_);
+    MenuController menu(settings_, engine_.career());
 
     while (true) {
         const FrontMenuAction action = menu.runMainMenu();
@@ -132,8 +151,31 @@ int GameController::runConsoleApp() {
             cout << "Saliendo del juego." << endl;
             break;
         }
+        if (action == FrontMenuAction::ContinueCareer) {
+            if (loadCareerForResume(false)) {
+                runCareerLoop();
+            } else {
+                cout << "No hay una carrera lista para continuar." << endl;
+                pauseForContinue();
+            }
+            continue;
+        }
+        if (action == FrontMenuAction::LoadCareer) {
+            if (loadCareerForResume(true)) {
+                runCareerLoop();
+            } else {
+                cout << "No se pudo cargar una carrera guardada." << endl;
+                pauseForContinue();
+            }
+            continue;
+        }
         if (action == FrontMenuAction::Settings) {
             menu.runSettingsMenu();
+            savePersistedSettings();
+            continue;
+        }
+        if (action == FrontMenuAction::Credits) {
+            menu.runCreditsMenu();
             continue;
         }
         runConsoleGameHub();
@@ -165,6 +207,55 @@ void GameController::runConsoleGameHub() {
     }
 }
 
+bool GameController::loadCareerForResume(bool forceReloadFromDisk) {
+    Career& career = engine_.career();
+    if (career.myTeam && !forceReloadFromDisk) {
+        return true;
+    }
+
+    ServiceResult loadResult = engine_.loadCareer();
+    for (const auto& message : loadResult.messages) cout << message << endl;
+    showLoadWarnings();
+    return loadResult.ok && career.myTeam;
+}
+
+bool GameController::createNewCareerFromConsole() {
+    Career& career = engine_.career();
+    engine_.initialize(true);
+    showLoadWarnings();
+    if (career.divisions.empty()) {
+        cout << "No se encontraron divisiones disponibles." << endl;
+        return false;
+    }
+
+    cout << "\nSelecciona la division:" << endl;
+    for (size_t i = 0; i < career.divisions.size(); ++i) {
+        cout << i + 1 << ". " << career.divisions[static_cast<size_t>(i)].display << endl;
+    }
+    int divisionChoice = readInt("Elige una division: ", 1, static_cast<int>(career.divisions.size()));
+    const string divisionId = career.divisions[static_cast<size_t>(divisionChoice - 1)].id;
+    auto teams = career.getDivisionTeams(divisionId);
+    if (teams.empty()) {
+        cout << "No hay equipos para esta division." << endl;
+        return false;
+    }
+
+    cout << "\nEquipos de " << divisionDisplay(divisionId) << ":" << endl;
+    for (size_t i = 0; i < teams.size(); ++i) {
+        cout << i + 1 << ". " << teams[static_cast<size_t>(i)]->name << endl;
+    }
+    int teamChoice = readInt("Elige un numero de equipo: ", 1, static_cast<int>(teams.size()));
+    const string managerName = readLine("Nombre del manager (Enter para 'Manager'): ");
+    ServiceResult startResult =
+        engine_.startCareer(divisionId, teams[static_cast<size_t>(teamChoice - 1)]->name, managerName);
+    if (startResult.ok) {
+        game_settings::applyNewCareerDifficulty(career, settings_);
+        startResult.messages.push_back("Configuracion aplicada: " + game_settings::settingsSummary(settings_) + ".");
+    }
+    for (const auto& message : startResult.messages) cout << message << endl;
+    return startResult.ok && career.myTeam;
+}
+
 void GameController::runCareerMode() {
     Career& career = engine_.career();
     cout << "\n=== Modo Carrera ===" << endl;
@@ -177,50 +268,19 @@ void GameController::runCareerMode() {
 
     bool careerStarted = false;
     if (careerStartChoice == 1) {
-        ServiceResult loadResult = engine_.loadCareer();
-        for (const auto& message : loadResult.messages) cout << message << endl;
-        showLoadWarnings();
-        careerStarted = loadResult.ok && career.myTeam;
+        careerStarted = loadCareerForResume(true);
     } else if (careerStartChoice == 2) {
-        engine_.initialize(true);
-        showLoadWarnings();
-        if (career.divisions.empty()) {
-            cout << "No se encontraron divisiones disponibles." << endl;
-            return;
-        }
-
-        cout << "\nSelecciona la division:" << endl;
-        for (size_t i = 0; i < career.divisions.size(); ++i) {
-            cout << i + 1 << ". " << career.divisions[i].display << endl;
-        }
-        int divisionChoice = readInt("Elige una division: ", 1, static_cast<int>(career.divisions.size()));
-        const string divisionId = career.divisions[static_cast<size_t>(divisionChoice - 1)].id;
-        auto teams = career.getDivisionTeams(divisionId);
-        if (teams.empty()) {
-            cout << "No hay equipos para esta division." << endl;
-            return;
-        }
-
-        cout << "\nEquipos de " << divisionDisplay(divisionId) << ":" << endl;
-        for (size_t i = 0; i < teams.size(); ++i) {
-            cout << i + 1 << ". " << teams[i]->name << endl;
-        }
-        int teamChoice = readInt("Elige un numero de equipo: ", 1, static_cast<int>(teams.size()));
-        const string managerName = readLine("Nombre del manager (Enter para 'Manager'): ");
-        ServiceResult startResult =
-            engine_.startCareer(divisionId, teams[static_cast<size_t>(teamChoice - 1)]->name, managerName);
-        if (startResult.ok) {
-            game_settings::applyNewCareerDifficulty(career, settings_);
-            startResult.messages.push_back("Configuracion aplicada: " + game_settings::settingsSummary(settings_) + ".");
-        }
-        for (const auto& message : startResult.messages) cout << message << endl;
-        careerStarted = startResult.ok && career.myTeam;
+        careerStarted = createNewCareerFromConsole();
     } else {
         return;
     }
 
     if (!careerStarted || !career.myTeam) return;
+    runCareerLoop();
+}
 
+void GameController::runCareerLoop() {
+    Career& career = engine_.career();
     int careerChoice = 0;
     do {
         cout << "\nTemporada " << career.currentSeason << ", Semana " << career.currentWeek << endl;

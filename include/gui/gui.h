@@ -2,4 +2,4 @@
 
 #include "engine/game_settings.h"
 
-int runGuiApp(const GameSettings& settings);
+int runGuiApp(GameSettings& settings);

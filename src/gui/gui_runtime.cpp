@@ -1,18 +1,97 @@
 ﻿#include "gui/gui_internal.h"
 
 #include "gui/gui_audio.h"
+#include "gui/gui_view_builders.h"
 
 #ifdef _WIN32
 
 #include "utils/utils.h"
 
 #include <algorithm>
+#include <sstream>
 
 namespace gui_win32 {
 
 GuiPageModel buildModel(AppState& state);
 
 namespace {
+
+std::vector<HWND> pageRefreshTargets(const AppState& state) {
+    return {
+        state.pageTitleLabel, state.breadcrumbLabel, state.infoLabel, state.filterLabel, state.filterCombo,
+        state.summaryLabel, state.summaryEdit, state.tableLabel, state.tableList,
+        state.squadLabel, state.squadList, state.transferLabel, state.transferList,
+        state.detailLabel, state.detailEdit, state.newsLabel, state.newsList, state.statusLabel,
+        state.scoutActionButton, state.shortlistButton, state.followShortlistButton, state.buyButton,
+        state.preContractButton, state.renewButton, state.sellButton, state.planButton, state.instructionButton,
+        state.youthUpgradeButton, state.trainingUpgradeButton, state.scoutingUpgradeButton, state.stadiumUpgradeButton,
+        state.emptyNewButton, state.emptyLoadButton, state.emptyValidateButton
+    };
+}
+
+std::string pageCacheKey(const AppState& state, GuiPage page) {
+    std::ostringstream out;
+    out << static_cast<int>(page) << "|" << state.currentFilter;
+    return out.str();
+}
+
+std::string pageCacheSignature(const AppState& state, GuiPage page) {
+    const Career& career = state.career;
+    std::ostringstream out;
+    out << static_cast<int>(page)
+        << "|" << state.currentFilter
+        << "|" << career.currentSeason
+        << "|" << career.currentWeek
+        << "|" << career.newsFeed.size()
+        << "|" << career.pendingTransfers.size()
+        << "|" << career.scoutingShortlist.size()
+        << "|" << career.boardConfidence
+        << "|" << state.selectedPlayerName
+        << "|" << state.selectedTransferPlayer
+        << "|" << state.selectedTransferClub;
+    if (career.myTeam) {
+        out << "|" << career.myTeam->name
+            << "|" << career.myTeam->budget
+            << "|" << career.myTeam->morale
+            << "|" << career.myTeam->players.size()
+            << "|" << career.myTeam->points;
+    }
+    return out.str();
+}
+
+bool canUseCachedModel(const AppState& state) {
+    return isHeavyPage(state.currentPage);
+}
+
+class ScopedRefreshRedrawLock {
+public:
+    explicit ScopedRefreshRedrawLock(AppState& state) : state_(state), targets_(pageRefreshTargets(state)) {
+        if (state_.window) SendMessageW(state_.window, WM_SETREDRAW, FALSE, 0);
+        for (HWND target : targets_) {
+            if (target && IsWindow(target)) SendMessageW(target, WM_SETREDRAW, FALSE, 0);
+        }
+    }
+
+    ~ScopedRefreshRedrawLock() {
+        for (HWND target : targets_) {
+            if (!target || !IsWindow(target)) continue;
+            SendMessageW(target, WM_SETREDRAW, TRUE, 0);
+            RedrawWindow(target, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_UPDATENOW);
+        }
+        if (state_.window) {
+            SendMessageW(state_.window, WM_SETREDRAW, TRUE, 0);
+            RedrawWindow(state_.window,
+                         nullptr,
+                         nullptr,
+                         RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ALLCHILDREN | RDW_UPDATENOW);
+        }
+        state_.pageRefreshInProgress = false;
+    }
+
+private:
+    AppState& state_;
+    std::vector<HWND> targets_;
+};
 
 std::string friendlyPanelTitle(const std::string& title) {
     if (title == "FrontMenuOverview") return "Panorama de arranque";
@@ -82,6 +161,7 @@ std::vector<std::string> filterOptionsForPage(GuiPage page) {
     switch (page) {
         case GuiPage::MainMenu:
         case GuiPage::Settings:
+        case GuiPage::Credits:
             return {};
         case GuiPage::Dashboard: return {"Todo", "Alertas", "Lesiones", "Contratos"};
         case GuiPage::Squad: return {"Todos", "XI", "ARQ", "DEF", "MED", "DEL", "Lesionados"};
@@ -152,6 +232,40 @@ bool isKnownDivision(const AppState& state, const std::string& divisionId) {
     return false;
 }
 
+std::string resolveKnownDivisionId(const AppState& state, const std::string& rawValue) {
+    const std::string normalized = toLower(trim(rawValue));
+    if (normalized.empty()) return std::string();
+    for (const auto& division : state.career.divisions) {
+        if (division.id == normalized || toLower(trim(division.display)) == normalized) {
+            return division.id;
+        }
+    }
+    return std::string();
+}
+
+std::string inferHeaderDivisionId(const AppState& state) {
+    std::vector<std::string> candidates;
+    if (!state.gameSetup.division.empty()) candidates.push_back(state.gameSetup.division);
+    if (!state.career.activeDivision.empty()) candidates.push_back(state.career.activeDivision);
+    if (state.career.myTeam) {
+        candidates.push_back(state.career.myTeam->division);
+        candidates.push_back(state.career.myTeam->name);
+    }
+    if (!state.gameSetup.club.empty()) candidates.push_back(state.gameSetup.club);
+
+    for (const auto& candidate : candidates) {
+        const std::string resolved = resolveKnownDivisionId(state, candidate);
+        if (!resolved.empty()) return resolved;
+
+        for (const auto& team : state.career.allTeams) {
+            if (toLower(trim(team.name)) != toLower(trim(candidate))) continue;
+            const std::string teamDivision = resolveKnownDivisionId(state, team.division);
+            if (!teamDivision.empty()) return teamDivision;
+        }
+    }
+    return std::string();
+}
+
 bool clubBelongsToDivision(const AppState& state, const std::string& divisionId, const std::string& clubName) {
     if (divisionId.empty() || clubName.empty()) return false;
     return std::any_of(state.career.allTeams.begin(), state.career.allTeams.end(), [&](const Team& team) {
@@ -166,26 +280,51 @@ bool hasAvailableTeams(const AppState& state, const std::string& divisionId) {
     });
 }
 
+bool hasPersistedCareer(const AppState& state) {
+    const std::string savePath = state.career.saveFile.empty() ? std::string("saves/career_save.txt") : state.career.saveFile;
+    return pathExists(savePath) || (savePath == "saves/career_save.txt" && pathExists("career_save.txt"));
+}
+
 }  // namespace
 
 bool isFrontMenuPage(GuiPage page) {
-    return page == GuiPage::MainMenu || page == GuiPage::Settings;
+    return page == GuiPage::MainMenu || page == GuiPage::Settings || page == GuiPage::Credits;
+}
+
+bool isHeavyPage(GuiPage page) {
+    return page == GuiPage::Transfers || page == GuiPage::Finances || page == GuiPage::News;
 }
 
 namespace {
 
 void syncSetupButtonsAndHints(AppState& state) {
     const bool hasCareer = state.career.myTeam != nullptr;
-    EnableWindow(state.teamCombo, hasAvailableTeams(state, state.gameSetup.division));
-    EnableWindow(state.newCareerButton, state.gameSetup.ready);
+    const bool hasSavedCareer = hasPersistedCareer(state);
+    EnableWindow(state.divisionCombo, !hasCareer);
+    EnableWindow(state.teamCombo, !hasCareer && hasAvailableTeams(state, state.gameSetup.division));
+    EnableWindow(state.newCareerButton, !hasCareer && state.gameSetup.ready);
     EnableWindow(state.emptyNewButton, state.gameSetup.ready);
     EnableWindow(state.saveButton, hasCareer);
     EnableWindow(state.simulateButton, hasCareer);
+    EnableWindow(state.menuContinueButton, hasCareer || hasSavedCareer);
+    EnableWindow(state.menuLoadButton, hasSavedCareer);
+
+    if (state.divisionLabel) {
+        std::string badge = "Division";
+        const std::string resolved = resolveKnownDivisionId(state, state.gameSetup.division.empty() ? state.career.activeDivision : state.gameSetup.division);
+        if (hasCareer && !resolved.empty()) {
+            badge += " [" + divisionDisplay(resolved) + "]";
+        }
+        setWindowTextUtf8(state.divisionLabel, badge);
+    }
 
     if (state.managerHelpLabel) {
         std::string helper;
         if (hasCareer) {
-            helper = "Carrera activa. Guardar y simular ya estan disponibles.";
+            const std::string resolved = resolveKnownDivisionId(state, state.career.activeDivision);
+            helper = "Carrera activa.";
+            if (!resolved.empty()) helper += " Division resuelta: " + divisionDisplay(resolved) + ".";
+            helper += " Guardar y simular ya estan disponibles.";
         } else {
             helper = state.gameSetup.managerError;
             if (helper.empty()) {
@@ -234,7 +373,7 @@ void fillTeamCombo(AppState& state, const std::string& divisionId, const std::st
     }
     SendMessageW(state.teamCombo, CB_SETCURSEL, selectedIndex, 0);
     state.suppressComboEvents = false;
-    EnableWindow(state.teamCombo, !divisionId.empty() && !teams.empty());
+    EnableWindow(state.teamCombo, !state.career.myTeam && !divisionId.empty() && !teams.empty());
 }
 
 void syncManagerNameFromUi(AppState& state) {
@@ -246,14 +385,23 @@ void syncManagerNameFromUi(AppState& state) {
 }
 
 void syncCombosFromCareer(AppState& state) {
+    const std::string resolvedDivision = inferHeaderDivisionId(state);
+
+    if (!resolvedDivision.empty() && state.career.activeDivision != resolvedDivision) {
+        state.career.setActiveDivision(resolvedDivision);
+    }
     if (state.career.myTeam) {
-        state.gameSetup.division = state.career.activeDivision;
+        state.gameSetup.division = !resolvedDivision.empty() ? resolvedDivision : state.career.myTeam->division;
         state.gameSetup.club = state.career.myTeam->name;
         state.gameSetup.manager = trim(state.career.managerName);
+    } else if (!resolvedDivision.empty()) {
+        state.gameSetup.division = resolvedDivision;
     }
     fillDivisionCombo(state, state.gameSetup.division);
     fillTeamCombo(state, state.gameSetup.division, state.gameSetup.club);
-    if (state.managerEdit) setWindowTextUtf8(state.managerEdit, state.gameSetup.manager);
+    if (state.managerEdit && trim(getWindowTextUtf8(state.managerEdit)) != state.gameSetup.manager) {
+        setWindowTextUtf8(state.managerEdit, state.gameSetup.manager);
+    }
     check_game_ready(state);
 }
 
@@ -319,9 +467,30 @@ void setStatus(AppState& state, const std::string& text) {
 }
 
 void refreshCurrentPage(AppState& state) {
+    if (state.pageRefreshInProgress) return;
+    state.pageRefreshInProgress = true;
+    ScopedRefreshRedrawLock redrawLock(state);
+    const DWORD refreshStart = GetTickCount();
+
+    if (state.career.myTeam || (state.gameSetup.division.empty() && !state.gameSetup.club.empty())) {
+        syncCombosFromCareer(state);
+    }
     check_game_ready(state);
     refreshFilterComboOptions(state);
-    state.currentModel = buildModel(state);
+    const std::string cacheKey = pageCacheKey(state, state.currentPage);
+    const std::string cacheSignature = pageCacheSignature(state, state.currentPage);
+    if (canUseCachedModel(state) &&
+        state.modelCacheSignatures.count(cacheKey) &&
+        state.modelCacheSignatures[cacheKey] == cacheSignature &&
+        state.modelCache.count(cacheKey)) {
+        state.currentModel = state.modelCache[cacheKey];
+    } else {
+        state.currentModel = buildModel(state);
+        if (canUseCachedModel(state)) {
+            state.modelCache[cacheKey] = state.currentModel;
+            state.modelCacheSignatures[cacheKey] = cacheSignature;
+        }
+    }
     syncMenuMusicForPage(state);
     state.insightHotspots.clear();
     bool dashboardEmptyState = state.currentPage == GuiPage::Dashboard && !state.career.myTeam;
@@ -375,7 +544,12 @@ void refreshCurrentPage(AppState& state) {
 
     layoutWindow(state);
     autosizeVisibleLists(state);
-    if (state.window) InvalidateRect(state.window, nullptr, FALSE);
+    const long long elapsed = static_cast<long long>(GetTickCount() - refreshStart);
+    state.pageTraceMs[static_cast<int>(state.currentPage)] = elapsed;
+    state.lastPageTrace = pageTitleFor(state.currentPage) + " render " + std::to_string(elapsed) + " ms";
+    if (isHeavyPage(state.currentPage) && state.infoLabel) {
+        setWindowTextUtf8(state.infoLabel, state.currentModel.infoLine + " | " + state.lastPageTrace);
+    }
 }
 
 void autosizeCurrentLists(AppState& state) {
@@ -394,12 +568,24 @@ void setCurrentPage(AppState& state, GuiPage page) {
     refreshCurrentPage(state);
 }
 
+void queuePageTransition(AppState& state, GuiPage page) {
+    if (!state.window || !IsWindow(state.window)) {
+        setCurrentPage(state, page);
+        return;
+    }
+    if (state.pageChangeQueued && state.queuedPage == page) return;
+    state.queuedPage = page;
+    state.pageChangeQueued = true;
+    PostMessageW(state.window, kGuiPageTransitionMessage, static_cast<WPARAM>(static_cast<int>(page)), 0);
+}
+
 void handleFilterChange(AppState& state) {
     state.currentFilter = comboText(state.filterCombo);
     refreshCurrentPage(state);
 }
 
 void handleListSelectionChange(AppState& state, int controlId) {
+    if (state.pageRefreshInProgress) return;
     int row = -1;
     if (controlId == IDC_SQUAD_LIST) row = selectedListViewRow(state.squadList);
     if (controlId == IDC_TRANSFER_LIST) row = selectedListViewRow(state.transferList);
@@ -419,6 +605,7 @@ void handleListSelectionChange(AppState& state, int controlId) {
 }
 
 void handleListColumnClick(AppState& state, const NMLISTVIEW& view) {
+    if (state.pageRefreshInProgress) return;
     if ((state.currentPage == GuiPage::Squad || state.currentPage == GuiPage::Youth) && view.hdr.idFrom == IDC_SQUAD_LIST) {
         if (state.squadSort.column == view.iSubItem) {
             state.squadSort.ascending = !state.squadSort.ascending;

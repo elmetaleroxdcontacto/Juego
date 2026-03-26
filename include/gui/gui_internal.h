@@ -65,13 +65,22 @@ enum ControlId {
     IDC_PAGE_YOUTH_BUTTON,
     IDC_PAGE_BOARD_BUTTON,
     IDC_PAGE_NEWS_BUTTON,
+    IDC_MENU_CONTINUE_BUTTON,
     IDC_MENU_PLAY_BUTTON,
     IDC_MENU_SETTINGS_BUTTON,
+    IDC_MENU_LOAD_BUTTON,
+    IDC_MENU_CREDITS_BUTTON,
+    IDC_MENU_EXIT_BUTTON,
     IDC_MENU_BACK_BUTTON,
     IDC_MENU_VOLUME_BUTTON,
     IDC_MENU_DIFFICULTY_BUTTON,
     IDC_MENU_SPEED_BUTTON,
     IDC_MENU_SIMULATION_BUTTON,
+    IDC_MENU_LANGUAGE_BUTTON,
+    IDC_MENU_TEXT_SPEED_BUTTON,
+    IDC_MENU_VISUAL_BUTTON,
+    IDC_MENU_MUSICMODE_BUTTON,
+    IDC_MENU_AUDIOFADE_BUTTON,
     IDC_EMPTY_NEW_BUTTON,
     IDC_EMPTY_LOAD_BUTTON,
     IDC_EMPTY_VALIDATE_BUTTON
@@ -80,6 +89,7 @@ enum ControlId {
 enum class GuiPage {
     MainMenu,
     Settings,
+    Credits,
     Dashboard,
     Squad,
     Tactics,
@@ -195,10 +205,14 @@ struct AppState {
     GameSettings settings;
     bool suppressComboEvents = false;
     bool suppressFilterEvents = false;
+    bool pageRefreshInProgress = false;
+    bool pageChangeQueued = false;
     bool menuMusicOpened = false;
     bool menuMusicPlaying = false;
     bool menuMusicMissingReported = false;
+    int menuMusicAppliedVolume = -1;
     std::wstring menuMusicPath;
+    GuiPage queuedPage = GuiPage::MainMenu;
     GuiPage currentPage = GuiPage::Dashboard;
     std::string currentFilter = "Todo";
     GameSetupState gameSetup;
@@ -209,6 +223,10 @@ struct AppState {
     GuiPageModel currentModel;
     std::vector<InsightHotspot> insightHotspots;
     std::map<std::string, std::vector<int> > columnWidthMemory;
+    std::map<std::string, GuiPageModel> modelCache;
+    std::map<std::string, std::string> modelCacheSignatures;
+    std::map<int, long long> pageTraceMs;
+    std::string lastPageTrace;
 
     HWND divisionCombo = nullptr;
     HWND teamCombo = nullptr;
@@ -236,13 +254,22 @@ struct AppState {
     HWND youthButton = nullptr;
     HWND boardButton = nullptr;
     HWND newsButton = nullptr;
+    HWND menuContinueButton = nullptr;
     HWND menuPlayButton = nullptr;
     HWND menuSettingsButton = nullptr;
+    HWND menuLoadButton = nullptr;
+    HWND menuCreditsButton = nullptr;
+    HWND menuExitButton = nullptr;
     HWND menuBackButton = nullptr;
     HWND menuVolumeButton = nullptr;
     HWND menuDifficultyButton = nullptr;
     HWND menuSpeedButton = nullptr;
     HWND menuSimulationButton = nullptr;
+    HWND menuLanguageButton = nullptr;
+    HWND menuTextSpeedButton = nullptr;
+    HWND menuVisualButton = nullptr;
+    HWND menuMusicModeButton = nullptr;
+    HWND menuAudioFadeButton = nullptr;
     HWND emptyNewButton = nullptr;
     HWND emptyLoadButton = nullptr;
     HWND emptyValidateButton = nullptr;
@@ -292,6 +319,7 @@ static const COLORREF kThemeMuted = RGB(145, 163, 176);
 static const COLORREF kThemeDanger = RGB(186, 78, 78);
 static const COLORREF kThemeWarning = RGB(208, 167, 72);
 static const COLORREF kThemeSelection = RGB(64, 91, 109);
+static const UINT kGuiPageTransitionMessage = WM_APP + 17;
 
 RECT childRectOnParent(HWND child, HWND parent);
 RECT expandedRect(RECT rect, int dx, int dy);
@@ -332,6 +360,7 @@ bool isPageButtonId(int id);
 bool isPrimaryButtonId(int id);
 bool isUpgradeButtonId(int id);
 bool isActionButtonId(int id);
+bool isHeavyPage(GuiPage page);
 
 void initializeInterface(AppState& state);
 void rebuildFonts(AppState& state);
@@ -354,6 +383,7 @@ void set_manager(AppState& state, const std::string& managerName);
 bool check_game_ready(AppState& state);
 void setStatus(AppState& state, const std::string& text);
 void setCurrentPage(AppState& state, GuiPage page);
+void queuePageTransition(AppState& state, GuiPage page);
 void refreshAll(AppState& state);
 void refreshCurrentPage(AppState& state);
 void autosizeCurrentLists(AppState& state);
@@ -362,6 +392,7 @@ void handleListSelectionChange(AppState& state, int controlId);
 void handleListColumnClick(AppState& state, const NMLISTVIEW& view);
 
 void startNewCareer(AppState& state);
+void continueCareer(AppState& state);
 void loadCareer(AppState& state);
 void saveCareer(AppState& state);
 void simulateWeek(AppState& state);
@@ -378,10 +409,16 @@ void runFollowShortlistAction(AppState& state);
 void runUpgradeAction(AppState& state, ClubUpgrade upgrade, const std::string& title);
 void openFrontendMenu(AppState& state);
 void openSettingsMenu(AppState& state);
+void openCreditsPage(AppState& state);
 void cycleFrontendVolume(AppState& state);
 void cycleFrontendDifficulty(AppState& state);
 void cycleFrontendSimulationSpeed(AppState& state);
 void cycleFrontendSimulationMode(AppState& state);
+void cycleFrontendLanguage(AppState& state);
+void cycleFrontendTextSpeed(AppState& state);
+void cycleFrontendVisualProfile(AppState& state);
+void cycleFrontendMenuMusicMode(AppState& state);
+void toggleFrontendAudioFade(AppState& state);
 
 }  // namespace gui_win32
 

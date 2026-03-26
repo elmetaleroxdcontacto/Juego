@@ -10,7 +10,7 @@ using namespace std;
 
 namespace {
 
-constexpr int kConsolePanelWidth = 62;
+constexpr int kConsolePanelWidth = 70;
 
 string padOrTrim(const string& text, int width) {
     if (width <= 0) return string();
@@ -62,13 +62,24 @@ string actionName(FrontMenuAction action) {
         case FrontMenuAction::CycleDifficulty: return "Dificultad";
         case FrontMenuAction::CycleSimulationSpeed: return "Velocidad de simulacion";
         case FrontMenuAction::CycleSimulationMode: return "Modo de simulacion";
+        case FrontMenuAction::CycleLanguage: return "Idioma";
+        case FrontMenuAction::CycleTextSpeed: return "Velocidad de texto";
+        case FrontMenuAction::CycleVisualProfile: return "Perfil visual";
+        case FrontMenuAction::CycleMenuMusicMode: return "Musica del frontend";
+        case FrontMenuAction::ToggleMenuAudioFade: return "Transicion de audio";
         default: return "Ajuste";
     }
 }
 
+bool hasSavedCareer(const Career& career) {
+    string savePath = career.saveFile.empty() ? "saves/career_save.txt" : career.saveFile;
+    return pathExists(savePath) || (savePath == "saves/career_save.txt" && pathExists("career_save.txt"));
+}
+
 }  // namespace
 
-MainMenuScreen::MainMenuScreen(const GameSettings& settings) : settings_(settings) {}
+MainMenuScreen::MainMenuScreen(const GameSettings& settings, const Career& career)
+    : settings_(settings), career_(career) {}
 
 string MainMenuScreen::headline() const {
     return game_settings::gameTitle();
@@ -79,7 +90,7 @@ string MainMenuScreen::sectionTitle() const {
 }
 
 string MainMenuScreen::subtitle() const {
-    return "Portada inicial inspirada en un simulador de gestion futbolistica: limpia, directa y lista para crecer.";
+    return "Frontend principal inspirado en un manager game: continuidad, configuracion y acceso directo al juego real.";
 }
 
 string MainMenuScreen::helperText() const {
@@ -87,32 +98,55 @@ string MainMenuScreen::helperText() const {
 }
 
 vector<string> MainMenuScreen::statusLines() const {
+    const bool hasSave = hasSavedCareer(career_);
+    const bool hasInMemoryCareer = career_.myTeam != nullptr;
     return {
         "Perfil actual: " + game_settings::settingsSummary(settings_),
-        "Audio: placeholder listo para integracion futura.",
-        "Entrada recomendada: Jugar abre el flujo real del juego."
+        string("Continuar: ") + (hasInMemoryCareer ? "sesion activa en memoria" : (hasSave ? "guardado disponible" : "sin guardado")),
+        "Musica frontend: " + game_settings::menuMusicModeLabel(settings_.menuMusicMode),
+        "Visual: " + game_settings::visualProfileLabel(settings_.visualProfile)
     };
 }
 
 vector<string> MainMenuScreen::roadmapLines() const {
     return {
-        "Base preparada para Continuar, Nueva partida y Cargar.",
-        "La GUI comparte los mismos ajustes iniciales del frontend.",
-        "F11 y fullscreen siguen disponibles al entrar en la interfaz Win32."
+        "Continuar y Cargar ya entran al flujo real sin crear rutas paralelas.",
+        "Configuraciones se persisten en disco y alimentan CLI, GUI y audio.",
+        "La arquitectura queda lista para perfil, idioma, video, resolucion y mas submenus."
     };
 }
 
 vector<MenuOption> MainMenuScreen::options() const {
     return {
+        {"Continuar",
+         "Retoma la carrera activa o intenta cargar el ultimo guardado directo al flujo real.",
+         FrontMenuAction::ContinueCareer,
+         't',
+         true},
         {"Jugar",
-         "Abre el flujo principal existente: dashboard, carrera, fichajes, tacticas y centro del club.",
+         "Abre el hub principal existente: carrera, juego rapido, copa y validacion.",
          FrontMenuAction::Play,
          'j',
-         true},
+         false},
+        {"Cargar guardado",
+         "Fuerza la carga del ultimo save y entra al proyecto actual del club.",
+         FrontMenuAction::LoadCareer,
+         'l',
+         false},
         {"Configuraciones",
-         "Ajusta volumen, dificultad, velocidad de simulacion y modo de simulacion antes de entrar.",
+         "Ajusta audio, dificultad, velocidad, idioma y preferencias visuales antes de entrar.",
          FrontMenuAction::Settings,
          'c',
+         false},
+        {"Creditos",
+         "Muestra identidad del proyecto, tecnologia y direccion actual del simulador.",
+         FrontMenuAction::Credits,
+         'r',
+         false},
+        {"Salir",
+         "Cierra el juego y guarda el ultimo perfil de configuracion en disco.",
+         FrontMenuAction::Exit,
+         'q',
          false}
     };
 }
@@ -128,7 +162,7 @@ string SettingsMenuScreen::sectionTitle() const {
 }
 
 string SettingsMenuScreen::subtitle() const {
-    return "Ajustes base compartidos entre consola y GUI, con estructura lista para audio, idioma y video.";
+    return "Ajustes persistentes compartidos entre consola, GUI, audio del frontend y timing de interfaz.";
 }
 
 string SettingsMenuScreen::helperText() const {
@@ -136,26 +170,21 @@ string SettingsMenuScreen::helperText() const {
 }
 
 vector<string> SettingsMenuScreen::statusLines() const {
-    return {
-        "Volumen: " + game_settings::volumeLabel(settings_.volume),
-        "Dificultad: " + game_settings::difficultyLabel(settings_.difficulty),
-        "Velocidad: " + game_settings::simulationSpeedLabel(settings_.simulationSpeed),
-        "Simulacion: " + game_settings::simulationModeLabel(settings_.simulationMode)
-    };
+    return game_settings::detailedSettingsSummary(settings_);
 }
 
 vector<string> SettingsMenuScreen::roadmapLines() const {
     return {
-        "Audio: canal preparado para integracion futura.",
-        "Video: pendiente para resolucion, ventana y fullscreen.",
-        "Persistencia: lista para guardar configuraciones en disco."
+        "La velocidad de simulacion ya modifica pulsos y transiciones del frontend.",
+        "El idioma queda preparado para localizacion futura sin romper el flujo actual.",
+        "El modo de musica define si el tema vive solo en portada o en todo el frontend."
     };
 }
 
 vector<MenuOption> SettingsMenuScreen::options() const {
     return {
         {"Volumen: " + game_settings::volumeLabel(settings_.volume),
-         "Control de frontend listo para conectarse a audio real cuando exista.",
+         "Control de salida general del frontend y referencia para la musica del menu.",
          FrontMenuAction::CycleVolume,
          'v',
          true},
@@ -167,18 +196,87 @@ vector<MenuOption> SettingsMenuScreen::options() const {
         {"Velocidad de simulacion: " + game_settings::simulationSpeedLabel(settings_.simulationSpeed),
          game_settings::simulationSpeedDescription(settings_.simulationSpeed),
          FrontMenuAction::CycleSimulationSpeed,
-         'r',
+         's',
          false},
         {"Modo de simulacion: " + game_settings::simulationModeLabel(settings_.simulationMode),
          game_settings::simulationModeDescription(settings_.simulationMode),
          FrontMenuAction::CycleSimulationMode,
          'm',
          false},
+        {"Idioma: " + game_settings::languageLabel(settings_.language),
+         game_settings::languageDescription(settings_.language),
+         FrontMenuAction::CycleLanguage,
+         'i',
+         false},
+        {"Velocidad de texto: " + game_settings::textSpeedLabel(settings_.textSpeed),
+         game_settings::textSpeedDescription(settings_.textSpeed),
+         FrontMenuAction::CycleTextSpeed,
+         't',
+         false},
+        {"Perfil visual: " + game_settings::visualProfileLabel(settings_.visualProfile),
+         game_settings::visualProfileDescription(settings_.visualProfile),
+         FrontMenuAction::CycleVisualProfile,
+         'p',
+         false},
+        {"Musica del frontend: " + game_settings::menuMusicModeLabel(settings_.menuMusicMode),
+         game_settings::menuMusicModeDescription(settings_.menuMusicMode),
+         FrontMenuAction::CycleMenuMusicMode,
+         'u',
+         false},
+        {"Transicion de audio: " + game_settings::menuAudioFadeLabel(settings_.menuAudioFade),
+         game_settings::menuAudioFadeDescription(settings_.menuAudioFade),
+         FrontMenuAction::ToggleMenuAudioFade,
+         'f',
+         false},
         {"Volver",
-         "Regresa al menu principal sin perder cambios.",
+         "Regresa al menu principal sin perder cambios ni el perfil persistido.",
          FrontMenuAction::Back,
          'q',
          false}
+    };
+}
+
+CreditsMenuScreen::CreditsMenuScreen(const GameSettings& settings) : settings_(settings) {}
+
+string CreditsMenuScreen::headline() const {
+    return game_settings::gameTitle();
+}
+
+string CreditsMenuScreen::sectionTitle() const {
+    return "Creditos";
+}
+
+string CreditsMenuScreen::subtitle() const {
+    return "Proyecto C++ con GUI Win32 y una base de simulador de gestion futbolistica construida para crecer.";
+}
+
+string CreditsMenuScreen::helperText() const {
+    return "Enter o Q vuelven al menu principal.";
+}
+
+vector<string> CreditsMenuScreen::statusLines() const {
+    return {
+        "Motor: simulacion, carrera, scouting, staff, GUI Win32 y CLI compartida.",
+        "Frontend: portada Chilean Footballito con audio, settings persistentes y accesos directos.",
+        "Perfil actual: " + game_settings::settingsSummary(settings_)
+    };
+}
+
+vector<string> CreditsMenuScreen::roadmapLines() const {
+    return {
+        "Objetivo: seguir acercando el proyecto a una experiencia tipo Football Manager.",
+        "Base lista para nuevas pantallas: continuar, perfil, carga, creditos ampliados y opciones de video.",
+        "El proyecto mantiene una arquitectura modular para evolucionar sin duplicar flujos."
+    };
+}
+
+vector<MenuOption> CreditsMenuScreen::options() const {
+    return {
+        {"Volver",
+         "Regresa al menu principal y conserva la misma configuracion persistida.",
+         FrontMenuAction::Back,
+         'q',
+         true}
     };
 }
 
@@ -229,21 +327,42 @@ void MenuRenderer::render(const MenuScreen& screen, int selectedIndex, bool allo
 MenuActionHandler::MenuActionHandler(GameSettings& settings) : settings_(settings) {}
 
 void MenuActionHandler::applySettingsAction(FrontMenuAction action) const {
+    bool changed = true;
     switch (action) {
         case FrontMenuAction::CycleVolume:
             game_settings::cycleVolume(settings_);
-            return;
+            break;
         case FrontMenuAction::CycleDifficulty:
             game_settings::cycleDifficulty(settings_);
-            return;
+            break;
         case FrontMenuAction::CycleSimulationSpeed:
             game_settings::cycleSimulationSpeed(settings_);
-            return;
+            break;
         case FrontMenuAction::CycleSimulationMode:
             game_settings::cycleSimulationMode(settings_);
-            return;
+            break;
+        case FrontMenuAction::CycleLanguage:
+            game_settings::cycleLanguage(settings_);
+            break;
+        case FrontMenuAction::CycleTextSpeed:
+            game_settings::cycleTextSpeed(settings_);
+            break;
+        case FrontMenuAction::CycleVisualProfile:
+            game_settings::cycleVisualProfile(settings_);
+            break;
+        case FrontMenuAction::CycleMenuMusicMode:
+            game_settings::cycleMenuMusicMode(settings_);
+            break;
+        case FrontMenuAction::ToggleMenuAudioFade:
+            game_settings::toggleMenuAudioFade(settings_);
+            break;
         default:
-            return;
+            changed = false;
+            break;
+    }
+
+    if (changed) {
+        game_settings::saveToDisk(settings_);
     }
 }
 
@@ -265,13 +384,33 @@ void MenuActionHandler::printSettingsFeedback(FrontMenuAction action) const {
             cout << actionName(action) << " actual: "
                  << game_settings::simulationModeLabel(settings_.simulationMode) << "." << endl;
             return;
+        case FrontMenuAction::CycleLanguage:
+            cout << actionName(action) << " actual: "
+                 << game_settings::languageLabel(settings_.language) << "." << endl;
+            return;
+        case FrontMenuAction::CycleTextSpeed:
+            cout << actionName(action) << " actual: "
+                 << game_settings::textSpeedLabel(settings_.textSpeed) << "." << endl;
+            return;
+        case FrontMenuAction::CycleVisualProfile:
+            cout << actionName(action) << " actual: "
+                 << game_settings::visualProfileLabel(settings_.visualProfile) << "." << endl;
+            return;
+        case FrontMenuAction::CycleMenuMusicMode:
+            cout << actionName(action) << " actual: "
+                 << game_settings::menuMusicModeLabel(settings_.menuMusicMode) << "." << endl;
+            return;
+        case FrontMenuAction::ToggleMenuAudioFade:
+            cout << actionName(action) << " actual: "
+                 << game_settings::menuAudioFadeLabel(settings_.menuAudioFade) << "." << endl;
+            return;
         default:
             return;
     }
 }
 
-MenuController::MenuController(GameSettings& settings)
-    : settings_(settings), renderer_(settings), actionHandler_(settings) {}
+MenuController::MenuController(GameSettings& settings, Career& career)
+    : settings_(settings), career_(career), renderer_(settings), actionHandler_(settings) {}
 
 bool MenuController::handleNavigationInput(const string& input,
                                            int& selectedIndex,
@@ -345,7 +484,7 @@ FrontMenuAction MenuController::readScreenAction(const MenuScreen& screen, int& 
 
 FrontMenuAction MenuController::runMainMenu() {
     int selectedIndex = 0;
-    return readScreenAction(MainMenuScreen(settings_), selectedIndex, true);
+    return readScreenAction(MainMenuScreen(settings_, career_), selectedIndex, true);
 }
 
 void MenuController::runSettingsMenu() {
@@ -358,5 +497,16 @@ void MenuController::runSettingsMenu() {
         }
         actionHandler_.applySettingsAction(action);
         actionHandler_.printSettingsFeedback(action);
+    }
+}
+
+void MenuController::runCreditsMenu() {
+    int selectedIndex = 0;
+    while (true) {
+        FrontMenuAction action = readScreenAction(CreditsMenuScreen(settings_), selectedIndex, false);
+        if (action == FrontMenuAction::Back || action == FrontMenuAction::Exit) {
+            cout << "Volviendo al menu principal." << endl;
+            return;
+        }
     }
 }

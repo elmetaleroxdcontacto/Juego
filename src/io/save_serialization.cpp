@@ -1,7 +1,9 @@
 #include "io/save_serialization.h"
 
+#include "competition/league_registry.h"
 #include "utils/utils.h"
 
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 
@@ -10,6 +12,21 @@ using namespace std;
 namespace {
 
 static constexpr int kCareerSaveVersion = 12;
+
+string canonicalizeDivisionValue(const string& raw) {
+    return canonicalDivisionId(raw);
+}
+
+void rebuildCareerDivisions(Career& career) {
+    career.divisions.clear();
+    const auto& registered = listRegisteredDivisions();
+    for (const auto& division : registered) {
+        const bool hasTeams = std::any_of(career.allTeams.begin(), career.allTeams.end(), [&](const Team& team) {
+            return canonicalizeDivisionValue(team.division) == division.id;
+        });
+        if (hasTeams) career.divisions.push_back(division);
+    }
+}
 
 string escapeSaveField(const string& value) {
     string out;
@@ -211,7 +228,7 @@ vector<SeasonHistoryEntry> decodeHistory(const string& encoded) {
         if (parts.size() < 8) continue;
         SeasonHistoryEntry entry;
         entry.season = parseIntField(parts[0], 1);
-        entry.division = parts[1];
+        entry.division = canonicalizeDivisionValue(parts[1]);
         entry.club = parts[2];
         entry.finish = parseIntField(parts[3]);
         entry.champion = parts[4];
@@ -752,7 +769,9 @@ bool deserializeCareer(istream& file, Career& career) {
 
         string divisionLine;
         if (!getline(file, divisionLine)) return false;
-        if (divisionLine.rfind("DIVISION ", 0) == 0) activeDivision = splitEscapedFields(divisionLine.substr(9), '|').front();
+        if (divisionLine.rfind("DIVISION ", 0) == 0) {
+            activeDivision = canonicalizeDivisionValue(splitEscapedFields(divisionLine.substr(9), '|').front());
+        }
 
         string myTeamLine;
         if (!getline(file, myTeamLine)) return false;
@@ -900,7 +919,7 @@ bool deserializeCareer(istream& file, Career& career) {
             if (fields.size() < 11) return false;
 
             Team team(fields[0]);
-            team.division = fields[1];
+            team.division = canonicalizeDivisionValue(fields[1]);
             team.tactics = fields[2];
             team.formation = fields[3];
             team.budget = parseLongField(fields[4]);
@@ -1012,9 +1031,17 @@ bool deserializeCareer(istream& file, Career& career) {
             allTeams.push_back(std::move(team));
         }
 
+        for (auto& team : allTeams) {
+            team.division = canonicalizeDivisionValue(team.division);
+        }
+        rebuildCareerDivisions(career);
+
         initialized = true;
-        if (activeDivision.empty() && !allTeams.empty()) activeDivision = allTeams.front().division;
-        career.setActiveDivision(activeDivision);
+        if (activeDivision.empty() && !allTeams.empty()) activeDivision = canonicalizeDivisionValue(allTeams.front().division);
+        if (!activeDivision.empty()) {
+            activeDivision = canonicalizeDivisionValue(activeDivision);
+            career.setActiveDivision(activeDivision);
+        }
 
         myTeam = nullptr;
         for (auto& team : allTeams) {
@@ -1023,6 +1050,8 @@ bool deserializeCareer(istream& file, Career& career) {
                 break;
             }
         }
+        if (myTeam) activeDivision = canonicalizeDivisionValue(myTeam->division);
+        if (!activeDivision.empty()) career.setActiveDivision(activeDivision);
         if (boardExpectedFinish <= 0) career.initializeBoardObjectives();
         if (boardMonthlyObjective.empty()) career.initializeDynamicObjective();
         if (!cupActive && !career.activeTeams.empty()) career.initializeSeasonCup();
@@ -1128,8 +1157,12 @@ bool deserializeCareer(istream& file, Career& career) {
         }
     }
 
-    if (myTeam) activeDivision = myTeam->division;
-    else if (!divisions.empty()) activeDivision = divisions.front().id;
+    for (auto& team : allTeams) {
+        team.division = canonicalizeDivisionValue(team.division);
+    }
+    rebuildCareerDivisions(career);
+    if (myTeam) activeDivision = canonicalizeDivisionValue(myTeam->division);
+    else if (!divisions.empty()) activeDivision = canonicalizeDivisionValue(divisions.front().id);
     if (!activeDivision.empty()) career.setActiveDivision(activeDivision);
     career.initializeBoardObjectives();
     career.initializeSeasonCup();

@@ -129,6 +129,17 @@ void finalizeAction(AppState& state,
     }
 }
 
+void pulseFrontendTiming(AppState& state) {
+    const int delay = game_settings::pageTransitionDelayMs(state.settings);
+    if (delay <= 0) return;
+    UpdateWindow(state.window);
+    Sleep(static_cast<DWORD>(delay));
+}
+
+void persistSettings(AppState& state) {
+    game_settings::saveToDisk(state.settings);
+}
+
 }  // namespace
 
 void startNewCareer(AppState& state) {
@@ -175,7 +186,18 @@ void startNewCareer(AppState& state) {
     }
 }
 
+void continueCareer(AppState& state) {
+    if (state.career.myTeam) {
+        pulseFrontendTiming(state);
+        queuePageTransition(state, GuiPage::Dashboard);
+        setStatus(state, "Carrera activa retomada desde memoria.");
+        return;
+    }
+    loadCareer(state);
+}
+
 void loadCareer(AppState& state) {
+    pulseFrontendTiming(state);
     ServiceResult result = loadCareerService(state.career);
     if (!result.ok) {
         std::string message = result.messages.empty() ? "No se encontro una carrera guardada." : result.messages.front();
@@ -190,7 +212,7 @@ void loadCareer(AppState& state) {
     syncCombosFromCareer(state);
     state.selectedPlayerName.clear();
     state.selectedTransferPlayer.clear();
-    setCurrentPage(state, GuiPage::Dashboard);
+    queuePageTransition(state, GuiPage::Dashboard);
     setStatus(state, result.messages.empty() ? "Carrera cargada." : result.messages.back());
     if (!result.messages.empty() && result.messages.size() > 1) {
         showLoadMessagesCompact(state, result, "Carga de carrera");
@@ -213,6 +235,7 @@ void simulateWeek(AppState& state) {
                   game_settings::simulationModeLabel(state.settings.simulationMode) +
                   " a velocidad " + game_settings::simulationSpeedLabel(state.settings.simulationSpeed) + "...");
     UpdateWindow(state.window);
+    pulseFrontendTiming(state);
     ServiceResult result = simulateCareerWeekService(state.career);
     syncCombosFromCareer(state);
     refreshAll(state);
@@ -341,38 +364,86 @@ void runUpgradeAction(AppState& state, ClubUpgrade upgrade, const std::string& t
 void openFrontendMenu(AppState& state) {
     setCurrentPage(state, GuiPage::MainMenu);
     setStatus(state, "Menu principal listo. Entra a Jugar o revisa Configuraciones.");
-    if (state.menuPlayButton) SetFocus(state.menuPlayButton);
+    if (state.menuContinueButton && IsWindowEnabled(state.menuContinueButton)) SetFocus(state.menuContinueButton);
+    else if (state.menuPlayButton) SetFocus(state.menuPlayButton);
 }
 
 void openSettingsMenu(AppState& state) {
+    pulseFrontendTiming(state);
     setCurrentPage(state, GuiPage::Settings);
-    setStatus(state, "Configuraciones abiertas. Ajusta volumen, dificultad, velocidad y simulacion.");
+    setStatus(state, "Configuraciones abiertas. Ajusta frontend, accesibilidad y audio del menu.");
     if (state.menuVolumeButton) SetFocus(state.menuVolumeButton);
+}
+
+void openCreditsPage(AppState& state) {
+    pulseFrontendTiming(state);
+    setCurrentPage(state, GuiPage::Credits);
+    setStatus(state, "Creditos abiertos. La portada mantiene la identidad del manager game.");
+    if (state.menuBackButton) SetFocus(state.menuBackButton);
 }
 
 void cycleFrontendVolume(AppState& state) {
     game_settings::cycleVolume(state.settings);
     refreshMenuMusicVolume(state);
+    persistSettings(state);
     refreshCurrentPage(state);
     setStatus(state, "Volumen ajustado a " + game_settings::volumeLabel(state.settings.volume) + ".");
 }
 
 void cycleFrontendDifficulty(AppState& state) {
     game_settings::cycleDifficulty(state.settings);
+    persistSettings(state);
     refreshCurrentPage(state);
     setStatus(state, "Dificultad actual: " + game_settings::difficultyLabel(state.settings.difficulty) + ".");
 }
 
 void cycleFrontendSimulationSpeed(AppState& state) {
     game_settings::cycleSimulationSpeed(state.settings);
+    persistSettings(state);
     refreshCurrentPage(state);
     setStatus(state, "Velocidad actual: " + game_settings::simulationSpeedLabel(state.settings.simulationSpeed) + ".");
 }
 
 void cycleFrontendSimulationMode(AppState& state) {
     game_settings::cycleSimulationMode(state.settings);
+    persistSettings(state);
     refreshCurrentPage(state);
     setStatus(state, "Modo de simulacion actual: " + game_settings::simulationModeLabel(state.settings.simulationMode) + ".");
+}
+
+void cycleFrontendLanguage(AppState& state) {
+    game_settings::cycleLanguage(state.settings);
+    persistSettings(state);
+    refreshCurrentPage(state);
+    setStatus(state, "Idioma actual: " + game_settings::languageLabel(state.settings.language) + ".");
+}
+
+void cycleFrontendTextSpeed(AppState& state) {
+    game_settings::cycleTextSpeed(state.settings);
+    persistSettings(state);
+    refreshCurrentPage(state);
+    setStatus(state, "Velocidad de texto: " + game_settings::textSpeedLabel(state.settings.textSpeed) + ".");
+}
+
+void cycleFrontendVisualProfile(AppState& state) {
+    game_settings::cycleVisualProfile(state.settings);
+    persistSettings(state);
+    refreshCurrentPage(state);
+    setStatus(state, "Perfil visual: " + game_settings::visualProfileLabel(state.settings.visualProfile) + ".");
+}
+
+void cycleFrontendMenuMusicMode(AppState& state) {
+    game_settings::cycleMenuMusicMode(state.settings);
+    persistSettings(state);
+    refreshCurrentPage(state);
+    setStatus(state, "Musica del frontend: " + game_settings::menuMusicModeLabel(state.settings.menuMusicMode) + ".");
+}
+
+void toggleFrontendAudioFade(AppState& state) {
+    game_settings::toggleMenuAudioFade(state.settings);
+    persistSettings(state);
+    refreshCurrentPage(state);
+    setStatus(state, "Audio del menu: " + game_settings::menuAudioFadeLabel(state.settings.menuAudioFade) + ".");
 }
 
 }  // namespace gui_win32
