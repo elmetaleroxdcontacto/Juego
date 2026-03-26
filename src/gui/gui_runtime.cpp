@@ -186,6 +186,7 @@ void setStatus(AppState& state, const std::string& text) {
 void refreshCurrentPage(AppState& state) {
     refreshFilterComboOptions(state);
     state.currentModel = buildModel(state);
+    state.insightHotspots.clear();
     bool dashboardEmptyState = state.currentPage == GuiPage::Dashboard && !state.career.myTeam;
 
     setWindowTextUtf8(state.pageTitleLabel, state.currentModel.title);

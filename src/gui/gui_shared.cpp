@@ -5,6 +5,7 @@
 #include "utils/utils.h"
 
 #include <algorithm>
+#include <cctype>
 #include <cstdlib>
 #include <sstream>
 
@@ -192,7 +193,231 @@ void resetListViewColumns(HWND list, const std::vector<std::pair<std::wstring, i
     }
 }
 
-void autosizeListViewColumns(const AppState& state, HWND list, const std::vector<std::pair<std::wstring, int> >& columns) {
+namespace {
+
+struct ColumnSizingProfile {
+    int expansionWeight = 100;
+    int minPercent = 72;
+    int floorPercent = 58;
+    int shrinkPriority = 1;
+    bool compact = false;
+};
+
+struct ColumnContentDensity {
+    int averageChars = 0;
+    int maxChars = 0;
+    int populatedRows = 0;
+    bool compactValues = false;
+    bool sparse = false;
+};
+
+bool containsAnyToken(const std::string& value, std::initializer_list<const char*> tokens) {
+    for (const char* token : tokens) {
+        if (!token) continue;
+        if (value.find(token) != std::string::npos) return true;
+    }
+    return false;
+}
+
+std::string panelTitleForList(const AppState& state, HWND list) {
+    if (list == state.tableList) return state.currentModel.primary.title;
+    if (list == state.squadList) return state.currentModel.secondary.title;
+    if (list == state.transferList) return state.currentModel.footer.title;
+    return std::string();
+}
+
+std::string columnMemoryKey(const AppState& state,
+                            HWND list,
+                            const std::vector<std::pair<std::wstring, int> >& columns) {
+    std::ostringstream key;
+    key << static_cast<int>(state.currentPage) << "|" << panelTitleForList(state, list) << "|" << columns.size();
+    for (const auto& column : columns) {
+        key << "|" << toLower(trim(wideToUtf8(column.first)));
+    }
+    return key.str();
+}
+
+bool looksCompactCellValue(const std::string& raw) {
+    const std::string value = trim(toLower(raw));
+    if (value.empty()) return true;
+
+    int alpha = 0;
+    int digits = 0;
+    int spaces = 0;
+    for (unsigned char c : value) {
+        if (std::isalpha(c)) ++alpha;
+        else if (std::isdigit(c)) ++digits;
+        else if (std::isspace(c)) ++spaces;
+    }
+
+    if (value.size() <= 4) return true;
+    if (alpha == 0 && digits > 0) return true;
+    if (digits >= alpha * 2 && value.size() <= 18) return true;
+    if (containsAnyToken(value, {"$", "%", "sem", "/100", "/10", "pts", "dg"})) return value.size() <= 18;
+    return spaces == 0 && value.size() <= 12;
+}
+
+std::vector<ColumnContentDensity> sampleColumnDensities(HWND list, size_t columnCount) {
+    std::vector<ColumnContentDensity> densities(columnCount);
+    if (!list || columnCount == 0) return densities;
+
+    const int rowCount = ListView_GetItemCount(list);
+    const int sampleRows = std::min(rowCount, 18);
+    if (sampleRows <= 0) return densities;
+
+    std::vector<int> compactVotes(columnCount, 0);
+    for (int row = 0; row < sampleRows; ++row) {
+        for (size_t col = 0; col < columnCount; ++col) {
+            const std::string value = listViewText(list, row, static_cast<int>(col));
+            const std::string trimmed = trim(value);
+            if (trimmed.empty() || trimmed == "-") continue;
+
+            ColumnContentDensity& density = densities[col];
+            const int length = static_cast<int>(trimmed.size());
+            density.averageChars += length;
+            density.maxChars = std::max(density.maxChars, length);
+            density.populatedRows += 1;
+            if (looksCompactCellValue(trimmed)) compactVotes[col] += 1;
+        }
+    }
+
+    for (size_t col = 0; col < columnCount; ++col) {
+        ColumnContentDensity& density = densities[col];
+        if (density.populatedRows > 0) {
+            density.averageChars /= density.populatedRows;
+        }
+        density.compactValues = compactVotes[col] >= std::max(1, density.populatedRows * 2 / 3);
+        density.sparse = density.populatedRows <= std::max(1, sampleRows / 3);
+    }
+    return densities;
+}
+
+void applyCompactProfile(ColumnSizingProfile& profile, int weight = 42, int minPercent = 86, int floorPercent = 74) {
+    profile.expansionWeight = std::min(profile.expansionWeight, weight);
+    profile.minPercent = std::max(profile.minPercent, minPercent);
+    profile.floorPercent = std::max(profile.floorPercent, floorPercent);
+    profile.shrinkPriority = 0;
+    profile.compact = true;
+}
+
+void applyMediumTextProfile(ColumnSizingProfile& profile, int weight = 132, int minPercent = 68, int floorPercent = 56) {
+    profile.expansionWeight = std::max(profile.expansionWeight, weight);
+    profile.minPercent = std::min(profile.minPercent, minPercent);
+    profile.floorPercent = std::min(profile.floorPercent, floorPercent);
+    profile.shrinkPriority = std::max(profile.shrinkPriority, 2);
+    profile.compact = false;
+}
+
+void applyWideTextProfile(ColumnSizingProfile& profile, int weight = 180, int minPercent = 60, int floorPercent = 48) {
+    profile.expansionWeight = std::max(profile.expansionWeight, weight);
+    profile.minPercent = std::min(profile.minPercent, minPercent);
+    profile.floorPercent = std::min(profile.floorPercent, floorPercent);
+    profile.shrinkPriority = std::max(profile.shrinkPriority, 3);
+    profile.compact = false;
+}
+
+void mergeDensityIntoProfile(ColumnSizingProfile& profile, const ColumnContentDensity& density) {
+    if (density.compactValues && density.maxChars <= 16) {
+        applyCompactProfile(profile, 40, 88, 76);
+    } else if (density.maxChars >= 28 || density.averageChars >= 18) {
+        applyWideTextProfile(profile, 200, 56, 44);
+    } else if (density.maxChars >= 18 || density.averageChars >= 12) {
+        applyMediumTextProfile(profile, 146, 64, 52);
+    }
+
+    if (density.sparse) {
+        profile.expansionWeight = std::max(32, profile.expansionWeight - 18);
+    } else if (density.maxChars >= 24) {
+        profile.expansionWeight += 12;
+    }
+}
+
+ColumnSizingProfile buildColumnSizingProfile(const AppState& state,
+                                             HWND list,
+                                             size_t index,
+                                             const std::wstring& headerText) {
+    ColumnSizingProfile profile;
+    const std::string panel = toLower(trim(panelTitleForList(state, list)));
+    const std::string header = toLower(trim(wideToUtf8(headerText)));
+
+    if (header.size() <= 3 ||
+        containsAnyToken(header, {"pj", "pg", "pe", "pp", "gf", "gc", "dg", "pts", "pos", "hab", "gls", "ast",
+                                  "xg", "xa", "min", "age", "pot", "fis", "med", "fit"})) {
+        applyCompactProfile(profile);
+    } else if (containsAnyToken(header, {"edad", "media", "potencial", "fisico", "forma", "moral", "valor",
+                                         "salario", "costo", "precio", "riesgo", "tiempo", "semanas"})) {
+        applyCompactProfile(profile, 48, 84, 70);
+    } else if (containsAnyToken(header, {"jugador", "club", "equipo", "rival", "detalle", "lectura", "perfil",
+                                         "competicion", "objetivo", "contexto", "mercado", "nota", "titular"})) {
+        applyWideTextProfile(profile);
+    } else if (containsAnyToken(header, {"estado", "tipo", "linea", "area", "rol", "encaje", "plan", "accion"})) {
+        applyMediumTextProfile(profile);
+    }
+
+    if (panel == "leaguetableview" || panel == "leaguepositionwidget" || panel == "competitionsummary" || panel == "racecontext") {
+        if (index == 1 || containsAnyToken(header, {"club", "equipo"})) {
+            applyWideTextProfile(profile, 220, 56, 44);
+        } else {
+            applyCompactProfile(profile, 36, 88, 76);
+        }
+    } else if (panel == "fixturelistview" || panel == "competitionreport" || panel == "seasonhistory") {
+        if (containsAnyToken(header, {"rival", "competicion", "detalle", "contexto"})) {
+            applyWideTextProfile(profile, 188, 58, 46);
+        } else if (containsAnyToken(header, {"estado", "tipo"})) {
+            applyMediumTextProfile(profile, 140, 66, 54);
+        } else {
+            applyCompactProfile(profile, 48, 84, 70);
+        }
+    } else if (panel == "playertableview" || panel == "youthplayertableview") {
+        if (index == 0 || containsAnyToken(header, {"jugador"})) {
+            applyWideTextProfile(profile, 212, 56, 44);
+        } else if (containsAnyToken(header, {"club", "estado", "rol", "contrato", "situacion"})) {
+            applyMediumTextProfile(profile, 148, 64, 52);
+        } else {
+            applyCompactProfile(profile, 44, 86, 72);
+        }
+    } else if (panel == "transfermarketview" || panel == "transferpipeline" || panel == "transfertargetcard" ||
+               state.currentPage == GuiPage::Transfers) {
+        if (containsAnyToken(header, {"jugador", "club", "detalle", "lectura", "mercado", "perfil", "recomendacion"})) {
+            applyWideTextProfile(profile, 196, 56, 42);
+        } else if (containsAnyToken(header, {"estado", "tipo", "riesgo", "encaje", "rol"})) {
+            applyMediumTextProfile(profile, 150, 64, 52);
+        } else {
+            applyCompactProfile(profile, 40, 86, 74);
+        }
+    } else if (panel == "newscardlist" || panel == "alertpanel" || panel == "alertpanel / newsfeedpanel" ||
+               state.currentPage == GuiPage::News) {
+        if (containsAnyToken(header, {"titular", "detalle", "lectura", "contexto", "competicion", "mercado", "club"})) {
+            applyWideTextProfile(profile, 204, 54, 42);
+        } else if (containsAnyToken(header, {"tipo", "estado"})) {
+            applyMediumTextProfile(profile, 144, 64, 52);
+        } else {
+            applyCompactProfile(profile, 46, 84, 70);
+        }
+    } else if (panel == "injurylistwidget") {
+        if (containsAnyToken(header, {"jugador", "detalle", "nota"})) {
+            applyWideTextProfile(profile, 182, 58, 46);
+        } else if (containsAnyToken(header, {"tipo", "estado"})) {
+            applyMediumTextProfile(profile, 136, 66, 54);
+        } else {
+            applyCompactProfile(profile, 48, 84, 70);
+        }
+    } else if (panel == "salarytable" || panel == "boardobjectivetable") {
+        if (containsAnyToken(header, {"jugador", "objetivo", "detalle", "concepto"})) {
+            applyWideTextProfile(profile, 190, 56, 44);
+        } else if (containsAnyToken(header, {"estado", "avance"})) {
+            applyMediumTextProfile(profile, 138, 64, 52);
+        } else {
+            applyCompactProfile(profile, 44, 86, 72);
+        }
+    }
+
+    return profile;
+}
+
+}  // namespace
+
+void autosizeListViewColumns(AppState& state, HWND list, const std::vector<std::pair<std::wstring, int> >& columns) {
     if (!list || columns.empty() || !IsWindow(list)) return;
     RECT client{};
     GetClientRect(list, &client);
@@ -201,42 +426,129 @@ void autosizeListViewColumns(const AppState& state, HWND list, const std::vector
 
     std::vector<int> widths(columns.size(), 0);
     std::vector<int> minWidths(columns.size(), 0);
+    std::vector<int> floorWidths(columns.size(), 0);
+    std::vector<int> hardFloorWidths(columns.size(), 0);
+    std::vector<ColumnSizingProfile> profiles(columns.size());
+    const std::vector<ColumnContentDensity> densities = sampleColumnDensities(list, columns.size());
+    const std::string memoryKey = columnMemoryKey(state, list, columns);
+    const auto remembered = state.columnWidthMemory.find(memoryKey);
+    const bool hasRememberedWidths = remembered != state.columnWidthMemory.end() &&
+                                     remembered->second.size() == columns.size();
     int totalWidth = 0;
-    int totalMinWidth = 0;
 
     for (size_t i = 0; i < columns.size(); ++i) {
+        profiles[i] = buildColumnSizingProfile(state, list, i, columns[i].first);
+        if (i < densities.size()) mergeDensityIntoProfile(profiles[i], densities[i]);
+        SendMessageW(list, LVM_SETCOLUMNWIDTH, static_cast<WPARAM>(i), LVSCW_AUTOSIZE);
+        int contentWidth = ListView_GetColumnWidth(list, static_cast<int>(i));
         SendMessageW(list, LVM_SETCOLUMNWIDTH, static_cast<WPARAM>(i), LVSCW_AUTOSIZE_USEHEADER);
-        int autoWidth = ListView_GetColumnWidth(list, static_cast<int>(i));
+        int headerWidth = ListView_GetColumnWidth(list, static_cast<int>(i));
+        int autoWidth = std::max(contentWidth, headerWidth);
         int preferredWidth = scaleByDpi(state, columns[i].second);
-        int minWidth = clampValue(preferredWidth * 70 / 100, scaleByDpi(state, 60), preferredWidth);
-        int width = std::max(autoWidth, minWidth);
+        int densityWidth = preferredWidth;
+        if (i < densities.size() && densities[i].maxChars > 0) {
+            const int perChar = scaleByDpi(state, profiles[i].compact ? 5 : 7);
+            densityWidth = scaleByDpi(state, 28) + std::min(40, densities[i].maxChars) * perChar;
+        }
+        int width = std::max(std::max(autoWidth, preferredWidth), std::min(availableWidth, densityWidth));
+        if (hasRememberedWidths) {
+            width = std::max(scaleByDpi(state, profiles[i].compact ? 44 : 76),
+                             (width * 7 + remembered->second[i] * 5) / 12);
+        }
+        int minWidth = clampValue(preferredWidth * profiles[i].minPercent / 100,
+                                  scaleByDpi(state, profiles[i].compact ? 54 : 92),
+                                  width);
+        int floorWidth = clampValue(preferredWidth * profiles[i].floorPercent / 100,
+                                    scaleByDpi(state, profiles[i].compact ? 42 : 76),
+                                    minWidth);
+        int hardFloor = scaleByDpi(state, profiles[i].compact ? 36 : 68);
         widths[i] = width;
         minWidths[i] = minWidth;
+        floorWidths[i] = floorWidth;
+        hardFloorWidths[i] = std::min(floorWidth, hardFloor);
         totalWidth += width;
-        totalMinWidth += minWidth;
     }
 
-    if (totalWidth < availableWidth && !widths.empty()) {
-        widths.back() += availableWidth - totalWidth;
-    } else if (totalWidth > availableWidth && totalMinWidth < availableWidth) {
-        int overflow = totalWidth - availableWidth;
-        int shrinkable = totalWidth - totalMinWidth;
-        for (size_t i = 0; i < widths.size() && overflow > 0 && shrinkable > 0; ++i) {
-            int reducible = widths[i] - minWidths[i];
-            if (reducible <= 0) continue;
-            int reduction = std::max(1, reducible * overflow / shrinkable);
-            reduction = std::min(reduction, reducible);
-            widths[i] -= reduction;
-            overflow -= reduction;
+    auto orderedIndices = [&](int minShrinkPriority) {
+        std::vector<size_t> order;
+        for (size_t i = 0; i < widths.size(); ++i) {
+            if (profiles[i].shrinkPriority >= minShrinkPriority) order.push_back(i);
         }
-        if (overflow > 0 && !widths.empty()) {
-            widths.back() = std::max(minWidths.back(), widths.back() - overflow);
+        std::stable_sort(order.begin(), order.end(), [&](size_t lhs, size_t rhs) {
+            if (profiles[lhs].shrinkPriority != profiles[rhs].shrinkPriority) {
+                return profiles[lhs].shrinkPriority > profiles[rhs].shrinkPriority;
+            }
+            return profiles[lhs].expansionWeight > profiles[rhs].expansionWeight;
+        });
+        return order;
+    };
+
+    auto shrinkTowards = [&](const std::vector<int>& targets, int minShrinkPriority, int& overflow) {
+        std::vector<size_t> order = orderedIndices(minShrinkPriority);
+        while (overflow > 0 && !order.empty()) {
+            bool changed = false;
+            for (size_t index : order) {
+                if (overflow <= 0) break;
+                int reducible = widths[index] - targets[index];
+                if (reducible <= 0) continue;
+                int step = std::min(overflow,
+                                    std::max(1, std::min(reducible,
+                                                         profiles[index].shrinkPriority >= 2 ? 3 : 2)));
+                widths[index] -= step;
+                overflow -= step;
+                changed = true;
+            }
+            if (!changed) break;
+        }
+    };
+
+    if (totalWidth < availableWidth && !widths.empty()) {
+        int extra = availableWidth - totalWidth;
+        std::vector<size_t> order;
+        for (size_t i = 0; i < widths.size(); ++i) order.push_back(i);
+        std::stable_sort(order.begin(), order.end(), [&](size_t lhs, size_t rhs) {
+            return profiles[lhs].expansionWeight > profiles[rhs].expansionWeight;
+        });
+        while (extra > 0 && !order.empty()) {
+            bool changed = false;
+            for (size_t index : order) {
+                if (extra <= 0) break;
+                int grant = std::min(extra, std::max(1, profiles[index].expansionWeight / 60));
+                widths[index] += grant;
+                extra -= grant;
+                changed = true;
+            }
+            if (!changed) break;
+        }
+    } else if (totalWidth > availableWidth) {
+        int overflow = totalWidth - availableWidth;
+        shrinkTowards(minWidths, 2, overflow);
+        shrinkTowards(minWidths, 1, overflow);
+        shrinkTowards(minWidths, 0, overflow);
+        shrinkTowards(floorWidths, 0, overflow);
+        shrinkTowards(hardFloorWidths, 0, overflow);
+
+        if (overflow > 0) {
+            int currentWidth = 0;
+            for (int width : widths) currentWidth += width;
+            if (currentWidth > 0) {
+                int adjustedTotal = 0;
+                for (size_t i = 0; i < widths.size(); ++i) {
+                    int scaledWidth = std::max(hardFloorWidths[i], widths[i] * availableWidth / currentWidth);
+                    widths[i] = scaledWidth;
+                    adjustedTotal += scaledWidth;
+                }
+                if (!widths.empty() && adjustedTotal != availableWidth) {
+                    widths.back() = std::max(hardFloorWidths.back(), widths.back() + (availableWidth - adjustedTotal));
+                }
+            }
         }
     }
 
     for (size_t i = 0; i < widths.size(); ++i) {
         ListView_SetColumnWidth(list, static_cast<int>(i), widths[i]);
     }
+    state.columnWidthMemory[memoryKey] = widths;
 }
 
 void drawRoundedPanel(HDC hdc, const RECT& rect, COLORREF fill, COLORREF border, int radius) {
@@ -356,6 +668,16 @@ static bool isActivePageButton(const AppState& state, int id) {
     return isPageButtonId(id) && pageForControlId(id) == state.currentPage;
 }
 
+static bool usesButtonBadge(int id) {
+    return isPageButtonId(id) || id == IDC_DISPLAY_MODE_BUTTON;
+}
+
+static DisplayMode displayModeForButton(const AppState& state) {
+    if (state.isBorderlessFullscreen) return DisplayMode::BorderlessFullscreen;
+    if (state.window && IsZoomed(state.window)) return DisplayMode::MaximizedWindow;
+    return DisplayMode::RestoredWindow;
+}
+
 static bool titleMatches(const std::string& value, const char* expected) {
     return value == expected;
 }
@@ -388,9 +710,15 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     COLORREF fill = kThemePanelAlt;
     COLORREF border = RGB(40, 62, 77);
     COLORREF text = kThemeText;
+    const DisplayMode displayMode = displayModeForButton(state);
     if (isPageButtonId(id)) {
         fill = RGB(14, 24, 32);
         border = RGB(35, 56, 69);
+    } else if (id == IDC_DISPLAY_MODE_BUTTON) {
+        fill = displayMode == DisplayMode::BorderlessFullscreen
+            ? RGB(24, 58, 80)
+            : (displayMode == DisplayMode::MaximizedWindow ? RGB(32, 48, 66) : RGB(42, 53, 30));
+        border = kThemeAccentBlue;
     } else if (isPrimaryButtonId(id)) {
         fill = RGB(19, 63, 49);
         border = kThemeAccentGreen;
@@ -429,9 +757,11 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     wchar_t textBuffer[128]{};
     GetWindowTextW(drawItem->hwndItem, textBuffer, static_cast<int>(sizeof(textBuffer) / sizeof(textBuffer[0])));
     RECT textRect = rect;
-    if (isPageButtonId(id)) {
+    if (usesButtonBadge(id)) {
         RECT badgeRect{rect.left + 14, rect.top + 8, rect.left + 38, rect.bottom - 8};
-        HBRUSH badgeBrush = CreateSolidBrush(activePage ? kThemeAccent : RGB(28, 46, 58));
+        HBRUSH badgeBrush = CreateSolidBrush(id == IDC_DISPLAY_MODE_BUTTON
+                                                 ? kThemeAccentBlue
+                                                 : (activePage ? kThemeAccent : RGB(28, 46, 58)));
         HGDIOBJ oldBrush = SelectObject(hdc, badgeBrush);
         HGDIOBJ oldPen = SelectObject(hdc, GetStockObject(NULL_PEN));
         Ellipse(hdc, badgeRect.left, badgeRect.top, badgeRect.right, badgeRect.bottom);
@@ -440,9 +770,15 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
         DeleteObject(badgeBrush);
 
         RECT badgeText = badgeRect;
-        SetTextColor(hdc, activePage ? RGB(34, 27, 8) : RGB(225, 234, 239));
+        SetTextColor(hdc,
+                     id == IDC_DISPLAY_MODE_BUTTON ? RGB(10, 24, 35)
+                                                   : (activePage ? RGB(34, 27, 8) : RGB(225, 234, 239)));
         HGDIOBJ oldBadgeFont = SelectObject(hdc, state.sectionFont ? state.sectionFont : state.font);
-        wchar_t iconText[2]{pageButtonGlyph(id), L'\0'};
+        const wchar_t glyph = id == IDC_DISPLAY_MODE_BUTTON
+            ? (displayMode == DisplayMode::BorderlessFullscreen ? L'W'
+                                                                : (displayMode == DisplayMode::MaximizedWindow ? L'F' : L'M'))
+            : pageButtonGlyph(id);
+        wchar_t iconText[2]{glyph, L'\0'};
         DrawTextW(hdc, iconText, -1, &badgeText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
         SelectObject(hdc, oldBadgeFont);
 
@@ -458,7 +794,7 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
               textBuffer,
               -1,
               &textRect,
-              (isPageButtonId(id) ? DT_LEFT : DT_CENTER) | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+              (usesButtonBadge(id) ? DT_LEFT : DT_CENTER) | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
     SelectObject(hdc, oldFont);
 }
 

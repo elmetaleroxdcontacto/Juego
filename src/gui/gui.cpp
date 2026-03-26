@@ -58,7 +58,191 @@ RECT primaryMonitorWorkArea() {
     return rect;
 }
 
+DisplayMode currentDisplayMode(const AppState& state) {
+    if (state.isBorderlessFullscreen) return DisplayMode::BorderlessFullscreen;
+    if (state.window && IsZoomed(state.window)) return DisplayMode::MaximizedWindow;
+    return DisplayMode::RestoredWindow;
+}
+
+std::string displayModeButtonText(const AppState& state) {
+    switch (currentDisplayMode(state)) {
+        case DisplayMode::RestoredWindow:
+            return "Maximizar F11";
+        case DisplayMode::MaximizedWindow:
+            return "Pantalla F11";
+        case DisplayMode::BorderlessFullscreen:
+            return "Ventana F11";
+    }
+    return "Pantalla F11";
+}
+
+void syncDisplayModeButton(AppState& state) {
+    if (!state.displayModeButton) return;
+    setWindowTextUtf8(state.displayModeButton, displayModeButtonText(state));
+    InvalidateRect(state.displayModeButton, nullptr, TRUE);
+}
+
+void openPageWithFilter(AppState& state, GuiPage page, const std::string& filter) {
+    state.currentPage = page;
+    state.currentFilter = filter;
+    refreshCurrentPage(state);
+}
+
+bool restoreWindowedPlacement(AppState& state) {
+    if (!state.window) return false;
+
+    if (state.restoreStyle != 0) {
+        SetWindowLongPtrW(state.window, GWL_STYLE, static_cast<LONG_PTR>(state.restoreStyle));
+        SetWindowLongPtrW(state.window, GWL_EXSTYLE, static_cast<LONG_PTR>(state.restoreExStyle));
+    }
+
+    WINDOWPLACEMENT placement = state.restorePlacement;
+    placement.length = sizeof(WINDOWPLACEMENT);
+    if (placement.rcNormalPosition.left == 0 && placement.rcNormalPosition.right == 0) {
+        GetWindowPlacement(state.window, &placement);
+    }
+    placement.flags = 0;
+    placement.showCmd = SW_SHOWNORMAL;
+    SetWindowPlacement(state.window, &placement);
+    SetWindowPos(state.window,
+                 nullptr,
+                 0,
+                 0,
+                 0,
+                 0,
+                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+    ShowWindow(state.window, SW_RESTORE);
+    state.isBorderlessFullscreen = false;
+    syncDisplayModeButton(state);
+    setStatus(state, "Ventana restaurada. El siguiente paso del ciclo es maximizar y luego fullscreen.");
+    return true;
+}
+
+bool enterBorderlessFullscreen(AppState& state) {
+    if (!state.window) return false;
+
+    state.restoreStyle = static_cast<DWORD>(GetWindowLongPtrW(state.window, GWL_STYLE));
+    state.restoreExStyle = static_cast<DWORD>(GetWindowLongPtrW(state.window, GWL_EXSTYLE));
+    state.restorePlacement.length = sizeof(WINDOWPLACEMENT);
+    GetWindowPlacement(state.window, &state.restorePlacement);
+
+    HMONITOR monitor = MonitorFromWindow(state.window, MONITOR_DEFAULTTONEAREST);
+    MONITORINFO info{};
+    info.cbSize = sizeof(info);
+    RECT target = primaryMonitorWorkArea();
+    if (monitor && GetMonitorInfoW(monitor, &info)) {
+        target = info.rcMonitor;
+    }
+
+    SetWindowLongPtrW(state.window,
+                      GWL_STYLE,
+                      static_cast<LONG_PTR>((state.restoreStyle & ~WS_OVERLAPPEDWINDOW) | WS_POPUP | WS_VISIBLE));
+    SetWindowLongPtrW(state.window, GWL_EXSTYLE, static_cast<LONG_PTR>(state.restoreExStyle));
+    SetWindowPos(state.window,
+                 HWND_TOP,
+                 target.left,
+                 target.top,
+                 target.right - target.left,
+                 target.bottom - target.top,
+                 SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+    state.isBorderlessFullscreen = true;
+    syncDisplayModeButton(state);
+    setStatus(state, "Pantalla completa sin borde activa. El siguiente paso del ciclo devuelve la ventana restaurada.");
+    return true;
+}
+
+void maximizeWindow(AppState& state) {
+    if (!state.window) return;
+    ShowWindow(state.window, SW_MAXIMIZE);
+    state.isBorderlessFullscreen = false;
+    syncDisplayModeButton(state);
+    setStatus(state, "Ventana maximizada. Usa Pantalla o F11 para pasar al fullscreen sin borde.");
+}
+
+const InsightHotspot* hitInsightHotspot(const AppState& state, POINT point) {
+    for (const auto& hotspot : state.insightHotspots) {
+        if (hotspot.action != InsightAction::None && PtInRect(&hotspot.rect, point)) {
+            return &hotspot;
+        }
+    }
+    return nullptr;
+}
+
+void executeInsightAction(AppState& state, InsightAction action) {
+    switch (action) {
+        case InsightAction::FocusDivision:
+            SetFocus(state.divisionCombo);
+            setStatus(state, "Insight: elige la division para definir el universo de la partida.");
+            return;
+        case InsightAction::FocusClub:
+            SetFocus(state.teamCombo);
+            setStatus(state, "Insight: elige el club para fijar proyecto, presupuesto y plantilla inicial.");
+            return;
+        case InsightAction::StartCareer:
+            startNewCareer(state);
+            return;
+        case InsightAction::OpenLeague:
+            openPageWithFilter(state, GuiPage::League, "Grupo actual");
+            setStatus(state, "Insight: se abrio la vista de liga para revisar la carrera competitiva.");
+            return;
+        case InsightAction::OpenSquad:
+            openPageWithFilter(state, GuiPage::Squad, "Todos");
+            setStatus(state, "Insight: se abrio la plantilla para revisar forma, moral y salud.");
+            return;
+        case InsightAction::OpenBoard:
+            openPageWithFilter(state, GuiPage::Board, "Resumen");
+            setStatus(state, "Insight: se abrio la directiva para revisar confianza y objetivos.");
+            return;
+        case InsightAction::RefreshMarketPulse:
+            runFollowShortlistAction(state);
+            return;
+        case InsightAction::RunScouting:
+            runScoutingAction(state);
+            return;
+        case InsightAction::OpenFinanceSummary:
+            openPageWithFilter(state, GuiPage::Finances, "Resumen");
+            setStatus(state, "Insight: se abrio el resumen financiero del club.");
+            return;
+        case InsightAction::OpenFinanceSalaries:
+            openPageWithFilter(state, GuiPage::Finances, "Salarios");
+            setStatus(state, "Insight: se abrio la vista salarial para revisar contratos y masa salarial.");
+            return;
+        case InsightAction::OpenFinanceInfrastructure:
+            openPageWithFilter(state, GuiPage::Finances, "Infraestructura");
+            setStatus(state, "Insight: se abrio infraestructura para revisar capacidad de crecimiento.");
+            return;
+        case InsightAction::OpenBoardSummary:
+            openPageWithFilter(state, GuiPage::Board, "Resumen");
+            setStatus(state, "Insight: se abrio el resumen de la directiva.");
+            return;
+        case InsightAction::OpenBoardObjectives:
+            openPageWithFilter(state, GuiPage::Board, "Objetivos");
+            setStatus(state, "Insight: se abrio el seguimiento de objetivos mensuales.");
+            return;
+        case InsightAction::OpenBoardHistory:
+            openPageWithFilter(state, GuiPage::Board, "Historial");
+            setStatus(state, "Insight: se abrio el historial para evaluar la presion del cargo.");
+            return;
+        case InsightAction::None:
+            return;
+    }
+}
+
 }  // namespace
+
+void cycleDisplayMode(AppState& state) {
+    switch (currentDisplayMode(state)) {
+        case DisplayMode::RestoredWindow:
+            maximizeWindow(state);
+            return;
+        case DisplayMode::MaximizedWindow:
+            enterBorderlessFullscreen(state);
+            return;
+        case DisplayMode::BorderlessFullscreen:
+            restoreWindowedPlacement(state);
+            return;
+    }
+}
 
 LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     AppState* state = reinterpret_cast<AppState*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
@@ -83,6 +267,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
             if (state) {
                 layoutWindow(*state);
                 autosizeCurrentLists(*state);
+                syncDisplayModeButton(*state);
             }
             return 0;
         case WM_DPICHANGED:
@@ -102,9 +287,31 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 }
                 layoutWindow(*state);
                 autosizeCurrentLists(*state);
+                syncDisplayModeButton(*state);
                 InvalidateRect(hwnd, nullptr, TRUE);
             }
             return 0;
+        case WM_SETCURSOR:
+            if (state && LOWORD(lParam) == HTCLIENT) {
+                POINT cursor{};
+                GetCursorPos(&cursor);
+                ScreenToClient(hwnd, &cursor);
+                if (hitInsightHotspot(*state, cursor)) {
+                    SetCursor(LoadCursor(nullptr, IDC_HAND));
+                    return TRUE;
+                }
+            }
+            break;
+        case WM_LBUTTONUP:
+            if (state) {
+                POINT point{static_cast<LONG>(static_cast<short>(LOWORD(lParam))),
+                            static_cast<LONG>(static_cast<short>(HIWORD(lParam)))};
+                if (const InsightHotspot* hotspot = hitInsightHotspot(*state, point)) {
+                    executeInsightAction(*state, hotspot->action);
+                    return 0;
+                }
+            }
+            break;
         case WM_NOTIFY:
             if (!state) break;
             if (reinterpret_cast<LPNMHDR>(lParam)->code == NM_CUSTOMDRAW) {
@@ -199,6 +406,9 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                     return 0;
                 case IDC_VALIDATE_BUTTON:
                     validateSystem(*state);
+                    return 0;
+                case IDC_DISPLAY_MODE_BUTTON:
+                    cycleDisplayMode(*state);
                     return 0;
                 case IDC_EMPTY_NEW_BUTTON:
                     startNewCareer(*state);
@@ -346,6 +556,10 @@ int runGuiApp() {
 
     MSG msg{};
     while (GetMessageW(&msg, nullptr, 0, 0) > 0) {
+        if (msg.message == WM_KEYDOWN && msg.wParam == VK_F11 && (msg.lParam & (1u << 30)) == 0) {
+            gui_win32::cycleDisplayMode(state);
+            continue;
+        }
         TranslateMessage(&msg);
         DispatchMessageW(&msg);
     }

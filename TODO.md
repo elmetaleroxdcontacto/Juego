@@ -3038,3 +3038,116 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Si quieres historial mas limpio en futuras entregas, publicar por ramas tematicas (`simulation`, `gui`, `data`) y abrir PRs separados.
 - Repetir esta misma logica con changelog publico en `README.md` o `CHANGELOG.md` para que los cambios importantes tambien se vean fuera del commit log.
 - Si vas a compartir builds, agregar una automatizacion de release con artefacto del `.exe` y notas de version.
+
+## Auditoria del proyecto (2026-03-25 22:35:43 -03:00) - toggle F11, columnas contextuales y dashboard owner-draw reforzado
+
+### Lista de cambios realizados
+
+- Se agrego un modo `F11` real en tiempo de ejecucion para alternar entre la ventana actual y fullscreen sin borde, preservando el estilo y la colocacion anteriores al restaurar.
+- `include/gui/gui_internal.h` y `src/gui/gui.cpp` ahora guardan el estado de la ventana, recuerdan `WINDOWPLACEMENT` y actualizan la barra de estado para que el atajo sea visible y util.
+- El autoajuste de columnas en `src/gui/gui_shared.cpp` dejo de ser generico: ahora distingue columnas compactas/numericas frente a columnas de texto largo y aplica reglas especificas para liga, plantilla, fichajes, noticias, lesiones y finanzas.
+- En las tablas de fichajes y noticias se reparte mejor el ancho visible entre `Jugador`, `Club`, `Detalle`, `Lectura`, `Mercado` y columnas numericas como edad, valor, salario o riesgo, reduciendo el efecto “todo apretado”.
+- `src/gui/gui_layout.cpp` reserva una nueva franja visual para widgets KPI owner-draw en el dashboard y dibuja tarjetas de pulso competitivo, vestuario/salud y mesa del manager.
+- El dashboard vacio tambien gana tarjetas de onboarding mas claras, incluyendo una pista visual de `F11` y una lectura mas limpia de los pasos para iniciar una carrera.
+- Las tarjetas principales del dashboard recibieron remates visuales adicionales para que el centro del club tenga mas jerarquia y no se vea como una pila uniforme de paneles.
+
+### Archivos modificados
+
+- `include/gui/gui_internal.h`
+- `src/gui/gui.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_shared.cpp`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager`
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- `FootballManager` recompilo correctamente y el ejecutable actualizado quedo en `build-cmake\\bin\\FootballManager.exe`.
+- La suite `FootballManagerTests` termino con `All tests passed`.
+- Persisten advertencias antiguas/no bloqueantes de comparacion signed/unsigned en custom draw y notify Win32, pero no impiden compilar ni ejecutar esta mejora.
+
+### Mejoras futuras sugeridas
+
+- Añadir un boton explicito de modo de pantalla en la cabecera para acompanar el `F11` y hacer el cambio de modo aun mas descubrible para usuarios no tecnicos.
+- Llevar la misma logica de widgets owner-draw a fichajes, finanzas y directiva con indicadores pequenos de riesgo, presupuesto y presion competitiva.
+- Afinar todavia mas las reglas de ancho por tabla usando no solo encabezados, sino tambien densidad real del contenido mostrado en cada refresco.
+
+## Auditoria del proyecto (2026-03-25 22:47:22 -03:00) - boton de pantalla, insight strips y autosize por densidad real
+
+### Lista de cambios realizados
+
+- Se agrego un boton explicito `Pantalla F11` en la cabecera para descubrir mejor el cambio de modo sin depender de conocer el atajo de teclado.
+- El nuevo boton usa el mismo flujo del `F11`: entra a fullscreen sin borde y cambia su texto a `Restaurar F11` cuando corresponde.
+- `src/gui/gui_layout.cpp` ajusta el layout superior para reservar espacio al nuevo boton y manejar mejor el wrap de acciones de cabecera en anchos medios.
+- Los widgets owner-draw dejaron de ser exclusivos del dashboard: ahora fichajes, finanzas y directiva tambien muestran una franja de indicadores compactos antes de los paneles principales.
+- En fichajes se anadieron indicadores de presion de mercado, caja/scouting y riesgo de plantilla para leer mejor la urgencia del mercado sin abrir cada panel.
+- En finanzas se anadieron indicadores de caja operativa, estructura salarial e infraestructura para ver de un vistazo flujo, riesgo y capacidad del club.
+- En directiva se anadieron indicadores de confianza, objetivo mensual y presion del cargo para reflejar mejor el estado politico del proyecto.
+- El autoajuste de columnas en `src/gui/gui_shared.cpp` ahora usa tambien densidad real del contenido: mide muestras de filas visibles, detecta columnas compactas frente a texto largo y mezcla ese analisis con las reglas por encabezado y por vista.
+- Con eso las tablas de fichajes, noticias, salarios y pipeline reparten mejor el ancho entre columnas de detalle y columnas cortas, incluso cuando cambian los datos mostrados tras refrescar.
+
+### Archivos modificados
+
+- `include/gui/gui_internal.h`
+- `src/gui/gui.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_shared.cpp`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager`
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- `FootballManager` recompilo correctamente y el ejecutable actualizado quedo en `build-cmake\\bin\\FootballManager.exe`.
+- La suite `FootballManagerTests` termino con `All tests passed`.
+- Siguen apareciendo advertencias previas/no bloqueantes de comparaciones signed/unsigned en codigo Win32 de notify/custom draw, pero no afectan esta entrega.
+
+### Mejoras futuras sugeridas
+
+- Afinar el boton de pantalla para ofrecer ciclo completo entre ventana restaurada, maximizado y fullscreen sin borde en vez de solo alternar el modo actual con fullscreen.
+- Dar a los insight strips accion contextual directa, por ejemplo abrir scouting, contratos o objetivos al hacer click sobre cada tarjeta.
+- Seguir puliendo el autosize con memoria por vista para recordar ajustes de ancho recientes y suavizar aun mas los cambios visuales entre refreshes.
+
+## Auditoria del proyecto (2026-03-25 23:03:01 -03:00) - ciclo de pantalla triple, insight strips clicables y autosize con memoria
+
+### Lista de cambios realizados
+
+- El boton de modo de pantalla y `F11` dejaron de ser un toggle binario: ahora recorren ciclo completo entre ventana restaurada, maximizado y fullscreen sin borde.
+- `src/gui/gui.cpp` detecta el modo actual de la ventana, ajusta el texto del boton segun el siguiente paso del ciclo (`Maximizar F11`, `Pantalla F11`, `Ventana F11`) y conserva el `WINDOWPLACEMENT` necesario para volver desde fullscreen a la ventana restaurada.
+- Las tarjetas KPI e insight strips ya no son solo decorativas: ahora registran hotspots, muestran una pista `Click:` y reaccionan al mouse con acciones contextuales.
+- En dashboard vacio las tarjetas ayudan a elegir division, club y lanzar la carrera; en dashboard activo abren liga, plantilla o directiva; en fichajes ejecutan radar/scouting o llevan a salarios; en finanzas y directiva abren resumen, salarios, infraestructura u objetivos concretos.
+- `src/gui/gui_layout.cpp` se refactorizo para reutilizar un renderer comun de tarjetas owner-draw, evitando duplicacion entre dashboard e insight strips contextuales.
+- El autosize de columnas ahora recuerda anchos recientes por vista y por conjunto de columnas, mezclando ese historial con el analisis actual de cabeceras y densidad para evitar saltos bruscos entre refreshes.
+- `src/gui/gui_shared.cpp` guarda esa memoria en `AppState`, la usa como sesgo suave en el recalculo y luego persiste el nuevo reparto, haciendo que fichajes, noticias, salarios y tablas largas se vean mas estables al refrescar.
+- La GUI recompilo correctamente tras el parche y la suite de pruebas completa siguio pasando.
+
+### Archivos modificados
+
+- `include/gui/gui_internal.h`
+- `src/gui/gui.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+- `src/gui/gui_shared.cpp`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerTests`
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- `cmake --build build-cmake --config Release --target FootballManager`
+- Resultado:
+- `FootballManager.exe` recompilo correctamente en `build-cmake\\bin\\FootballManager.exe`.
+- La suite `FootballManagerTests` termino con `All tests passed`.
+- Persisten advertencias antiguas/no bloqueantes de comparaciones signed/unsigned en notify/custom draw Win32, pero no afectan esta entrega.
+
+### Mejoras futuras sugeridas
+
+- Hacer que las tarjetas clicables reaccionen tambien al teclado (`Tab`, `Enter`, `Space`) para que el onboarding y los paneles KPI sean accesibles sin mouse.
+- Conectar el hover de las tarjetas a tooltips ricos con mas contexto operativo, por ejemplo recomendacion tactica, alerta medica o lectura financiera ampliada.
+- Extender la memoria visual a altura de filas, orden preferido y filtro reciente por pagina para que cada vista recupere aun mejor el contexto de trabajo del manager.

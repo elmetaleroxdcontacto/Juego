@@ -7,6 +7,7 @@
 #include "engine/models.h"
 
 #include <string>
+#include <map>
 #include <utility>
 #include <vector>
 
@@ -32,6 +33,7 @@ enum ControlId {
     IDC_SAVE_BUTTON,
     IDC_SIMULATE_BUTTON,
     IDC_VALIDATE_BUTTON,
+    IDC_DISPLAY_MODE_BUTTON,
     IDC_FILTER_COMBO,
     IDC_SUMMARY_EDIT,
     IDC_NEWS_LIST,
@@ -80,6 +82,30 @@ enum class GuiPage {
     News
 };
 
+enum class DisplayMode {
+    RestoredWindow,
+    MaximizedWindow,
+    BorderlessFullscreen
+};
+
+enum class InsightAction {
+    None,
+    FocusDivision,
+    FocusClub,
+    StartCareer,
+    OpenLeague,
+    OpenSquad,
+    OpenBoard,
+    RefreshMarketPulse,
+    RunScouting,
+    OpenFinanceSummary,
+    OpenFinanceSalaries,
+    OpenFinanceInfrastructure,
+    OpenBoardSummary,
+    OpenBoardObjectives,
+    OpenBoardHistory
+};
+
 struct SortState {
     int column = 0;
     bool ascending = true;
@@ -120,10 +146,20 @@ struct GuiPageModel {
     std::vector<DashboardMetric> metrics;
 };
 
+struct InsightHotspot {
+    RECT rect{};
+    InsightAction action = InsightAction::None;
+    std::wstring hint;
+};
+
 struct AppState {
     HINSTANCE instance = nullptr;
     HWND window = nullptr;
     UINT dpi = 96;
+    bool isBorderlessFullscreen = false;
+    WINDOWPLACEMENT restorePlacement{};
+    DWORD restoreStyle = 0;
+    DWORD restoreExStyle = 0;
     HFONT font = nullptr;
     HFONT titleFont = nullptr;
     HFONT sectionFont = nullptr;
@@ -143,6 +179,8 @@ struct AppState {
     std::string selectedTransferPlayer;
     std::string selectedTransferClub;
     GuiPageModel currentModel;
+    std::vector<InsightHotspot> insightHotspots;
+    std::map<std::string, std::vector<int> > columnWidthMemory;
 
     HWND divisionCombo = nullptr;
     HWND teamCombo = nullptr;
@@ -157,6 +195,7 @@ struct AppState {
     HWND saveButton = nullptr;
     HWND simulateButton = nullptr;
     HWND validateButton = nullptr;
+    HWND displayModeButton = nullptr;
 
     HWND dashboardButton = nullptr;
     HWND squadButton = nullptr;
@@ -245,7 +284,7 @@ std::string listViewText(HWND list, int row, int subItem);
 void clearListView(HWND list);
 void addListViewRow(HWND list, const std::vector<std::string>& values);
 void resetListViewColumns(HWND list, const std::vector<std::pair<std::wstring, int> >& columns);
-void autosizeListViewColumns(const AppState& state, HWND list, const std::vector<std::pair<std::wstring, int> >& columns);
+void autosizeListViewColumns(AppState& state, HWND list, const std::vector<std::pair<std::wstring, int> >& columns);
 void drawRoundedPanel(HDC hdc, const RECT& rect, COLORREF fill, COLORREF border, int radius = 16);
 void drawPitchOverlay(HDC hdc, const RECT& rect);
 void drawSectionHeader(HDC hdc, const RECT& rect, const std::wstring& title);
@@ -265,6 +304,7 @@ void layoutWindow(AppState& state);
 void paintWindowChrome(AppState& state, HDC hdc);
 void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem);
 LRESULT handleListCustomDraw(AppState& state, LPNMHDR header);
+void cycleDisplayMode(AppState& state);
 
 std::string selectedDivisionId(const AppState& state);
 void fillDivisionCombo(AppState& state, const std::string& selectedId = std::string());

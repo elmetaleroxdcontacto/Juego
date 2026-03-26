@@ -2,6 +2,7 @@
 
 #ifdef _WIN32
 
+#include "finance/finance_system.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -18,6 +19,16 @@ struct ActionButtonRef {
     int width;
 };
 
+struct DashboardSpotlightCard {
+    std::wstring label;
+    std::wstring value;
+    std::wstring detail;
+    std::wstring actionHint;
+    COLORREF accent = RGB(71, 126, 212);
+    int pulse = 0;
+    InsightAction action = InsightAction::None;
+};
+
 constexpr int kWindowPadding = 12;
 constexpr int kSideRailWideWidth = 182;
 constexpr int kSideRailCompactWidth = 168;
@@ -32,6 +43,10 @@ constexpr int kHeaderFieldHeight = 32;
 constexpr int kHeaderButtonHeight = 34;
 constexpr int kHeaderRowGap = 8;
 constexpr int kMetricCount = 5;
+constexpr int kDashboardSpotlightWideReserve = 96;
+constexpr int kDashboardSpotlightCompactReserve = 150;
+constexpr int kInsightStripWideReserve = 88;
+constexpr int kInsightStripCompactReserve = 134;
 
 struct HeaderLayoutProfile {
     int sideWidth = kSideRailWideWidth;
@@ -77,7 +92,7 @@ HeaderLayoutProfile buildHeaderLayout(const RECT& client) {
 
     layout.buttonsTop = layout.shareTopRow ? 16 : layout.controlsBottom + 10;
     const int availableButtonRow = std::max(320, width - kWindowPadding * 2);
-    const int fullButtonRowWidth = 156 + 112 + 112 + 126 + 94 + 10 * 4;
+    const int fullButtonRowWidth = 156 + 112 + 112 + 126 + 154 + 94 + 10 * 5;
     const int buttonRows = availableButtonRow >= fullButtonRowWidth ? 1 : 2;
     layout.buttonsBottom = layout.buttonsTop + kHeaderButtonHeight + (buttonRows - 1) * (kHeaderButtonHeight + kHeaderRowGap);
 
@@ -113,6 +128,21 @@ PageLayoutProfile buildPageLayoutProfile(GuiPage page) {
             return {404, 350, 32, 292, 194, 228, 166, 154, 150};
     }
     return PageLayoutProfile{};
+}
+
+bool pageUsesInsightStrip(const AppState& state) {
+    if (state.currentPage == GuiPage::Dashboard) return true;
+    if (!state.career.myTeam) return false;
+    return state.currentPage == GuiPage::Transfers ||
+           state.currentPage == GuiPage::Finances ||
+           state.currentPage == GuiPage::Board;
+}
+
+int pulseFromRatio(long long current, long long good, long long dangerFloor) {
+    if (current <= dangerFloor) return 6;
+    if (current >= good) return 100;
+    const long long span = std::max(1LL, good - dangerFloor);
+    return clampValue(static_cast<int>((current - dangerFloor) * 100 / span), 0, 100);
 }
 
 std::vector<DashboardMetric> defaultMetrics() {
@@ -208,6 +238,392 @@ void drawTopMetrics(AppState& state, HDC hdc, const RECT& client) {
         DrawTextW(hdc, utf8ToWide(metrics[i].value).c_str(), -1, &valueRect, DT_LEFT | DT_BOTTOM | DT_SINGLELINE | DT_END_ELLIPSIS);
         SelectObject(hdc, oldFont);
     }
+}
+
+std::vector<DashboardSpotlightCard> buildDashboardSpotlightCards(const AppState& state) {
+    std::vector<DashboardSpotlightCard> cards;
+
+    if (!state.career.myTeam) {
+        const std::string division = comboText(state.divisionCombo);
+        const std::string team = comboText(state.teamCombo);
+        const std::string manager = trim(getWindowTextUtf8(state.managerEdit));
+        cards.push_back({L"Paso 1 · Universo",
+                         utf8ToWide(division.empty() ? "Selecciona division" : division),
+                         L"Define la liga base antes de crear la carrera.",
+                         L"Click: elegir division",
+                         kThemeAccentBlue,
+                         division.empty() ? 24 : 72,
+                         InsightAction::FocusDivision});
+        cards.push_back({L"Paso 2 · Proyecto",
+                         utf8ToWide(team.empty() ? "Elige club" : team),
+                         L"Busca reto deportivo, cantera o estabilidad financiera.",
+                         L"Click: elegir club",
+                         kThemeAccentGreen,
+                         team.empty() ? 36 : 78,
+                         InsightAction::FocusClub});
+        cards.push_back({L"Paso 3 · Lanzamiento",
+                         utf8ToWide(manager.empty() ? "Manager pendiente" : manager),
+                         L"Nueva partida inicia el club hub. F11 alterna fullscreen en vivo.",
+                         L"Click: crear carrera",
+                         kThemeAccent,
+                         manager.empty() ? 48 : 92,
+                         InsightAction::StartCareer});
+        return cards;
+    }
+
+    const Team& team = *state.career.myTeam;
+    int injured = 0;
+    int lowMorale = 0;
+    int lowFitness = 0;
+    for (const auto& player : team.players) {
+        if (player.injured) injured++;
+        if (player.happiness < 45) lowMorale++;
+        if (!player.injured && player.fitness < 62) lowFitness++;
+    }
+
+    const int fieldSize = std::max(1, state.career.currentCompetitiveFieldSize());
+    const int rank = std::max(1, state.career.currentCompetitiveRank());
+    const int rankPulse = clampValue(100 - ((rank - 1) * 100 / std::max(1, fieldSize - 1)), 0, 100);
+    const int squadPulse = clampValue(team.morale - injured * 7 - lowFitness * 3, 0, 100);
+    const int deskPulse = state.career.boardMonthlyTarget > 0
+        ? clampValue(state.career.boardMonthlyProgress * 100 / std::max(1, state.career.boardMonthlyTarget), 0, 100)
+        : clampValue(state.career.boardConfidence, 0, 100);
+
+    std::ostringstream competitiveValue;
+    competitiveValue << "#" << rank << " de " << fieldSize;
+    std::ostringstream competitiveDetail;
+    competitiveDetail << "Puntos " << team.points
+                      << " | DG " << (team.goalsFor - team.goalsAgainst)
+                      << "\nObjetivo: "
+                      << (state.career.boardMonthlyObjective.empty() ? "sin objetivo mensual" : state.career.boardMonthlyObjective);
+
+    std::ostringstream squadValue;
+    squadValue << "Moral " << team.morale << " | LES " << injured;
+    std::ostringstream squadDetail;
+    squadDetail << "Bajos de forma " << lowFitness
+                << " | animos delicados " << lowMorale
+                << "\nEntreno: " << team.trainingFocus;
+
+    std::ostringstream deskDetail;
+    deskDetail << "Shortlist " << state.career.scoutingShortlist.size()
+               << " | directiva " << state.career.boardConfidence << "/100"
+               << "\n" << (team.transferPolicy.empty() ? "Politica mixta" : team.transferPolicy);
+
+    COLORREF squadAccent = injured >= 3 || lowFitness >= 4 ? kThemeWarning : kThemeAccentGreen;
+    COLORREF deskAccent = team.budget < 0 ? kThemeDanger : kThemeAccent;
+    cards.push_back({L"Pulso competitivo",
+                     utf8ToWide(competitiveValue.str()),
+                     utf8ToWide(competitiveDetail.str()),
+                     L"Click: abrir liga",
+                     kThemeAccentBlue,
+                     rankPulse,
+                     InsightAction::OpenLeague});
+    cards.push_back({L"Vestuario y salud",
+                     utf8ToWide(squadValue.str()),
+                     utf8ToWide(squadDetail.str()),
+                     L"Click: abrir plantilla",
+                     squadAccent,
+                     squadPulse,
+                     InsightAction::OpenSquad});
+    cards.push_back({L"Mesa del manager",
+                     utf8ToWide(formatMoneyValue(team.budget)),
+                     utf8ToWide(deskDetail.str()),
+                     L"Click: abrir directiva",
+                     deskAccent,
+                     deskPulse,
+                     InsightAction::OpenBoard});
+    return cards;
+}
+
+std::vector<DashboardSpotlightCard> buildContextInsightCards(const AppState& state) {
+    std::vector<DashboardSpotlightCard> cards;
+    if (!state.career.myTeam) return cards;
+
+    const Team& team = *state.career.myTeam;
+    if (state.currentPage == GuiPage::Transfers) {
+        int expiringContracts = 0;
+        int wantsOut = 0;
+        int injured = 0;
+        int salaryHeavy = 0;
+        for (const auto& player : team.players) {
+            if (player.contractWeeks <= 12) ++expiringContracts;
+            if (player.wantsToLeave) ++wantsOut;
+            if (player.injured) ++injured;
+            if (player.wage > std::max(25000LL, team.sponsorWeekly / 3)) ++salaryHeavy;
+        }
+
+        const int marketPressure = clampValue(expiringContracts * 11 + wantsOut * 15 +
+                                              static_cast<int>(state.career.pendingTransfers.size()) * 9 + injured * 6,
+                                              0,
+                                              100);
+        const int squadRisk = clampValue(salaryHeavy * 12 + injured * 8, 0, 100);
+        cards.push_back({L"Presion de mercado",
+                         utf8ToWide(std::to_string(expiringContracts + wantsOut) + " focos"),
+                         utf8ToWide("Pendientes " + std::to_string(state.career.pendingTransfers.size()) +
+                                    " | lesionados " + std::to_string(injured) +
+                                    "\nContratos cortos " + std::to_string(expiringContracts) +
+                                    " | salidas " + std::to_string(wantsOut)),
+                         L"Click: actualizar radar",
+                         marketPressure >= 65 ? kThemeWarning : kThemeAccentBlue,
+                         marketPressure,
+                         InsightAction::RefreshMarketPulse});
+        cards.push_back({L"Caja y scouting",
+                         utf8ToWide(formatMoneyValue(team.budget)),
+                         utf8ToWide("Shortlist " + std::to_string(state.career.scoutingShortlist.size()) +
+                                    " | jefe scouting " + std::to_string(team.scoutingChief) +
+                                    "\nRed " + (team.scoutingRegions.empty() ? std::string("-") : joinStringValues(team.scoutingRegions, ", "))),
+                         L"Click: lanzar scouting",
+                         team.budget < 0 ? kThemeDanger : kThemeAccentGreen,
+                         pulseFromRatio(team.budget, std::max(220000LL, team.sponsorWeekly * 5), -50000LL),
+                         InsightAction::RunScouting});
+        cards.push_back({L"Riesgo de plantilla",
+                         utf8ToWide(std::to_string(squadRisk / 10) + "/10"),
+                         utf8ToWide("Sueldos altos " + std::to_string(salaryHeavy) +
+                                    " | lesionados " + std::to_string(injured) +
+                                    "\nCompra con salida previa si la masa salarial ya esta tensa."),
+                         L"Click: abrir salarios",
+                         squadRisk >= 60 ? kThemeDanger : kThemeAccent,
+                         100 - std::min(92, squadRisk),
+                         InsightAction::OpenFinanceSalaries});
+        return cards;
+    }
+
+    if (state.currentPage == GuiPage::Finances) {
+        const WeeklyFinanceReport finance = finance_system::projectWeeklyReport(team);
+        const int infraAverage = (team.youthFacilityLevel + team.trainingFacilityLevel + team.stadiumLevel +
+                                  team.scoutingChief + team.performanceAnalyst + team.medicalTeam) / 6;
+        const long long safeSponsor = std::max(1LL, finance.sponsorIncome);
+        const int payrollLoad = clampValue(static_cast<int>(finance.wageBill * 100 / safeSponsor), 0, 180);
+        cards.push_back({L"Caja operativa",
+                         utf8ToWide(formatMoneyValue(finance.netCashFlow)),
+                         utf8ToWide("Buffer " + formatMoneyValue(finance.transferBuffer) +
+                                    " | deuda " + formatMoneyValue(team.debt) +
+                                    "\nSponsor " + formatMoneyValue(finance.sponsorIncome) +
+                                    " | bonos " + formatMoneyValue(finance.bonusIncome)),
+                         L"Click: ver resumen",
+                         finance.netCashFlow < 0 ? kThemeDanger : kThemeAccentGreen,
+                         pulseFromRatio(finance.transferBuffer, std::max(180000LL, team.sponsorWeekly * 4), -80000LL),
+                         InsightAction::OpenFinanceSummary});
+        cards.push_back({L"Estructura salarial",
+                         utf8ToWide(formatMoneyValue(finance.wageBill)),
+                         utf8ToWide("Carga " + std::to_string(payrollLoad) + "% del sponsor semanal" +
+                                    "\nRiesgo " + finance.riskLevel +
+                                    " | taquilla " + formatMoneyValue(finance.matchdayIncome)),
+                         L"Click: ver salarios",
+                         payrollLoad > 110 ? kThemeWarning : kThemeAccentBlue,
+                         clampValue(118 - payrollLoad, 8, 100),
+                         InsightAction::OpenFinanceSalaries});
+        cards.push_back({L"Infraestructura",
+                         utf8ToWide(std::to_string(infraAverage) + "/100"),
+                         utf8ToWide("Cantera " + std::to_string(team.youthFacilityLevel) +
+                                    " | entreno " + std::to_string(team.trainingFacilityLevel) +
+                                    "\nEstadio " + std::to_string(team.stadiumLevel) +
+                                    " | analisis " + std::to_string(team.performanceAnalyst)),
+                         L"Click: ver infraestructura",
+                         infraAverage >= 60 ? kThemeAccent : kThemeAccentBlue,
+                         clampValue(infraAverage, 0, 100),
+                         InsightAction::OpenFinanceInfrastructure});
+        return cards;
+    }
+
+    if (state.currentPage == GuiPage::Board) {
+        const int rank = std::max(1, state.career.currentCompetitiveRank());
+        const int fieldSize = std::max(1, state.career.currentCompetitiveFieldSize());
+        const int boardPulse = clampValue(state.career.boardConfidence, 0, 100);
+        const int objectivePulse = state.career.boardMonthlyTarget > 0
+            ? clampValue(state.career.boardMonthlyProgress * 100 / std::max(1, state.career.boardMonthlyTarget), 0, 100)
+            : std::max(35, boardPulse);
+        const int jobPulse = clampValue((team.jobSecurity + boardPulse) / 2, 0, 100);
+        cards.push_back({L"Confianza directiva",
+                         utf8ToWide(std::to_string(state.career.boardConfidence) + "/100"),
+                         utf8ToWide("Esperan puesto " + std::to_string(state.career.boardExpectedFinish) +
+                                    " | actual #" + std::to_string(rank) +
+                                    "\nAdvertencias " + std::to_string(state.career.boardWarningWeeks) +
+                                    " | campo " + std::to_string(fieldSize)),
+                         L"Click: ver resumen",
+                         state.career.boardConfidence < 35 ? kThemeDanger : kThemeAccentGreen,
+                         boardPulse,
+                         InsightAction::OpenBoardSummary});
+        cards.push_back({L"Objetivo mensual",
+                         utf8ToWide(state.career.boardMonthlyTarget > 0
+                                        ? std::to_string(state.career.boardMonthlyProgress) + "/" + std::to_string(state.career.boardMonthlyTarget)
+                                        : "Sin target"),
+                         utf8ToWide((state.career.boardMonthlyObjective.empty() ? std::string("Sin objetivo dinamico")
+                                                                                 : state.career.boardMonthlyObjective) +
+                                    "\nDeadline sem " + std::to_string(state.career.boardMonthlyDeadlineWeek)),
+                         L"Click: ver objetivos",
+                         objectivePulse < 45 ? kThemeWarning : kThemeAccentBlue,
+                         objectivePulse,
+                         InsightAction::OpenBoardObjectives});
+        cards.push_back({L"Presion del cargo",
+                         utf8ToWide(std::to_string(team.jobSecurity) + "/100"),
+                         utf8ToWide("Prestigio " + std::to_string(team.clubPrestige) +
+                                    " | DT " + team.headCoachName +
+                                    "\nPolitica " + (team.transferPolicy.empty() ? std::string("Mixta") : team.transferPolicy)),
+                         L"Click: ver historial",
+                         team.jobSecurity < 35 ? kThemeDanger : kThemeAccent,
+                         jobPulse,
+                         InsightAction::OpenBoardHistory});
+    }
+
+    return cards;
+}
+
+RECT dashboardSpotlightBand(const AppState& state, const RECT& contentShell, const RECT& summaryCard) {
+    const auto s = [&](int value) { return scaleByDpi(state, value); };
+    RECT band{contentShell.left + s(16), contentShell.top + s(110), contentShell.right - s(16), summaryCard.top - s(12)};
+
+    RECT infoRect = childRectOnParent(state.infoLabel, state.window);
+    if (infoRect.bottom > 0) {
+        band.top = std::max(band.top, infoRect.bottom + s(18));
+    }
+
+    const std::array<HWND, 13> actionButtons = {
+        state.scoutActionButton, state.shortlistButton, state.followShortlistButton, state.buyButton,
+        state.preContractButton, state.renewButton, state.sellButton, state.planButton, state.instructionButton,
+        state.youthUpgradeButton, state.trainingUpgradeButton, state.scoutingUpgradeButton, state.stadiumUpgradeButton
+    };
+    for (HWND button : actionButtons) {
+        if (!button || !IsWindowVisible(button)) continue;
+        RECT rect = childRectOnParent(button, state.window);
+        band.top = std::max(band.top, rect.bottom + s(14));
+    }
+
+    if (band.bottom < band.top + s(54)) {
+        SetRectEmpty(&band);
+    }
+    return band;
+}
+
+void rememberInsightHotspot(AppState& state, const RECT& rect, const DashboardSpotlightCard& card) {
+    if (card.action == InsightAction::None) return;
+    InsightHotspot hotspot;
+    hotspot.rect = rect;
+    hotspot.action = card.action;
+    hotspot.hint = card.actionHint;
+    state.insightHotspots.push_back(hotspot);
+}
+
+void drawInsightCard(AppState& state, HDC hdc, const RECT& cardRect, const DashboardSpotlightCard& card) {
+    const auto s = [&](int value) { return scaleByDpi(state, value); };
+    const bool hasAction = card.action != InsightAction::None && !card.actionHint.empty();
+
+    drawRoundedPanel(hdc, cardRect, RGB(13, 26, 35), RGB(37, 62, 78), s(16));
+
+    RECT accent = cardRect;
+    accent.bottom = accent.top + s(6);
+    HBRUSH accentBrush = CreateSolidBrush(card.accent);
+    FillRect(hdc, &accent, accentBrush);
+    DeleteObject(accentBrush);
+
+    RECT labelRect{cardRect.left + s(14), cardRect.top + s(10), cardRect.right - s(14), cardRect.top + s(28)};
+    RECT valueRect{cardRect.left + s(14), labelRect.bottom + s(2), cardRect.right - s(14), labelRect.bottom + s(34)};
+    RECT detailRect{cardRect.left + s(14), valueRect.bottom + s(2), cardRect.right - s(14),
+                    cardRect.bottom - (hasAction ? s(34) : s(22))};
+    RECT actionRect{cardRect.left + s(14), cardRect.bottom - s(34), cardRect.right - s(14), cardRect.bottom - s(18)};
+    RECT trackRect{cardRect.left + s(14), cardRect.bottom - s(14), cardRect.right - s(14), cardRect.bottom - s(8)};
+
+    SetBkMode(hdc, TRANSPARENT);
+    SetTextColor(hdc, kThemeMuted);
+    HGDIOBJ oldFont = SelectObject(hdc, state.font ? state.font : static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT)));
+    DrawTextW(hdc, card.label.c_str(), -1, &labelRect, DT_LEFT | DT_TOP | DT_SINGLELINE | DT_END_ELLIPSIS);
+
+    SelectObject(hdc, state.sectionFont ? state.sectionFont : state.font);
+    SetTextColor(hdc, kThemeText);
+    DrawTextW(hdc, card.value.c_str(), -1, &valueRect, DT_LEFT | DT_TOP | DT_SINGLELINE | DT_END_ELLIPSIS);
+
+    SelectObject(hdc, state.font ? state.font : static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT)));
+    SetTextColor(hdc, RGB(204, 219, 228));
+    DrawTextW(hdc, card.detail.c_str(), -1, &detailRect, DT_LEFT | DT_WORDBREAK | DT_END_ELLIPSIS);
+
+    if (hasAction) {
+        SetTextColor(hdc, card.accent);
+        DrawTextW(hdc, card.actionHint.c_str(), -1, &actionRect, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+        rememberInsightHotspot(state, cardRect, card);
+    }
+
+    drawRoundedPanel(hdc, trackRect, RGB(19, 35, 45), RGB(39, 61, 74), s(8));
+    RECT fill = trackRect;
+    fill.left += 1;
+    fill.top += 1;
+    fill.bottom -= 1;
+    const int pulseWidth = std::max(s(8),
+                                    static_cast<int>((trackRect.right - trackRect.left - 2) *
+                                                     clampValue(card.pulse, 0, 100) / 100));
+    fill.right = std::min(trackRect.right - 1, fill.left + pulseWidth);
+    drawRoundedPanel(hdc, fill, card.accent, card.accent, s(7));
+    SelectObject(hdc, oldFont);
+}
+
+void drawDashboardSpotlights(AppState& state, HDC hdc, const RECT& band) {
+    if (IsRectEmpty(&band)) return;
+
+    const auto s = [&](int value) { return scaleByDpi(state, value); };
+    const std::vector<DashboardSpotlightCard> cards = buildDashboardSpotlightCards(state);
+    if (cards.empty()) return;
+
+    const int width = band.right - band.left;
+    const int height = band.bottom - band.top;
+    const int gap = s(14);
+    const int columns = width < s(900) ? 2 : 3;
+    const int rows = static_cast<int>((cards.size() + columns - 1) / columns);
+    const int cardWidth = std::max(s(210), (width - gap * (columns - 1)) / columns);
+    const int cardHeight = std::max(s(64), (height - gap * (rows - 1)) / rows);
+
+    for (size_t i = 0; i < cards.size(); ++i) {
+        const int row = static_cast<int>(i) / columns;
+        const int column = static_cast<int>(i) % columns;
+        RECT card{
+            band.left + column * (cardWidth + gap),
+            band.top + row * (cardHeight + gap),
+            std::min(band.right, band.left + column * (cardWidth + gap) + cardWidth),
+            std::min(band.bottom, band.top + row * (cardHeight + gap) + cardHeight)
+        };
+        drawInsightCard(state, hdc, card, cards[i]);
+    }
+}
+
+void drawContextSpotlights(AppState& state, HDC hdc, const RECT& band) {
+    if (IsRectEmpty(&band)) return;
+
+    const auto s = [&](int value) { return scaleByDpi(state, value); };
+    const std::vector<DashboardSpotlightCard> cards = buildContextInsightCards(state);
+    if (cards.empty()) return;
+
+    const int width = band.right - band.left;
+    const int height = band.bottom - band.top;
+    const int gap = s(14);
+    const int columns = width < s(900) ? 2 : 3;
+    const int rows = static_cast<int>((cards.size() + columns - 1) / columns);
+    const int cardWidth = std::max(s(196), (width - gap * (columns - 1)) / columns);
+    const int cardHeight = std::max(s(62), (height - gap * (rows - 1)) / rows);
+
+    for (size_t i = 0; i < cards.size(); ++i) {
+        const int row = static_cast<int>(i) / columns;
+        const int column = static_cast<int>(i) % columns;
+        RECT card{
+            band.left + column * (cardWidth + gap),
+            band.top + row * (cardHeight + gap),
+            std::min(band.right, band.left + column * (cardWidth + gap) + cardWidth),
+            std::min(band.bottom, band.top + row * (cardHeight + gap) + cardHeight)
+        };
+        drawInsightCard(state, hdc, card, cards[i]);
+    }
+}
+
+void drawDashboardCardCap(const AppState& state, HDC hdc, const RECT& card, COLORREF accent, const std::wstring& caption) {
+    const auto s = [&](int value) { return scaleByDpi(state, value); };
+    RECT cap{card.left + s(12), card.top + s(10), card.right - s(12), card.top + s(30)};
+    RECT line{cap.left, cap.bottom - s(2), cap.left + s(56), cap.bottom + s(2)};
+    HBRUSH lineBrush = CreateSolidBrush(accent);
+    FillRect(hdc, &line, lineBrush);
+    DeleteObject(lineBrush);
+
+    SetBkMode(hdc, TRANSPARENT);
+    SetTextColor(hdc, RGB(196, 212, 222));
+    HGDIOBJ oldFont = SelectObject(hdc, state.font ? state.font : static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT)));
+    DrawTextW(hdc, caption.c_str(), -1, &cap, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+    SelectObject(hdc, oldFont);
 }
 
 void drawTacticsBoard(AppState& state, HDC hdc, const RECT& rect) {
@@ -337,8 +753,8 @@ void applyInterfaceFonts(AppState& state) {
     const std::array<HWND, 3> tablePanels = {state.tableList, state.squadList, state.transferList};
     for (HWND hwnd : tablePanels) setControlFont(hwnd, state.font);
 
-    const std::array<HWND, 18> buttons = {
-        state.newCareerButton, state.loadButton, state.saveButton, state.simulateButton, state.validateButton,
+    const std::array<HWND, 19> buttons = {
+        state.newCareerButton, state.loadButton, state.saveButton, state.simulateButton, state.validateButton, state.displayModeButton,
         state.dashboardButton, state.squadButton, state.tacticsButton, state.calendarButton, state.leagueButton,
         state.transfersButton, state.financesButton, state.youthButton, state.boardButton, state.newsButton,
         state.emptyNewButton, state.emptyLoadButton, state.emptyValidateButton
@@ -411,6 +827,7 @@ void layoutWindow(AppState& state) {
         buttonRight -= buttonGap;
     };
     placeHeaderButton(state.validateButton, s(94));
+    placeHeaderButton(state.displayModeButton, s(154));
     placeHeaderButton(state.simulateButton, s(126));
     placeHeaderButton(state.saveButton, s(112));
     placeHeaderButton(state.loadButton, s(112));
@@ -496,7 +913,15 @@ void layoutWindow(AppState& state) {
         lastActionBottom = actionY + s(28);
     }
 
+    const bool contextualInsightStrip = pageUsesInsightStrip(state) && state.currentPage != GuiPage::Dashboard;
+    const int dashboardSpotlightReserve = dashboardLayout
+        ? s((client.right - client.left) < s(1380) ? kDashboardSpotlightCompactReserve : kDashboardSpotlightWideReserve)
+        : 0;
+    const int contextualInsightReserve = contextualInsightStrip
+        ? s((client.right - client.left) < s(1380) ? kInsightStripCompactReserve : kInsightStripWideReserve)
+        : 0;
     int panelsTop = hasVisibleActionButtons ? lastActionBottom + s(18) : contentTop + s(28);
+    panelsTop += dashboardSpotlightReserve + contextualInsightReserve;
     const int footerHeight = std::max(s(pageLayout.footerMinHeight),
                                       static_cast<int>(client.bottom - (panelsTop + topPanelHeight + midPanelHeight + s(150))));
 
@@ -584,6 +1009,7 @@ void initializeInterface(AppState& state) {
     state.saveButton = createControl(state, 0, L"BUTTON", L"Guardar", buttonStyle, 0, 0, 86, 28, state.window, IDC_SAVE_BUTTON);
     state.simulateButton = createControl(state, 0, L"BUTTON", L"Simular", buttonStyle, 0, 0, 126, 28, state.window, IDC_SIMULATE_BUTTON);
     state.validateButton = createControl(state, 0, L"BUTTON", L"Validar", buttonStyle, 0, 0, 92, 28, state.window, IDC_VALIDATE_BUTTON);
+    state.displayModeButton = createControl(state, 0, L"BUTTON", L"Pantalla F11", buttonStyle, 0, 0, 154, 28, state.window, IDC_DISPLAY_MODE_BUTTON);
     state.emptyNewButton = createControl(state, 0, L"BUTTON", L"Crear carrera", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_NEW_BUTTON);
     state.emptyLoadButton = createControl(state, 0, L"BUTTON", L"Abrir guardado", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_LOAD_BUTTON);
     state.emptyValidateButton = createControl(state, 0, L"BUTTON", L"Validar datos", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_VALIDATE_BUTTON);
@@ -654,7 +1080,7 @@ void initializeInterface(AppState& state) {
     setCurrentPage(state, GuiPage::Dashboard);
     layoutWindow(state);
     refreshAll(state);
-    setStatus(state, "GUI lista con layout modular.");
+    setStatus(state, "GUI lista. Usa el boton o F11 para recorrer ventana, maximizado y fullscreen.");
 }
 
 void paintWindowChrome(AppState& state, HDC hdc) {
@@ -663,6 +1089,7 @@ void paintWindowChrome(AppState& state, HDC hdc) {
     const auto s = [&](int value) { return scaleByDpi(state, value); };
     const HeaderLayoutProfile header = buildHeaderLayout(client);
     FillRect(hdc, &client, state.backgroundBrush ? state.backgroundBrush : static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
+    state.insightHotspots.clear();
 
     RECT topBar{0, 0, client.right, s(header.topBarHeight) - s(10)};
     FillRect(hdc, &topBar, state.headerBrush ? state.headerBrush : state.backgroundBrush);
@@ -689,6 +1116,30 @@ void paintWindowChrome(AppState& state, HDC hdc) {
     if (IsWindowVisible(state.detailEdit)) drawRoundedPanel(hdc, detailCard, RGB(15, 27, 37), RGB(44, 72, 90), s(16));
     if (IsWindowVisible(state.newsList)) drawRoundedPanel(hdc, newsCard, RGB(15, 27, 37), RGB(44, 72, 90), s(16));
     drawRoundedPanel(hdc, statusCard, RGB(11, 23, 31), RGB(39, 65, 79), s(12));
+
+    if (state.currentPage == GuiPage::Dashboard) {
+        RECT spotlightBand = dashboardSpotlightBand(state, contentShell, summaryCard);
+        drawDashboardSpotlights(state, hdc, spotlightBand);
+        if (IsWindowVisible(state.summaryEdit)) drawDashboardCardCap(state, hdc, summaryCard, kThemeAccentBlue, L"mesa de partido");
+        if (IsWindowVisible(state.detailEdit)) drawDashboardCardCap(state, hdc, detailCard, kThemeAccentGreen, L"vestuario");
+        if (IsWindowVisible(state.newsList)) drawDashboardCardCap(state, hdc, newsCard, kThemeAccent, L"pulso mundial");
+    } else if (pageUsesInsightStrip(state)) {
+        RECT spotlightBand = dashboardSpotlightBand(state, contentShell, summaryCard);
+        drawContextSpotlights(state, hdc, spotlightBand);
+        if (state.currentPage == GuiPage::Transfers) {
+            if (IsWindowVisible(state.summaryEdit)) drawDashboardCardCap(state, hdc, summaryCard, kThemeAccentBlue, L"radar");
+            if (IsWindowVisible(state.detailEdit)) drawDashboardCardCap(state, hdc, detailCard, kThemeAccentGreen, L"objetivo");
+            if (IsWindowVisible(state.newsList)) drawDashboardCardCap(state, hdc, newsCard, kThemeAccent, L"mercado");
+        } else if (state.currentPage == GuiPage::Finances) {
+            if (IsWindowVisible(state.summaryEdit)) drawDashboardCardCap(state, hdc, summaryCard, kThemeAccentGreen, L"caja");
+            if (IsWindowVisible(state.detailEdit)) drawDashboardCardCap(state, hdc, detailCard, kThemeAccentBlue, L"flujo");
+            if (IsWindowVisible(state.newsList)) drawDashboardCardCap(state, hdc, newsCard, kThemeAccent, L"riesgo");
+        } else if (state.currentPage == GuiPage::Board) {
+            if (IsWindowVisible(state.summaryEdit)) drawDashboardCardCap(state, hdc, summaryCard, kThemeAccentBlue, L"mandato");
+            if (IsWindowVisible(state.detailEdit)) drawDashboardCardCap(state, hdc, detailCard, kThemeAccentGreen, L"reporte");
+            if (IsWindowVisible(state.newsList)) drawDashboardCardCap(state, hdc, newsCard, kThemeAccent, L"presion");
+        }
+    }
 
     RECT menuTitle{s(20), s(header.topBarHeight + 10), s(header.sideWidth - 10), s(header.topBarHeight + 34)};
     SetBkMode(hdc, TRANSPARENT);
