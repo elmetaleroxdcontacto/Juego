@@ -84,9 +84,9 @@ HeaderLayoutProfile buildHeaderLayout(const RECT& client) {
     HeaderLayoutProfile layout;
     const int width = client.right - client.left;
     layout.sideWidth = width < 1240 ? kSideRailCompactWidth : kSideRailWideWidth;
-    layout.shareTopRow = width >= 1780;
-    layout.splitControls = width < 1360;
-    layout.stackedControls = width < 1100;
+    layout.shareTopRow = width >= 2260;
+    layout.splitControls = width < 1540;
+    layout.stackedControls = width < 1180;
 
     if (layout.stackedControls) {
         layout.controlsBottom = 16 + kHeaderFieldHeight * 3 + kHeaderRowGap * 2 + kHeaderHintHeight + 6;
@@ -98,7 +98,7 @@ HeaderLayoutProfile buildHeaderLayout(const RECT& client) {
 
     layout.buttonsTop = layout.shareTopRow ? 16 : layout.controlsBottom + 10;
     const int availableButtonRow = std::max(320, width - kWindowPadding * 2);
-    const int fullButtonRowWidth = 156 + 112 + 112 + 126 + 154 + 94 + 10 * 5;
+    const int fullButtonRowWidth = 156 + 112 + 112 + 126 + 138 + 154 + 94 + 10 * 6;
     const int buttonRows = availableButtonRow >= fullButtonRowWidth ? 1 : 2;
     layout.buttonsBottom = layout.buttonsTop + kHeaderButtonHeight + (buttonRows - 1) * (kHeaderButtonHeight + kHeaderRowGap);
 
@@ -109,6 +109,11 @@ HeaderLayoutProfile buildHeaderLayout(const RECT& client) {
     layout.metricTop = std::max(layout.controlsBottom, layout.buttonsBottom) + 16;
     layout.topBarHeight = layout.metricTop + layout.metricRows * kMetricHeight + (layout.metricRows - 1) * kMetricGap + 14;
     return layout;
+}
+
+RECT offsetRectY(RECT rect, int deltaY) {
+    OffsetRect(&rect, 0, deltaY);
+    return rect;
 }
 
 PageLayoutProfile buildPageLayoutProfile(GuiPage page) {
@@ -231,6 +236,7 @@ void drawPlayerDots(HDC hdc,
 void drawTopMetrics(AppState& state, HDC hdc, const RECT& client) {
     const HeaderLayoutProfile header = buildHeaderLayout(client);
     const auto s = [&](int value) { return scaleByDpi(state, value); };
+    const int pageOffsetY = -state.pageScrollY;
     std::vector<DashboardMetric> metrics = state.currentModel.metrics.empty() ? defaultMetrics() : state.currentModel.metrics;
     const int left = s(kWindowPadding + 6);
     const int gap = s(kMetricGap);
@@ -241,7 +247,7 @@ void drawTopMetrics(AppState& state, HDC hdc, const RECT& client) {
     for (size_t i = 0; i < metrics.size() && i < 5; ++i) {
         const int row = static_cast<int>(i) / header.metricColumns;
         const int column = static_cast<int>(i) % header.metricColumns;
-        const int top = s(header.metricTop) + row * (height + gap);
+        const int top = s(header.metricTop) + row * (height + gap) + pageOffsetY;
         RECT card{left + column * (width + gap), top, left + column * (width + gap) + width, top + height};
         drawRoundedPanel(hdc, card, RGB(11, 24, 33), RGB(35, 58, 74), s(14));
 
@@ -733,29 +739,28 @@ void showActionButtonsForPage(AppState& state) {
     bool hasCareer = state.career.myTeam != nullptr;
     for (const auto& mapping : mappings) {
         bool visible = hasCareer && std::find(mapping.pages.begin(), mapping.pages.end(), state.currentPage) != mapping.pages.end();
-        ShowWindow(mapping.hwnd, visible ? SW_SHOW : SW_HIDE);
+        setControlVisibility(state, mapping.hwnd, visible);
         EnableWindow(mapping.hwnd, visible);
     }
 }
 
 void setMenuButtonsVisible(AppState& state, bool visible) {
-    const int showMode = visible ? SW_SHOW : SW_HIDE;
-    ShowWindow(state.menuContinueButton, showMode);
-    ShowWindow(state.menuPlayButton, showMode);
-    ShowWindow(state.menuSettingsButton, showMode);
-    ShowWindow(state.menuLoadButton, showMode);
-    ShowWindow(state.menuCreditsButton, showMode);
-    ShowWindow(state.menuExitButton, showMode);
-    ShowWindow(state.menuBackButton, showMode);
-    ShowWindow(state.menuVolumeButton, showMode);
-    ShowWindow(state.menuDifficultyButton, showMode);
-    ShowWindow(state.menuSpeedButton, showMode);
-    ShowWindow(state.menuSimulationButton, showMode);
-    ShowWindow(state.menuLanguageButton, showMode);
-    ShowWindow(state.menuTextSpeedButton, showMode);
-    ShowWindow(state.menuVisualButton, showMode);
-    ShowWindow(state.menuMusicModeButton, showMode);
-    ShowWindow(state.menuAudioFadeButton, showMode);
+    setControlVisibility(state, state.menuContinueButton, visible);
+    setControlVisibility(state, state.menuPlayButton, visible);
+    setControlVisibility(state, state.menuSettingsButton, visible);
+    setControlVisibility(state, state.menuLoadButton, visible);
+    setControlVisibility(state, state.menuCreditsButton, visible);
+    setControlVisibility(state, state.menuExitButton, visible);
+    setControlVisibility(state, state.menuBackButton, visible);
+    setControlVisibility(state, state.menuVolumeButton, visible);
+    setControlVisibility(state, state.menuDifficultyButton, visible);
+    setControlVisibility(state, state.menuSpeedButton, visible);
+    setControlVisibility(state, state.menuSimulationButton, visible);
+    setControlVisibility(state, state.menuLanguageButton, visible);
+    setControlVisibility(state, state.menuTextSpeedButton, visible);
+    setControlVisibility(state, state.menuVisualButton, visible);
+    setControlVisibility(state, state.menuMusicModeButton, visible);
+    setControlVisibility(state, state.menuAudioFadeButton, visible);
 }
 
 void updateFrontendMenuButtonLabels(AppState& state) {
@@ -857,8 +862,8 @@ void applyInterfaceFonts(AppState& state) {
     const std::array<HWND, 3> tablePanels = {state.tableList, state.squadList, state.transferList};
     for (HWND hwnd : tablePanels) setControlFont(hwnd, state.font);
 
-    const std::array<HWND, 35> buttons = {
-        state.newCareerButton, state.loadButton, state.saveButton, state.simulateButton, state.validateButton, state.displayModeButton,
+    const std::array<HWND, 36> buttons = {
+        state.newCareerButton, state.loadButton, state.saveButton, state.simulateButton, state.validateButton, state.displayModeButton, state.frontMenuButton,
         state.dashboardButton, state.squadButton, state.tacticsButton, state.calendarButton, state.leagueButton,
         state.transfersButton, state.financesButton, state.youthButton, state.boardButton, state.newsButton,
         state.menuContinueButton, state.menuPlayButton, state.menuSettingsButton, state.menuLoadButton,
@@ -931,33 +936,65 @@ void layoutWindow(AppState& state) {
         state.dashboardButton, state.squadButton, state.tacticsButton, state.calendarButton, state.leagueButton,
         state.transfersButton, state.financesButton, state.youthButton, state.boardButton, state.newsButton
     };
-    const std::array<HWND, 4> headerButtons = {
-        state.newCareerButton, state.loadButton, state.saveButton, state.simulateButton
+    const std::array<HWND, 5> headerButtons = {
+        state.newCareerButton, state.loadButton, state.saveButton, state.simulateButton, state.frontMenuButton
+    };
+    int maxContentBottom = 0;
+    auto recordBottom = [&](int y, int height) {
+        maxContentBottom = std::max(maxContentBottom, y + height);
+    };
+    auto placeWindow = [&](HWND hwnd, int x, int y, int width, int height) {
+        if (!hwnd) return;
+        moveControlAndInvalidate(state, hwnd, x, y - state.pageScrollY, width, height);
+        if (IsWindowVisible(hwnd)) recordBottom(y, height);
+    };
+    auto syncScrollState = [&]() -> bool {
+        const int contentHeight = std::max(static_cast<int>(client.bottom), maxContentBottom + s(6));
+        const int maxScroll = std::max(0, contentHeight - static_cast<int>(client.bottom));
+        const int clamped = clampValue(state.pageScrollY, 0, maxScroll);
+        state.pageContentHeight = contentHeight;
+        state.maxPageScrollY = maxScroll;
+
+        SCROLLINFO info{};
+        info.cbSize = sizeof(info);
+        info.fMask = SIF_RANGE | SIF_PAGE | SIF_POS | SIF_DISABLENOSCROLL;
+        info.nMin = 0;
+        info.nMax = std::max(0, contentHeight - 1);
+        info.nPage = std::max(1, static_cast<int>(client.bottom));
+        info.nPos = clamped;
+        SetScrollInfo(state.window, SB_VERT, &info, TRUE);
+
+        if (clamped != state.pageScrollY) {
+            state.pageScrollY = clamped;
+            layoutWindow(state);
+            return true;
+        }
+        return false;
     };
 
     if (frontMenuPage) {
-        for (HWND hwnd : topControls) ShowWindow(hwnd, SW_HIDE);
-        for (HWND hwnd : topLabels) ShowWindow(hwnd, SW_HIDE);
-        for (HWND hwnd : navButtons) ShowWindow(hwnd, SW_HIDE);
-        for (HWND hwnd : headerButtons) ShowWindow(hwnd, SW_HIDE);
-        ShowWindow(state.validateButton, SW_HIDE);
-        ShowWindow(state.breadcrumbLabel, SW_HIDE);
-        ShowWindow(state.pageTitleLabel, SW_HIDE);
-        ShowWindow(state.infoLabel, SW_HIDE);
+        for (HWND hwnd : topControls) setControlVisibility(state, hwnd, false);
+        for (HWND hwnd : topLabels) setControlVisibility(state, hwnd, false);
+        for (HWND hwnd : navButtons) setControlVisibility(state, hwnd, false);
+        for (HWND hwnd : headerButtons) setControlVisibility(state, hwnd, false);
+        setControlVisibility(state, state.validateButton, false);
+        hideControlAndInvalidate(state, state.breadcrumbLabel);
+        hideControlAndInvalidate(state, state.pageTitleLabel);
+        hideControlAndInvalidate(state, state.infoLabel);
 
         showActionButtonsForPage(state);
         setMenuButtonsVisible(state, true);
         updateFrontendMenuButtonLabels(state);
-        ShowWindow(state.emptyNewButton, SW_HIDE);
-        ShowWindow(state.emptyLoadButton, SW_HIDE);
-        ShowWindow(state.emptyValidateButton, SW_HIDE);
+        setControlVisibility(state, state.emptyNewButton, false);
+        setControlVisibility(state, state.emptyLoadButton, false);
+        setControlVisibility(state, state.emptyValidateButton, false);
 
-        ShowWindow(state.tableLabel, SW_HIDE);
-        ShowWindow(state.tableList, SW_HIDE);
-        ShowWindow(state.squadLabel, SW_HIDE);
-        ShowWindow(state.squadList, SW_HIDE);
-        ShowWindow(state.transferLabel, SW_HIDE);
-        ShowWindow(state.transferList, SW_HIDE);
+        setControlVisibility(state, state.tableLabel, false);
+        setControlVisibility(state, state.tableList, false);
+        setControlVisibility(state, state.squadLabel, false);
+        setControlVisibility(state, state.squadList, false);
+        setControlVisibility(state, state.transferLabel, false);
+        setControlVisibility(state, state.transferList, false);
 
         const int shellLeft = padding + s(30);
         const int shellTop = padding + s(26);
@@ -976,13 +1013,13 @@ void layoutWindow(AppState& state) {
         const int summaryHeight = std::max(s(230), static_cast<int>(client.bottom - panelsTop - s(100)));
         const int detailHeight = std::max(s(170), (summaryHeight - s(40)) / 2);
 
-        MoveWindow(state.summaryLabel, shellLeft + s(16), panelsTop, leftWidth, s(kPanelLabelHeight), TRUE);
-        MoveWindow(state.summaryEdit, shellLeft + s(16), panelsTop + s(kPanelBodyOffset), leftWidth, summaryHeight, TRUE);
-        MoveWindow(state.detailLabel, shellLeft + s(34) + leftWidth, panelsTop, rightWidth, s(kPanelLabelHeight), TRUE);
-        MoveWindow(state.detailEdit, shellLeft + s(34) + leftWidth, panelsTop + s(kPanelBodyOffset), rightWidth, detailHeight, TRUE);
+        placeWindow(state.summaryLabel, shellLeft + s(16), panelsTop, leftWidth, s(kPanelLabelHeight));
+        placeWindow(state.summaryEdit, shellLeft + s(16), panelsTop + s(kPanelBodyOffset), leftWidth, summaryHeight);
+        placeWindow(state.detailLabel, shellLeft + s(34) + leftWidth, panelsTop, rightWidth, s(kPanelLabelHeight));
+        placeWindow(state.detailEdit, shellLeft + s(34) + leftWidth, panelsTop + s(kPanelBodyOffset), rightWidth, detailHeight);
         const int feedTop = panelsTop + detailHeight + s(44);
-        MoveWindow(state.newsLabel, shellLeft + s(34) + leftWidth, feedTop, rightWidth, s(kPanelLabelHeight), TRUE);
-        MoveWindow(state.newsList, shellLeft + s(34) + leftWidth, feedTop + s(kPanelBodyOffset), rightWidth, summaryHeight - detailHeight - s(18), TRUE);
+        placeWindow(state.newsLabel, shellLeft + s(34) + leftWidth, feedTop, rightWidth, s(kPanelLabelHeight));
+        placeWindow(state.newsList, shellLeft + s(34) + leftWidth, feedTop + s(kPanelBodyOffset), rightWidth, summaryHeight - detailHeight - s(18));
 
         if (state.currentPage == GuiPage::MainMenu) {
             const int secondaryTop = buttonTop + s(50);
@@ -990,104 +1027,102 @@ void layoutWindow(AppState& state) {
             const int secondaryCount = 4;
             const int secondaryWidth = std::max(s(132),
                                                 static_cast<int>((shellWidth - s(32) - secondaryGap * (secondaryCount - 1)) / secondaryCount));
-            MoveWindow(state.menuContinueButton, shellLeft + s(16), buttonTop, primaryWidth, s(42), TRUE);
-            MoveWindow(state.menuPlayButton,
-                       shellLeft + s(16) + primaryWidth + primaryGap,
-                       buttonTop,
-                       primaryWidth,
-                       s(42),
-                       TRUE);
-            MoveWindow(state.menuSettingsButton, shellLeft + s(16), secondaryTop, secondaryWidth, s(40), TRUE);
-            MoveWindow(state.menuLoadButton, shellLeft + s(16) + (secondaryWidth + secondaryGap), secondaryTop, secondaryWidth, s(40), TRUE);
-            MoveWindow(state.menuCreditsButton,
-                       shellLeft + s(16) + (secondaryWidth + secondaryGap) * 2,
-                       secondaryTop,
-                       secondaryWidth,
-                       s(40),
-                       TRUE);
-            MoveWindow(state.menuExitButton,
-                       shellLeft + s(16) + (secondaryWidth + secondaryGap) * 3,
-                       secondaryTop,
-                       secondaryWidth,
-                       s(40),
-                       TRUE);
-            ShowWindow(state.menuContinueButton, SW_SHOW);
-            ShowWindow(state.menuPlayButton, SW_SHOW);
-            ShowWindow(state.menuSettingsButton, SW_SHOW);
-            ShowWindow(state.menuLoadButton, SW_SHOW);
-            ShowWindow(state.menuCreditsButton, SW_SHOW);
-            ShowWindow(state.menuExitButton, SW_SHOW);
-            ShowWindow(state.menuBackButton, SW_HIDE);
-            ShowWindow(state.menuVolumeButton, SW_HIDE);
-            ShowWindow(state.menuDifficultyButton, SW_HIDE);
-            ShowWindow(state.menuSpeedButton, SW_HIDE);
-            ShowWindow(state.menuSimulationButton, SW_HIDE);
-            ShowWindow(state.menuLanguageButton, SW_HIDE);
-            ShowWindow(state.menuTextSpeedButton, SW_HIDE);
-            ShowWindow(state.menuVisualButton, SW_HIDE);
-            ShowWindow(state.menuMusicModeButton, SW_HIDE);
-            ShowWindow(state.menuAudioFadeButton, SW_HIDE);
+            placeWindow(state.menuContinueButton, shellLeft + s(16), buttonTop, primaryWidth, s(42));
+            placeWindow(state.menuPlayButton,
+                        shellLeft + s(16) + primaryWidth + primaryGap,
+                        buttonTop,
+                        primaryWidth,
+                        s(42));
+            placeWindow(state.menuSettingsButton, shellLeft + s(16), secondaryTop, secondaryWidth, s(40));
+            placeWindow(state.menuLoadButton, shellLeft + s(16) + (secondaryWidth + secondaryGap), secondaryTop, secondaryWidth, s(40));
+            placeWindow(state.menuCreditsButton,
+                        shellLeft + s(16) + (secondaryWidth + secondaryGap) * 2,
+                        secondaryTop,
+                        secondaryWidth,
+                        s(40));
+            placeWindow(state.menuExitButton,
+                        shellLeft + s(16) + (secondaryWidth + secondaryGap) * 3,
+                        secondaryTop,
+                        secondaryWidth,
+                        s(40));
+            setControlVisibility(state, state.menuContinueButton, true);
+            setControlVisibility(state, state.menuPlayButton, true);
+            setControlVisibility(state, state.menuSettingsButton, true);
+            setControlVisibility(state, state.menuLoadButton, true);
+            setControlVisibility(state, state.menuCreditsButton, true);
+            setControlVisibility(state, state.menuExitButton, true);
+            setControlVisibility(state, state.menuBackButton, false);
+            setControlVisibility(state, state.menuVolumeButton, false);
+            setControlVisibility(state, state.menuDifficultyButton, false);
+            setControlVisibility(state, state.menuSpeedButton, false);
+            setControlVisibility(state, state.menuSimulationButton, false);
+            setControlVisibility(state, state.menuLanguageButton, false);
+            setControlVisibility(state, state.menuTextSpeedButton, false);
+            setControlVisibility(state, state.menuVisualButton, false);
+            setControlVisibility(state, state.menuMusicModeButton, false);
+            setControlVisibility(state, state.menuAudioFadeButton, false);
         } else if (state.currentPage == GuiPage::Settings) {
             const int settingsWidth = clampValue((shellWidth - s(44)) / 2, s(280), s(420));
             const int rightColumnLeft = shellLeft + s(28) + settingsWidth;
-            MoveWindow(state.menuVolumeButton, shellLeft + s(16), buttonTop, settingsWidth, s(38), TRUE);
-            MoveWindow(state.menuDifficultyButton, rightColumnLeft, buttonTop, settingsWidth, s(38), TRUE);
-            MoveWindow(state.menuSpeedButton, shellLeft + s(16), buttonTop + s(46), settingsWidth, s(38), TRUE);
-            MoveWindow(state.menuSimulationButton, rightColumnLeft, buttonTop + s(46), settingsWidth, s(38), TRUE);
-            MoveWindow(state.menuLanguageButton, shellLeft + s(16), buttonTop + s(92), settingsWidth, s(38), TRUE);
-            MoveWindow(state.menuTextSpeedButton, rightColumnLeft, buttonTop + s(92), settingsWidth, s(38), TRUE);
-            MoveWindow(state.menuVisualButton, shellLeft + s(16), buttonTop + s(138), settingsWidth, s(38), TRUE);
-            MoveWindow(state.menuMusicModeButton, rightColumnLeft, buttonTop + s(138), settingsWidth, s(38), TRUE);
-            MoveWindow(state.menuAudioFadeButton, shellLeft + s(16), buttonTop + s(184), settingsWidth, s(38), TRUE);
-            MoveWindow(state.menuBackButton, rightColumnLeft, buttonTop + s(184), settingsWidth, s(36), TRUE);
-            ShowWindow(state.menuContinueButton, SW_HIDE);
-            ShowWindow(state.menuPlayButton, SW_HIDE);
-            ShowWindow(state.menuSettingsButton, SW_HIDE);
-            ShowWindow(state.menuLoadButton, SW_HIDE);
-            ShowWindow(state.menuCreditsButton, SW_HIDE);
-            ShowWindow(state.menuExitButton, SW_HIDE);
-            ShowWindow(state.menuBackButton, SW_SHOW);
-            ShowWindow(state.menuVolumeButton, SW_SHOW);
-            ShowWindow(state.menuDifficultyButton, SW_SHOW);
-            ShowWindow(state.menuSpeedButton, SW_SHOW);
-            ShowWindow(state.menuSimulationButton, SW_SHOW);
-            ShowWindow(state.menuLanguageButton, SW_SHOW);
-            ShowWindow(state.menuTextSpeedButton, SW_SHOW);
-            ShowWindow(state.menuVisualButton, SW_SHOW);
-            ShowWindow(state.menuMusicModeButton, SW_SHOW);
-            ShowWindow(state.menuAudioFadeButton, SW_SHOW);
+            placeWindow(state.menuVolumeButton, shellLeft + s(16), buttonTop, settingsWidth, s(38));
+            placeWindow(state.menuDifficultyButton, rightColumnLeft, buttonTop, settingsWidth, s(38));
+            placeWindow(state.menuSpeedButton, shellLeft + s(16), buttonTop + s(46), settingsWidth, s(38));
+            placeWindow(state.menuSimulationButton, rightColumnLeft, buttonTop + s(46), settingsWidth, s(38));
+            placeWindow(state.menuLanguageButton, shellLeft + s(16), buttonTop + s(92), settingsWidth, s(38));
+            placeWindow(state.menuTextSpeedButton, rightColumnLeft, buttonTop + s(92), settingsWidth, s(38));
+            placeWindow(state.menuVisualButton, shellLeft + s(16), buttonTop + s(138), settingsWidth, s(38));
+            placeWindow(state.menuMusicModeButton, rightColumnLeft, buttonTop + s(138), settingsWidth, s(38));
+            placeWindow(state.menuAudioFadeButton, shellLeft + s(16), buttonTop + s(184), settingsWidth, s(38));
+            placeWindow(state.menuBackButton, rightColumnLeft, buttonTop + s(184), settingsWidth, s(36));
+            setControlVisibility(state, state.menuContinueButton, false);
+            setControlVisibility(state, state.menuPlayButton, false);
+            setControlVisibility(state, state.menuSettingsButton, false);
+            setControlVisibility(state, state.menuLoadButton, false);
+            setControlVisibility(state, state.menuCreditsButton, false);
+            setControlVisibility(state, state.menuExitButton, false);
+            setControlVisibility(state, state.menuBackButton, true);
+            setControlVisibility(state, state.menuVolumeButton, true);
+            setControlVisibility(state, state.menuDifficultyButton, true);
+            setControlVisibility(state, state.menuSpeedButton, true);
+            setControlVisibility(state, state.menuSimulationButton, true);
+            setControlVisibility(state, state.menuLanguageButton, true);
+            setControlVisibility(state, state.menuTextSpeedButton, true);
+            setControlVisibility(state, state.menuVisualButton, true);
+            setControlVisibility(state, state.menuMusicModeButton, true);
+            setControlVisibility(state, state.menuAudioFadeButton, true);
         } else {
-            MoveWindow(state.menuBackButton, shellLeft + s(16), buttonTop, s(220), s(38), TRUE);
-            ShowWindow(state.menuContinueButton, SW_HIDE);
-            ShowWindow(state.menuPlayButton, SW_HIDE);
-            ShowWindow(state.menuSettingsButton, SW_HIDE);
-            ShowWindow(state.menuLoadButton, SW_HIDE);
-            ShowWindow(state.menuCreditsButton, SW_HIDE);
-            ShowWindow(state.menuExitButton, SW_HIDE);
-            ShowWindow(state.menuBackButton, SW_SHOW);
-            ShowWindow(state.menuVolumeButton, SW_HIDE);
-            ShowWindow(state.menuDifficultyButton, SW_HIDE);
-            ShowWindow(state.menuSpeedButton, SW_HIDE);
-            ShowWindow(state.menuSimulationButton, SW_HIDE);
-            ShowWindow(state.menuLanguageButton, SW_HIDE);
-            ShowWindow(state.menuTextSpeedButton, SW_HIDE);
-            ShowWindow(state.menuVisualButton, SW_HIDE);
-            ShowWindow(state.menuMusicModeButton, SW_HIDE);
-            ShowWindow(state.menuAudioFadeButton, SW_HIDE);
+            placeWindow(state.menuBackButton, shellLeft + s(16), buttonTop, s(220), s(38));
+            setControlVisibility(state, state.menuContinueButton, false);
+            setControlVisibility(state, state.menuPlayButton, false);
+            setControlVisibility(state, state.menuSettingsButton, false);
+            setControlVisibility(state, state.menuLoadButton, false);
+            setControlVisibility(state, state.menuCreditsButton, false);
+            setControlVisibility(state, state.menuExitButton, false);
+            setControlVisibility(state, state.menuBackButton, true);
+            setControlVisibility(state, state.menuVolumeButton, false);
+            setControlVisibility(state, state.menuDifficultyButton, false);
+            setControlVisibility(state, state.menuSpeedButton, false);
+            setControlVisibility(state, state.menuSimulationButton, false);
+            setControlVisibility(state, state.menuLanguageButton, false);
+            setControlVisibility(state, state.menuTextSpeedButton, false);
+            setControlVisibility(state, state.menuVisualButton, false);
+            setControlVisibility(state, state.menuMusicModeButton, false);
+            setControlVisibility(state, state.menuAudioFadeButton, false);
         }
 
-        MoveWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20), TRUE);
+        placeWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20));
+        if (syncScrollState()) return;
         return;
     }
 
-    for (HWND hwnd : topControls) ShowWindow(hwnd, SW_SHOW);
-    for (HWND hwnd : topLabels) ShowWindow(hwnd, SW_SHOW);
-    for (HWND hwnd : navButtons) ShowWindow(hwnd, SW_SHOW);
-    for (HWND hwnd : headerButtons) ShowWindow(hwnd, SW_SHOW);
-    ShowWindow(state.validateButton, SW_SHOW);
-    ShowWindow(state.breadcrumbLabel, SW_SHOW);
-    ShowWindow(state.pageTitleLabel, SW_SHOW);
-    ShowWindow(state.infoLabel, SW_SHOW);
+    for (HWND hwnd : topControls) setControlVisibility(state, hwnd, true);
+    for (HWND hwnd : topLabels) setControlVisibility(state, hwnd, true);
+    for (HWND hwnd : navButtons) setControlVisibility(state, hwnd, true);
+    for (HWND hwnd : headerButtons) setControlVisibility(state, hwnd, true);
+    setControlVisibility(state, state.validateButton, true);
+    setControlVisibility(state, state.breadcrumbLabel, true);
+    setControlVisibility(state, state.pageTitleLabel, true);
+    setControlVisibility(state, state.infoLabel, true);
     setMenuButtonsVisible(state, false);
 
     const int primaryButtonHeight = s(kHeaderButtonHeight);
@@ -1101,12 +1136,13 @@ void layoutWindow(AppState& state) {
             buttonTop += primaryButtonHeight + s(kHeaderRowGap);
         }
         buttonRight -= width;
-        MoveWindow(hwnd, buttonRight, buttonTop, width, primaryButtonHeight, TRUE);
+        placeWindow(hwnd, buttonRight, buttonTop, width, primaryButtonHeight);
         if (buttonTop == s(header.buttonsTop)) topRowLeftmostButton = std::min(topRowLeftmostButton, buttonRight);
         buttonRight -= buttonGap;
     };
     placeHeaderButton(state.validateButton, s(94));
     placeHeaderButton(state.displayModeButton, s(154));
+    placeHeaderButton(state.frontMenuButton, s(138));
     placeHeaderButton(state.simulateButton, s(126));
     placeHeaderButton(state.saveButton, s(112));
     placeHeaderButton(state.loadButton, s(112));
@@ -1126,8 +1162,8 @@ void layoutWindow(AppState& state) {
 
     auto placeFieldBlock = [&](HWND label, int labelWidth, HWND field, int inputOffset, int x, int y, int width, int controlHeight) {
         int fieldWidth = std::max(s(150), width - inputOffset);
-        MoveWindow(label, x, y + s(4), labelWidth, s(22), TRUE);
-        MoveWindow(field, x + inputOffset, y, fieldWidth, controlHeight, TRUE);
+        placeWindow(label, x, y + s(4), labelWidth, s(22));
+        placeWindow(field, x + inputOffset, y, fieldWidth, controlHeight);
         if (field == state.managerEdit) {
             managerFieldLeft = x + inputOffset;
             managerFieldTop = y;
@@ -1158,12 +1194,11 @@ void layoutWindow(AppState& state) {
         placeFieldBlock(state.teamLabel, s(46), state.teamCombo, s(56), teamX, fieldTop, teamBlockWidth, s(420));
         placeFieldBlock(state.managerLabel, s(78), state.managerEdit, s(86), managerX, fieldTop, managerBlockWidth, fieldHeight);
     }
-    MoveWindow(state.managerHelpLabel,
-               managerFieldLeft,
-               managerFieldTop + fieldHeight + s(3),
-               managerFieldWidth,
-               hintHeight,
-               TRUE);
+    placeWindow(state.managerHelpLabel,
+                managerFieldLeft,
+                managerFieldTop + fieldHeight + s(3),
+                managerFieldWidth,
+                hintHeight);
 
     const int sideX = padding;
     int navY = topBarHeight + s(12);
@@ -1172,15 +1207,15 @@ void layoutWindow(AppState& state) {
         state.transfersButton, state.financesButton, state.youthButton, state.boardButton, state.newsButton
     };
     for (HWND button : pages) {
-        MoveWindow(button, sideX, navY, sideWidth, s(40), TRUE);
+        placeWindow(button, sideX, navY, sideWidth, s(40));
         navY += s(48);
     }
 
-    MoveWindow(state.breadcrumbLabel, contentLeft, topBarHeight + s(12), contentWidth, s(20), TRUE);
-    MoveWindow(state.pageTitleLabel, contentLeft, topBarHeight + s(38), contentWidth, s(32), TRUE);
-    MoveWindow(state.infoLabel, contentLeft, topBarHeight + s(74), contentWidth, s(24), TRUE);
-    MoveWindow(state.filterLabel, infoLeft + s(6), topBarHeight + s(40), s(56), s(20), TRUE);
-    MoveWindow(state.filterCombo, infoLeft + s(68), topBarHeight + s(36), infoWidth - s(68), s(320), TRUE);
+    placeWindow(state.breadcrumbLabel, contentLeft, topBarHeight + s(12), contentWidth, s(20));
+    placeWindow(state.pageTitleLabel, contentLeft, topBarHeight + s(38), contentWidth, s(32));
+    placeWindow(state.infoLabel, contentLeft, topBarHeight + s(74), contentWidth, s(24));
+    placeWindow(state.filterLabel, infoLeft + s(6), topBarHeight + s(40), s(56), s(20));
+    placeWindow(state.filterCombo, infoLeft + s(68), topBarHeight + s(36), infoWidth - s(68), s(320));
 
     showActionButtonsForPage(state);
     std::vector<ActionButtonRef> visibleButtons = {
@@ -1202,7 +1237,7 @@ void layoutWindow(AppState& state) {
             actionX = contentLeft;
             actionY += s(36);
         }
-        MoveWindow(action.hwnd, actionX, actionY, action.width, s(28), TRUE);
+        placeWindow(action.hwnd, actionX, actionY, action.width, s(28));
         actionX += action.width + s(10);
         lastActionBottom = actionY + s(28);
     }
@@ -1225,22 +1260,23 @@ void layoutWindow(AppState& state) {
         const int buttonWidth = clampValue((contentWidth - s(48)) / 2, s(164), s(212));
         const int emptyButtonTop = panelsTop + summaryHeight - s(62);
 
-        MoveWindow(state.summaryLabel, contentLeft, panelsTop, contentWidth, s(kPanelLabelHeight), TRUE);
-        MoveWindow(state.summaryEdit, contentLeft, panelsTop + s(kPanelBodyOffset), contentWidth, summaryHeight, TRUE);
+        placeWindow(state.summaryLabel, contentLeft, panelsTop, contentWidth, s(kPanelLabelHeight));
+        placeWindow(state.summaryEdit, contentLeft, panelsTop + s(kPanelBodyOffset), contentWidth, summaryHeight);
 
-        MoveWindow(state.detailLabel, infoLeft, panelsTop, infoWidth, s(kPanelLabelHeight), TRUE);
-        MoveWindow(state.detailEdit, infoLeft, panelsTop + s(kPanelBodyOffset), infoWidth, sideHeight, TRUE);
+        placeWindow(state.detailLabel, infoLeft, panelsTop, infoWidth, s(kPanelLabelHeight));
+        placeWindow(state.detailEdit, infoLeft, panelsTop + s(kPanelBodyOffset), infoWidth, sideHeight);
 
         int newsTop = panelsTop + sideHeight + s(kPanelSectionGap);
-        MoveWindow(state.newsLabel, infoLeft, newsTop, infoWidth, s(kPanelLabelHeight), TRUE);
-        MoveWindow(state.newsList, infoLeft, newsTop + s(kPanelBodyOffset), infoWidth, summaryHeight - sideHeight - s(28), TRUE);
-        MoveWindow(state.emptyNewButton, contentLeft + s(20), emptyButtonTop, buttonWidth, s(34), TRUE);
-        MoveWindow(state.emptyLoadButton, contentLeft + s(28) + buttonWidth, emptyButtonTop, buttonWidth, s(34), TRUE);
-        ShowWindow(state.emptyNewButton, SW_SHOW);
-        ShowWindow(state.emptyLoadButton, SW_SHOW);
-        ShowWindow(state.emptyValidateButton, SW_HIDE);
+        placeWindow(state.newsLabel, infoLeft, newsTop, infoWidth, s(kPanelLabelHeight));
+        placeWindow(state.newsList, infoLeft, newsTop + s(kPanelBodyOffset), infoWidth, summaryHeight - sideHeight - s(28));
+        placeWindow(state.emptyNewButton, contentLeft + s(20), emptyButtonTop, buttonWidth, s(34));
+        placeWindow(state.emptyLoadButton, contentLeft + s(28) + buttonWidth, emptyButtonTop, buttonWidth, s(34));
+        setControlVisibility(state, state.emptyNewButton, true);
+        setControlVisibility(state, state.emptyLoadButton, true);
+        setControlVisibility(state, state.emptyValidateButton, false);
 
-        MoveWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20), TRUE);
+        placeWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20));
+        if (syncScrollState()) return;
         return;
     }
 
@@ -1248,34 +1284,35 @@ void layoutWindow(AppState& state) {
     ShowWindow(state.emptyLoadButton, SW_HIDE);
     ShowWindow(state.emptyValidateButton, SW_HIDE);
 
-    MoveWindow(state.summaryLabel, contentLeft, panelsTop, summaryWidth, s(kPanelLabelHeight), TRUE);
-    MoveWindow(state.summaryEdit, contentLeft, panelsTop + s(kPanelBodyOffset), summaryWidth, topPanelHeight, TRUE);
-    MoveWindow(state.tableLabel, contentLeft + summaryWidth + padding, panelsTop, tableWidth, s(kPanelLabelHeight), TRUE);
-    MoveWindow(state.tableList, contentLeft + summaryWidth + padding, panelsTop + s(kPanelBodyOffset), tableWidth, topPanelHeight, TRUE);
+    placeWindow(state.summaryLabel, contentLeft, panelsTop, summaryWidth, s(kPanelLabelHeight));
+    placeWindow(state.summaryEdit, contentLeft, panelsTop + s(kPanelBodyOffset), summaryWidth, topPanelHeight);
+    placeWindow(state.tableLabel, contentLeft + summaryWidth + padding, panelsTop, tableWidth, s(kPanelLabelHeight));
+    placeWindow(state.tableList, contentLeft + summaryWidth + padding, panelsTop + s(kPanelBodyOffset), tableWidth, topPanelHeight);
 
     int secondTop = panelsTop + topPanelHeight + s(kPanelSectionGap);
-    MoveWindow(state.squadLabel, contentLeft, secondTop, contentWidth, s(kPanelLabelHeight), TRUE);
-    MoveWindow(state.squadList, contentLeft, secondTop + s(kPanelBodyOffset), contentWidth, midPanelHeight, TRUE);
+    placeWindow(state.squadLabel, contentLeft, secondTop, contentWidth, s(kPanelLabelHeight));
+    placeWindow(state.squadList, contentLeft, secondTop + s(kPanelBodyOffset), contentWidth, midPanelHeight);
 
     int footerTop = secondTop + midPanelHeight + s(kPanelSectionGap);
-    MoveWindow(state.transferLabel, contentLeft, footerTop, contentWidth, s(kPanelLabelHeight), TRUE);
-    MoveWindow(state.transferList, contentLeft, footerTop + s(kPanelBodyOffset), contentWidth, footerHeight, TRUE);
+    placeWindow(state.transferLabel, contentLeft, footerTop, contentWidth, s(kPanelLabelHeight));
+    placeWindow(state.transferList, contentLeft, footerTop + s(kPanelBodyOffset), contentWidth, footerHeight);
 
     if (dashboardLayout) {
-        MoveWindow(state.detailLabel, infoLeft, secondTop, infoWidth, s(kPanelLabelHeight), TRUE);
-        MoveWindow(state.detailEdit, infoLeft, secondTop + s(kPanelBodyOffset), infoWidth, s(pageLayout.dashboardDetailHeight), TRUE);
+        placeWindow(state.detailLabel, infoLeft, secondTop, infoWidth, s(kPanelLabelHeight));
+        placeWindow(state.detailEdit, infoLeft, secondTop + s(kPanelBodyOffset), infoWidth, s(pageLayout.dashboardDetailHeight));
         int newsTop = secondTop + s(kPanelBodyOffset) + s(pageLayout.dashboardDetailHeight) + s(26);
-        MoveWindow(state.newsLabel, infoLeft, newsTop, infoWidth, s(kPanelLabelHeight), TRUE);
-        MoveWindow(state.newsList, infoLeft, newsTop + s(kPanelBodyOffset), infoWidth, client.bottom - (newsTop + s(kPanelBodyOffset)) - s(58), TRUE);
+        placeWindow(state.newsLabel, infoLeft, newsTop, infoWidth, s(kPanelLabelHeight));
+        placeWindow(state.newsList, infoLeft, newsTop + s(kPanelBodyOffset), infoWidth, client.bottom - (newsTop + s(kPanelBodyOffset)) - s(58));
     } else {
-        MoveWindow(state.detailLabel, infoLeft, panelsTop, infoWidth, s(kPanelLabelHeight), TRUE);
-        MoveWindow(state.detailEdit, infoLeft, panelsTop + s(kPanelBodyOffset), infoWidth, topPanelHeight + s(pageLayout.nonDashboardDetailExtra), TRUE);
+        placeWindow(state.detailLabel, infoLeft, panelsTop, infoWidth, s(kPanelLabelHeight));
+        placeWindow(state.detailEdit, infoLeft, panelsTop + s(kPanelBodyOffset), infoWidth, topPanelHeight + s(pageLayout.nonDashboardDetailExtra));
         int feedTop = panelsTop + topPanelHeight + s(pageLayout.nonDashboardDetailExtra) + s(42);
-        MoveWindow(state.newsLabel, infoLeft, feedTop, infoWidth, s(kPanelLabelHeight), TRUE);
-        MoveWindow(state.newsList, infoLeft, feedTop + s(kPanelBodyOffset), infoWidth, client.bottom - feedTop - s(60), TRUE);
+        placeWindow(state.newsLabel, infoLeft, feedTop, infoWidth, s(kPanelLabelHeight));
+        placeWindow(state.newsList, infoLeft, feedTop + s(kPanelBodyOffset), infoWidth, client.bottom - feedTop - s(60));
     }
 
-    MoveWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20), TRUE);
+    placeWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20));
+    if (syncScrollState()) return;
 }
 
 void initializeInterface(AppState& state) {
@@ -1306,6 +1343,7 @@ void initializeInterface(AppState& state) {
     state.simulateButton = createControl(state, 0, L"BUTTON", L"Simular", buttonStyle, 0, 0, 126, 28, state.window, IDC_SIMULATE_BUTTON);
     state.validateButton = createControl(state, 0, L"BUTTON", L"Auditar", buttonStyle, 0, 0, 92, 28, state.window, IDC_VALIDATE_BUTTON);
     state.displayModeButton = createControl(state, 0, L"BUTTON", L"Pantalla F11", buttonStyle, 0, 0, 154, 28, state.window, IDC_DISPLAY_MODE_BUTTON);
+    state.frontMenuButton = createControl(state, 0, L"BUTTON", L"Menu principal", buttonStyle, 0, 0, 138, 28, state.window, IDC_FRONT_MENU_BUTTON);
     state.menuContinueButton = createControl(state, 0, L"BUTTON", L"Continuar", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_CONTINUE_BUTTON);
     state.menuPlayButton = createControl(state, 0, L"BUTTON", L"Jugar", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_PLAY_BUTTON);
     state.menuSettingsButton = createControl(state, 0, L"BUTTON", L"Configuraciones", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_SETTINGS_BUTTON);
@@ -1325,9 +1363,9 @@ void initializeInterface(AppState& state) {
     state.emptyNewButton = createControl(state, 0, L"BUTTON", L"Crear carrera", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_NEW_BUTTON);
     state.emptyLoadButton = createControl(state, 0, L"BUTTON", L"Abrir guardado", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_LOAD_BUTTON);
     state.emptyValidateButton = createControl(state, 0, L"BUTTON", L"Validar datos", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_VALIDATE_BUTTON);
-    ShowWindow(state.emptyNewButton, SW_HIDE);
-    ShowWindow(state.emptyLoadButton, SW_HIDE);
-    ShowWindow(state.emptyValidateButton, SW_HIDE);
+    setControlVisibility(state, state.emptyNewButton, false);
+    setControlVisibility(state, state.emptyLoadButton, false);
+    setControlVisibility(state, state.emptyValidateButton, false);
     ShowWindow(state.menuContinueButton, SW_HIDE);
     ShowWindow(state.menuBackButton, SW_HIDE);
     ShowWindow(state.menuLoadButton, SW_HIDE);
@@ -1368,8 +1406,8 @@ void initializeInterface(AppState& state) {
     state.scoutingUpgradeButton = createControl(state, 0, L"BUTTON", L"Scout+", buttonStyle, 0, 0, 94, 26, state.window, IDC_SCOUTING_UPGRADE_BUTTON);
     state.stadiumUpgradeButton = createControl(state, 0, L"BUTTON", L"Estadio+", buttonStyle, 0, 0, 96, 26, state.window, IDC_STADIUM_UPGRADE_BUTTON);
 
-    state.breadcrumbLabel = createControl(state, 0, L"STATIC", L"Club > Resumen del club", WS_CHILD | WS_VISIBLE, 0, 0, 320, 18, state.window, 0);
-    state.pageTitleLabel = createControl(state, 0, L"STATIC", L"Resumen del club", WS_CHILD | WS_VISIBLE, 0, 0, 360, 24, state.window, 0);
+    state.breadcrumbLabel = createControl(state, 0, L"STATIC", L"", WS_CHILD | WS_VISIBLE, 0, 0, 320, 18, state.window, 0);
+    state.pageTitleLabel = createControl(state, 0, L"STATIC", L"", WS_CHILD | WS_VISIBLE, 0, 0, 360, 24, state.window, 0);
     state.infoLabel = createControl(state, 0, L"STATIC", L"", WS_CHILD | WS_VISIBLE, 0, 0, 400, 22, state.window, 0);
     state.summaryLabel = createControl(state, 0, L"STATIC", L"Proximo partido", WS_CHILD | WS_VISIBLE, 0, 0, 240, 18, state.window, 0);
     state.summaryEdit = createControl(state, WS_EX_CLIENTEDGE, L"EDIT", L"", WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL, 0, 0, 300, 180, state.window, IDC_SUMMARY_EDIT);
@@ -1414,13 +1452,15 @@ void paintWindowChrome(AppState& state, HDC hdc) {
     RECT client{};
     GetClientRect(state.window, &client);
     const auto s = [&](int value) { return scaleByDpi(state, value); };
+    const int pageOffsetY = -state.pageScrollY;
+    const auto shiftRect = [&](RECT rect) { return offsetRectY(rect, pageOffsetY); };
     const HeaderLayoutProfile header = buildHeaderLayout(client);
     FillRect(hdc, &client, state.backgroundBrush ? state.backgroundBrush : static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
     state.insightHotspots.clear();
 
     if (isFrontMenuPage(state.currentPage)) {
         const bool highContrastFrontend = state.settings.visualProfile == VisualProfile::HighContrast;
-        RECT hero{ s(18), s(18), client.right - s(18), client.bottom - s(44) };
+        RECT hero = shiftRect(RECT{s(18), s(18), client.right - s(18), client.bottom - s(44)});
         drawRoundedPanel(hdc,
                          hero,
                          highContrastFrontend ? RGB(6, 18, 25) : RGB(9, 22, 30),
@@ -1508,15 +1548,15 @@ void paintWindowChrome(AppState& state, HDC hdc) {
         return;
     }
 
-    RECT topBar{0, 0, client.right, s(header.topBarHeight) - s(10)};
+    RECT topBar = shiftRect(RECT{0, 0, client.right, s(header.topBarHeight) - s(10)});
     FillRect(hdc, &topBar, state.headerBrush ? state.headerBrush : state.backgroundBrush);
-    drawRoundedPanel(hdc, RECT{s(8), s(8), client.right - s(8), s(header.topBarHeight) - s(12)}, RGB(10, 23, 30), RGB(28, 53, 65), s(18));
+    drawRoundedPanel(hdc, shiftRect(RECT{s(8), s(8), client.right - s(8), s(header.topBarHeight) - s(12)}), RGB(10, 23, 30), RGB(28, 53, 65), s(18));
     drawTopMetrics(state, hdc, client);
 
-    RECT sideMenu{s(8), s(header.topBarHeight), s(8) + s(header.sideWidth), client.bottom - s(34)};
+    RECT sideMenu = shiftRect(RECT{s(8), s(header.topBarHeight), s(8) + s(header.sideWidth), client.bottom - s(34)});
     drawRoundedPanel(hdc, sideMenu, RGB(12, 23, 31), RGB(34, 57, 70), s(18));
 
-    RECT contentShell{s(kWindowPadding + header.sideWidth + 6), s(header.topBarHeight), client.right - s(kWindowPadding), client.bottom - s(34)};
+    RECT contentShell = shiftRect(RECT{s(kWindowPadding + header.sideWidth + 6), s(header.topBarHeight), client.right - s(kWindowPadding), client.bottom - s(34)});
     drawRoundedPanel(hdc, contentShell, RGB(10, 21, 29), RGB(32, 53, 66), s(22));
 
     RECT summaryCard = expandedRect(childRectOnParent(state.summaryEdit, state.window), s(8), s(24));
@@ -1560,7 +1600,7 @@ void paintWindowChrome(AppState& state, HDC hdc) {
         }
     }
 
-    RECT menuTitle{s(20), s(header.topBarHeight + 10), s(header.sideWidth - 10), s(header.topBarHeight + 34)};
+    RECT menuTitle = shiftRect(RECT{s(20), s(header.topBarHeight + 10), s(header.sideWidth - 10), s(header.topBarHeight + 34)});
     SetBkMode(hdc, TRANSPARENT);
     SetTextColor(hdc, kThemeMuted);
     HGDIOBJ oldFont = SelectObject(hdc, state.sectionFont ? state.sectionFont : state.font);

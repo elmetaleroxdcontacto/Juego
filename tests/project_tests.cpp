@@ -47,6 +47,12 @@
 #include <utility>
 #include <vector>
 
+#ifdef _WIN32
+#include <direct.h>
+#else
+#include <unistd.h>
+#endif
+
 using namespace std;
 
 namespace {
@@ -179,6 +185,27 @@ Team makeTeam(const string& name,
     ensureTeamIdentity(team);
     return team;
 }
+
+bool changeCurrentDirectoryForTest(const string& path) {
+#ifdef _WIN32
+    return _chdir(path.c_str()) == 0;
+#else
+    return chdir(path.c_str()) == 0;
+#endif
+}
+
+struct ScopedCurrentDirectory {
+    string previous;
+    bool valid = false;
+
+    explicit ScopedCurrentDirectory(const string& target) : previous(currentWorkingDirectory()) {
+        valid = changeCurrentDirectoryForTest(target);
+    }
+
+    ~ScopedCurrentDirectory() {
+        if (!previous.empty()) changeCurrentDirectoryForTest(previous);
+    }
+};
 
 void testValidationSuiteReflectsRosterAudit() {
     const DataValidationReport report = buildRosterDataValidationReport();
@@ -1300,7 +1327,8 @@ void testGameSettingsCycleAndDifficultyImpact() {
 }
 
 void testGameSettingsPersistenceAndFrontendScope() {
-    const string settingsPath = "saves/test_game_settings.cfg";
+    const string settingsDir = "saves/test_settings_runtime";
+    const string settingsPath = settingsDir + "/game_settings.cfg";
     std::remove(settingsPath.c_str());
 
     GameSettings original;
@@ -1317,6 +1345,8 @@ void testGameSettingsPersistenceAndFrontendScope() {
 
     expect(game_settings::saveToDisk(original, settingsPath),
            "La configuracion del frontend debe persistirse en disco.");
+    expect(pathExists(settingsPath),
+           "Guardar configuracion debe crear tambien carpetas intermedias si hacen falta.");
 
     GameSettings loaded;
     loaded.volume = 100;
@@ -1727,6 +1757,74 @@ void testSaveCareerCreatesBackup() {
     std::remove((savePath + ".bak").c_str());
 }
 
+void testSaveCareerCreatesNestedDirectory() {
+    const string saveDir = "saves/runtime_nested";
+    const string savePath = saveDir + "/test_nested_save.txt";
+    std::remove(savePath.c_str());
+    std::remove((savePath + ".bak").c_str());
+
+    Career career;
+    career.currentSeason = 4;
+    career.currentWeek = 9;
+    career.allTeams.push_back(makeTeam("Nested FC", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
+    career.allTeams.push_back(makeTeam("Nested Rival", "primera division", 66, 2, 2, "Balanced", "Equilibrado", 620000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Nested FC");
+    expect(career.myTeam != nullptr, "La prueba de directorio anidado necesita club usuario.");
+    career.saveFile = savePath;
+
+    expect(career.saveCareer(), "Guardar carrera debe crear tambien la carpeta del save si no existe.");
+    expect(pathExists(savePath), "El save anidado debe quedar creado en disco.");
+
+    Career loaded;
+    loaded.saveFile = savePath;
+    expect(loaded.loadCareer(), "La carga debe funcionar tambien desde el nuevo directorio anidado.");
+    expect(loaded.myTeam != nullptr && loaded.myTeam->name == "Nested FC",
+           "El save anidado debe restaurar correctamente el club controlado.");
+
+    std::remove(savePath.c_str());
+    std::remove((savePath + ".bak").c_str());
+}
+
+void testProjectPathsResolveFromNestedWorkingDirectory() {
+    const string probeDir = resolveProjectPath("saves/runtime_cwd_probe/nested");
+    expect(ensureDirectory(probeDir), "La prueba de cwd necesita crear un directorio de trabajo anidado.");
+
+    const string probeSettingsPath = "saves/runtime_cwd_probe/settings_probe.cfg";
+    const string resolvedProbeSettingsPath = resolveProjectPath(probeSettingsPath);
+    std::remove(resolvedProbeSettingsPath.c_str());
+
+    {
+        ScopedCurrentDirectory cwd(probeDir);
+        expect(cwd.valid, "La prueba de rutas necesita cambiar el directorio actual.");
+
+        vector<string> lines;
+        expect(readTextFileLines("data/configs/league_registry.csv", lines) && lines.size() > 1,
+               "La lectura de configs debe seguir funcionando fuera de la raiz del repo.");
+
+        GameSettings saved;
+        saved.volume = 25;
+        saved.menuThemeId = "path-probe";
+        expect(game_settings::saveToDisk(saved, probeSettingsPath),
+               "Los settings deben poder guardarse con cwd anidado.");
+
+        GameSettings loaded;
+        loaded.volume = 70;
+        loaded.menuThemeId = "default";
+        expect(game_settings::loadFromDisk(loaded, probeSettingsPath),
+               "Los settings deben poder cargarse con cwd anidado.");
+        expect(loaded.volume == 25 && loaded.menuThemeId == "path-probe",
+               "La persistencia de settings debe resolverse contra la raiz del proyecto.");
+
+        Career career;
+        career.initializeLeague(true);
+        expect(!career.divisions.empty(),
+               "La carga de divisiones no debe depender del directorio de trabajo.");
+    }
+
+    std::remove(resolvedProbeSettingsPath.c_str());
+}
+
 }  // namespace
 
 int main() {
@@ -1781,6 +1879,8 @@ int main() {
         {"teams_txt_folder_aliases", testTeamsTxtFolderAliasesDoNotTriggerOrphanWarnings},
         {"negotiation_agent_costs", testNegotiationTracksAgentCosts},
         {"save_backup", testSaveCareerCreatesBackup},
+        {"save_nested_directory", testSaveCareerCreatesNestedDirectory},
+        {"project_root_paths", testProjectPathsResolveFromNestedWorkingDirectory},
         {"simulate_match_state", testSimulateMatchAppliesPostProcessState},
         {"save_load_roundtrip", testSaveLoadRoundTripPreservesCareerState},
         {"legacy_division_ids", testLegacyDivisionIdentifiersCanonicalizeOnLoad},

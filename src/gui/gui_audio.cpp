@@ -139,12 +139,17 @@ std::wstring resolveThemePath(const AppState& state) {
     const std::wstring exeDir = executableDirectory();
     const std::wstring cwd = currentDirectoryPath();
     const std::wstring wideFile = utf8ToWide(theme->fileName);
+    const std::wstring projectFile = utf8ToWide(resolveProjectPath(theme->fileName));
+    const std::wstring projectLegacy =
+        utf8ToWide(resolveProjectPath("Los Miserables - El Crack  Video Oficial (HD Remastered).mp3"));
     const std::vector<std::wstring> candidates = {
         canonicalPath(utf8ToWide(theme->fileName)),
+        canonicalPath(projectFile),
         canonicalPath(joinWidePath(cwd, wideFile)),
         canonicalPath(joinWidePath(exeDir, wideFile)),
         canonicalPath(joinWidePath(exeDir, utf8ToWide(std::string("..\\") + theme->fileName))),
         canonicalPath(joinWidePath(exeDir, utf8ToWide(std::string("..\\..\\") + theme->fileName))),
+        canonicalPath(projectLegacy),
         joinWidePath(cwd, kLegacyMenuMusicFileName),
         joinWidePath(exeDir, kLegacyMenuMusicFileName),
         canonicalPath(joinWidePath(exeDir, std::wstring(L"..\\") + kLegacyMenuMusicFileName)),

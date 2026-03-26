@@ -8,6 +8,7 @@
 #include "utils/utils.h"
 
 #include <algorithm>
+#include <functional>
 #include <sstream>
 
 namespace gui_win32 {
@@ -35,28 +36,86 @@ std::string pageCacheKey(const AppState& state, GuiPage page) {
     return out.str();
 }
 
+template <typename T>
+void mixDigest(std::size_t& seed, const T& value) {
+    std::hash<T> hasher;
+    seed ^= hasher(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+
+std::size_t digestLines(const std::vector<std::string>& lines) {
+    std::size_t seed = lines.size();
+    for (const auto& line : lines) mixDigest(seed, line);
+    return seed;
+}
+
+std::size_t digestPendingTransfers(const std::vector<PendingTransfer>& transfers) {
+    std::size_t seed = transfers.size();
+    for (const auto& transfer : transfers) {
+        mixDigest(seed, transfer.playerName);
+        mixDigest(seed, transfer.fromTeam);
+        mixDigest(seed, transfer.toTeam);
+        mixDigest(seed, transfer.fee);
+        mixDigest(seed, transfer.wage);
+        mixDigest(seed, transfer.contractWeeks);
+        mixDigest(seed, transfer.effectiveSeason);
+        mixDigest(seed, transfer.loanWeeks);
+        mixDigest(seed, transfer.preContract);
+        mixDigest(seed, transfer.loan);
+        mixDigest(seed, transfer.promisedRole);
+    }
+    return seed;
+}
+
+std::size_t digestPlayers(const std::vector<Player>& players) {
+    std::size_t seed = players.size();
+    for (const auto& player : players) {
+        mixDigest(seed, player.name);
+        mixDigest(seed, player.position);
+        mixDigest(seed, player.age);
+        mixDigest(seed, player.skill);
+        mixDigest(seed, player.value);
+        mixDigest(seed, player.wage);
+        mixDigest(seed, player.contractWeeks);
+        mixDigest(seed, player.happiness);
+        mixDigest(seed, player.currentForm);
+        mixDigest(seed, player.fitness);
+        mixDigest(seed, player.injured);
+        mixDigest(seed, player.injuryWeeks);
+        mixDigest(seed, player.matchesSuspended);
+    }
+    return seed;
+}
+
 std::string pageCacheSignature(const AppState& state, GuiPage page) {
     const Career& career = state.career;
-    std::ostringstream out;
-    out << static_cast<int>(page)
-        << "|" << state.currentFilter
-        << "|" << career.currentSeason
-        << "|" << career.currentWeek
-        << "|" << career.newsFeed.size()
-        << "|" << career.pendingTransfers.size()
-        << "|" << career.scoutingShortlist.size()
-        << "|" << career.boardConfidence
-        << "|" << state.selectedPlayerName
-        << "|" << state.selectedTransferPlayer
-        << "|" << state.selectedTransferClub;
+    std::size_t digest = static_cast<std::size_t>(page);
+    mixDigest(digest, state.currentFilter);
+    mixDigest(digest, career.currentSeason);
+    mixDigest(digest, career.currentWeek);
+    mixDigest(digest, career.boardConfidence);
+    mixDigest(digest, career.boardMonthlyObjective);
+    mixDigest(digest, career.boardMonthlyProgress);
+    mixDigest(digest, state.selectedPlayerName);
+    mixDigest(digest, state.selectedTransferPlayer);
+    mixDigest(digest, state.selectedTransferClub);
+    mixDigest(digest, digestLines(career.newsFeed));
+    mixDigest(digest, digestLines(career.managerInbox));
+    mixDigest(digest, digestLines(career.scoutInbox));
+    mixDigest(digest, digestLines(career.scoutingShortlist));
+    mixDigest(digest, digestPendingTransfers(career.pendingTransfers));
     if (career.myTeam) {
-        out << "|" << career.myTeam->name
-            << "|" << career.myTeam->budget
-            << "|" << career.myTeam->morale
-            << "|" << career.myTeam->players.size()
-            << "|" << career.myTeam->points;
+        mixDigest(digest, career.myTeam->name);
+        mixDigest(digest, career.myTeam->budget);
+        mixDigest(digest, career.myTeam->debt);
+        mixDigest(digest, career.myTeam->sponsorWeekly);
+        mixDigest(digest, career.myTeam->morale);
+        mixDigest(digest, career.myTeam->points);
+        mixDigest(digest, career.myTeam->stadiumLevel);
+        mixDigest(digest, career.myTeam->trainingFacilityLevel);
+        mixDigest(digest, career.myTeam->youthFacilityLevel);
+        mixDigest(digest, digestPlayers(career.myTeam->players));
     }
-    return out.str();
+    return std::to_string(digest);
 }
 
 bool canUseCachedModel(const AppState& state) {
@@ -187,8 +246,8 @@ void renderFeed(HWND list, const std::vector<std::string>& lines) {
     }
 }
 
-void renderListPanel(HWND label, HWND list, const ListPanelModel& model) {
-    setWindowTextUtf8(label, friendlyPanelTitle(model.title));
+void renderListPanel(AppState& state, HWND label, HWND list, const ListPanelModel& model) {
+    updateDynamicStaticText(state, label, friendlyPanelTitle(model.title));
     resetListViewColumns(list, model.columns);
     clearListView(list);
     for (const auto& row : model.rows) {
@@ -462,8 +521,7 @@ bool check_game_ready(AppState& state) {
 }
 
 void setStatus(AppState& state, const std::string& text) {
-    setWindowTextUtf8(state.statusLabel, text);
-    if (state.statusLabel) InvalidateRect(state.statusLabel, nullptr, TRUE);
+    updateDynamicStaticText(state, state.statusLabel, text);
 }
 
 void refreshCurrentPage(AppState& state) {
@@ -496,14 +554,20 @@ void refreshCurrentPage(AppState& state) {
     bool dashboardEmptyState = state.currentPage == GuiPage::Dashboard && !state.career.myTeam;
     const bool frontMenuPage = isFrontMenuPage(state.currentPage);
 
-    setWindowTextUtf8(state.pageTitleLabel, state.currentModel.title);
-    setWindowTextUtf8(state.breadcrumbLabel, state.currentModel.breadcrumb);
-    setWindowTextUtf8(state.infoLabel, state.currentModel.infoLine);
-    setWindowTextUtf8(state.summaryLabel, friendlyPanelTitle(state.currentModel.summary.title));
+    if (frontMenuPage) {
+        updateDynamicStaticText(state, state.pageTitleLabel, "");
+        updateDynamicStaticText(state, state.breadcrumbLabel, "");
+        updateDynamicStaticText(state, state.infoLabel, "");
+    } else {
+        updateDynamicStaticText(state, state.pageTitleLabel, state.currentModel.title);
+        updateDynamicStaticText(state, state.breadcrumbLabel, state.currentModel.breadcrumb);
+        updateDynamicStaticText(state, state.infoLabel, state.currentModel.infoLine);
+    }
+    updateDynamicStaticText(state, state.summaryLabel, friendlyPanelTitle(state.currentModel.summary.title));
     setWindowTextUtf8(state.summaryEdit, state.currentModel.summary.content);
-    setWindowTextUtf8(state.detailLabel, friendlyPanelTitle(state.currentModel.detail.title));
+    updateDynamicStaticText(state, state.detailLabel, friendlyPanelTitle(state.currentModel.detail.title));
     setWindowTextUtf8(state.detailEdit, state.currentModel.detail.content);
-    setWindowTextUtf8(state.newsLabel, friendlyPanelTitle(state.currentModel.feed.title));
+    updateDynamicStaticText(state, state.newsLabel, friendlyPanelTitle(state.currentModel.feed.title));
     if (state.instructionButton) {
         std::string actionLabel = "Instruccion";
         if (state.currentPage == GuiPage::Dashboard) actionLabel = "Reunion";
@@ -521,9 +585,9 @@ void refreshCurrentPage(AppState& state) {
         setWindowTextUtf8(state.scoutActionButton, state.currentPage == GuiPage::News ? "Asignar" : "Otear");
     }
 
-    renderListPanel(state.tableLabel, state.tableList, state.currentModel.primary);
-    renderListPanel(state.squadLabel, state.squadList, state.currentModel.secondary);
-    renderListPanel(state.transferLabel, state.transferList, state.currentModel.footer);
+    renderListPanel(state, state.tableLabel, state.tableList, state.currentModel.primary);
+    renderListPanel(state, state.squadLabel, state.squadList, state.currentModel.secondary);
+    renderListPanel(state, state.transferLabel, state.transferList, state.currentModel.footer);
     renderFeed(state.newsList, state.currentModel.feed.lines);
 
     bool showTable = !frontMenuPage && state.currentPage != GuiPage::Tactics && !dashboardEmptyState;
@@ -533,14 +597,14 @@ void refreshCurrentPage(AppState& state) {
     bool showFooter = !frontMenuPage && !dashboardEmptyState;
     bool showFooterLabel = showFooter;
     bool showFilter = !frontMenuPage && !dashboardEmptyState;
-    ShowWindow(state.tableList, showTable ? SW_SHOW : SW_HIDE);
-    ShowWindow(state.tableLabel, showTableLabel ? SW_SHOW : SW_HIDE);
-    ShowWindow(state.squadList, showSquad ? SW_SHOW : SW_HIDE);
-    ShowWindow(state.squadLabel, showSquadLabel ? SW_SHOW : SW_HIDE);
-    ShowWindow(state.transferList, showFooter ? SW_SHOW : SW_HIDE);
-    ShowWindow(state.transferLabel, showFooterLabel ? SW_SHOW : SW_HIDE);
-    ShowWindow(state.filterLabel, showFilter ? SW_SHOW : SW_HIDE);
-    ShowWindow(state.filterCombo, showFilter ? SW_SHOW : SW_HIDE);
+    setControlVisibility(state, state.tableList, showTable);
+    setControlVisibility(state, state.tableLabel, showTableLabel);
+    setControlVisibility(state, state.squadList, showSquad);
+    setControlVisibility(state, state.squadLabel, showSquadLabel);
+    setControlVisibility(state, state.transferList, showFooter);
+    setControlVisibility(state, state.transferLabel, showFooterLabel);
+    setControlVisibility(state, state.filterLabel, showFilter);
+    setControlVisibility(state, state.filterCombo, showFilter);
 
     layoutWindow(state);
     autosizeVisibleLists(state);
@@ -562,6 +626,9 @@ void refreshAll(AppState& state) {
 }
 
 void setCurrentPage(AppState& state, GuiPage page) {
+    if (state.currentPage != page) {
+        state.pageScrollY = 0;
+    }
     state.currentPage = page;
     std::vector<std::string> options = filterOptionsForPage(page);
     state.currentFilter = options.empty() ? std::string() : options.front();

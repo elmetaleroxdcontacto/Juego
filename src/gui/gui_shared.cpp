@@ -76,6 +76,70 @@ std::string getWindowTextUtf8(HWND hwnd) {
     return trim(wideToUtf8(buffer));
 }
 
+void updateDynamicStaticText(AppState& state, HWND hwnd, const std::string& text) {
+    if (!hwnd || !IsWindow(hwnd)) return;
+
+    RECT oldRect = childRectOnParent(hwnd, state.window);
+    setWindowTextUtf8(hwnd, text);
+    RECT newRect = childRectOnParent(hwnd, state.window);
+
+    const int padX = scaleByDpi(state, 10);
+    const int padY = scaleByDpi(state, 8);
+    InflateRect(&oldRect, padX, padY);
+    InflateRect(&newRect, padX, padY);
+    if (state.window && IsWindow(state.window)) {
+        InvalidateRect(state.window, &oldRect, TRUE);
+        InvalidateRect(state.window, &newRect, TRUE);
+    }
+    InvalidateRect(hwnd, nullptr, TRUE);
+}
+
+void hideControlAndInvalidate(AppState& state, HWND hwnd, int padX, int padY) {
+    if (!hwnd || !IsWindow(hwnd)) return;
+
+    RECT rect = childRectOnParent(hwnd, state.window);
+    ShowWindow(hwnd, SW_HIDE);
+    if (state.window && IsWindow(state.window)) {
+        InflateRect(&rect, scaleByDpi(state, padX), scaleByDpi(state, padY));
+        InvalidateRect(state.window, &rect, TRUE);
+    }
+}
+
+void showControlAndInvalidate(AppState& state, HWND hwnd, int padX, int padY) {
+    if (!hwnd || !IsWindow(hwnd)) return;
+    ShowWindow(hwnd, SW_SHOW);
+    RECT rect = childRectOnParent(hwnd, state.window);
+    if (state.window && IsWindow(state.window)) {
+        InflateRect(&rect, scaleByDpi(state, padX), scaleByDpi(state, padY));
+        InvalidateRect(state.window, &rect, TRUE);
+    }
+    InvalidateRect(hwnd, nullptr, TRUE);
+}
+
+void setControlVisibility(AppState& state, HWND hwnd, bool visible, int padX, int padY) {
+    if (visible) {
+        showControlAndInvalidate(state, hwnd, padX, padY);
+    } else {
+        hideControlAndInvalidate(state, hwnd, padX, padY);
+    }
+}
+
+void moveControlAndInvalidate(AppState& state, HWND hwnd, int x, int y, int width, int height, int padX, int padY) {
+    if (!hwnd || !IsWindow(hwnd)) return;
+
+    RECT oldRect = childRectOnParent(hwnd, state.window);
+    MoveWindow(hwnd, x, y, width, height, TRUE);
+    RECT newRect = childRectOnParent(hwnd, state.window);
+
+    if (state.window && IsWindow(state.window)) {
+        InflateRect(&oldRect, scaleByDpi(state, padX), scaleByDpi(state, padY));
+        InflateRect(&newRect, scaleByDpi(state, padX), scaleByDpi(state, padY));
+        InvalidateRect(state.window, &oldRect, TRUE);
+        InvalidateRect(state.window, &newRect, TRUE);
+    }
+    InvalidateRect(hwnd, nullptr, TRUE);
+}
+
 HWND createControl(AppState& state,
                    DWORD exStyle,
                    const wchar_t* className,
@@ -670,7 +734,7 @@ static bool isActivePageButton(const AppState& state, int id) {
 }
 
 static bool usesButtonBadge(int id) {
-    return isPageButtonId(id) || id == IDC_DISPLAY_MODE_BUTTON || id == IDC_MENU_CONTINUE_BUTTON ||
+    return isPageButtonId(id) || id == IDC_DISPLAY_MODE_BUTTON || id == IDC_FRONT_MENU_BUTTON || id == IDC_MENU_CONTINUE_BUTTON ||
            id == IDC_MENU_PLAY_BUTTON || id == IDC_MENU_LOAD_BUTTON || id == IDC_MENU_SETTINGS_BUTTON ||
            id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON || id == IDC_MENU_BACK_BUTTON;
 }
@@ -731,6 +795,7 @@ static wchar_t buttonBadgeGlyph(int id, DisplayMode displayMode) {
     if (id == IDC_MENU_CONTINUE_BUTTON) return L'C';
     if (id == IDC_MENU_PLAY_BUTTON) return L'J';
     if (id == IDC_MENU_LOAD_BUTTON) return L'L';
+    if (id == IDC_FRONT_MENU_BUTTON) return L'M';
     if (id == IDC_MENU_SETTINGS_BUTTON) return L'A';
     if (id == IDC_MENU_CREDITS_BUTTON) return L'R';
     if (id == IDC_MENU_EXIT_BUTTON) return L'S';
@@ -789,6 +854,9 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
             ? RGB(24, 58, 80)
             : (displayMode == DisplayMode::MaximizedWindow ? RGB(32, 48, 66) : RGB(42, 53, 30));
         border = kThemeAccentBlue;
+    } else if (id == IDC_FRONT_MENU_BUTTON) {
+        fill = RGB(26, 44, 64);
+        border = RGB(105, 156, 219);
     } else if (isPrimaryButtonId(id)) {
         fill = RGB(19, 63, 49);
         border = kThemeAccentGreen;
@@ -825,6 +893,7 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     accentRect.right = accentRect.left + (isFrontMenuButtonId(id) ? 6 : 4);
     COLORREF accentColor = activePage ? kThemeAccent : (isPrimaryButtonId(id) ? kThemeAccentGreen : border);
     if (id == IDC_MENU_CONTINUE_BUTTON) accentColor = RGB(87, 196, 204);
+    if (id == IDC_FRONT_MENU_BUTTON) accentColor = RGB(105, 156, 219);
     if (id == IDC_MENU_SETTINGS_BUTTON) accentColor = kThemeAccentBlue;
     if (id == IDC_MENU_LOAD_BUTTON) accentColor = RGB(110, 157, 215);
     if (id == IDC_MENU_CREDITS_BUTTON) accentColor = kThemeAccent;
@@ -861,6 +930,7 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
         RECT badgeRect{rect.left + 14, rect.top + 8, rect.left + 38, rect.bottom - 8};
         COLORREF badgeFill = RGB(28, 46, 58);
         if (id == IDC_DISPLAY_MODE_BUTTON) badgeFill = kThemeAccentBlue;
+        else if (id == IDC_FRONT_MENU_BUTTON) badgeFill = RGB(105, 156, 219);
         else if (activePage) badgeFill = kThemeAccent;
         else if (id == IDC_MENU_CONTINUE_BUTTON) badgeFill = RGB(87, 196, 204);
         else if (id == IDC_MENU_PLAY_BUTTON) badgeFill = kThemeAccentGreen;
@@ -907,7 +977,7 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
 }
 
 LRESULT handleListCustomDraw(AppState& state, LPNMHDR header) {
-    if (!header || header->code != NM_CUSTOMDRAW) return CDRF_DODEFAULT;
+    if (!header || static_cast<int>(header->code) != NM_CUSTOMDRAW) return CDRF_DODEFAULT;
     HWND tableHeader = state.tableList ? ListView_GetHeader(state.tableList) : nullptr;
     HWND squadHeader = state.squadList ? ListView_GetHeader(state.squadList) : nullptr;
     HWND transferHeader = state.transferList ? ListView_GetHeader(state.transferList) : nullptr;

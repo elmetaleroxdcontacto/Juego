@@ -3747,3 +3747,351 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Exponer un selector real de `tema del menu` en GUI y CLI cuando existan varias pistas versionadas en `assets/audio/menu_themes.csv`.
 - Mostrar la traza de rendimiento por pagina en un overlay o panel tecnico opcional para diagnosticar cuellos de botella sin depender solo del status bar.
 - Seguir expandiendo el frontend con pantallas reales de perfil, carga visual de partida y preferencias de video/resolucion usando la misma arquitectura persistente.
+
+## Auditoria del proyecto (2026-03-26 15:20:25 -03:00) - correccion de persistencia fragil y cache pesado de GUI
+
+### Resumen de cambios realizados
+
+- Se reviso el proyecto completo con compilacion, suite automatizada y validacion CLI para buscar fallas reales en lugar de solo hacer una inspeccion superficial.
+- Se corrigio el guardado de carrera para que soporte rutas vacias o personalizadas de forma robusta: ahora normaliza `saveFile`, usa `saves/career_save.txt` como fallback estable y crea carpetas padre intermedias antes de escribir temp, backup y save final.
+- Se endurecio tambien la persistencia de `GameSettings` para que al guardar en rutas anidadas cree correctamente el directorio destino en lugar de depender de una ruta simple.
+- Se reforzo la firma del cache de paginas pesadas de la GUI (`Transfers`, `Finances`, `News`) con huellas mas ricas de noticias, inbox, transferencias pendientes y estado del plantel, evitando que una vista quede mostrando datos viejos cuando cambiaba el contenido pero no algunos contadores basicos.
+- Se agregaron nuevas pruebas automatizadas para cubrir persistencia de settings en carpetas anidadas y guardado/carga de carrera en rutas creadas al vuelo.
+
+### Archivos creados o modificados
+
+- `TODO.md`
+- `src/io/save_manager.cpp`
+- `src/engine/game_settings.cpp`
+- `src/gui/gui_runtime.cpp`
+- `tests/project_tests.cpp`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- `.\\build-cmake\\bin\\FootballManagerCLI.exe --validate`
+- `.\\build.bat --tests --run-tests`
+- Resultado:
+- `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe` compilaron correctamente por CMake en la verificacion directa.
+- La suite automatizada termino con `All tests passed`, incluyendo el nuevo caso `save_nested_directory`.
+- La validacion CLI termino `sin fallas`.
+- `build.bat --tests --run-tests` tambien termino bien, aunque en este entorno MinGW + OneDrive la ruta CMake volvio a tropezar primero con un `Permission denied` al renombrar `objects.a`, por lo que el propio script uso correctamente la ruta fallback y aun asi dejo la suite pasando.
+
+### Mejoras futuras sugeridas
+
+- Limpiar o retirar definitivamente del arbol el bloque historico de save/load que sigue dentro de `src/engine/models.cpp` bajo `#if 0`, para reducir ruido y evitar confusion futura durante mantenimiento.
+- Llevar el mismo endurecimiento de firmas/cache a otras vistas si se agregan nuevos paneles costosos o comparadores mas complejos.
+- Investigar una mitigacion mas fuerte para el bloqueo intermitente de `objects.a` en MinGW + OneDrive, idealmente separando mejor los directorios de build temporales del contenido sincronizado.
+
+## Auditoria del proyecto (2026-03-26 15:26:45 -03:00) - limpieza visual del frontend y etiquetas sin ghosting
+
+### Resumen de cambios realizados
+
+- Se corrigio el frontend principal para que la portada no mezcle texto fantasma del layout clasico con el hero personalizado de `Chilean Footballito`.
+- Se agrego una capa de actualizacion segura para `STATIC` dinamicos que invalida el area vieja y nueva del control antes y despues de cambiar texto, evitando solapes visuales en la barra inferior y en encabezados transparentes.
+- En las paginas de frontend ahora se limpian y ocultan con repintado explicito las etiquetas heredadas (`breadcrumb`, `title`, `info`) para que no queden rastros en la esquina superior izquierda.
+- Tambien se eliminaron textos iniciales residuales en etiquetas del encabezado clasico para que la ventana no arranque mostrando contenido incorrecto antes de que el layout definitivo termine de acomodarse.
+
+### Archivos creados o modificados
+
+- `TODO.md`
+- `include/gui/gui_internal.h`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+- `src/gui/gui_shared.cpp`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager`
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- `FootballManager.exe` recompilo correctamente con el ajuste del frontend.
+- La suite automatizada termino en `All tests passed`.
+- Persisten solo advertencias Win32 antiguas no bloqueantes de comparaciones signed/unsigned.
+
+### Mejoras futuras sugeridas
+
+- Llevar la misma estrategia de invalidacion controlada a otros `STATIC` transparentes si se siguen ampliando dashboards owner-draw con mas cambios de texto en vivo.
+- Revisar si conviene encapsular el status bar del frontend en un renderer propio en lugar de depender de un `STATIC` clasico.
+- Agregar una prueba visual/manual guiada para la portada y la barra inferior, de modo que estos glitches de repintado se detecten antes en futuras iteraciones.
+
+## Auditoria del proyecto (2026-03-26 15:31:16 -03:00) - retorno al menu principal desde la partida
+
+### Resumen de cambios realizados
+
+- Se agrego un boton real `Menu principal` dentro de la cabecera del juego para volver a la portada sin cerrar la aplicacion ni perder la carrera activa.
+- El nuevo boton reutiliza el flujo existente de `openFrontendMenu`, por lo que al volver a la portada queda habilitado `Continuar` y se puede retomar la sesion actual desde memoria.
+- Se ajusto el layout de botones superiores para reservar espacio al nuevo acceso de retorno y mantener consistente la distribucion de la cabecera.
+- Tambien se integro el estilo visual del nuevo boton con badge, colores y comportamiento del resto de la GUI owner-draw.
+
+### Archivos creados o modificados
+
+- `TODO.md`
+- `include/gui/gui_internal.h`
+- `src/gui/gui.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_shared.cpp`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager`
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- `FootballManager.exe` recompilo correctamente con el nuevo boton de retorno.
+- La suite automatizada termino en `All tests passed`.
+- Persisten solo advertencias Win32 antiguas no bloqueantes de comparaciones signed/unsigned.
+
+### Mejoras futuras sugeridas
+
+- Agregar un dialogo opcional de confirmacion al volver a la portada cuando haya una carrera activa y cambios recientes no guardados.
+- Exponer tambien un atajo de teclado contextual para volver al menu principal desde la partida sin depender solo del boton.
+- Mostrar en la portada un bloque pequeño con `carrera activa` y ultimo club usado para que el retorno/continuar sea aun mas claro.
+
+## Auditoria del proyecto (2026-03-26 15:43:09 -03:00) - cabecera reordenada y scroll vertical real de la UI
+
+### Resumen de cambios realizados
+
+- Se reviso y corrigio el layout raiz de la GUI Win32 para reducir solapamientos en la cabecera y mejorar la distribucion de campos, acciones y paneles.
+- Se endurecieron los umbrales responsive de la cabecera para que botones y campos compartan fila solo en anchos realmente amplios; en resoluciones comunes ahora la barra superior reparte mejor las acciones y evita montajes entre controles.
+- Se implemento scroll vertical real sobre la ventana principal con barra lateral, rueda del mouse y soporte de `Page Up`, `Page Down`, `Home` y `End` para recorrer pantallas altas.
+- El layout ahora conserva un `pageScrollY` y recalcula posiciones de controles y paneles de acuerdo con el desplazamiento vertical, incluyendo el pintado custom de la GUI para que fondos, cabecera, rail lateral y contenido se muevan de forma consistente.
+- Tambien se ajusto el estilo de la ventana para reservar scroll vertical y mejorar el clipping visual del contenido mientras se navega.
+
+### Archivos creados o modificados
+
+- `TODO.md`
+- `include/gui/gui_internal.h`
+- `src/gui/gui.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+
+### Causa del problema detectado
+
+- La interfaz estaba construida sobre coordenadas absolutas en el `HWND` raiz, sin una estrategia real para overflow vertical ni una politica suficientemente estricta para repartir la cabecera cuando el ancho disponible se tensaba.
+- Eso hacia que al crecer la cantidad de controles superiores o cambiar el alto util de la ventana, algunos bloques quedaran demasiado comprimidos y parte del contenido inferior se volviera inaccesible sin una navegacion vertical propia.
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager`
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- `FootballManager.exe` recompilo correctamente con el nuevo layout y el scroll vertical.
+- La suite automatizada termino en `All tests passed`.
+- Persisten solo advertencias Win32 antiguas no bloqueantes de comparaciones signed/unsigned.
+
+### Mejoras futuras sugeridas
+
+- Migrar en una iteracion futura el contenido central a un `content host` dedicado para poder mantener cabecera fija y scroll solo en el cuerpo, si se quiere una experiencia aun mas cercana a un manager moderno.
+- Afinar el espaciado y la jerarquia visual de la cabecera con una microcapa de `brand / setup / acciones / estado` todavia mas explicita.
+- Agregar una prueba manual guiada de viewport pequeno, maximizado y DPI alto para detectar antes recortes o combinaciones de scroll conflictivas.
+
+## Auditoria del proyecto (2026-03-26 15:47:29 -03:00) - limpieza de ghosting y controles fantasma tras scroll/layout
+
+### Resumen de cambios realizados
+
+- Se corrigio el problema visual donde quedaban botones, labels y textos fantasmas pegados en pantalla despues de mover la interfaz o cambiar de pagina.
+- Se agregaron helpers para mostrar, ocultar y mover controles invalidando explicitamente tanto el rectangulo viejo como el nuevo, de modo que la GUI repinte correctamente al hacer scroll o al reorganizar el layout.
+- Se aplico esa limpieza a botones del frontend, acciones de pagina, bloques superiores, labels principales y paneles reutilizados, evitando residuos como `Jugar`, `Perfil del manager` o botones de upgrades en posiciones viejas.
+- Tambien se ajusto el refresco de visibilidad de tablas y filtros para que los cambios de pagina no dejen restos visuales del estado anterior.
+
+### Archivos creados o modificados
+
+- `TODO.md`
+- `include/gui/gui_internal.h`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+- `src/gui/gui_shared.cpp`
+
+### Causa del problema detectado
+
+- El scroll vertical y los cambios de pagina ya movian/ocultaban controles, pero no invalidaban de forma consistente las areas anteriores de esos `HWND`, por lo que algunos restos graficos quedaban pintados sobre la nueva composicion.
+- Eso generaba ghosting visible de botones y labels de vistas previas, especialmente en una GUI Win32 con bastante owner-draw y elementos reutilizados entre paginas.
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager`
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- `FootballManager.exe` recompilo correctamente con la limpieza de repintado.
+- La suite automatizada termino en `All tests passed`.
+- Persisten solo advertencias Win32 antiguas no bloqueantes de comparaciones signed/unsigned.
+
+### Mejoras futuras sugeridas
+
+- Consolidar en una siguiente iteracion un sistema de layout con `deferred window positioning` para reducir aun mas flicker y trabajo de repintado.
+- Mantener cabecera y status totalmente fijos mientras solo el cuerpo central se desplaza, para una experiencia todavia mas estable.
+- Agregar una rutina visual/manual de smoke test para cambios de pagina + scroll que detecte rapido este tipo de ghosting en futuras expansiones.
+
+## Auditoria del proyecto (2026-03-26 16:06:39 -03:00) - build, runtime y consistencia tecnica general
+
+### Chequeos ejecutados
+
+- `Get-ChildItem -Force`
+- `rg --files`
+- `git status --short`
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- `.\\build-cmake\\bin\\FootballManagerCLI.exe --validate`
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests --clean-first`
+- `& 'C:\\Users\\moise\\OneDrive\\Escritorio\\Juego\\FootballManagerCLI.exe' --validate` ejecutado desde `build-cmake\\bin`
+- `& 'C:\\Users\\moise\\OneDrive\\Escritorio\\Juego\\FootballManagerCLI.exe' --validate` ejecutado desde la raiz del repo
+- `FM_FORCE_FALLBACK=1 .\\build.bat --tests`
+- recorrido de CLI automatizado para crear carrera, guardar y volver a cargar desde el flujo principal
+
+### Errores encontrados
+
+- Se reprodujo una falla real de dependencia del directorio de trabajo: al ejecutar el binario con `working directory` en `build-cmake\\bin`, la validacion quedo con `Divisiones: 0 | Equipos revisados: 0` y fallo `Guardado/carga: No hay divisiones para validar`.
+- Se reprodujo una falla de build limpio en CMake/MinGW: `ar.exe: unable to rename 'CMakeFiles\\FootballManager.dir/objects.a'; reason: Permission denied`, y el mismo bloqueo aparecio luego para `FootballManagerCLI`. Esto deja `build-cmake\\bin` vacio tras el intento de limpieza.
+- Se confirmaron warnings reales de compilacion en la GUI Win32 por comparaciones signed/unsigned en `src/gui/gui.cpp` y `src/gui/gui_shared.cpp`.
+- Se detecto una incoherencia de distribucion/pruebas: conviven ejecutables en la raiz del repo y en `build-cmake\\bin`, y no necesariamente reflejan el mismo estado del codigo, lo que puede producir resultados distintos en validacion.
+
+### Cambios aplicados
+
+- No se aplicaron cambios de codigo en esta pasada; la entrega fue una auditoria tecnica enfocada en evidencia reproducible.
+- Se agrego esta nueva entrada de auditoria al final de `TODO.md`.
+
+### Archivos modificados
+
+- `TODO.md`
+
+### Deuda tecnica detectada
+
+- El proyecto depende de rutas relativas crudas en varios modulos (`competition`, `career`, `validators`, `gui_audio`, `game_settings`), lo que vuelve fragil el arranque fuera de la raiz del repo.
+- La GUI sigue concentrando mucho layout manual en archivos grandes y con muchas llamadas directas a `MoveWindow`/`ShowWindow`, lo que aumenta la probabilidad de regresiones visuales.
+- `tests/project_tests.cpp` concentra gran parte de la cobertura en un unico archivo muy grande; cubre bastante logica de dominio, pero no protege build limpio, launch desde `build-cmake\\bin` ni interacciones GUI reales.
+- Existe codigo de guardado/carga aparentemente vestigial en `src/engine/models.cpp` mientras la implementacion activa vive en `src/io/save_manager.cpp`, lo que puede inducir fixes en el lugar incorrecto.
+
+### Mejoras futuras sugeridas
+
+- Introducir una resolucion centralizada de rutas base del proyecto a partir del ejecutable o de una carpeta de datos configurada, para eliminar la dependencia del `working directory`.
+- Agregar un smoke test automatizado que ejecute `--validate` desde `build-cmake\\bin` y falle si las divisiones o configs no cargan.
+- Reducir warnings Win32 de signed/unsigned en el manejo de notificaciones para dejar la build mas limpia y menos propensa a comparaciones ambiguas.
+- Separar cobertura automatizada en varios archivos de test y sumar al menos una verificacion de build limpio y otra del flujo de guardado/carga desde un binario empaquetado.
+
+## Auditoria del proyecto (2026-03-26 16:30:45 -03:00) - rutas base estables, fallback ampliado y validacion fuera de la raiz
+
+### Chequeos ejecutados
+
+- `cmake -S . -B build-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++`
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- `.\\build-cmake\\bin\\FootballManagerCLI.exe --validate`
+- `& 'C:\\Users\\moise\\OneDrive\\Escritorio\\Juego\\build-cmake\\bin\\FootballManagerCLI.exe' --validate` ejecutado con `working directory` en `build-cmake\\bin`
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests --clean-first`
+- `FM_FORCE_FALLBACK=1 .\\build.bat --all --run-tests`
+- `.\\FootballManagerTests.exe`
+- `.\\FootballManagerCLI.exe --validate`
+
+### Errores encontrados
+
+- La carga de datos, saves, settings y assets seguia dependiendo del `working directory`, lo que hacia fallar `--validate` fuera de la raiz del repo.
+- `build.bat` en fallback solo construia el target principal, asi que una caida de CMake podia dejar CLI y tests desactualizados.
+- Persistian warnings Win32 signed/unsigned en notificaciones GUI.
+- La ruta `cmake --build ... --clean-first` con `MinGW Makefiles` sigue chocando con `ar.exe` y `objects.a` en este entorno OneDrive/MinGW, incluso despues de endurecer la configuracion de CMake.
+
+### Cambios aplicados
+
+- Se implemento una resolucion centralizada de raiz del proyecto en `utils`, con deteccion del repo a partir del `cwd` y del ejecutable, mas `resolveProjectPath()` para estabilizar rutas relativas.
+- `pathExists`, `isDirectory`, `ensureDirectory`, `readTextFileLines` y `listDirectories` ahora pueden resolver correctamente recursos del proyecto aunque el binario se ejecute desde `build-cmake\\bin` o un directorio anidado.
+- El guardado/carga de carrera y los settings dejaron de depender del `cwd`: `save_manager` y `game_settings` ya escriben y leen contra la raiz real del proyecto.
+- La validacion ahora escribe y revisa sus archivos runtime usando rutas del proyecto estables.
+- El frontend de audio suma resolucion directa del asset/theme desde la raiz del proyecto, no solo desde `cwd` o el directorio del ejecutable.
+- Se corrigieron los warnings Win32 de comparaciones signed/unsigned en notificaciones `NM_CUSTOMDRAW` y `NM_CLICK`.
+- `build.bat` ahora construye tambien `FootballManagerCLI` y `FootballManagerTests` cuando la ruta principal cae al fallback, en vez de dejar solo el target principal.
+- Se agrego una prueba automatizada nueva que cambia el `working directory` a una carpeta anidada y verifica que configs, divisiones y settings sigan funcionando.
+
+### Archivos modificados
+
+- `CMakeLists.txt`
+- `build.bat`
+- `TODO.md`
+- `include/utils/utils.h`
+- `src/utils/utils.cpp`
+- `src/engine/game_settings.cpp`
+- `src/gui/gui.cpp`
+- `src/gui/gui_audio.cpp`
+- `src/gui/gui_shared.cpp`
+- `src/io/save_manager.cpp`
+- `src/validators/validators.cpp`
+- `tests/project_tests.cpp`
+
+### Deuda tecnica detectada
+
+- La compilacion limpia con `MinGW Makefiles` y `clean-first` sigue siendo fragil por un lock externo sobre `objects.a`; ya no bloquea la entrega normal porque `build.bat` recompone el flujo por fallback, pero el problema de entorno persiste fuera del script.
+- La GUI Win32 sigue muy concentrada en pocos archivos grandes y con bastante layout manual, lo que mantiene alto el costo de futuras correcciones visuales.
+- Sigue existiendo codigo historico desactivado en `src/engine/models.cpp`; no rompe el runtime actual, pero mantiene ruido en la base y conviene retirarlo en una pasada separada.
+
+### Mejoras futuras sugeridas
+
+- Introducir un smoke test de proceso real que lance CLI y GUI desde `build-cmake\\bin` y verifique recursos, saves y settings.
+- Retirar el bloque historico desactivado de persistencia en `src/engine/models.cpp` para dejar una sola historia de guardado/carga.
+- Evaluar un generador alternativo a `MinGW Makefiles` o una carpeta de build fuera de OneDrive para eliminar de raiz el bloqueo de `objects.a` en rebuilds limpios.
+
+## Auditoria del proyecto (2026-03-26 16:37:40 -03:00) - CMake sincroniza ejecutables a la raiz igual que build.bat
+
+### Chequeos ejecutados
+
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `.\\FootballManagerTests.exe`
+
+### Cambios realizados
+
+- Se agrego un `POST_BUILD` comun en `CMakeLists.txt` para que cada target configurado copie su `.exe` a la raiz del proyecto al terminar de compilar.
+- Ahora `cmake --build` deja sincronizados `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe` en la misma ubicacion visible que ya usa `build.bat`.
+- Se verifico que los binarios de la raiz queden con la misma fecha y tamano que sus equivalentes en `build-cmake\\bin`.
+
+### Archivos modificados
+
+- `CMakeLists.txt`
+- `TODO.md`
+
+### Causa del problema detectado
+
+- La ruta CMake y la ruta `build.bat` generaban artefactos en lugares distintos, asi que al compilar directo con `cmake --build` podian quedar `.exe` viejos en la raiz aunque el build nuevo estuviera correcto dentro de `build-cmake\\bin`.
+
+### Mejoras futuras sugeridas
+
+- Unificar a futuro la nocion de artefacto canonico del proyecto para evitar duplicar binarios entre `build-cmake\\bin` y la raiz.
+- Agregar un smoke test automatizado que falle si un build por CMake no deja los ejecutables esperados en la ruta de salida visible.
+
+## Auditoria del proyecto (2026-03-26 16:53:54 -03:00) - build.bat sincroniza tambien la salida CMake
+
+### Chequeos ejecutados
+
+- `FM_FORCE_FALLBACK=1 build.bat --all` con `FM_SKIP_RUN=1`
+- Revision de artefactos en raiz y en `build-cmake\\bin`
+- Revision del resumen de salida de `build.bat`
+
+### Causa raiz detectada
+
+- `build.bat` ya usaba CMake como ruta principal, pero cuando caia al fallback directo con `g++` solo dejaba actualizados los `.exe` de la raiz del repo; `build-cmake\\bin` podia quedar desfasado respecto de la ultima compilacion hecha por el script.
+
+### Cambios realizados
+
+- Se agrego una sincronizacion comun de artefactos en `build.bat`.
+- Si la ruta usada es CMake, el script sigue copiando los binarios a la raiz del proyecto.
+- Si la ruta usada es fallback, el script ahora tambien copia `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe` a `build-cmake\\bin`.
+- Se mejoro el resumen final del script para mostrar explicitamente la carpeta `build-cmake\\bin` y la raiz del proyecto como salidas sincronizadas.
+- Se actualizo `README.md` para dejar documentado que `build.bat` mantiene alineadas ambas ubicaciones de binarios.
+
+### Archivos modificados
+
+- `build.bat`
+- `README.md`
+- `TODO.md`
+
+### Mejora aplicada al build
+
+- Ahora `build.bat` deja consistentes las dos rutas de artefactos del proyecto aunque no se pueda completar la ruta principal de CMake en ese intento.
+
+### Mejoras futuras sugeridas
+
+- Agregar una bandera explicita como `--cmake-only` para forzar error si CMake falla y evitar el fallback cuando se quiera depurar exclusivamente esa ruta.
+- Incorporar una verificacion automatica de timestamps o hashes en el script para confirmar visualmente que raiz y `build-cmake\\bin` quedaron sincronizados.

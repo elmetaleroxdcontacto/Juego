@@ -18,6 +18,9 @@ void resetRandomSeed();
 
 std::string trim(const std::string& s);
 std::string toLower(const std::string& s);
+std::string currentWorkingDirectory();
+std::string projectRootPath();
+std::string resolveProjectPath(const std::string& path);
 
 bool pathExists(const std::string& path);
 bool isDirectory(const std::string& path);

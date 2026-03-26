@@ -8,6 +8,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if(MINGW)
+    set(CMAKE_C_USE_RESPONSE_FILE_FOR_OBJECTS 1)
+    set(CMAKE_CXX_USE_RESPONSE_FILE_FOR_OBJECTS 1)
+    set(CMAKE_C_USE_RESPONSE_FILE_FOR_INCLUDES 1)
+    set(CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES 1)
+    set(CMAKE_C_RESPONSE_FILE_LINK_FLAG "@")
+    set(CMAKE_CXX_RESPONSE_FILE_LINK_FLAG "@")
+endif()
+
 set(FM_CAREER_SOURCES
     src/career/analytics_service.cpp
     src/career/app_services.cpp
@@ -191,6 +200,13 @@ function(fm_configure_target target_name)
 
     set_target_properties(${target_name} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    )
+
+    add_custom_command(TARGET ${target_name} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:${target_name}>
+            ${CMAKE_SOURCE_DIR}/$<TARGET_FILE_NAME:${target_name}>
+        VERBATIM
     )
 endfunction()
 

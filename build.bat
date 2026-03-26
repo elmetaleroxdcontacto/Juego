@@ -21,7 +21,14 @@ set "RUN_TESTS=0"
 set "BUILD_ROUTE=Sin definir"
 set "FORWARD_ARGS="
 set "OUTPUT=%ROOT_DIR%\FootballManager.exe"
-set "TEST_OUTPUT=%CMAKE_BUILD_DIR%\bin\FootballManagerTests.exe"
+set "CMAKE_BIN_DIR=%CMAKE_BUILD_DIR%\bin"
+set "CMAKE_GUI_OUTPUT=%CMAKE_BIN_DIR%\FootballManager.exe"
+set "CMAKE_CLI_OUTPUT=%CMAKE_BIN_DIR%\FootballManagerCLI.exe"
+set "CMAKE_TEST_OUTPUT=%CMAKE_BIN_DIR%\FootballManagerTests.exe"
+set "TEST_OUTPUT=%CMAKE_TEST_OUTPUT%"
+set "ROOT_GUI_OUTPUT=%ROOT_DIR%\FootballManager.exe"
+set "ROOT_CLI_OUTPUT=%ROOT_DIR%\FootballManagerCLI.exe"
+set "ROOT_TEST_OUTPUT=%ROOT_DIR%\FootballManagerTests.exe"
 
 :parse_args
 if "%~1"=="" goto :after_parse
@@ -85,7 +92,7 @@ cmake --build "%CMAKE_BUILD_DIR%" --config Release --target %CMAKE_TARGETS% > "%
 if errorlevel 1 goto :legacy_build_after_cmake_build
 
 set "BUILD_ROUTE=CMake"
-set "OUTPUT=%CMAKE_BUILD_DIR%\bin\%PRIMARY_TARGET%.exe"
+set "OUTPUT=%CMAKE_BIN_DIR%\%PRIMARY_TARGET%.exe"
 if not exist "%OUTPUT%" set "OUTPUT=%CMAKE_BUILD_DIR%\%PRIMARY_TARGET%.exe"
 if not exist "%TEST_OUTPUT%" set "TEST_OUTPUT=%CMAKE_BUILD_DIR%\FootballManagerTests.exe"
 goto :post_build
@@ -138,11 +145,13 @@ echo.
 %CXX% !OBJECTS! -o "%OUTPUT%" %FALLBACK_LDFLAGS%
 if errorlevel 1 goto :link_error
 
-if "%RUN_TESTS%"=="1" if /i not "%PRIMARY_TARGET%"=="FootballManagerTests" (
-    echo Aviso: la ruta fallback compilo solo el target principal solicitado. Los tests automaticos requieren la ruta CMake.
-)
+call :fallback_build_additional_targets
+if errorlevel 1 exit /b %ERRORLEVEL%
 
 :post_build
+call :sync_outputs
+if errorlevel 1 exit /b %ERRORLEVEL%
+
 echo.
 echo ========================================
 echo   Compilacion exitosa
@@ -150,6 +159,8 @@ echo ========================================
 echo Ruta usada : %BUILD_ROUTE%
 echo Targets    : %CMAKE_TARGETS%
 echo Principal  : %OUTPUT%
+if exist "%CMAKE_BIN_DIR%" echo CMake bin  : %CMAKE_BIN_DIR%
+echo Raiz       : %ROOT_DIR%
 if exist "%TEST_OUTPUT%" echo Tests      : %TEST_OUTPUT%
 echo ========================================
 echo.
@@ -192,6 +203,49 @@ pushd "%ROOT_DIR%"
 set "RUN_EXIT=%ERRORLEVEL%"
 popd
 exit /b %RUN_EXIT%
+
+:sync_outputs
+if /i "%BUILD_ROUTE%"=="CMake" goto :sync_root_outputs
+goto :sync_cmake_outputs
+
+:sync_root_outputs
+if exist "%CMAKE_GUI_OUTPUT%" copy /y "%CMAKE_GUI_OUTPUT%" "%ROOT_GUI_OUTPUT%" >nul
+if exist "%CMAKE_CLI_OUTPUT%" copy /y "%CMAKE_CLI_OUTPUT%" "%ROOT_CLI_OUTPUT%" >nul
+if exist "%CMAKE_TEST_OUTPUT%" copy /y "%CMAKE_TEST_OUTPUT%" "%ROOT_TEST_OUTPUT%" >nul
+goto :eof
+
+:sync_cmake_outputs
+if not exist "%CMAKE_BUILD_DIR%" mkdir "%CMAKE_BUILD_DIR%"
+if not exist "%CMAKE_BIN_DIR%" mkdir "%CMAKE_BIN_DIR%"
+if exist "%ROOT_GUI_OUTPUT%" copy /y "%ROOT_GUI_OUTPUT%" "%CMAKE_GUI_OUTPUT%" >nul
+if exist "%ROOT_CLI_OUTPUT%" copy /y "%ROOT_CLI_OUTPUT%" "%CMAKE_CLI_OUTPUT%" >nul
+if exist "%ROOT_TEST_OUTPUT%" copy /y "%ROOT_TEST_OUTPUT%" "%CMAKE_TEST_OUTPUT%" >nul
+goto :eof
+
+:fallback_build_additional_targets
+if /i not "%BUILD_ROUTE%"=="Fallback directo g++" goto :eof
+if /i "%PRIMARY_TARGET%"=="FootballManagerTests" goto :eof
+if /i "%FM_FALLBACK_CHILD%"=="1" goto :eof
+
+echo %CMAKE_TARGETS% | findstr /C:"FootballManagerCLI" >nul
+if not errorlevel 1 if /i not "%PRIMARY_TARGET%"=="FootballManagerCLI" (
+    echo Construyendo target adicional FootballManagerCLI por fallback...
+    set "FM_FORCE_FALLBACK=1"
+    set "FM_SKIP_RUN=1"
+    set "FM_FALLBACK_CHILD=1"
+    call "%~f0" --cli
+    if errorlevel 1 exit /b %ERRORLEVEL%
+)
+
+if "%RUN_TESTS%"=="1" if /i not "%PRIMARY_TARGET%"=="FootballManagerTests" (
+    echo Construyendo target adicional FootballManagerTests por fallback...
+    set "FM_FORCE_FALLBACK=1"
+    set "FM_SKIP_RUN=1"
+    set "FM_FALLBACK_CHILD=1"
+    call "%~f0" --tests
+    if errorlevel 1 exit /b %ERRORLEVEL%
+)
+goto :eof
 
 :compile_error
 echo.

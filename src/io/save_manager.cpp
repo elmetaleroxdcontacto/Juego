@@ -16,6 +16,25 @@ using namespace std;
 
 namespace save_manager {
 
+namespace {
+
+string normalizeSavePath(const string& path) {
+    return trim(path.empty() ? string("saves/career_save.txt") : path);
+}
+
+string resolveSavePath(const string& path) {
+    const string normalized = normalizeSavePath(path);
+    return resolveProjectPath(normalized);
+}
+
+string parentDirectory(const string& path) {
+    const string filename = pathFilename(path);
+    if (filename == path) return string();
+    return path.substr(0, path.size() - filename.size());
+}
+
+}  // namespace
+
 #ifdef _WIN32
 wstring utf8ToWidePath(const string& text) {
     if (text.empty()) return wstring();
@@ -93,13 +112,14 @@ bool copyExistingFile(const string& sourcePath, const string& targetPath) {
 }
 
 bool saveCareer(Career& career) {
-    if (career.saveFile.rfind("saves/", 0) == 0 || career.saveFile.rfind("saves\\", 0) == 0) {
-        ensureDirectory("saves");
-    }
+    career.saveFile = normalizeSavePath(career.saveFile);
+    const string savePath = resolveSavePath(career.saveFile);
+    const string saveFolder = parentDirectory(savePath);
+    if (!saveFolder.empty() && !ensureDirectory(saveFolder)) return false;
 
-    const string tempPath = career.saveFile + ".tmp";
-    const string backupPath = career.saveFile + ".bak";
-    const bool backupReady = copyExistingFile(career.saveFile, backupPath);
+    const string tempPath = savePath + ".tmp";
+    const string backupPath = savePath + ".bak";
+    const bool backupReady = copyExistingFile(savePath, backupPath);
 
     ofstream file(tempPath, ios::binary | ios::trunc);
     if (!file.is_open()) return false;
@@ -114,14 +134,14 @@ bool saveCareer(Career& career) {
         return false;
     }
 
-    if (!replaceFileAtomically(tempPath, career.saveFile)) {
-        if (overwriteFromTempFile(tempPath, career.saveFile)) {
+    if (!replaceFileAtomically(tempPath, savePath)) {
+        if (overwriteFromTempFile(tempPath, savePath)) {
             std::remove(tempPath.c_str());
             return true;
         }
         std::remove(tempPath.c_str());
         if (backupReady && pathExists(backupPath)) {
-            overwriteFromTempFile(backupPath, career.saveFile);
+            overwriteFromTempFile(backupPath, savePath);
         }
         return false;
     }
@@ -129,10 +149,10 @@ bool saveCareer(Career& career) {
 }
 
 bool loadCareer(Career& career) {
-    const string requestedSave = career.saveFile;
-    string resolvedSave = requestedSave;
-    if (!pathExists(resolvedSave) && resolvedSave == "saves/career_save.txt" && pathExists("career_save.txt")) {
-        resolvedSave = "career_save.txt";
+    const string requestedSave = normalizeSavePath(career.saveFile);
+    string resolvedSave = resolveSavePath(requestedSave);
+    if (!pathExists(resolvedSave) && requestedSave == "saves/career_save.txt") {
+        resolvedSave = resolveProjectPath("career_save.txt");
     }
 
     ifstream file(resolvedSave, ios::binary);

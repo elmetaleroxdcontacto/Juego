@@ -35,6 +35,7 @@ enum ControlId {
     IDC_SIMULATE_BUTTON,
     IDC_VALIDATE_BUTTON,
     IDC_DISPLAY_MODE_BUTTON,
+    IDC_FRONT_MENU_BUTTON,
     IDC_FILTER_COMBO,
     IDC_SUMMARY_EDIT,
     IDC_NEWS_LIST,
@@ -211,6 +212,9 @@ struct AppState {
     bool menuMusicPlaying = false;
     bool menuMusicMissingReported = false;
     int menuMusicAppliedVolume = -1;
+    int pageScrollY = 0;
+    int maxPageScrollY = 0;
+    int pageContentHeight = 0;
     std::wstring menuMusicPath;
     GuiPage queuedPage = GuiPage::MainMenu;
     GuiPage currentPage = GuiPage::Dashboard;
@@ -243,6 +247,7 @@ struct AppState {
     HWND simulateButton = nullptr;
     HWND validateButton = nullptr;
     HWND displayModeButton = nullptr;
+    HWND frontMenuButton = nullptr;
 
     HWND dashboardButton = nullptr;
     HWND squadButton = nullptr;
@@ -328,6 +333,11 @@ std::string wideToUtf8(const std::wstring& text);
 std::string toEditText(const std::string& text);
 void setWindowTextUtf8(HWND hwnd, const std::string& text);
 std::string getWindowTextUtf8(HWND hwnd);
+void updateDynamicStaticText(AppState& state, HWND hwnd, const std::string& text);
+void hideControlAndInvalidate(AppState& state, HWND hwnd, int padX = 8, int padY = 6);
+void showControlAndInvalidate(AppState& state, HWND hwnd, int padX = 8, int padY = 6);
+void setControlVisibility(AppState& state, HWND hwnd, bool visible, int padX = 8, int padY = 6);
+void moveControlAndInvalidate(AppState& state, HWND hwnd, int x, int y, int width, int height, int padX = 10, int padY = 8);
 HWND createControl(AppState& state,
                    DWORD exStyle,
                    const wchar_t* className,

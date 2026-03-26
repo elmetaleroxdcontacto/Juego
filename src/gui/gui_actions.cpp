@@ -362,8 +362,12 @@ void runUpgradeAction(AppState& state, ClubUpgrade upgrade, const std::string& t
 }
 
 void openFrontendMenu(AppState& state) {
+    pulseFrontendTiming(state);
     setCurrentPage(state, GuiPage::MainMenu);
-    setStatus(state, "Menu principal listo. Entra a Jugar o revisa Configuraciones.");
+    setStatus(state,
+              state.career.myTeam
+                  ? "Volviste al menu principal. Usa Continuar para retomar la carrera activa."
+                  : "Menu principal listo. Entra a Jugar o revisa Configuraciones.");
     if (state.menuContinueButton && IsWindowEnabled(state.menuContinueButton)) SetFocus(state.menuContinueButton);
     else if (state.menuPlayButton) SetFocus(state.menuPlayButton);
 }

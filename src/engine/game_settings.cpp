@@ -16,6 +16,12 @@ string normalizeSettingsPath(const string& path) {
     return trim(path.empty() ? string("saves/game_settings.cfg") : path);
 }
 
+string parentDirectory(const string& path) {
+    const string filename = pathFilename(path);
+    if (filename == path) return string();
+    return path.substr(0, path.size() - filename.size());
+}
+
 int parseIntValue(const string& text, int defaultValue) {
     try {
         return stoi(trim(text));
@@ -427,7 +433,7 @@ bool sanitize(GameSettings& settings) {
 
 bool loadFromDisk(GameSettings& settings, const string& path) {
     vector<string> lines;
-    const string resolvedPath = normalizeSettingsPath(path.empty() ? settingsFilePath() : path);
+    const string resolvedPath = resolveProjectPath(normalizeSettingsPath(path.empty() ? settingsFilePath() : path));
     if (!readTextFileLines(resolvedPath, lines)) {
         sanitize(settings);
         return false;
@@ -460,8 +466,8 @@ bool loadFromDisk(GameSettings& settings, const string& path) {
 }
 
 bool saveToDisk(const GameSettings& settings, const string& path) {
-    const string resolvedPath = normalizeSettingsPath(path.empty() ? settingsFilePath() : path);
-    const string folder = pathFilename(resolvedPath) == resolvedPath ? string() : resolvedPath.substr(0, resolvedPath.size() - pathFilename(resolvedPath).size());
+    const string resolvedPath = resolveProjectPath(normalizeSettingsPath(path.empty() ? settingsFilePath() : path));
+    const string folder = parentDirectory(resolvedPath);
     if (!folder.empty()) ensureDirectory(folder);
 
     ofstream file(resolvedPath, ios::binary | ios::trunc);

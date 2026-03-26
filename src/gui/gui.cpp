@@ -84,9 +84,35 @@ void syncDisplayModeButton(AppState& state) {
 }
 
 void openPageWithFilter(AppState& state, GuiPage page, const std::string& filter) {
+    if (state.currentPage != page) {
+        state.pageScrollY = 0;
+    }
     state.currentPage = page;
     state.currentFilter = filter;
     refreshCurrentPage(state);
+}
+
+bool scrollViewportTo(AppState& state, int target) {
+    const int clamped = std::max(0, std::min(target, std::max(0, state.maxPageScrollY)));
+    if (clamped == state.pageScrollY) return false;
+    state.pageScrollY = clamped;
+    layoutWindow(state);
+    InvalidateRect(state.window, nullptr, TRUE);
+    return true;
+}
+
+bool scrollViewportBy(AppState& state, int delta) {
+    return scrollViewportTo(state, state.pageScrollY + delta);
+}
+
+int pageScrollStep(const AppState& state) {
+    return scaleByDpi(state, 72);
+}
+
+int pageScrollJump(const AppState& state) {
+    RECT client{};
+    GetClientRect(state.window, &client);
+    return std::max(scaleByDpi(state, 240), static_cast<int>((client.bottom * 3) / 4));
 }
 
 bool restoreWindowedPlacement(AppState& state) {
@@ -472,7 +498,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
             break;
         case WM_NOTIFY:
             if (!state) break;
-            if (reinterpret_cast<LPNMHDR>(lParam)->code == NM_CUSTOMDRAW) {
+            if (static_cast<int>(reinterpret_cast<LPNMHDR>(lParam)->code) == NM_CUSTOMDRAW) {
                 return handleListCustomDraw(*state, reinterpret_cast<LPNMHDR>(lParam));
             }
             if (reinterpret_cast<LPNMHDR>(lParam)->code == LVN_COLUMNCLICK) {
@@ -483,7 +509,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 reinterpret_cast<LPNMHDR>(lParam)->idFrom == IDC_TABLE_LIST ||
                 reinterpret_cast<LPNMHDR>(lParam)->idFrom == IDC_TRANSFER_LIST) {
                 if (reinterpret_cast<LPNMHDR>(lParam)->code == LVN_ITEMCHANGED ||
-                    reinterpret_cast<LPNMHDR>(lParam)->code == NM_CLICK) {
+                    static_cast<int>(reinterpret_cast<LPNMHDR>(lParam)->code) == NM_CLICK) {
                     handleListSelectionChange(*state, static_cast<int>(reinterpret_cast<LPNMHDR>(lParam)->idFrom));
                     return 0;
                 }
@@ -493,6 +519,51 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
             if (state && wParam != 0) {
                 drawThemedButton(*state, reinterpret_cast<const DRAWITEMSTRUCT*>(lParam));
                 return TRUE;
+            }
+            break;
+        case WM_VSCROLL:
+            if (state) {
+                SCROLLINFO info{};
+                info.cbSize = sizeof(info);
+                info.fMask = SIF_ALL;
+                GetScrollInfo(hwnd, SB_VERT, &info);
+
+                int target = state->pageScrollY;
+                switch (LOWORD(wParam)) {
+                    case SB_TOP:
+                        target = 0;
+                        break;
+                    case SB_BOTTOM:
+                        target = state->maxPageScrollY;
+                        break;
+                    case SB_LINEUP:
+                        target -= pageScrollStep(*state);
+                        break;
+                    case SB_LINEDOWN:
+                        target += pageScrollStep(*state);
+                        break;
+                    case SB_PAGEUP:
+                        target -= pageScrollJump(*state);
+                        break;
+                    case SB_PAGEDOWN:
+                        target += pageScrollJump(*state);
+                        break;
+                    case SB_THUMBPOSITION:
+                    case SB_THUMBTRACK:
+                        target = info.nTrackPos;
+                        break;
+                    default:
+                        break;
+                }
+                if (scrollViewportTo(*state, target)) return 0;
+            }
+            break;
+        case WM_MOUSEWHEEL:
+            if (state && state->maxPageScrollY > 0) {
+                const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
+                if (delta != 0 && scrollViewportBy(*state, -MulDiv(pageScrollStep(*state) * 3, delta, WHEEL_DELTA))) {
+                    return 0;
+                }
             }
             break;
         case WM_CTLCOLOREDIT:
@@ -596,6 +667,9 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                     return 0;
                 case IDC_DISPLAY_MODE_BUTTON:
                     cycleDisplayMode(*state);
+                    return 0;
+                case IDC_FRONT_MENU_BUTTON:
+                    openFrontendMenu(*state);
                     return 0;
                 case IDC_MENU_CONTINUE_BUTTON:
                     continueCareer(*state);
@@ -718,10 +792,30 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
             }
             break;
         case WM_KEYDOWN:
-            if (state && isFrontMenuPage(state->currentPage) && wParam == VK_ESCAPE) {
-                if (state->currentPage == GuiPage::Settings || state->currentPage == GuiPage::Credits) {
-                    openFrontendMenu(*state);
-                    return 0;
+            if (state) {
+                if (isFrontMenuPage(state->currentPage) && wParam == VK_ESCAPE) {
+                    if (state->currentPage == GuiPage::Settings || state->currentPage == GuiPage::Credits) {
+                        openFrontendMenu(*state);
+                        return 0;
+                    }
+                }
+                if (state->maxPageScrollY > 0) {
+                    switch (wParam) {
+                        case VK_PRIOR:
+                            if (scrollViewportBy(*state, -pageScrollJump(*state))) return 0;
+                            break;
+                        case VK_NEXT:
+                            if (scrollViewportBy(*state, pageScrollJump(*state))) return 0;
+                            break;
+                        case VK_HOME:
+                            if (scrollViewportTo(*state, 0)) return 0;
+                            break;
+                        case VK_END:
+                            if (scrollViewportTo(*state, state->maxPageScrollY)) return 0;
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
             break;
@@ -793,7 +887,7 @@ int runGuiApp(GameSettings& settings) {
     HWND window = CreateWindowExW(0,
                                   windowClass.lpszClassName,
                                   L"Chilean Footballito",
-                                  WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_MAXIMIZE,
+                                  WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_MAXIMIZE | WS_VSCROLL | WS_CLIPCHILDREN,
                                   workArea.left,
                                   workArea.top,
                                   workArea.right - workArea.left,

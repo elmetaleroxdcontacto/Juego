@@ -512,8 +512,9 @@ static ValidationResult validateSaveLoad() {
     }
     career.myTeam = career.activeTeams.front();
     career.saveFile = "saves/validation_career_save_runtime.txt";
-    std::remove(career.saveFile.c_str());
-    std::remove((career.saveFile + ".tmp").c_str());
+    const string resolvedValidationSave = resolveProjectPath(career.saveFile);
+    std::remove(resolvedValidationSave.c_str());
+    std::remove((resolvedValidationSave + ".tmp").c_str());
     career.currentSeason = 2;
     career.currentWeek = 3;
     career.resetSeason();
@@ -555,7 +556,7 @@ static ValidationResult validateSaveLoad() {
         return {"Guardado/carga", false, "No se pudo escribir el archivo de validacion."};
     }
 
-    ifstream rawSave(career.saveFile);
+    ifstream rawSave(resolvedValidationSave);
     string firstLine;
     const string expectedVersionLine = "VERSION " + to_string(save_serialization::currentCareerSaveVersion());
     if (!rawSave.is_open() || !getline(rawSave, firstLine) || trim(firstLine) != expectedVersionLine) {
@@ -1095,14 +1096,15 @@ DataValidationReport buildRosterDataValidationReport() {
 }
 
 static bool writeRosterDataValidationReportInternal(const DataValidationReport& report, const string& path) {
-    string parent = path;
+    const string resolvedPath = resolveProjectPath(path);
+    string parent = resolvedPath;
     size_t slash = parent.find_last_of("/\\");
     if (slash != string::npos) {
         parent = parent.substr(0, slash);
         if (!parent.empty()) ensureDirectory(parent);
     }
 
-    ofstream file(path.c_str());
+    ofstream file(resolvedPath.c_str());
     if (!file.is_open()) return false;
 
     file << "=== Auditoria de Plantillas ===\n";

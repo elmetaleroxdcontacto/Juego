@@ -35,6 +35,9 @@ std::mt19937 makeFreshRng() {
 
 static std::mt19937 rng{makeFreshRng()};
 
+string trim(const string& s);
+string joinPath(const string& a, const string& b);
+
 static bool isPathSeparator(char c) {
     return c == '/' || c == '\\';
 }
@@ -87,13 +90,138 @@ static bool isAbsolutePath(const string& path) {
 #endif
 }
 
+static string trimTrailingSeparators(string path) {
+    if (path.empty()) return path;
+#ifdef _WIN32
+    const bool hasDriveRoot = path.size() == 3 && path[1] == ':' && isPathSeparator(path[2]);
+#else
+    const bool hasDriveRoot = path == "/";
+#endif
+    while (path.size() > 1 && !hasDriveRoot && isPathSeparator(path.back())) {
+        path.pop_back();
+    }
+    return path;
+}
+
+static string parentPath(const string& path) {
+    string normalized = trimTrailingSeparators(normalizePathSeparators(trim(path)));
+    if (normalized.empty()) return normalized;
+#ifdef _WIN32
+    if (normalized.size() == 2 && normalized[1] == ':') return normalized;
+    if (normalized.size() == 3 && normalized[1] == ':' && isPathSeparator(normalized[2])) return normalized;
+#else
+    if (normalized == "/") return normalized;
+#endif
+    const size_t pos = normalized.find_last_of("/\\");
+    if (pos == string::npos) return normalized;
+    if (pos == 0) return normalized.substr(0, 1);
+#ifdef _WIN32
+    if (pos == 2 && normalized[1] == ':') return normalized.substr(0, 3);
+#endif
+    return normalized.substr(0, pos);
+}
+
+#ifdef _WIN32
+static string currentWorkingDirectoryRaw() {
+    wchar_t buffer[MAX_PATH]{};
+    DWORD length = GetCurrentDirectoryW(MAX_PATH, buffer);
+    if (length == 0 || length >= MAX_PATH) return string();
+    return normalizePathSeparators(wideToUtf8(std::wstring(buffer, buffer + length)));
+}
+
+static string executablePathRaw() {
+    wchar_t buffer[MAX_PATH]{};
+    DWORD length = GetModuleFileNameW(nullptr, buffer, MAX_PATH);
+    if (length == 0 || length >= MAX_PATH) return string();
+    return normalizePathSeparators(wideToUtf8(std::wstring(buffer, buffer + length)));
+}
+#else
+static string currentWorkingDirectoryRaw() {
+    char buffer[4096]{};
+    if (getcwd(buffer, sizeof(buffer)) == nullptr) return string();
+    return normalizePathSeparators(string(buffer));
+}
+
+static string executablePathRaw() {
+    return currentWorkingDirectoryRaw();
+}
+#endif
+
+static bool rawPathExists(const string& path) {
+#ifdef _WIN32
+    const DWORD attributes = GetFileAttributesW(utf8ToWide(path).c_str());
+    return attributes != INVALID_FILE_ATTRIBUTES;
+#else
+    struct stat info;
+    return stat(path.c_str(), &info) == 0;
+#endif
+}
+
+static bool rawIsDirectory(const string& path) {
+#ifdef _WIN32
+    const DWORD attributes = GetFileAttributesW(utf8ToWide(path).c_str());
+    if (attributes == INVALID_FILE_ATTRIBUTES) return false;
+    return (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+#else
+    struct stat info;
+    if (stat(path.c_str(), &info) != 0) return false;
+    return S_ISDIR(info.st_mode);
+#endif
+}
+
+static bool looksLikeProjectRoot(const string& candidate) {
+    if (candidate.empty() || !rawIsDirectory(candidate)) return false;
+    return rawPathExists(joinPath(candidate, "CMakeLists.txt")) &&
+           rawPathExists(joinPath(candidate, "data/configs/league_registry.csv"));
+}
+
+static string detectProjectRoot() {
+    vector<string> seeds = {currentWorkingDirectoryRaw(), parentPath(executablePathRaw())};
+    vector<string> seen;
+    auto alreadySeen = [&](const string& path) {
+        return find(seen.begin(), seen.end(), path) != seen.end();
+    };
+
+    for (const string& seed : seeds) {
+        string current = trimTrailingSeparators(normalizePathSeparators(trim(seed)));
+        for (int depth = 0; depth < 6 && !current.empty(); ++depth) {
+            if (!alreadySeen(current)) seen.push_back(current);
+            if (looksLikeProjectRoot(current)) return current;
+            const string parent = parentPath(current);
+            if (parent.empty() || parent == current) break;
+            current = parent;
+        }
+    }
+
+    for (const string& seed : seeds) {
+        if (!trim(seed).empty()) return trimTrailingSeparators(normalizePathSeparators(seed));
+    }
+    return ".";
+}
+
 static bool createSingleDirectory(const string& path) {
 #ifdef _WIN32
     if (_wmkdir(utf8ToWide(path).c_str()) == 0) return true;
 #else
     if (mkdir(path.c_str(), 0755) == 0) return true;
 #endif
-    return errno == EEXIST && isDirectory(path);
+    return errno == EEXIST && rawIsDirectory(path);
+}
+
+string currentWorkingDirectory() {
+    return currentWorkingDirectoryRaw();
+}
+
+string projectRootPath() {
+    static const string root = detectProjectRoot();
+    return root;
+}
+
+string resolveProjectPath(const string& path) {
+    const string trimmedPath = trim(path);
+    if (trimmedPath.empty()) return projectRootPath();
+    if (isAbsolutePath(trimmedPath)) return normalizePathSeparators(trimmedPath);
+    return joinPath(projectRootPath(), trimmedPath);
 }
 
 int randInt(int minVal, int maxVal) {
@@ -130,31 +258,26 @@ string toLower(const string& s) {
 }
 
 bool pathExists(const string& path) {
-#ifdef _WIN32
-    const DWORD attributes = GetFileAttributesW(utf8ToWide(path).c_str());
-    return attributes != INVALID_FILE_ATTRIBUTES;
-#else
-    struct stat info;
-    return stat(path.c_str(), &info) == 0;
-#endif
+    const string normalized = trim(normalizePathSeparators(path));
+    if (normalized.empty()) return false;
+    if (rawPathExists(normalized)) return true;
+    if (isAbsolutePath(normalized)) return false;
+    return rawPathExists(resolveProjectPath(normalized));
 }
 
 bool isDirectory(const string& path) {
-#ifdef _WIN32
-    const DWORD attributes = GetFileAttributesW(utf8ToWide(path).c_str());
-    if (attributes == INVALID_FILE_ATTRIBUTES) return false;
-    return (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
-#else
-    struct stat info;
-    if (stat(path.c_str(), &info) != 0) return false;
-    return S_ISDIR(info.st_mode);
-#endif
+    const string normalized = trim(normalizePathSeparators(path));
+    if (normalized.empty()) return false;
+    if (rawIsDirectory(normalized)) return true;
+    if (isAbsolutePath(normalized)) return false;
+    return rawIsDirectory(resolveProjectPath(normalized));
 }
 
 bool ensureDirectory(const string& path) {
     string normalized = trim(normalizePathSeparators(path));
     if (normalized.empty()) return false;
-    if (isDirectory(normalized)) return true;
+    if (!isAbsolutePath(normalized)) normalized = resolveProjectPath(normalized);
+    if (rawIsDirectory(normalized)) return true;
 
     string current;
     size_t index = 0;
@@ -187,19 +310,24 @@ bool ensureDirectory(const string& path) {
             if (component.empty()) continue;
             if (!current.empty() && !isPathSeparator(current.back())) current.push_back(separator);
             current += component;
-            if (!isDirectory(current) && !createSingleDirectory(current)) return false;
+            if (!rawIsDirectory(current) && !createSingleDirectory(current)) return false;
             component.clear();
             continue;
         }
         component.push_back(c);
     }
-    return isDirectory(normalized);
+    return rawIsDirectory(normalized);
 }
 
 bool readTextFileLines(const string& path, vector<string>& lines) {
     lines.clear();
+    string resolvedPath = trim(normalizePathSeparators(path));
+    if (resolvedPath.empty()) return false;
+    if (!rawPathExists(resolvedPath) && !isAbsolutePath(resolvedPath)) {
+        resolvedPath = resolveProjectPath(resolvedPath);
+    }
 #ifdef _WIN32
-    HANDLE handle = CreateFileW(utf8ToWide(path).c_str(),
+    HANDLE handle = CreateFileW(utf8ToWide(resolvedPath).c_str(),
                                 GENERIC_READ,
                                 FILE_SHARE_READ,
                                 nullptr,
@@ -216,7 +344,7 @@ bool readTextFileLines(const string& path, vector<string>& lines) {
     }
     CloseHandle(handle);
 #else
-    FILE* file = fopen(path.c_str(), "rb");
+    FILE* file = fopen(resolvedPath.c_str(), "rb");
     if (file == nullptr) return false;
     string content;
     char buffer[4096];
@@ -242,9 +370,14 @@ bool readTextFileLines(const string& path, vector<string>& lines) {
 
 vector<string> listDirectories(const string& root) {
     vector<string> out;
-    if (!isDirectory(root)) return out;
+    string resolvedRoot = trim(normalizePathSeparators(root));
+    if (resolvedRoot.empty()) return out;
+    if (!rawIsDirectory(resolvedRoot) && !isAbsolutePath(resolvedRoot)) {
+        resolvedRoot = resolveProjectPath(resolvedRoot);
+    }
+    if (!rawIsDirectory(resolvedRoot)) return out;
 #ifdef _WIN32
-    string pattern = joinPath(root, "*");
+    string pattern = joinPath(resolvedRoot, "*");
     WIN32_FIND_DATAW findData;
     HANDLE handle = FindFirstFileW(utf8ToWide(pattern).c_str(), &findData);
     if (handle == INVALID_HANDLE_VALUE) return out;
@@ -252,18 +385,18 @@ vector<string> listDirectories(const string& root) {
         const string name = wideToUtf8(findData.cFileName);
         if (name == "." || name == "..") continue;
         if ((findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) {
-            out.push_back(joinPath(root, name));
+            out.push_back(joinPath(resolvedRoot, name));
         }
     } while (FindNextFileW(handle, &findData));
     FindClose(handle);
 #else
-    DIR* dir = opendir(root.c_str());
+    DIR* dir = opendir(resolvedRoot.c_str());
     if (dir == nullptr) return out;
     while (dirent* entry = readdir(dir)) {
         const string name = entry->d_name;
         if (name == "." || name == "..") continue;
-        const string fullPath = joinPath(root, name);
-        if (isDirectory(fullPath)) out.push_back(fullPath);
+        const string fullPath = joinPath(resolvedRoot, name);
+        if (rawIsDirectory(fullPath)) out.push_back(fullPath);
     }
     closedir(dir);
 #endif

@@ -104,6 +104,7 @@ build.bat --validate
 ```
 
 El script ahora informa si uso la ruta CMake o la fallback, que targets compilo y donde quedaron los binarios.
+Tambien mantiene sincronizados los ejecutables visibles de la raiz del repo y `build-cmake/bin`, incluso si la compilacion cae al fallback directo con `g++`.
 
 ## Ejecucion
 
