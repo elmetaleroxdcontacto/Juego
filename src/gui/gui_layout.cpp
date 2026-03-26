@@ -10,6 +10,10 @@
 #include <map>
 #include <sstream>
 
+#ifndef EM_SETCUEBANNER
+#define EM_SETCUEBANNER 0x1501
+#endif
+
 namespace gui_win32 {
 
 namespace {
@@ -40,6 +44,7 @@ constexpr int kPanelBodyOffset = 24;
 constexpr int kPanelSectionGap = 46;
 constexpr int kStatusHeight = 28;
 constexpr int kHeaderFieldHeight = 32;
+constexpr int kHeaderHintHeight = 18;
 constexpr int kHeaderButtonHeight = 34;
 constexpr int kHeaderRowGap = 8;
 constexpr int kMetricCount = 5;
@@ -83,11 +88,11 @@ HeaderLayoutProfile buildHeaderLayout(const RECT& client) {
     layout.stackedControls = width < 1100;
 
     if (layout.stackedControls) {
-        layout.controlsBottom = 16 + kHeaderFieldHeight * 3 + kHeaderRowGap * 2;
+        layout.controlsBottom = 16 + kHeaderFieldHeight * 3 + kHeaderRowGap * 2 + kHeaderHintHeight + 6;
     } else if (layout.splitControls) {
-        layout.controlsBottom = 16 + kHeaderFieldHeight * 2 + kHeaderRowGap;
+        layout.controlsBottom = 16 + kHeaderFieldHeight * 2 + kHeaderRowGap + kHeaderHintHeight + 6;
     } else {
-        layout.controlsBottom = 16 + kHeaderFieldHeight;
+        layout.controlsBottom = 16 + kHeaderFieldHeight + kHeaderHintHeight + 6;
     }
 
     layout.buttonsTop = layout.shareTopRow ? 16 : layout.controlsBottom + 10;
@@ -136,6 +141,20 @@ bool pageUsesInsightStrip(const AppState& state) {
     return state.currentPage == GuiPage::Transfers ||
            state.currentPage == GuiPage::Finances ||
            state.currentPage == GuiPage::Board;
+}
+
+const Team* previewSetupTeam(const AppState& state) {
+    if (state.gameSetup.division.empty() || state.gameSetup.club.empty()) return nullptr;
+    for (const auto& team : state.career.allTeams) {
+        if (team.division == state.gameSetup.division && team.name == state.gameSetup.club) return &team;
+    }
+    return nullptr;
+}
+
+COLORREF setupStepAccent(bool completed, bool current) {
+    if (completed) return kThemeAccentGreen;
+    if (current) return kThemeWarning;
+    return kThemeDanger;
 }
 
 int pulseFromRatio(long long current, long long good, long long dangerFloor) {
@@ -244,30 +263,40 @@ std::vector<DashboardSpotlightCard> buildDashboardSpotlightCards(const AppState&
     std::vector<DashboardSpotlightCard> cards;
 
     if (!state.career.myTeam) {
-        const std::string division = comboText(state.divisionCombo);
-        const std::string team = comboText(state.teamCombo);
-        const std::string manager = trim(getWindowTextUtf8(state.managerEdit));
-        cards.push_back({L"Paso 1 · Universo",
-                         utf8ToWide(division.empty() ? "Selecciona division" : division),
-                         L"Define la liga base antes de crear la carrera.",
+        const Team* setupTeam = previewSetupTeam(state);
+        const bool divisionReady = !state.gameSetup.division.empty();
+        const bool clubReady = setupTeam != nullptr;
+        const bool managerReady = !state.gameSetup.manager.empty();
+        const bool currentDivision = state.gameSetup.currentStep == 1;
+        const bool currentClub = state.gameSetup.currentStep == 2;
+        const bool currentManager = state.gameSetup.currentStep == 3 && !state.gameSetup.ready;
+        cards.push_back({L"Paso 1 - Universo",
+                         utf8ToWide(divisionReady ? divisionDisplay(state.gameSetup.division) : "Elige division"),
+                         utf8ToWide(divisionReady ? "Division lista. Ya puedes pasar al club."
+                                                  : "Selecciona la division para habilitar clubes y presupuesto."),
                          L"Click: elegir division",
-                         kThemeAccentBlue,
-                         division.empty() ? 24 : 72,
+                         setupStepAccent(divisionReady, currentDivision),
+                         divisionReady ? 100 : 24,
                          InsightAction::FocusDivision});
-        cards.push_back({L"Paso 2 · Proyecto",
-                         utf8ToWide(team.empty() ? "Elige club" : team),
-                         L"Busca reto deportivo, cantera o estabilidad financiera.",
+        cards.push_back({L"Paso 2 - Proyecto",
+                         utf8ToWide(clubReady ? setupTeam->name : "Club pendiente"),
+                         utf8ToWide(clubReady ? ("Presupuesto " + formatMoneyValue(setupTeam->budget))
+                                              : "Elige un club para ver presupuesto, contexto y estilo deportivo."),
                          L"Click: elegir club",
-                         kThemeAccentGreen,
-                         team.empty() ? 36 : 78,
+                         setupStepAccent(clubReady, currentClub),
+                         clubReady ? 100 : (divisionReady ? 58 : 18),
                          InsightAction::FocusClub});
-        cards.push_back({L"Paso 3 · Lanzamiento",
-                         utf8ToWide(manager.empty() ? "Manager pendiente" : manager),
-                         L"Nueva partida inicia el club hub. F11 alterna fullscreen en vivo.",
-                         L"Click: crear carrera",
-                         kThemeAccent,
-                         manager.empty() ? 48 : 92,
-                         InsightAction::StartCareer});
+        cards.push_back({L"Paso 3 - Lanzamiento",
+                         utf8ToWide(managerReady ? state.gameSetup.manager : "Manager pendiente"),
+                         utf8ToWide(state.gameSetup.ready
+                                        ? "Checklist completa. Nueva partida ya se puede iniciar."
+                                        : (state.gameSetup.managerError.empty()
+                                               ? "Escribe el nombre del manager para cerrar el flujo."
+                                               : state.gameSetup.managerError)),
+                         utf8ToWide(state.gameSetup.ready ? "Click: crear carrera" : "Click: escribir manager"),
+                         setupStepAccent(managerReady, currentManager),
+                         state.gameSetup.ready ? 100 : (managerReady ? 78 : 24),
+                         state.gameSetup.ready ? InsightAction::StartCareer : InsightAction::FocusManager});
         return cards;
     }
 
@@ -741,6 +770,7 @@ void applyInterfaceFonts(AppState& state) {
     setLabelFont(state.divisionLabel, state.font);
     setLabelFont(state.teamLabel, state.font);
     setLabelFont(state.managerLabel, state.font);
+    setLabelFont(state.managerHelpLabel, state.font);
 
     const std::array<HWND, 5> inputs = {
         state.divisionCombo, state.teamCombo, state.managerEdit, state.filterCombo, state.newsList
@@ -836,15 +866,24 @@ void layoutWindow(AppState& state) {
 
     const int fieldTop = s(16);
     const int fieldHeight = s(kHeaderFieldHeight);
+    const int hintHeight = s(kHeaderHintHeight);
     const int blockGap = s(20);
     const int rowTwoTop = fieldTop + fieldHeight + s(kHeaderRowGap);
     const int rowThreeTop = rowTwoTop + fieldHeight + s(kHeaderRowGap);
     const int headerAvailableWidth = std::max(s(520), headerRightLimit - s(20));
+    int managerFieldLeft = s(20);
+    int managerFieldTop = fieldTop;
+    int managerFieldWidth = s(240);
 
     auto placeFieldBlock = [&](HWND label, int labelWidth, HWND field, int inputOffset, int x, int y, int width, int controlHeight) {
         int fieldWidth = std::max(s(150), width - inputOffset);
         MoveWindow(label, x, y + s(4), labelWidth, s(22), TRUE);
         MoveWindow(field, x + inputOffset, y, fieldWidth, controlHeight, TRUE);
+        if (field == state.managerEdit) {
+            managerFieldLeft = x + inputOffset;
+            managerFieldTop = y;
+            managerFieldWidth = fieldWidth;
+        }
     };
 
     if (header.stackedControls) {
@@ -870,6 +909,12 @@ void layoutWindow(AppState& state) {
         placeFieldBlock(state.teamLabel, s(46), state.teamCombo, s(56), teamX, fieldTop, teamBlockWidth, s(420));
         placeFieldBlock(state.managerLabel, s(78), state.managerEdit, s(86), managerX, fieldTop, managerBlockWidth, fieldHeight);
     }
+    MoveWindow(state.managerHelpLabel,
+               managerFieldLeft,
+               managerFieldTop + fieldHeight + s(3),
+               managerFieldWidth,
+               hintHeight,
+               TRUE);
 
     const int sideX = padding;
     int navY = topBarHeight + s(12);
@@ -928,7 +973,7 @@ void layoutWindow(AppState& state) {
     if (dashboardEmptyState) {
         int summaryHeight = std::max(s(380), static_cast<int>(client.bottom) - panelsTop - s(82));
         int sideHeight = std::max(s(170), (summaryHeight - s(34)) / 2);
-        const int buttonWidth = clampValue((contentWidth - s(72)) / 3, s(140), s(184));
+        const int buttonWidth = clampValue((contentWidth - s(48)) / 2, s(164), s(212));
         const int emptyButtonTop = panelsTop + summaryHeight - s(62);
 
         MoveWindow(state.summaryLabel, contentLeft, panelsTop, contentWidth, s(kPanelLabelHeight), TRUE);
@@ -942,10 +987,9 @@ void layoutWindow(AppState& state) {
         MoveWindow(state.newsList, infoLeft, newsTop + s(kPanelBodyOffset), infoWidth, summaryHeight - sideHeight - s(28), TRUE);
         MoveWindow(state.emptyNewButton, contentLeft + s(20), emptyButtonTop, buttonWidth, s(34), TRUE);
         MoveWindow(state.emptyLoadButton, contentLeft + s(28) + buttonWidth, emptyButtonTop, buttonWidth, s(34), TRUE);
-        MoveWindow(state.emptyValidateButton, contentLeft + s(36) + buttonWidth * 2, emptyButtonTop, buttonWidth, s(34), TRUE);
         ShowWindow(state.emptyNewButton, SW_SHOW);
         ShowWindow(state.emptyLoadButton, SW_SHOW);
-        ShowWindow(state.emptyValidateButton, SW_SHOW);
+        ShowWindow(state.emptyValidateButton, SW_HIDE);
 
         MoveWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20), TRUE);
         return;
@@ -997,18 +1041,21 @@ void initializeInterface(AppState& state) {
     state.divisionLabel = createControl(state, 0, L"STATIC", L"Division", WS_CHILD | WS_VISIBLE, 18, 18, 82, 20, state.window, 0);
     state.teamLabel = createControl(state, 0, L"STATIC", L"Club", WS_CHILD | WS_VISIBLE, 354, 18, 72, 20, state.window, 0);
     state.managerLabel = createControl(state, 0, L"STATIC", L"Manager", WS_CHILD | WS_VISIBLE, 702, 18, 82, 20, state.window, 0);
+    state.managerHelpLabel = createControl(state, 0, L"STATIC", L"Completa el nombre del manager.", WS_CHILD | WS_VISIBLE, 676, 44, 220, 18, state.window, 0);
     state.filterLabel = createControl(state, 0, L"STATIC", L"Filtro", WS_CHILD | WS_VISIBLE, 0, 0, 50, 20, state.window, 0);
 
     state.divisionCombo = createControl(state, 0, L"COMBOBOX", L"", WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL, 92, 14, 184, 300, state.window, IDC_DIVISION_COMBO);
     state.teamCombo = createControl(state, 0, L"COMBOBOX", L"", WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL, 360, 14, 224, 300, state.window, IDC_TEAM_COMBO);
-    state.managerEdit = createControl(state, WS_EX_CLIENTEDGE, L"EDIT", L"Manager", WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL, 676, 14, 188, 24, state.window, IDC_MANAGER_EDIT);
+    state.managerEdit = createControl(state, WS_EX_CLIENTEDGE, L"EDIT", L"", WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL, 676, 14, 188, 24, state.window, IDC_MANAGER_EDIT);
     state.filterCombo = createControl(state, 0, L"COMBOBOX", L"", WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL, 0, 0, 180, 260, state.window, IDC_FILTER_COMBO);
+    SendMessageW(state.managerEdit, EM_SETCUEBANNER, TRUE, reinterpret_cast<LPARAM>(L"Ingresa nombre del manager"));
+    SendMessageW(state.managerEdit, EM_LIMITTEXT, 48, 0);
 
     state.newCareerButton = createControl(state, 0, L"BUTTON", L"Nueva partida", buttonStyle, 0, 0, 100, 28, state.window, IDC_NEW_CAREER_BUTTON);
     state.loadButton = createControl(state, 0, L"BUTTON", L"Cargar", buttonStyle, 0, 0, 86, 28, state.window, IDC_LOAD_BUTTON);
     state.saveButton = createControl(state, 0, L"BUTTON", L"Guardar", buttonStyle, 0, 0, 86, 28, state.window, IDC_SAVE_BUTTON);
     state.simulateButton = createControl(state, 0, L"BUTTON", L"Simular", buttonStyle, 0, 0, 126, 28, state.window, IDC_SIMULATE_BUTTON);
-    state.validateButton = createControl(state, 0, L"BUTTON", L"Validar", buttonStyle, 0, 0, 92, 28, state.window, IDC_VALIDATE_BUTTON);
+    state.validateButton = createControl(state, 0, L"BUTTON", L"Auditar", buttonStyle, 0, 0, 92, 28, state.window, IDC_VALIDATE_BUTTON);
     state.displayModeButton = createControl(state, 0, L"BUTTON", L"Pantalla F11", buttonStyle, 0, 0, 154, 28, state.window, IDC_DISPLAY_MODE_BUTTON);
     state.emptyNewButton = createControl(state, 0, L"BUTTON", L"Crear carrera", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_NEW_BUTTON);
     state.emptyLoadButton = createControl(state, 0, L"BUTTON", L"Abrir guardado", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_LOAD_BUTTON);
@@ -1075,8 +1122,8 @@ void initializeInterface(AppState& state) {
     ListView_SetTextColor(state.squadList, kThemeText);
     ListView_SetTextColor(state.transferList, kThemeText);
     state.career.initializeLeague();
-    fillDivisionCombo(state);
-    fillTeamCombo(state, selectedDivisionId(state));
+    fillDivisionCombo(state, state.gameSetup.division);
+    fillTeamCombo(state, state.gameSetup.division, state.gameSetup.club);
     setCurrentPage(state, GuiPage::Dashboard);
     layoutWindow(state);
     refreshAll(state);
@@ -1120,9 +1167,11 @@ void paintWindowChrome(AppState& state, HDC hdc) {
     if (state.currentPage == GuiPage::Dashboard) {
         RECT spotlightBand = dashboardSpotlightBand(state, contentShell, summaryCard);
         drawDashboardSpotlights(state, hdc, spotlightBand);
-        if (IsWindowVisible(state.summaryEdit)) drawDashboardCardCap(state, hdc, summaryCard, kThemeAccentBlue, L"mesa de partido");
-        if (IsWindowVisible(state.detailEdit)) drawDashboardCardCap(state, hdc, detailCard, kThemeAccentGreen, L"vestuario");
-        if (IsWindowVisible(state.newsList)) drawDashboardCardCap(state, hdc, newsCard, kThemeAccent, L"pulso mundial");
+        if (state.career.myTeam) {
+            if (IsWindowVisible(state.summaryEdit)) drawDashboardCardCap(state, hdc, summaryCard, kThemeAccentBlue, L"mesa de partido");
+            if (IsWindowVisible(state.detailEdit)) drawDashboardCardCap(state, hdc, detailCard, kThemeAccentGreen, L"vestuario");
+            if (IsWindowVisible(state.newsList)) drawDashboardCardCap(state, hdc, newsCard, kThemeAccent, L"pulso mundial");
+        }
     } else if (pageUsesInsightStrip(state)) {
         RECT spotlightBand = dashboardSpotlightBand(state, contentShell, summaryCard);
         drawContextSpotlights(state, hdc, spotlightBand);

@@ -2,6 +2,8 @@
 
 #ifdef _WIN32
 
+#include "utils/utils.h"
+
 #include <algorithm>
 
 namespace gui_win32 {
@@ -62,9 +64,9 @@ std::string friendlyPanelTitle(const std::string& title) {
     if (title == "NewsDetail") return "Detalle";
     if (title == "AlertPanel") return "Alertas";
     if (title == "AlertPanel / NewsFeedPanel") return "Pulso del club";
-    if (title == "LaunchChecklistPanel") return "Arma tu partida";
-    if (title == "CareerActivationPanel") return "Acciones listas";
-    if (title == "ClubHubPreviewPanel") return "Que desbloqueas";
+    if (title == "LaunchChecklistPanel") return "Paso a paso";
+    if (title == "GameSetupStatusPanel") return "Estado actual de la partida";
+    if (title == "GameSetupChecklistPanel") return "Checklist dinamico";
     return title;
 }
 
@@ -132,9 +134,59 @@ void refreshFilterComboOptions(AppState& state) {
     state.suppressFilterEvents = false;
 }
 
+bool isKnownDivision(const AppState& state, const std::string& divisionId) {
+    for (const auto& division : state.career.divisions) {
+        if (division.id == divisionId) return true;
+    }
+    return false;
+}
+
+bool clubBelongsToDivision(const AppState& state, const std::string& divisionId, const std::string& clubName) {
+    if (divisionId.empty() || clubName.empty()) return false;
+    return std::any_of(state.career.allTeams.begin(), state.career.allTeams.end(), [&](const Team& team) {
+        return team.division == divisionId && team.name == clubName;
+    });
+}
+
+bool hasAvailableTeams(const AppState& state, const std::string& divisionId) {
+    if (divisionId.empty()) return false;
+    return std::any_of(state.career.allTeams.begin(), state.career.allTeams.end(), [&](const Team& team) {
+        return team.division == divisionId;
+    });
+}
+
+void syncSetupButtonsAndHints(AppState& state) {
+    const bool hasCareer = state.career.myTeam != nullptr;
+    EnableWindow(state.teamCombo, hasAvailableTeams(state, state.gameSetup.division));
+    EnableWindow(state.newCareerButton, state.gameSetup.ready);
+    EnableWindow(state.emptyNewButton, state.gameSetup.ready);
+    EnableWindow(state.saveButton, hasCareer);
+    EnableWindow(state.simulateButton, hasCareer);
+
+    if (state.managerHelpLabel) {
+        std::string helper;
+        if (hasCareer) {
+            helper = "Carrera activa. Guardar y simular ya estan disponibles.";
+        } else {
+            helper = state.gameSetup.managerError;
+            if (helper.empty()) {
+                helper = state.gameSetup.manager.empty()
+                    ? "Completa el nombre del manager."
+                    : (state.gameSetup.ready ? "Manager valido. Puedes iniciar la partida."
+                                             : "Manager listo. Completa los pasos pendientes.");
+            }
+        }
+        setWindowTextUtf8(state.managerHelpLabel, helper);
+        InvalidateRect(state.managerHelpLabel, nullptr, TRUE);
+    }
+    if (state.newCareerButton) InvalidateRect(state.newCareerButton, nullptr, TRUE);
+    if (state.emptyNewButton) InvalidateRect(state.emptyNewButton, nullptr, TRUE);
+}
+
 }  // namespace
 
 std::string selectedDivisionId(const AppState& state) {
+    if (!state.gameSetup.division.empty()) return state.gameSetup.division;
     int index = comboIndex(state.divisionCombo);
     if (index < 0 || index >= static_cast<int>(state.career.divisions.size())) return std::string();
     return state.career.divisions[static_cast<size_t>(index)].id;
@@ -143,12 +195,12 @@ std::string selectedDivisionId(const AppState& state) {
 void fillDivisionCombo(AppState& state, const std::string& selectedId) {
     state.suppressComboEvents = true;
     SendMessageW(state.divisionCombo, CB_RESETCONTENT, 0, 0);
-    int selectedIndex = 0;
+    int selectedIndex = -1;
     for (size_t i = 0; i < state.career.divisions.size(); ++i) {
         addComboItem(state.divisionCombo, state.career.divisions[i].display);
         if (!selectedId.empty() && state.career.divisions[i].id == selectedId) selectedIndex = static_cast<int>(i);
     }
-    if (!state.career.divisions.empty()) SendMessageW(state.divisionCombo, CB_SETCURSEL, selectedIndex, 0);
+    SendMessageW(state.divisionCombo, CB_SETCURSEL, selectedIndex, 0);
     state.suppressComboEvents = false;
 }
 
@@ -156,26 +208,90 @@ void fillTeamCombo(AppState& state, const std::string& divisionId, const std::st
     state.suppressComboEvents = true;
     SendMessageW(state.teamCombo, CB_RESETCONTENT, 0, 0);
     std::vector<Team*> teams = state.career.getDivisionTeams(divisionId);
-    int selectedIndex = 0;
+    int selectedIndex = -1;
     for (size_t i = 0; i < teams.size(); ++i) {
         addComboItem(state.teamCombo, teams[i]->name);
         if (!selectedTeam.empty() && teams[i]->name == selectedTeam) selectedIndex = static_cast<int>(i);
     }
-    if (!teams.empty()) SendMessageW(state.teamCombo, CB_SETCURSEL, selectedIndex, 0);
+    SendMessageW(state.teamCombo, CB_SETCURSEL, selectedIndex, 0);
     state.suppressComboEvents = false;
+    EnableWindow(state.teamCombo, !divisionId.empty() && !teams.empty());
 }
 
 void syncManagerNameFromUi(AppState& state) {
     std::string name = getWindowTextUtf8(state.managerEdit);
-    state.career.managerName = name.empty() ? "Manager" : name;
+    state.gameSetup.manager = trim(name);
+    if (state.career.myTeam) {
+        state.career.managerName = state.gameSetup.manager.empty() ? "Manager" : state.gameSetup.manager;
+    }
 }
 
 void syncCombosFromCareer(AppState& state) {
-    fillDivisionCombo(state, state.career.activeDivision);
-    fillTeamCombo(state, state.career.activeDivision, state.career.myTeam ? state.career.myTeam->name : std::string());
     if (state.career.myTeam) {
-        setWindowTextUtf8(state.managerEdit, state.career.managerName);
+        state.gameSetup.division = state.career.activeDivision;
+        state.gameSetup.club = state.career.myTeam->name;
+        state.gameSetup.manager = trim(state.career.managerName);
     }
+    fillDivisionCombo(state, state.gameSetup.division);
+    fillTeamCombo(state, state.gameSetup.division, state.gameSetup.club);
+    if (state.managerEdit) setWindowTextUtf8(state.managerEdit, state.gameSetup.manager);
+    check_game_ready(state);
+}
+
+void set_division(AppState& state, const std::string& divisionId) {
+    state.gameSetup.division = isKnownDivision(state, divisionId) ? divisionId : std::string();
+    if (!clubBelongsToDivision(state, state.gameSetup.division, state.gameSetup.club)) {
+        state.gameSetup.club.clear();
+    }
+    fillDivisionCombo(state, state.gameSetup.division);
+    fillTeamCombo(state, state.gameSetup.division, state.gameSetup.club);
+    check_game_ready(state);
+    setStatus(state, state.gameSetup.inlineMessage);
+    refreshCurrentPage(state);
+}
+
+void set_club(AppState& state, const std::string& clubName) {
+    state.gameSetup.club = clubBelongsToDivision(state, state.gameSetup.division, clubName) ? clubName : std::string();
+    fillTeamCombo(state, state.gameSetup.division, state.gameSetup.club);
+    check_game_ready(state);
+    setStatus(state, state.gameSetup.inlineMessage);
+    refreshCurrentPage(state);
+}
+
+void set_manager(AppState& state, const std::string& managerName) {
+    state.gameSetup.manager = trim(managerName);
+    check_game_ready(state);
+    setStatus(state, state.gameSetup.ready ? "Checklist completa. Nueva partida habilitada." : state.gameSetup.inlineMessage);
+    refreshCurrentPage(state);
+}
+
+bool check_game_ready(AppState& state) {
+    state.gameSetup.manager = trim(state.gameSetup.manager);
+    state.gameSetup.ready = false;
+    state.gameSetup.managerError.clear();
+    state.gameSetup.inlineMessage.clear();
+
+    if (state.gameSetup.division.empty()) {
+        state.gameSetup.currentStep = 1;
+        state.gameSetup.inlineMessage = "Paso 1 pendiente: elige una division para cargar clubes.";
+    } else if (!hasAvailableTeams(state, state.gameSetup.division)) {
+        state.gameSetup.currentStep = 2;
+        state.gameSetup.inlineMessage = "Paso 2 bloqueado: esta division no tiene clubes disponibles.";
+    } else if (state.gameSetup.club.empty()) {
+        state.gameSetup.currentStep = 2;
+        state.gameSetup.inlineMessage = "Paso 2 pendiente: selecciona el club que quieres dirigir.";
+    } else if (state.gameSetup.manager.empty()) {
+        state.gameSetup.currentStep = 3;
+        state.gameSetup.managerError = "Ingresa nombre del manager.";
+        state.gameSetup.inlineMessage = "Paso 3 pendiente: escribe el nombre del manager para iniciar.";
+    } else {
+        state.gameSetup.currentStep = 3;
+        state.gameSetup.ready = true;
+        state.gameSetup.inlineMessage = "Checklist completa. La partida esta lista para empezar.";
+    }
+
+    syncSetupButtonsAndHints(state);
+    return state.gameSetup.ready;
 }
 
 void setStatus(AppState& state, const std::string& text) {
@@ -184,6 +300,7 @@ void setStatus(AppState& state, const std::string& text) {
 }
 
 void refreshCurrentPage(AppState& state) {
+    check_game_ready(state);
     refreshFilterComboOptions(state);
     state.currentModel = buildModel(state);
     state.insightHotspots.clear();
@@ -245,9 +362,7 @@ void autosizeCurrentLists(AppState& state) {
 }
 
 void refreshAll(AppState& state) {
-    bool hasCareer = state.career.myTeam != nullptr;
-    EnableWindow(state.saveButton, hasCareer);
-    EnableWindow(state.simulateButton, hasCareer);
+    check_game_ready(state);
     refreshCurrentPage(state);
 }
 

@@ -178,6 +178,10 @@ void executeInsightAction(AppState& state, InsightAction action) {
             SetFocus(state.teamCombo);
             setStatus(state, "Insight: elige el club para fijar proyecto, presupuesto y plantilla inicial.");
             return;
+        case InsightAction::FocusManager:
+            SetFocus(state.managerEdit);
+            setStatus(state, "Insight: escribe el nombre del manager para completar la partida.");
+            return;
         case InsightAction::StartCareer:
             startNewCareer(state);
             return;
@@ -371,8 +375,22 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                     SetTextColor(hdc, kThemeMuted);
                 } else if (control == state->statusLabel) {
                     SetTextColor(hdc, RGB(188, 228, 216));
+                } else if (control == state->managerHelpLabel) {
+                    if (state->career.myTeam || state->gameSetup.ready) {
+                        SetTextColor(hdc, kThemeAccentGreen);
+                    } else if (!state->gameSetup.managerError.empty()) {
+                        SetTextColor(hdc, kThemeDanger);
+                    } else {
+                        SetTextColor(hdc, kThemeWarning);
+                    }
                 } else if (control == state->infoLabel) {
-                    SetTextColor(hdc, kThemeText);
+                    if (!state->career.myTeam) {
+                        if (state->gameSetup.ready) SetTextColor(hdc, kThemeAccentGreen);
+                        else if (!state->gameSetup.managerError.empty()) SetTextColor(hdc, kThemeDanger);
+                        else SetTextColor(hdc, kThemeWarning);
+                    } else {
+                        SetTextColor(hdc, kThemeText);
+                    }
                 } else {
                     SetTextColor(hdc, kThemeMuted);
                 }
@@ -384,7 +402,22 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
             switch (LOWORD(wParam)) {
                 case IDC_DIVISION_COMBO:
                     if (HIWORD(wParam) == CBN_SELCHANGE && !state->suppressComboEvents) {
-                        fillTeamCombo(*state, selectedDivisionId(*state));
+                        int selected = comboIndex(state->divisionCombo);
+                        std::string divisionId;
+                        if (selected >= 0 && selected < static_cast<int>(state->career.divisions.size())) {
+                            divisionId = state->career.divisions[static_cast<size_t>(selected)].id;
+                        }
+                        set_division(*state, divisionId);
+                    }
+                    return 0;
+                case IDC_TEAM_COMBO:
+                    if (HIWORD(wParam) == CBN_SELCHANGE && !state->suppressComboEvents) {
+                        set_club(*state, comboText(state->teamCombo));
+                    }
+                    return 0;
+                case IDC_MANAGER_EDIT:
+                    if (HIWORD(wParam) == EN_CHANGE) {
+                        set_manager(*state, getWindowTextUtf8(state->managerEdit));
                     }
                     return 0;
                 case IDC_FILTER_COMBO:

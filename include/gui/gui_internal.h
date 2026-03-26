@@ -92,6 +92,7 @@ enum class InsightAction {
     None,
     FocusDivision,
     FocusClub,
+    FocusManager,
     StartCareer,
     OpenLeague,
     OpenSquad,
@@ -131,6 +132,16 @@ struct ListPanelModel {
 struct FeedPanelModel {
     std::string title;
     std::vector<std::string> lines;
+};
+
+struct GameSetupState {
+    std::string division;
+    std::string club;
+    std::string manager;
+    bool ready = false;
+    int currentStep = 1;
+    std::string managerError;
+    std::string inlineMessage;
 };
 
 struct GuiPageModel {
@@ -174,6 +185,7 @@ struct AppState {
     bool suppressFilterEvents = false;
     GuiPage currentPage = GuiPage::Dashboard;
     std::string currentFilter = "Todo";
+    GameSetupState gameSetup;
     SortState squadSort;
     std::string selectedPlayerName;
     std::string selectedTransferPlayer;
@@ -190,6 +202,7 @@ struct AppState {
     HWND managerLabel = nullptr;
     HWND filterLabel = nullptr;
     HWND filterCombo = nullptr;
+    HWND managerHelpLabel = nullptr;
     HWND newCareerButton = nullptr;
     HWND loadButton = nullptr;
     HWND saveButton = nullptr;
@@ -311,6 +324,10 @@ void fillDivisionCombo(AppState& state, const std::string& selectedId = std::str
 void fillTeamCombo(AppState& state, const std::string& divisionId, const std::string& selectedTeam = std::string());
 void syncCombosFromCareer(AppState& state);
 void syncManagerNameFromUi(AppState& state);
+void set_division(AppState& state, const std::string& divisionId);
+void set_club(AppState& state, const std::string& clubName);
+void set_manager(AppState& state, const std::string& managerName);
+bool check_game_ready(AppState& state);
 void setStatus(AppState& state, const std::string& text);
 void setCurrentPage(AppState& state, GuiPage page);
 void refreshAll(AppState& state);

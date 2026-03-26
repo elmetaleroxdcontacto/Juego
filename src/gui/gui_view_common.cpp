@@ -24,6 +24,32 @@
 
 namespace gui_win32 {
 
+namespace {
+
+const Team* selectedSetupTeam(const AppState& state) {
+    if (state.gameSetup.division.empty() || state.gameSetup.club.empty()) return nullptr;
+    for (const auto& team : state.career.allTeams) {
+        if (team.division == state.gameSetup.division && team.name == state.gameSetup.club) return &team;
+    }
+    return nullptr;
+}
+
+std::string setupDivisionLabel(const AppState& state) {
+    for (const auto& division : state.career.divisions) {
+        if (division.id == state.gameSetup.division) return division.display;
+    }
+    return "Sin division";
+}
+
+std::string setupStatusLabel(const AppState& state) {
+    if (state.gameSetup.ready) return "Lista para iniciar";
+    if (state.gameSetup.currentStep == 1) return "Paso 1 pendiente";
+    if (state.gameSetup.currentStep == 2) return "Paso 2 en progreso";
+    return "Paso 3 en progreso";
+}
+
+}  // namespace
+
 std::string pageTitleFor(GuiPage page) {
     switch (page) {
         case GuiPage::Dashboard: return "Resumen del club";
@@ -68,14 +94,19 @@ std::string boardStatusLabel(int confidence) {
     return "Critica";
 }
 
-std::vector<DashboardMetric> buildMetrics(const Career& career, const std::vector<std::string>& alerts) {
+std::vector<DashboardMetric> buildMetrics(const AppState& state, const std::vector<std::string>& alerts) {
+    const Career& career = state.career;
     if (!career.myTeam) {
+        const Team* setupTeam = selectedSetupTeam(state);
+        const bool hasDivision = !state.gameSetup.division.empty();
+        const bool hasClub = setupTeam != nullptr;
+        const bool hasManager = !state.gameSetup.manager.empty();
         return {
-            {"Club", "Sin carrera", kThemeAccentBlue},
-            {"Estado", "Listo para empezar", kThemeAccentGreen},
-            {"Presupuesto", "--", kThemeAccent},
-            {"Reputacion", "Manager nuevo", kThemeAccentBlue},
-            {"Alertas", "Base lista", alerts.empty() ? kThemeAccentGreen : kThemeWarning}
+            {"Division", hasDivision ? setupDivisionLabel(state) : "Pendiente", hasDivision ? kThemeAccentGreen : kThemeDanger},
+            {"Club", hasClub ? setupTeam->name : "Club pendiente", hasClub ? kThemeAccentGreen : (hasDivision ? kThemeWarning : kThemeDanger)},
+            {"Presupuesto", hasClub ? formatMoneyValue(setupTeam->budget) : "No disponible", hasClub ? kThemeAccentGreen : kThemeDanger},
+            {"Manager", hasManager ? state.gameSetup.manager : "Pendiente", hasManager ? kThemeAccentGreen : kThemeDanger},
+            {"Estado", setupStatusLabel(state), state.gameSetup.ready ? kThemeAccentGreen : kThemeWarning}
         };
     }
 

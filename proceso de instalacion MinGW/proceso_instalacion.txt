@@ -1,0 +1,234 @@
+GUIA PRACTICA PARA INSTALAR MinGW Y COMPILAR ESTE PROYECTO EN WINDOWS
+
+Proyecto:
+- Football Manager Chile Simulator
+
+Ruta de referencia del repo:
+- C:\Users\moise\OneDrive\Escritorio\Juego
+
+======================================================================
+1. QUE NECESITAS
+======================================================================
+
+Para compilar este proyecto en Windows necesitas:
+
+- MinGW con `g++`
+- `mingw32-make`
+- CMake
+
+Este proyecto usa CMake como camino principal de compilacion y `build.bat`
+como atajo. Si CMake falla, `build.bat` puede intentar un fallback directo
+con `g++`.
+
+======================================================================
+2. SI YA TIENES MinGW INSTALADO
+======================================================================
+
+Si ya existe esta carpeta:
+
+- C:\MinGW
+
+entonces primero prueba esto:
+
+1. Agrega `C:\MinGW\bin` al PATH del sistema.
+2. Cierra y vuelve a abrir VS Code o la terminal.
+3. Verifica:
+
+   g++ --version
+   mingw32-make --version
+
+Si ambos comandos responden, no necesitas reinstalar MinGW.
+
+======================================================================
+3. INSTALAR MinGW DESDE ESTA CARPETA
+======================================================================
+
+En esta carpeta ya tienes:
+
+- `mingw-get-setup.exe`
+
+Pasos:
+
+1. Ejecuta `mingw-get-setup.exe`.
+2. Instala MinGW en una ruta simple, por ejemplo:
+
+   C:\MinGW
+
+3. Abre "MinGW Installation Manager".
+4. Marca para instalar como minimo:
+
+   - `mingw32-base`
+   - `mingw32-gcc-g++`
+   - `mingw32-make`
+
+5. Aplica la instalacion.
+6. Espera a que termine la descarga e instalacion.
+
+======================================================================
+4. AGREGAR MinGW AL PATH
+======================================================================
+
+Metodo grafico:
+
+1. Presiona `Win + R`.
+2. Escribe `sysdm.cpl` y presiona Enter.
+3. Ve a:
+
+   Opciones avanzadas -> Variables de entorno
+
+4. En "Variables del sistema", edita `Path`.
+5. Agrega:
+
+   C:\MinGW\bin
+
+6. Acepta todo.
+7. Reinicia VS Code, PowerShell o CMD.
+
+Metodo PowerShell como administrador:
+
+```powershell
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\MinGW\bin", "Machine")
+```
+
+======================================================================
+5. INSTALAR CMake SI FALTA
+======================================================================
+
+Verifica:
+
+```powershell
+cmake --version
+```
+
+Si no responde, instala CMake y asegurate de que tambien quede en el PATH.
+
+======================================================================
+6. VERIFICAR QUE TODO QUEDO BIEN
+======================================================================
+
+Abre una terminal nueva y ejecuta:
+
+```powershell
+where g++
+where mingw32-make
+where cmake
+g++ --version
+mingw32-make --version
+cmake --version
+```
+
+Si los tres comandos existen, ya puedes compilar el proyecto.
+
+======================================================================
+7. COMPILAR ESTE PROYECTO
+======================================================================
+
+Ve a la raiz del repo:
+
+```powershell
+cd C:\Users\moise\OneDrive\Escritorio\Juego
+```
+
+Opcion recomendada:
+
+```powershell
+cmake -S . -B build-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++
+cmake --build build-cmake --config Release --target FootballManager
+```
+
+Para compilar tambien consola y tests:
+
+```powershell
+cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests
+```
+
+Opcion rapida con script del proyecto:
+
+```powershell
+build.bat
+```
+
+Compilar sin ejecutar al final:
+
+```powershell
+$env:FM_SKIP_RUN='1'
+cmd /c build.bat
+```
+
+Forzar fallback directo con `g++` si CMake se pone inestable:
+
+```powershell
+$env:FM_SKIP_RUN='1'
+$env:FM_FORCE_FALLBACK='1'
+cmd /c build.bat
+```
+
+======================================================================
+8. EJECUTAR
+======================================================================
+
+GUI principal:
+
+```powershell
+.\build-cmake\bin\FootballManager.exe
+```
+
+Modo consola:
+
+```powershell
+.\build-cmake\bin\FootballManagerCLI.exe
+```
+
+Validacion:
+
+```powershell
+.\build-cmake\bin\FootballManagerCLI.exe --validate
+```
+
+Tests:
+
+```powershell
+.\build-cmake\bin\FootballManagerTests.exe
+```
+
+======================================================================
+9. PROBLEMAS COMUNES
+======================================================================
+
+`g++` no se reconoce:
+- Falta agregar `C:\MinGW\bin` al PATH.
+- Reinicia la terminal o VS Code.
+
+`cmake` no se reconoce:
+- CMake no esta instalado o no esta en el PATH.
+
+Falla el linking con archivos bloqueados:
+- Cierra el juego si esta abierto.
+- Cierra exploradores o herramientas que esten usando el `.exe`.
+- Si el repo esta dentro de OneDrive, puede haber bloqueos temporales.
+
+`build.bat` compila pero no arranca:
+- Ejecuta manualmente `build-cmake\bin\FootballManager.exe`.
+- Si quieres evitar autoejecucion, usa `FM_SKIP_RUN=1`.
+
+======================================================================
+10. RESUMEN CORTO
+======================================================================
+
+Si quieres la version corta:
+
+1. Instala MinGW.
+2. Asegurate de tener `g++`, `mingw32-make` y `cmake`.
+3. Agrega `C:\MinGW\bin` al PATH.
+4. En la raiz del proyecto ejecuta:
+
+```powershell
+build.bat
+```
+
+o:
+
+```powershell
+cmake -S . -B build-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++
+cmake --build build-cmake --config Release --target FootballManager
+```

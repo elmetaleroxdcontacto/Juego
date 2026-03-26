@@ -3151,3 +3151,105 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Hacer que las tarjetas clicables reaccionen tambien al teclado (`Tab`, `Enter`, `Space`) para que el onboarding y los paneles KPI sean accesibles sin mouse.
 - Conectar el hover de las tarjetas a tooltips ricos con mas contexto operativo, por ejemplo recomendacion tactica, alerta medica o lectura financiera ampliada.
 - Extender la memoria visual a altura de filas, orden preferido y filtro reciente por pagina para que cada vista recupere aun mejor el contexto de trabajo del manager.
+
+## Auditoria del proyecto (2026-03-25 23:08:03 -03:00) - README rehecho y alineado con el estado real del proyecto
+
+### Lista de cambios realizados
+
+- Se rehizo `README.md` completo para que deje de mezclar descripcion antigua, refactor parcial y bloques desactualizados.
+- El nuevo README explica con claridad que el proyecto ofrece GUI Win32, CLI, validacion y tests separados, en vez de presentar una unica forma ambigua de uso.
+- Se corrigieron problemas de legibilidad y formato del README anterior, incluyendo texto roto por encoding y secciones que ya no reflejaban el estado actual de la GUI.
+- La documentacion ahora describe los ejecutables reales generados por CMake: `FootballManager.exe`, `FootballManagerCLI.exe` y `FootballManagerTests.exe`.
+- Se documentaron las rutas y comandos correctos para compilar con CMake, usar `build.bat`, ejecutar la GUI, abrir el modo consola y lanzar validacion o tests.
+- Se agrego una vista mas ordenada de arquitectura, capas del proyecto, carpetas principales, flujo de entrada y documentacion adicional disponible en `docs/`.
+- Tambien se actualizaron highlights funcionales para reflejar mejoras recientes de GUI, simulacion, desarrollo de jugadores y estructura modular.
+
+### Archivos modificados
+
+- `README.md`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- Revision manual del contenido de `README.md`
+- Resultado:
+- La documentacion quedo alineada con el estado real del repositorio y con los targets actuales de `CMakeLists.txt`.
+- No fue necesario recompilar ni ejecutar tests porque esta pasada fue exclusivamente documental.
+
+### Mejoras futuras sugeridas
+
+- Agregar capturas de pantalla de la GUI actual al README para que el repositorio muestre de inmediato el estado visual del juego.
+- Incorporar una seccion corta de troubleshooting para errores comunes de MinGW, OneDrive y relink de `objects.a` en Windows.
+- Sumar un `CHANGELOG.md` o una seccion de releases para separar mejor documentacion estable de historial de cambios recientes.
+
+## Auditoria del proyecto (2026-03-25 23:11:18 -03:00) - guia de MinGW corregida y aterrizada al proyecto
+
+### Lista de cambios realizados
+
+- Se rehizo `proceso de instalacion MinGW/proceso_instalacion.txt` para eliminar la mezcla anterior de guia generica en ingles, bloque duplicado en espanol y texto roto por encoding.
+- La nueva version ahora explica de forma concreta como instalar MinGW, agregar `C:\MinGW\bin` al PATH y verificar `g++`, `mingw32-make` y `cmake`.
+- La guia quedo alineada con este repositorio real: usa la ruta actual del proyecto, documenta `build.bat`, la compilacion principal con CMake y los ejecutables reales generados (`FootballManager.exe`, `FootballManagerCLI.exe`, `FootballManagerTests.exe`).
+- Tambien se anadio una seccion de problemas comunes para PATH, falta de CMake y bloqueos de linking en Windows/OneDrive.
+
+### Archivos modificados
+
+- `proceso de instalacion MinGW/proceso_instalacion.txt`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- Revision manual del contenido final de `proceso de instalacion MinGW/proceso_instalacion.txt`
+- Contraste rapido contra `build.bat` y `CMakeLists.txt`
+- Resultado:
+- La guia quedo consistente con el flujo actual de build del proyecto.
+- No fue necesario recompilar ni ejecutar tests porque esta pasada fue exclusivamente documental.
+
+### Mejoras futuras sugeridas
+
+- Crear una segunda guia breve de "instalacion minima" orientada a usuarios no tecnicos con menos texto y capturas.
+- Volver a incorporar o rehacer `install_mingw_instructions.txt` si quieres mantener una version paralela en ingles.
+- Agregar una seccion de troubleshooting especifica para VS Code y extensiones de C++ en Windows.
+
+## Auditoria del proyecto (2026-03-25 23:44:21 -03:00) - flujo de nueva partida centralizado, validacion automatica y UX del resumen del club corregida
+
+### Lista de cambios realizados
+
+- Se centralizo el setup de nueva partida en un unico estado `gameSetup` con `division`, `club`, `manager`, `ready`, paso actual, error de manager y mensaje inline para evitar desincronizaciones entre combos, cabecera y dashboard.
+- Se agregaron funciones explicitas `set_division()`, `set_club()`, `set_manager()` y `check_game_ready()` para separar la logica del flujo respecto de la capa Win32.
+- El flujo ahora valida en tiempo real: cambiar division, club o manager actualiza el estado global al instante y habilita o deshabilita `Nueva partida` sin depender del boton `Validar`.
+- Se corrigio la inconsistencia visual donde podia verse un club seleccionado pero la cabecera seguia mostrando `Sin carrera`; ahora las metricas leen el setup activo y muestran division, club, manager, estado y presupuesto real del club elegido.
+- `Guardar` y `Simular` quedaron vinculados a la existencia de una carrera activa, mientras que `Nueva partida` solo se habilita si la checklist completa esta resuelta.
+- El campo manager ahora usa placeholder `Ingresa nombre del manager`, limite razonable de texto y ayuda contextual debajo del input con feedback visual: verde cuando esta listo, amarillo en progreso y rojo si falta el nombre.
+- Se rehizo el dashboard vacio para que el panel derecho deje de repetir `Acciones listas` y pase a mostrar `Estado actual de la partida` mas una `Checklist dinamico` coherente con el flujo real.
+- Se elimino el boton de validacion redundante del estado vacio y el boton superior se renombro a `Auditar` para separar la auditoria de datos del flujo de creacion de partida.
+- Tambien se redujo ruido visual en la pantalla vacia: menos caps decorativos, menos acciones redundantes y tarjetas de pasos con foco claro en `Paso 1 -> Paso 2 -> Paso 3`.
+
+### Archivos modificados
+
+- `include/gui/gui_internal.h`
+- `include/gui/gui_view_builders.h`
+- `src/gui/gui.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+- `src/gui/gui_view_common.cpp`
+- `src/gui/gui_view_competition.cpp`
+- `src/gui/gui_view_management.cpp`
+- `src/gui/gui_view_overview.cpp`
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- `cmake --build build-cmake --config Release --target FootballManager`
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `.\\build-cmake\\bin\\FootballManagerTests.exe`
+- Resultado:
+- La compilacion del codigo GUI llego correctamente hasta el link final tras recompilar `gui.cpp`, `gui_actions.cpp`, `gui_layout.cpp`, `gui_runtime.cpp`, `gui_view_common.cpp`, `gui_view_overview.cpp` y vistas relacionadas.
+- `FootballManagerTests.exe` termino con `All tests passed`.
+- El relink final de `build-cmake\\bin\\FootballManager.exe` quedo bloqueado por Windows porque el ejecutable seguia abierto (`FootballManager`, PID 16064), por lo que el codigo quedo actualizado pero ese binario en particular necesita cerrarse antes de volver a compilarlo.
+
+### Mejoras futuras sugeridas
+
+- Llevar la misma checklist guiada a un modal o wizard opcional para usuarios nuevos que prefieran creacion paso a paso fuera del dashboard principal.
+- Anadir mensajes contextuales mas ricos por division y club, por ejemplo objetivo deportivo, presupuesto esperado y nivel de presion antes de crear la carrera.
+- Hacer que el dashboard de setup recuerde la ultima division explorada entre sesiones, sin autoarrancar la carrera hasta que la checklist vuelva a quedar valida.

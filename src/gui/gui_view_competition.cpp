@@ -11,7 +11,7 @@ GuiPageModel buildCalendarModel(AppState& state) {
     std::vector<std::string> alerts = buildAlertLines(state.career);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
-    model.metrics = buildMetrics(state.career, alerts);
+    model.metrics = buildMetrics(state, alerts);
     model.infoLine = "Calendario competitivo con proximos partidos, copa y contexto de temporada.";
     model.summary.title = "CalendarSummary";
     model.primary = buildFixtureModel(state.career, state.currentFilter == "Toda la fase" ? 24 : (state.currentFilter == "Proximos 10" ? 10 : 5));
@@ -51,7 +51,7 @@ GuiPageModel buildLeagueModel(AppState& state) {
     std::vector<std::string> alerts = buildAlertLines(state.career);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
-    model.metrics = buildMetrics(state.career, alerts);
+    model.metrics = buildMetrics(state, alerts);
     model.infoLine = "Tabla de liga, zonas de objetivo y contexto competitivo del club.";
     model.summary.title = "CompetitionSummary";
     model.primary = buildLeagueTableModel(state.career, state.currentFilter);

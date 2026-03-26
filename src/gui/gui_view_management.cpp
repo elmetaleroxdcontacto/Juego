@@ -20,7 +20,7 @@ GuiPageModel buildTransfersModel(AppState& state) {
     const auto actionLines = manager_advice::buildManagerActionLines(state.career, 3);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
-    model.metrics = buildMetrics(state.career, alerts);
+    model.metrics = buildMetrics(state, alerts);
     model.infoLine = "Mercado de fichajes con filtros, lectura del plantel y objetivos prioritarios.";
     model.summary.title = "TransferSearchPanel";
     model.primary.title = "TransferSearchPanel";
@@ -123,7 +123,7 @@ GuiPageModel buildFinancesModel(AppState& state) {
     const auto storyLines = manager_advice::buildCareerStorylines(state.career, 2);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
-    model.metrics = buildMetrics(state.career, alerts);
+    model.metrics = buildMetrics(state, alerts);
     model.infoLine = "Finanzas, salarios e infraestructura del club.";
     model.summary.title = "FinanceSummary";
     model.primary.title = "FinanceBreakdown";
@@ -196,7 +196,7 @@ GuiPageModel buildBoardModel(AppState& state) {
     const auto storyLines = manager_advice::buildCareerStorylines(state.career, 3);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
-    model.metrics = buildMetrics(state.career, alerts);
+    model.metrics = buildMetrics(state, alerts);
     model.infoLine = "Objetivos, confianza y memoria institucional.";
     model.summary.title = "BoardObjectives";
     model.primary.title = "BoardObjectiveTable";
@@ -252,7 +252,7 @@ GuiPageModel buildNewsModel(AppState& state) {
     const auto storyLines = manager_advice::buildCareerStorylines(state.career, 4);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
-    model.metrics = buildMetrics(state.career, alerts);
+    model.metrics = buildMetrics(state, alerts);
     model.infoLine = "Centro del manager: inbox, scouting, rumores y alertas para seguir el pulso del mundo.";
     model.summary.title = "ScoutingInbox";
     model.primary.title = "NewsCardList";

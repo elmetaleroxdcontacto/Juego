@@ -134,11 +134,24 @@ void startNewCareer(AppState& state) {
         return;
     }
 
-    std::string divisionId = selectedDivisionId(state);
-    if (divisionId.empty()) divisionId = state.career.divisions.front().id;
-    std::string teamName = comboText(state.teamCombo);
     syncManagerNameFromUi(state);
-    ServiceResult result = startCareerService(state.career, divisionId, teamName, state.career.managerName);
+    if (!check_game_ready(state)) {
+        refreshCurrentPage(state);
+        if (state.gameSetup.division.empty()) {
+            SetFocus(state.divisionCombo);
+        } else if (state.gameSetup.club.empty()) {
+            SetFocus(state.teamCombo);
+        } else {
+            SetFocus(state.managerEdit);
+        }
+        setStatus(state, state.gameSetup.inlineMessage + (state.gameSetup.managerError.empty() ? std::string() : " " + state.gameSetup.managerError));
+        return;
+    }
+
+    ServiceResult result = startCareerService(state.career,
+                                              state.gameSetup.division,
+                                              state.gameSetup.club,
+                                              state.gameSetup.manager);
     if (!result.ok) {
         std::string message = result.messages.empty() ? "No se pudo iniciar la carrera." : result.messages.front();
         MessageBoxW(state.window, utf8ToWide(message).c_str(), L"Football Manager", MB_OK | MB_ICONWARNING);
@@ -147,7 +160,9 @@ void startNewCareer(AppState& state) {
     state.selectedPlayerName.clear();
     state.selectedTransferPlayer.clear();
     setCurrentPage(state, GuiPage::Dashboard);
-    setStatus(state, result.messages.empty() ? "Nueva carrera iniciada." : result.messages.back());
+    setStatus(state, result.messages.empty()
+                         ? (result.ok ? "Nueva carrera iniciada." : "No se pudo iniciar la carrera.")
+                         : result.messages.back());
     if (!result.messages.empty() && result.messages.size() > 1) {
         showLoadMessagesCompact(state, result, "Nueva carrera");
     }
@@ -159,8 +174,8 @@ void loadCareer(AppState& state) {
         std::string message = result.messages.empty() ? "No se encontro una carrera guardada." : result.messages.front();
         MessageBoxW(state.window, utf8ToWide(message).c_str(), L"Football Manager", MB_OK | MB_ICONINFORMATION);
         setStatus(state, message);
-        fillDivisionCombo(state);
-        fillTeamCombo(state, selectedDivisionId(state));
+        fillDivisionCombo(state, state.gameSetup.division);
+        fillTeamCombo(state, state.gameSetup.division, state.gameSetup.club);
         refreshAll(state);
         return;
     }
@@ -195,16 +210,16 @@ void simulateWeek(AppState& state) {
 }
 
 void validateSystem(AppState& state) {
-    setStatus(state, "Ejecutando validacion...");
+    setStatus(state, "Ejecutando auditoria de datos...");
     UpdateWindow(state.window);
     ValidationSuiteSummary summary = runValidationService();
     const std::wstring dialogText = buildValidationDialogText(summary);
     if (summary.ok) {
         MessageBoxW(state.window, dialogText.c_str(), L"Football Manager", MB_OK | MB_ICONINFORMATION);
-        setStatus(state, "Validacion completada sin fallas.");
+        setStatus(state, "Auditoria completada sin fallas.");
     } else {
         MessageBoxW(state.window, dialogText.c_str(), L"Football Manager", MB_OK | MB_ICONWARNING);
-        setStatus(state, "Validacion completada con fallas.");
+        setStatus(state, "Auditoria completada con fallas.");
     }
 }
 

@@ -21,10 +21,10 @@ GuiPageModel buildDashboardModel(AppState& state) {
     const auto storyLines = manager_advice::buildCareerStorylines(state.career, 3);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
-    model.metrics = buildMetrics(state.career, alerts);
+    model.metrics = buildMetrics(state, alerts);
     model.infoLine = state.career.myTeam
         ? "Panorama inmediato del club: proximo rival, forma del plantel, clasificacion y focos de gestion."
-        : "Prepara la partida en tres pasos: division, club y manager.";
+        : state.gameSetup.inlineMessage;
     model.summary.title = "UpcomingMatchWidget";
     model.primary = buildLeagueTableModel(state.career, "Grupo actual");
     model.secondary = buildTeamStatusModel(state.career);
@@ -34,30 +34,65 @@ GuiPageModel buildDashboardModel(AppState& state) {
     model.feed.lines = state.currentFilter == "Alertas" ? alerts : buildFeedLines(state.career, state.currentFilter == "Todo" ? "" : state.currentFilter);
 
     if (!state.career.myTeam) {
+        const Team* setupTeam = nullptr;
+        for (const auto& team : state.career.allTeams) {
+            if (team.division == state.gameSetup.division && team.name == state.gameSetup.club) {
+                setupTeam = &team;
+                break;
+            }
+        }
+        const bool hasDivision = !state.gameSetup.division.empty();
+        const bool hasClub = setupTeam != nullptr;
+        const bool hasManager = !state.gameSetup.manager.empty();
+        const int completedSteps = static_cast<int>(hasDivision) + static_cast<int>(hasClub) + static_cast<int>(hasManager);
+        const std::string stepLine = state.gameSetup.currentStep == 1 ? "Paso actual: 1. Elige division"
+                                   : state.gameSetup.currentStep == 2 ? "Paso actual: 2. Elige club"
+                                                                      : (state.gameSetup.ready ? "Paso actual: listo para crear carrera"
+                                                                                               : "Paso actual: 3. Nombra al manager");
         model.summary.title = "LaunchChecklistPanel";
-        model.detail.title = "CareerActivationPanel";
-        model.feed.title = "ClubHubPreviewPanel";
+        model.detail.title = "GameSetupStatusPanel";
+        model.feed.title = "GameSetupChecklistPanel";
         model.summary.content =
-            "Arma tu partida\r\n\r\n"
-            "[1] Escoge division\r\n"
-            "Define el universo competitivo y los clubes disponibles.\r\n\r\n"
-            "[2] Elige club\r\n"
-            "Decide si quieres proyecto joven, club vendedor o candidato.\r\n\r\n"
-            "[3] Nombra al manager\r\n"
-            "Ese perfil alimenta la reputacion y la narrativa de carrera.";
+            "Flujo de inicio\r\n\r\n"
+            "[1] Division\r\n"
+            "Estado: " + std::string(hasDivision ? "OK" : "PENDIENTE") + "\r\n"
+            "Actual: " + (hasDivision ? divisionDisplay(state.gameSetup.division) : std::string("Sin elegir")) + "\r\n"
+            "Define el universo competitivo y habilita el listado de clubes.\r\n\r\n"
+            "[2] Club\r\n"
+            "Estado: " + std::string(hasClub ? "OK" : "PENDIENTE") + "\r\n"
+            "Actual: " + (hasClub ? setupTeam->name : std::string("Sin elegir")) + "\r\n"
+            "Presupuesto base: " + (hasClub ? formatMoneyValue(setupTeam->budget) : std::string("No disponible")) + "\r\n\r\n"
+            "[3] Manager\r\n"
+            "Estado: " + std::string(hasManager ? "OK" : "PENDIENTE") + "\r\n"
+            "Actual: " + (hasManager ? state.gameSetup.manager : std::string("Ingresa nombre del manager")) + "\r\n" +
+            (state.gameSetup.managerError.empty() ? std::string("Validacion en vivo activa.") : ("Error: " + state.gameSetup.managerError)) +
+            "\r\n\r\n"
+            "[Desbloqueas al iniciar]\r\n"
+            "- centro del club, partido y clasificacion\r\n"
+            "- mercado, contratos, finanzas y scouting\r\n"
+            "- cantera, directiva y noticias";
         model.detail.content =
-            "Acciones listas\r\n\r\n"
-            "Nueva partida\r\n"
-            "Crea una carrera desde cero con el club elegido.\r\n\r\n"
-            "Cargar\r\n"
-            "Retoma un guardado y vuelve directo al centro del club.\r\n\r\n"
-            "Validar\r\n"
-            "Revisa datos externos o reglas antes de jugar.";
+            "Estado de setup\r\n\r\n"
+            "Division: " + (hasDivision ? divisionDisplay(state.gameSetup.division) : std::string("Pendiente")) + "\r\n"
+            "Club: " + (hasClub ? setupTeam->name : std::string("Pendiente")) + "\r\n"
+            "Manager: " + (hasManager ? state.gameSetup.manager : std::string("Pendiente")) + "\r\n"
+            "Progreso: " + std::to_string(completedSteps) + "/3 pasos completados\r\n"
+            "Inicio habilitado: " + std::string(state.gameSetup.ready ? "SI" : "NO") + "\r\n"
+            + stepLine + "\r\n\r\n"
+            "Validacion automatica\r\n"
+            + (state.gameSetup.ready
+                   ? std::string("No hay errores bloqueantes. Puedes crear la partida ahora.")
+                   : state.gameSetup.inlineMessage + (state.gameSetup.managerError.empty() ? std::string() : "\r\n" + state.gameSetup.managerError))
+            + "\r\n\r\n"
+            "Acciones disponibles\r\n"
+            "- Nueva partida se activa cuando el checklist queda completo.\r\n"
+            "- Cargar abre un guardado existente sin romper este flujo.";
         model.feed.lines.clear();
-        model.feed.lines.push_back("[Centro del club] Partido, clasificacion, estado fisico y alertas en una sola vista.");
-        model.feed.lines.push_back("[Gestion] Mercado, contratos, finanzas, scouting y cantera se desbloquean al iniciar.");
-        model.feed.lines.push_back("[Recomendacion] Un club pequeno muestra mejor el impacto de cantera, sueldos y rotacion.");
-        model.feed.lines.push_back("[Chequeo] Usa Validar si tocaste datos externos o reglas de competicion.");
+        model.feed.lines.push_back(std::string(hasDivision ? "[OK] " : "[X] ") + "Division " + (hasDivision ? "elegida" : "pendiente"));
+        model.feed.lines.push_back(std::string(hasClub ? "[OK] " : "[X] ") + "Club " + (hasClub ? ("elegido: " + setupTeam->name) : "pendiente"));
+        model.feed.lines.push_back(std::string(hasManager ? "[OK] " : "[X] ") + "Manager " + (hasManager ? ("listo: " + state.gameSetup.manager) : "pendiente"));
+        model.feed.lines.push_back(std::string(state.gameSetup.ready ? "[OK] " : "[..] ") + stepLine);
+        model.feed.lines.push_back("[Carga] Usa Cargar si quieres retomar un guardado existente.");
         return model;
     }
 
@@ -128,7 +163,7 @@ GuiPageModel buildSquadModel(AppState& state, bool youthOnly) {
     std::vector<std::string> alerts = buildAlertLines(state.career);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
-    model.metrics = buildMetrics(state.career, alerts);
+    model.metrics = buildMetrics(state, alerts);
     model.infoLine = youthOnly ? "Cantera con filtro por edad y potencial." : "Plantilla completa con orden por columnas y ficha detallada.";
     model.summary.title = youthOnly ? "YouthSummaryPanel" : "SquadSummaryPanel";
     model.primary = state.career.myTeam ? buildSquadUnitModel(*state.career.myTeam) : ListPanelModel{};
@@ -186,7 +221,7 @@ GuiPageModel buildTacticsModel(AppState& state) {
     std::vector<std::string> alerts = buildAlertLines(state.career);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
-    model.metrics = buildMetrics(state.career, alerts);
+    model.metrics = buildMetrics(state, alerts);
     model.infoLine = "Lee el plan tactico, el once inicial y el impacto esperado de cada ajuste.";
     model.summary.title = "TacticalSummary";
     model.primary.title = "TacticsBoard";

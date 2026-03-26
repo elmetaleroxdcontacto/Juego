@@ -40,7 +40,7 @@ std::string breadcrumbFor(GuiPage page);
 bool isCongestedWeek(const Career& career);
 std::string trainingSchedulePreview(const Team& team, bool congestedWeek, std::size_t limit = 3);
 std::string boardStatusLabel(int confidence);
-std::vector<DashboardMetric> buildMetrics(const Career& career, const std::vector<std::string>& alerts);
+std::vector<DashboardMetric> buildMetrics(const AppState& state, const std::vector<std::string>& alerts);
 LeagueTable selectedLeagueTable(const AppState& state);
 std::string findNextMatchLine(const Career& career);
 std::vector<std::vector<std::string> > buildFixtureRows(const Career& career, int limit);
