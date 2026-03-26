@@ -3009,3 +3009,32 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Agregar un modo `F11` o alternador explicito para cambiar entre maximizado, ventana y fullscreen sin borde durante la ejecucion.
 - Afinar el reparto de ancho entre columnas “texto largo” y columnas numericas con reglas especificas por vista para mejorar todavia mas fichajes y noticias.
 - Profundizar la parte visual owner-draw con widgets KPI y tarjetas de resumen mas ricas en el dashboard sin abandonar Win32 puro.
+
+## Auditoria del proyecto (2026-03-25 22:21:51 -03:00) - publicacion en GitHub y registro de entrega
+
+### Lista de cambios realizados
+
+- Se creo el commit `de2bafe` con descripcion amplia de la refactorizacion de simulacion, mercado, desarrollo y modernizacion de la GUI Win32.
+- El repositorio se publico/sincronizo en `origin/main` hacia GitHub.
+- La descripcion del commit incluye:
+- unificacion de salud del jugador y desarrollo mensual
+- mejoras del match engine y reportes
+- rediseno responsive de la GUI con DPI awareness, tablas autoajustables y arranque maximizado
+- verificacion ejecutada con build de tests y suite completa pasando
+
+### Archivos modificados
+
+- `TODO.md`
+
+### Verificacion ejecutada
+
+- `git push origin main`
+- Resultado:
+- cambios publicados correctamente en GitHub sobre `main`
+- GitHub informo que el push omitio la regla de PR para este envio directo, pero la actualizacion quedo aplicada en el remoto
+
+### Mejoras futuras sugeridas
+
+- Si quieres historial mas limpio en futuras entregas, publicar por ramas tematicas (`simulation`, `gui`, `data`) y abrir PRs separados.
+- Repetir esta misma logica con changelog publico en `README.md` o `CHANGELOG.md` para que los cambios importantes tambien se vean fuera del commit log.
+- Si vas a compartir builds, agregar una automatizacion de release con artefacto del `.exe` y notas de version.
