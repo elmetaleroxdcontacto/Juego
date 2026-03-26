@@ -4095,3 +4095,47 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 
 - Agregar una bandera explicita como `--cmake-only` para forzar error si CMake falla y evitar el fallback cuando se quiera depurar exclusivamente esa ruta.
 - Incorporar una verificacion automatica de timestamps o hashes en el script para confirmar visualmente que raiz y `build-cmake\\bin` quedaron sincronizados.
+
+## Auditoria del proyecto (2026-03-26 17:12:17 -03:00) - scroll parcial y repintado estable en la GUI Win32
+
+### Fecha y hora
+
+- `2026-03-26 17:12:17 -03:00`
+
+### Causa raiz detectada
+
+- La GUI estaba aplicando `pageScrollY` a toda la ventana, no solo al contenido central desplazable. Eso hacia que cabecera, menu lateral, metricas y barra de estado se movieran junto con el scroll, provocando recortes arriba y abajo.
+- Ademas, el refresco reentrante no estaba invalidando de forma uniforme todos los controles que cambian entre la portada y las vistas del juego, asi que podian quedar restos visuales de botones o textos de la pantalla anterior.
+
+### Cambios realizados
+
+- Se separo el layout entre controles fijos y controles desplazables dentro de `layoutWindow`.
+- La cabecera superior, la navegacion lateral, los botones principales, el filtro, las metricas y la barra de estado ahora permanecen fijos mientras solo se desplaza el contenido central y derecho.
+- Los paneles de contenido (`summary`, `table`, `squad`, `transfer`, `detail`, `news`) y el estado vacio de inicio ahora usan scroll real sin arrastrar la cabecera.
+- Se elimino el desplazamiento del chrome superior en `paintWindowChrome`, para que el fondo y las tarjetas estructurales no suban ni se recorten al bajar la pagina.
+- Se amplio el set de controles incluidos en el refresco protegido de pagina para limpiar mejor restos del frontend anterior al entrar al dashboard o volver entre vistas.
+
+### Archivos modificados
+
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+- `TODO.md`
+
+### Mejora aplicada al layout
+
+- La ventana ahora se comporta como una interfaz de manager game mas estable: arriba quedan branding, setup, acciones y estados; al centro y derecha se desplazan los paneles largos sin romper la estructura fija.
+
+### Mejora aplicada al scroll vertical
+
+- El scroll vertical ahora recorre el contenido util de la pagina sin cortar division, club, manager, botones de accion ni la barra de estado.
+
+### Chequeos ejecutados
+
+- `cmake --build build-cmake --config Release --target FootballManager`
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `.\\FootballManagerTests.exe`
+
+### Mejoras futuras sugeridas
+
+- Añadir una prueba visual automatizada o smoke test de navegacion entre `MainMenu`, `Dashboard` vacio y `Dashboard` con carrera para detectar fantasmas de repintado.
+- Separar aun mas el area scrollable en una region dedicada para que el `WM_MOUSEWHEEL` pueda discriminar mejor entre panel principal y listas internas.

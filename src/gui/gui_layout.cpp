@@ -111,11 +111,6 @@ HeaderLayoutProfile buildHeaderLayout(const RECT& client) {
     return layout;
 }
 
-RECT offsetRectY(RECT rect, int deltaY) {
-    OffsetRect(&rect, 0, deltaY);
-    return rect;
-}
-
 PageLayoutProfile buildPageLayoutProfile(GuiPage page) {
     switch (page) {
         case GuiPage::MainMenu:
@@ -236,7 +231,6 @@ void drawPlayerDots(HDC hdc,
 void drawTopMetrics(AppState& state, HDC hdc, const RECT& client) {
     const HeaderLayoutProfile header = buildHeaderLayout(client);
     const auto s = [&](int value) { return scaleByDpi(state, value); };
-    const int pageOffsetY = -state.pageScrollY;
     std::vector<DashboardMetric> metrics = state.currentModel.metrics.empty() ? defaultMetrics() : state.currentModel.metrics;
     const int left = s(kWindowPadding + 6);
     const int gap = s(kMetricGap);
@@ -247,7 +241,7 @@ void drawTopMetrics(AppState& state, HDC hdc, const RECT& client) {
     for (size_t i = 0; i < metrics.size() && i < 5; ++i) {
         const int row = static_cast<int>(i) / header.metricColumns;
         const int column = static_cast<int>(i) % header.metricColumns;
-        const int top = s(header.metricTop) + row * (height + gap) + pageOffsetY;
+        const int top = s(header.metricTop) + row * (height + gap);
         RECT card{left + column * (width + gap), top, left + column * (width + gap) + width, top + height};
         drawRoundedPanel(hdc, card, RGB(11, 24, 33), RGB(35, 58, 74), s(14));
 
@@ -943,10 +937,17 @@ void layoutWindow(AppState& state) {
     auto recordBottom = [&](int y, int height) {
         maxContentBottom = std::max(maxContentBottom, y + height);
     };
-    auto placeWindow = [&](HWND hwnd, int x, int y, int width, int height) {
+    auto placeWindowWithMode = [&](HWND hwnd, int x, int y, int width, int height, bool scrollable) {
         if (!hwnd) return;
-        moveControlAndInvalidate(state, hwnd, x, y - state.pageScrollY, width, height);
-        if (IsWindowVisible(hwnd)) recordBottom(y, height);
+        const int targetY = scrollable ? (y - state.pageScrollY) : y;
+        moveControlAndInvalidate(state, hwnd, x, targetY, width, height);
+        if (scrollable && IsWindowVisible(hwnd)) recordBottom(y, height);
+    };
+    auto placeFixedWindow = [&](HWND hwnd, int x, int y, int width, int height) {
+        placeWindowWithMode(hwnd, x, y, width, height, false);
+    };
+    auto placeScrollableWindow = [&](HWND hwnd, int x, int y, int width, int height) {
+        placeWindowWithMode(hwnd, x, y, width, height, true);
     };
     auto syncScrollState = [&]() -> bool {
         const int contentHeight = std::max(static_cast<int>(client.bottom), maxContentBottom + s(6));
@@ -1013,13 +1014,13 @@ void layoutWindow(AppState& state) {
         const int summaryHeight = std::max(s(230), static_cast<int>(client.bottom - panelsTop - s(100)));
         const int detailHeight = std::max(s(170), (summaryHeight - s(40)) / 2);
 
-        placeWindow(state.summaryLabel, shellLeft + s(16), panelsTop, leftWidth, s(kPanelLabelHeight));
-        placeWindow(state.summaryEdit, shellLeft + s(16), panelsTop + s(kPanelBodyOffset), leftWidth, summaryHeight);
-        placeWindow(state.detailLabel, shellLeft + s(34) + leftWidth, panelsTop, rightWidth, s(kPanelLabelHeight));
-        placeWindow(state.detailEdit, shellLeft + s(34) + leftWidth, panelsTop + s(kPanelBodyOffset), rightWidth, detailHeight);
+        placeScrollableWindow(state.summaryLabel, shellLeft + s(16), panelsTop, leftWidth, s(kPanelLabelHeight));
+        placeScrollableWindow(state.summaryEdit, shellLeft + s(16), panelsTop + s(kPanelBodyOffset), leftWidth, summaryHeight);
+        placeScrollableWindow(state.detailLabel, shellLeft + s(34) + leftWidth, panelsTop, rightWidth, s(kPanelLabelHeight));
+        placeScrollableWindow(state.detailEdit, shellLeft + s(34) + leftWidth, panelsTop + s(kPanelBodyOffset), rightWidth, detailHeight);
         const int feedTop = panelsTop + detailHeight + s(44);
-        placeWindow(state.newsLabel, shellLeft + s(34) + leftWidth, feedTop, rightWidth, s(kPanelLabelHeight));
-        placeWindow(state.newsList, shellLeft + s(34) + leftWidth, feedTop + s(kPanelBodyOffset), rightWidth, summaryHeight - detailHeight - s(18));
+        placeScrollableWindow(state.newsLabel, shellLeft + s(34) + leftWidth, feedTop, rightWidth, s(kPanelLabelHeight));
+        placeScrollableWindow(state.newsList, shellLeft + s(34) + leftWidth, feedTop + s(kPanelBodyOffset), rightWidth, summaryHeight - detailHeight - s(18));
 
         if (state.currentPage == GuiPage::MainMenu) {
             const int secondaryTop = buttonTop + s(50);
@@ -1027,20 +1028,20 @@ void layoutWindow(AppState& state) {
             const int secondaryCount = 4;
             const int secondaryWidth = std::max(s(132),
                                                 static_cast<int>((shellWidth - s(32) - secondaryGap * (secondaryCount - 1)) / secondaryCount));
-            placeWindow(state.menuContinueButton, shellLeft + s(16), buttonTop, primaryWidth, s(42));
-            placeWindow(state.menuPlayButton,
+            placeFixedWindow(state.menuContinueButton, shellLeft + s(16), buttonTop, primaryWidth, s(42));
+            placeFixedWindow(state.menuPlayButton,
                         shellLeft + s(16) + primaryWidth + primaryGap,
                         buttonTop,
                         primaryWidth,
                         s(42));
-            placeWindow(state.menuSettingsButton, shellLeft + s(16), secondaryTop, secondaryWidth, s(40));
-            placeWindow(state.menuLoadButton, shellLeft + s(16) + (secondaryWidth + secondaryGap), secondaryTop, secondaryWidth, s(40));
-            placeWindow(state.menuCreditsButton,
+            placeFixedWindow(state.menuSettingsButton, shellLeft + s(16), secondaryTop, secondaryWidth, s(40));
+            placeFixedWindow(state.menuLoadButton, shellLeft + s(16) + (secondaryWidth + secondaryGap), secondaryTop, secondaryWidth, s(40));
+            placeFixedWindow(state.menuCreditsButton,
                         shellLeft + s(16) + (secondaryWidth + secondaryGap) * 2,
                         secondaryTop,
                         secondaryWidth,
                         s(40));
-            placeWindow(state.menuExitButton,
+            placeFixedWindow(state.menuExitButton,
                         shellLeft + s(16) + (secondaryWidth + secondaryGap) * 3,
                         secondaryTop,
                         secondaryWidth,
@@ -1064,16 +1065,16 @@ void layoutWindow(AppState& state) {
         } else if (state.currentPage == GuiPage::Settings) {
             const int settingsWidth = clampValue((shellWidth - s(44)) / 2, s(280), s(420));
             const int rightColumnLeft = shellLeft + s(28) + settingsWidth;
-            placeWindow(state.menuVolumeButton, shellLeft + s(16), buttonTop, settingsWidth, s(38));
-            placeWindow(state.menuDifficultyButton, rightColumnLeft, buttonTop, settingsWidth, s(38));
-            placeWindow(state.menuSpeedButton, shellLeft + s(16), buttonTop + s(46), settingsWidth, s(38));
-            placeWindow(state.menuSimulationButton, rightColumnLeft, buttonTop + s(46), settingsWidth, s(38));
-            placeWindow(state.menuLanguageButton, shellLeft + s(16), buttonTop + s(92), settingsWidth, s(38));
-            placeWindow(state.menuTextSpeedButton, rightColumnLeft, buttonTop + s(92), settingsWidth, s(38));
-            placeWindow(state.menuVisualButton, shellLeft + s(16), buttonTop + s(138), settingsWidth, s(38));
-            placeWindow(state.menuMusicModeButton, rightColumnLeft, buttonTop + s(138), settingsWidth, s(38));
-            placeWindow(state.menuAudioFadeButton, shellLeft + s(16), buttonTop + s(184), settingsWidth, s(38));
-            placeWindow(state.menuBackButton, rightColumnLeft, buttonTop + s(184), settingsWidth, s(36));
+            placeFixedWindow(state.menuVolumeButton, shellLeft + s(16), buttonTop, settingsWidth, s(38));
+            placeFixedWindow(state.menuDifficultyButton, rightColumnLeft, buttonTop, settingsWidth, s(38));
+            placeFixedWindow(state.menuSpeedButton, shellLeft + s(16), buttonTop + s(46), settingsWidth, s(38));
+            placeFixedWindow(state.menuSimulationButton, rightColumnLeft, buttonTop + s(46), settingsWidth, s(38));
+            placeFixedWindow(state.menuLanguageButton, shellLeft + s(16), buttonTop + s(92), settingsWidth, s(38));
+            placeFixedWindow(state.menuTextSpeedButton, rightColumnLeft, buttonTop + s(92), settingsWidth, s(38));
+            placeFixedWindow(state.menuVisualButton, shellLeft + s(16), buttonTop + s(138), settingsWidth, s(38));
+            placeFixedWindow(state.menuMusicModeButton, rightColumnLeft, buttonTop + s(138), settingsWidth, s(38));
+            placeFixedWindow(state.menuAudioFadeButton, shellLeft + s(16), buttonTop + s(184), settingsWidth, s(38));
+            placeFixedWindow(state.menuBackButton, rightColumnLeft, buttonTop + s(184), settingsWidth, s(36));
             setControlVisibility(state, state.menuContinueButton, false);
             setControlVisibility(state, state.menuPlayButton, false);
             setControlVisibility(state, state.menuSettingsButton, false);
@@ -1091,7 +1092,7 @@ void layoutWindow(AppState& state) {
             setControlVisibility(state, state.menuMusicModeButton, true);
             setControlVisibility(state, state.menuAudioFadeButton, true);
         } else {
-            placeWindow(state.menuBackButton, shellLeft + s(16), buttonTop, s(220), s(38));
+            placeFixedWindow(state.menuBackButton, shellLeft + s(16), buttonTop, s(220), s(38));
             setControlVisibility(state, state.menuContinueButton, false);
             setControlVisibility(state, state.menuPlayButton, false);
             setControlVisibility(state, state.menuSettingsButton, false);
@@ -1110,7 +1111,7 @@ void layoutWindow(AppState& state) {
             setControlVisibility(state, state.menuAudioFadeButton, false);
         }
 
-        placeWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20));
+        placeFixedWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20));
         if (syncScrollState()) return;
         return;
     }
@@ -1136,7 +1137,7 @@ void layoutWindow(AppState& state) {
             buttonTop += primaryButtonHeight + s(kHeaderRowGap);
         }
         buttonRight -= width;
-        placeWindow(hwnd, buttonRight, buttonTop, width, primaryButtonHeight);
+        placeFixedWindow(hwnd, buttonRight, buttonTop, width, primaryButtonHeight);
         if (buttonTop == s(header.buttonsTop)) topRowLeftmostButton = std::min(topRowLeftmostButton, buttonRight);
         buttonRight -= buttonGap;
     };
@@ -1162,8 +1163,8 @@ void layoutWindow(AppState& state) {
 
     auto placeFieldBlock = [&](HWND label, int labelWidth, HWND field, int inputOffset, int x, int y, int width, int controlHeight) {
         int fieldWidth = std::max(s(150), width - inputOffset);
-        placeWindow(label, x, y + s(4), labelWidth, s(22));
-        placeWindow(field, x + inputOffset, y, fieldWidth, controlHeight);
+        placeFixedWindow(label, x, y + s(4), labelWidth, s(22));
+        placeFixedWindow(field, x + inputOffset, y, fieldWidth, controlHeight);
         if (field == state.managerEdit) {
             managerFieldLeft = x + inputOffset;
             managerFieldTop = y;
@@ -1194,7 +1195,7 @@ void layoutWindow(AppState& state) {
         placeFieldBlock(state.teamLabel, s(46), state.teamCombo, s(56), teamX, fieldTop, teamBlockWidth, s(420));
         placeFieldBlock(state.managerLabel, s(78), state.managerEdit, s(86), managerX, fieldTop, managerBlockWidth, fieldHeight);
     }
-    placeWindow(state.managerHelpLabel,
+    placeFixedWindow(state.managerHelpLabel,
                 managerFieldLeft,
                 managerFieldTop + fieldHeight + s(3),
                 managerFieldWidth,
@@ -1207,15 +1208,15 @@ void layoutWindow(AppState& state) {
         state.transfersButton, state.financesButton, state.youthButton, state.boardButton, state.newsButton
     };
     for (HWND button : pages) {
-        placeWindow(button, sideX, navY, sideWidth, s(40));
+        placeFixedWindow(button, sideX, navY, sideWidth, s(40));
         navY += s(48);
     }
 
-    placeWindow(state.breadcrumbLabel, contentLeft, topBarHeight + s(12), contentWidth, s(20));
-    placeWindow(state.pageTitleLabel, contentLeft, topBarHeight + s(38), contentWidth, s(32));
-    placeWindow(state.infoLabel, contentLeft, topBarHeight + s(74), contentWidth, s(24));
-    placeWindow(state.filterLabel, infoLeft + s(6), topBarHeight + s(40), s(56), s(20));
-    placeWindow(state.filterCombo, infoLeft + s(68), topBarHeight + s(36), infoWidth - s(68), s(320));
+    placeFixedWindow(state.breadcrumbLabel, contentLeft, topBarHeight + s(12), contentWidth, s(20));
+    placeFixedWindow(state.pageTitleLabel, contentLeft, topBarHeight + s(38), contentWidth, s(32));
+    placeFixedWindow(state.infoLabel, contentLeft, topBarHeight + s(74), contentWidth, s(24));
+    placeFixedWindow(state.filterLabel, infoLeft + s(6), topBarHeight + s(40), s(56), s(20));
+    placeFixedWindow(state.filterCombo, infoLeft + s(68), topBarHeight + s(36), infoWidth - s(68), s(320));
 
     showActionButtonsForPage(state);
     std::vector<ActionButtonRef> visibleButtons = {
@@ -1237,7 +1238,7 @@ void layoutWindow(AppState& state) {
             actionX = contentLeft;
             actionY += s(36);
         }
-        placeWindow(action.hwnd, actionX, actionY, action.width, s(28));
+        placeFixedWindow(action.hwnd, actionX, actionY, action.width, s(28));
         actionX += action.width + s(10);
         lastActionBottom = actionY + s(28);
     }
@@ -1260,22 +1261,22 @@ void layoutWindow(AppState& state) {
         const int buttonWidth = clampValue((contentWidth - s(48)) / 2, s(164), s(212));
         const int emptyButtonTop = panelsTop + summaryHeight - s(62);
 
-        placeWindow(state.summaryLabel, contentLeft, panelsTop, contentWidth, s(kPanelLabelHeight));
-        placeWindow(state.summaryEdit, contentLeft, panelsTop + s(kPanelBodyOffset), contentWidth, summaryHeight);
+        placeScrollableWindow(state.summaryLabel, contentLeft, panelsTop, contentWidth, s(kPanelLabelHeight));
+        placeScrollableWindow(state.summaryEdit, contentLeft, panelsTop + s(kPanelBodyOffset), contentWidth, summaryHeight);
 
-        placeWindow(state.detailLabel, infoLeft, panelsTop, infoWidth, s(kPanelLabelHeight));
-        placeWindow(state.detailEdit, infoLeft, panelsTop + s(kPanelBodyOffset), infoWidth, sideHeight);
+        placeScrollableWindow(state.detailLabel, infoLeft, panelsTop, infoWidth, s(kPanelLabelHeight));
+        placeScrollableWindow(state.detailEdit, infoLeft, panelsTop + s(kPanelBodyOffset), infoWidth, sideHeight);
 
         int newsTop = panelsTop + sideHeight + s(kPanelSectionGap);
-        placeWindow(state.newsLabel, infoLeft, newsTop, infoWidth, s(kPanelLabelHeight));
-        placeWindow(state.newsList, infoLeft, newsTop + s(kPanelBodyOffset), infoWidth, summaryHeight - sideHeight - s(28));
-        placeWindow(state.emptyNewButton, contentLeft + s(20), emptyButtonTop, buttonWidth, s(34));
-        placeWindow(state.emptyLoadButton, contentLeft + s(28) + buttonWidth, emptyButtonTop, buttonWidth, s(34));
+        placeScrollableWindow(state.newsLabel, infoLeft, newsTop, infoWidth, s(kPanelLabelHeight));
+        placeScrollableWindow(state.newsList, infoLeft, newsTop + s(kPanelBodyOffset), infoWidth, summaryHeight - sideHeight - s(28));
+        placeScrollableWindow(state.emptyNewButton, contentLeft + s(20), emptyButtonTop, buttonWidth, s(34));
+        placeScrollableWindow(state.emptyLoadButton, contentLeft + s(28) + buttonWidth, emptyButtonTop, buttonWidth, s(34));
         setControlVisibility(state, state.emptyNewButton, true);
         setControlVisibility(state, state.emptyLoadButton, true);
         setControlVisibility(state, state.emptyValidateButton, false);
 
-        placeWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20));
+        placeFixedWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20));
         if (syncScrollState()) return;
         return;
     }
@@ -1284,34 +1285,34 @@ void layoutWindow(AppState& state) {
     ShowWindow(state.emptyLoadButton, SW_HIDE);
     ShowWindow(state.emptyValidateButton, SW_HIDE);
 
-    placeWindow(state.summaryLabel, contentLeft, panelsTop, summaryWidth, s(kPanelLabelHeight));
-    placeWindow(state.summaryEdit, contentLeft, panelsTop + s(kPanelBodyOffset), summaryWidth, topPanelHeight);
-    placeWindow(state.tableLabel, contentLeft + summaryWidth + padding, panelsTop, tableWidth, s(kPanelLabelHeight));
-    placeWindow(state.tableList, contentLeft + summaryWidth + padding, panelsTop + s(kPanelBodyOffset), tableWidth, topPanelHeight);
+    placeScrollableWindow(state.summaryLabel, contentLeft, panelsTop, summaryWidth, s(kPanelLabelHeight));
+    placeScrollableWindow(state.summaryEdit, contentLeft, panelsTop + s(kPanelBodyOffset), summaryWidth, topPanelHeight);
+    placeScrollableWindow(state.tableLabel, contentLeft + summaryWidth + padding, panelsTop, tableWidth, s(kPanelLabelHeight));
+    placeScrollableWindow(state.tableList, contentLeft + summaryWidth + padding, panelsTop + s(kPanelBodyOffset), tableWidth, topPanelHeight);
 
     int secondTop = panelsTop + topPanelHeight + s(kPanelSectionGap);
-    placeWindow(state.squadLabel, contentLeft, secondTop, contentWidth, s(kPanelLabelHeight));
-    placeWindow(state.squadList, contentLeft, secondTop + s(kPanelBodyOffset), contentWidth, midPanelHeight);
+    placeScrollableWindow(state.squadLabel, contentLeft, secondTop, contentWidth, s(kPanelLabelHeight));
+    placeScrollableWindow(state.squadList, contentLeft, secondTop + s(kPanelBodyOffset), contentWidth, midPanelHeight);
 
     int footerTop = secondTop + midPanelHeight + s(kPanelSectionGap);
-    placeWindow(state.transferLabel, contentLeft, footerTop, contentWidth, s(kPanelLabelHeight));
-    placeWindow(state.transferList, contentLeft, footerTop + s(kPanelBodyOffset), contentWidth, footerHeight);
+    placeScrollableWindow(state.transferLabel, contentLeft, footerTop, contentWidth, s(kPanelLabelHeight));
+    placeScrollableWindow(state.transferList, contentLeft, footerTop + s(kPanelBodyOffset), contentWidth, footerHeight);
 
     if (dashboardLayout) {
-        placeWindow(state.detailLabel, infoLeft, secondTop, infoWidth, s(kPanelLabelHeight));
-        placeWindow(state.detailEdit, infoLeft, secondTop + s(kPanelBodyOffset), infoWidth, s(pageLayout.dashboardDetailHeight));
+        placeScrollableWindow(state.detailLabel, infoLeft, secondTop, infoWidth, s(kPanelLabelHeight));
+        placeScrollableWindow(state.detailEdit, infoLeft, secondTop + s(kPanelBodyOffset), infoWidth, s(pageLayout.dashboardDetailHeight));
         int newsTop = secondTop + s(kPanelBodyOffset) + s(pageLayout.dashboardDetailHeight) + s(26);
-        placeWindow(state.newsLabel, infoLeft, newsTop, infoWidth, s(kPanelLabelHeight));
-        placeWindow(state.newsList, infoLeft, newsTop + s(kPanelBodyOffset), infoWidth, client.bottom - (newsTop + s(kPanelBodyOffset)) - s(58));
+        placeScrollableWindow(state.newsLabel, infoLeft, newsTop, infoWidth, s(kPanelLabelHeight));
+        placeScrollableWindow(state.newsList, infoLeft, newsTop + s(kPanelBodyOffset), infoWidth, client.bottom - (newsTop + s(kPanelBodyOffset)) - s(58));
     } else {
-        placeWindow(state.detailLabel, infoLeft, panelsTop, infoWidth, s(kPanelLabelHeight));
-        placeWindow(state.detailEdit, infoLeft, panelsTop + s(kPanelBodyOffset), infoWidth, topPanelHeight + s(pageLayout.nonDashboardDetailExtra));
+        placeScrollableWindow(state.detailLabel, infoLeft, panelsTop, infoWidth, s(kPanelLabelHeight));
+        placeScrollableWindow(state.detailEdit, infoLeft, panelsTop + s(kPanelBodyOffset), infoWidth, topPanelHeight + s(pageLayout.nonDashboardDetailExtra));
         int feedTop = panelsTop + topPanelHeight + s(pageLayout.nonDashboardDetailExtra) + s(42);
-        placeWindow(state.newsLabel, infoLeft, feedTop, infoWidth, s(kPanelLabelHeight));
-        placeWindow(state.newsList, infoLeft, feedTop + s(kPanelBodyOffset), infoWidth, client.bottom - feedTop - s(60));
+        placeScrollableWindow(state.newsLabel, infoLeft, feedTop, infoWidth, s(kPanelLabelHeight));
+        placeScrollableWindow(state.newsList, infoLeft, feedTop + s(kPanelBodyOffset), infoWidth, client.bottom - feedTop - s(60));
     }
 
-    placeWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20));
+    placeFixedWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20));
     if (syncScrollState()) return;
 }
 
@@ -1452,15 +1453,13 @@ void paintWindowChrome(AppState& state, HDC hdc) {
     RECT client{};
     GetClientRect(state.window, &client);
     const auto s = [&](int value) { return scaleByDpi(state, value); };
-    const int pageOffsetY = -state.pageScrollY;
-    const auto shiftRect = [&](RECT rect) { return offsetRectY(rect, pageOffsetY); };
     const HeaderLayoutProfile header = buildHeaderLayout(client);
     FillRect(hdc, &client, state.backgroundBrush ? state.backgroundBrush : static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
     state.insightHotspots.clear();
 
     if (isFrontMenuPage(state.currentPage)) {
         const bool highContrastFrontend = state.settings.visualProfile == VisualProfile::HighContrast;
-        RECT hero = shiftRect(RECT{s(18), s(18), client.right - s(18), client.bottom - s(44)});
+        RECT hero{ s(18), s(18), client.right - s(18), client.bottom - s(44) };
         drawRoundedPanel(hdc,
                          hero,
                          highContrastFrontend ? RGB(6, 18, 25) : RGB(9, 22, 30),
@@ -1548,15 +1547,15 @@ void paintWindowChrome(AppState& state, HDC hdc) {
         return;
     }
 
-    RECT topBar = shiftRect(RECT{0, 0, client.right, s(header.topBarHeight) - s(10)});
+    RECT topBar{0, 0, client.right, s(header.topBarHeight) - s(10)};
     FillRect(hdc, &topBar, state.headerBrush ? state.headerBrush : state.backgroundBrush);
-    drawRoundedPanel(hdc, shiftRect(RECT{s(8), s(8), client.right - s(8), s(header.topBarHeight) - s(12)}), RGB(10, 23, 30), RGB(28, 53, 65), s(18));
+    drawRoundedPanel(hdc, RECT{s(8), s(8), client.right - s(8), s(header.topBarHeight) - s(12)}, RGB(10, 23, 30), RGB(28, 53, 65), s(18));
     drawTopMetrics(state, hdc, client);
 
-    RECT sideMenu = shiftRect(RECT{s(8), s(header.topBarHeight), s(8) + s(header.sideWidth), client.bottom - s(34)});
+    RECT sideMenu{ s(8), s(header.topBarHeight), s(8) + s(header.sideWidth), client.bottom - s(34) };
     drawRoundedPanel(hdc, sideMenu, RGB(12, 23, 31), RGB(34, 57, 70), s(18));
 
-    RECT contentShell = shiftRect(RECT{s(kWindowPadding + header.sideWidth + 6), s(header.topBarHeight), client.right - s(kWindowPadding), client.bottom - s(34)});
+    RECT contentShell{ s(kWindowPadding + header.sideWidth + 6), s(header.topBarHeight), client.right - s(kWindowPadding), client.bottom - s(34) };
     drawRoundedPanel(hdc, contentShell, RGB(10, 21, 29), RGB(32, 53, 66), s(22));
 
     RECT summaryCard = expandedRect(childRectOnParent(state.summaryEdit, state.window), s(8), s(24));
@@ -1600,7 +1599,7 @@ void paintWindowChrome(AppState& state, HDC hdc) {
         }
     }
 
-    RECT menuTitle = shiftRect(RECT{s(20), s(header.topBarHeight + 10), s(header.sideWidth - 10), s(header.topBarHeight + 34)});
+    RECT menuTitle{ s(20), s(header.topBarHeight + 10), s(header.sideWidth - 10), s(header.topBarHeight + 34) };
     SetBkMode(hdc, TRANSPARENT);
     SetTextColor(hdc, kThemeMuted);
     HGDIOBJ oldFont = SelectObject(hdc, state.sectionFont ? state.sectionFont : state.font);

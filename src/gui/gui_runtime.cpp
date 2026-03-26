@@ -19,6 +19,12 @@ namespace {
 
 std::vector<HWND> pageRefreshTargets(const AppState& state) {
     return {
+        state.divisionLabel, state.teamLabel, state.managerLabel, state.managerHelpLabel,
+        state.divisionCombo, state.teamCombo, state.managerEdit,
+        state.newCareerButton, state.loadButton, state.saveButton, state.simulateButton, state.validateButton,
+        state.displayModeButton, state.frontMenuButton,
+        state.dashboardButton, state.squadButton, state.tacticsButton, state.calendarButton, state.leagueButton,
+        state.transfersButton, state.financesButton, state.youthButton, state.boardButton, state.newsButton,
         state.pageTitleLabel, state.breadcrumbLabel, state.infoLabel, state.filterLabel, state.filterCombo,
         state.summaryLabel, state.summaryEdit, state.tableLabel, state.tableList,
         state.squadLabel, state.squadList, state.transferLabel, state.transferList,
@@ -26,6 +32,10 @@ std::vector<HWND> pageRefreshTargets(const AppState& state) {
         state.scoutActionButton, state.shortlistButton, state.followShortlistButton, state.buyButton,
         state.preContractButton, state.renewButton, state.sellButton, state.planButton, state.instructionButton,
         state.youthUpgradeButton, state.trainingUpgradeButton, state.scoutingUpgradeButton, state.stadiumUpgradeButton,
+        state.menuContinueButton, state.menuPlayButton, state.menuSettingsButton, state.menuLoadButton,
+        state.menuCreditsButton, state.menuExitButton, state.menuBackButton, state.menuVolumeButton,
+        state.menuDifficultyButton, state.menuSpeedButton, state.menuSimulationButton, state.menuLanguageButton,
+        state.menuTextSpeedButton, state.menuVisualButton, state.menuMusicModeButton, state.menuAudioFadeButton,
         state.emptyNewButton, state.emptyLoadButton, state.emptyValidateButton
     };
 }
