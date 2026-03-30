@@ -4218,3 +4218,52 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - Persisten archivos monolíticos y de transición (`models.cpp`, `app_services.cpp`, `save_serialization.cpp`, `project_tests.cpp`).
   - El repo mantiene código legacy paralelo al stack nuevo de estado/serialización, incluyendo una versión de save antigua todavía presente en `models.cpp`.
   - La suite automatizada cubre bastante lógica de dominio, pero no incluye GUI Win32 ni flujos interactivos reales de CLI, por lo que regresiones de layout, fullscreen, scroll e input no quedan protegidas.
+
+## Auditoría técnica completa del repositorio - seguimiento de estabilización
+
+- Fecha y hora:
+  - `2026-03-30 11:57:12 -03:00`
+
+- Auditoría realizada:
+  - Revisión completa de build, persistencia, validadores, flujo CLI/GUI y consistencia entre `FootballManagerTests` y `FootballManagerCLI --validate`.
+  - Recompilación de `FootballManager`, `FootballManagerCLI` y `FootballManagerTests`.
+  - Ejecución secuencial de tests automatizados, validación CLI y smoke test de arranque Win32.
+  - Verificación estructural del save temporal `saves/validation_career_save_runtime.txt` tras guardar y recargar.
+
+- Bugs encontrados:
+  - Atributos de `Player` quedaban sin inicializar al cargar/generar planteles, introduciendo UB y perfiles fuera de rango.
+  - La validación CLI de guardado/carga podía fallar por esa UB aunque la suite de tests pasara en otro proceso.
+  - El reemplazo de saves en Windows podía dejar bloques `PLAYER`/`ENDTEAM` residuales al sobrescribir un archivo previo.
+
+- Bugs corregidos:
+  - Se inicializaron de forma segura los campos escalares de `Player` en `include/engine/models.h`.
+  - Se amplió la auditoría de datos en `src/validators/validators.cpp` para validar consistencia, big matches, forma, disciplina táctica, versatilidad, impulso moral, carga de fatiga y semanas de descontento.
+  - Se endureció el reemplazo de archivos en `src/io/save_manager.cpp` para priorizar `ReplaceFileW` cuando el target ya existe y evitar residuos al sobrescribir.
+  - Se agregaron pruebas automatizadas en `tests/project_tests.cpp` para perfilar rangos cargados y para comprobar que un overwrite de save no conserva bloques sobrantes.
+
+- Archivos modificados:
+  - `include/engine/models.h`
+  - `src/io/save_manager.cpp`
+  - `src/validators/validators.cpp`
+  - `tests/project_tests.cpp`
+
+- Tests ejecutados:
+  - `.\build-cmake\bin\FootballManagerTests.exe`
+  - `.\build-cmake\bin\FootballManagerCLI.exe --validate`
+
+- Validaciones realizadas:
+  - Build correcto de `FootballManager`, `FootballManagerCLI` y `FootballManagerTests`.
+  - Suite de tests completa en verde, incluyendo nuevas pruebas `loaded_player_profiles` y `save_overwrite_structure`.
+  - CLI `--validate` en verde con suite lógica y auditoría de datos sin fallas.
+  - Smoke test de arranque del ejecutable Win32: el proceso `FootballManager.exe` abrió y se mantuvo vivo durante la comprobación.
+  - Save de validación consistente tras la corrección: conteos declarados y líneas reales de `TEAM`/`PLAYER`/`ENDTEAM` quedaron alineados.
+
+- Deuda técnica pendiente:
+  - La validación visual profunda de GUI Win32 sigue siendo parcial: se confirmó arranque, pero no hubo automatización fiable para inspeccionar resize, maximizado y fullscreen con aserciones visuales.
+  - Persisten módulos grandes y de alta responsabilidad (`project_tests.cpp`, `validators.cpp`, `save_serialization.cpp`, `career_state.cpp`).
+  - Sigue existiendo código legacy deshabilitado en `src/engine/models.cpp`, lo que aumenta fricción de mantenimiento.
+
+- Mejoras futuras sugeridas:
+  - Aislar helpers de persistencia y validación en módulos más pequeños para reducir superficie de regresión.
+  - Añadir smoke tests no interactivos de GUI Win32 para `WM_SIZE`, maximizado y fullscreen.
+  - Crear una ruta de save temporal por proceso en validación para evitar colisiones si se ejecutan varias auditorías al mismo tiempo.

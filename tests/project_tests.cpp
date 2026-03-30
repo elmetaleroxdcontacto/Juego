@@ -80,6 +80,14 @@ string replaceAllCopy(string text, const string& needle, const string& replaceme
     return text;
 }
 
+int countLinesStartingWith(const vector<string>& lines, const string& prefix) {
+    int count = 0;
+    for (const string& line : lines) {
+        if (line.rfind(prefix, 0) == 0) count++;
+    }
+    return count;
+}
+
 Player makePlayer(const string& name,
                   const string& position,
                   int skill,
@@ -216,6 +224,34 @@ void testValidationSuiteReflectsRosterAudit() {
                "El resumen de validacion debe informar errores de datos.");
     } else {
         expect(summary.ok, "La suite debe quedar sana cuando no existen errores de datos ni fallas logicas.");
+    }
+}
+
+void testLoadedPlayersHaveBoundedProfileMetrics() {
+    Career career;
+    career.initializeLeague(true);
+    expect(!career.allTeams.empty(), "La auditoria de perfiles necesita equipos cargados.");
+
+    for (const Team& team : career.allTeams) {
+        expect(!team.players.empty(), "Cada club cargado debe conservar jugadores.");
+        for (const Player& player : team.players) {
+            expect(player.consistency >= 1 && player.consistency <= 100,
+                   "La consistencia cargada debe quedar dentro de rango.");
+            expect(player.bigMatches >= 1 && player.bigMatches <= 100,
+                   "El atributo de partidos grandes debe quedar dentro de rango.");
+            expect(player.currentForm >= 1 && player.currentForm <= 100,
+                   "La forma actual debe quedar dentro de rango.");
+            expect(player.tacticalDiscipline >= 1 && player.tacticalDiscipline <= 100,
+                   "La disciplina tactica debe quedar dentro de rango.");
+            expect(player.versatility >= 1 && player.versatility <= 100,
+                   "La versatilidad debe quedar dentro de rango.");
+            expect(player.moraleMomentum >= -25 && player.moraleMomentum <= 25,
+                   "El impulso moral no puede salir del rango operativo.");
+            expect(player.fatigueLoad >= 0 && player.fatigueLoad <= 100,
+                   "La carga de fatiga debe quedar dentro de 0-100.");
+            expect(player.unhappinessWeeks >= 0 && player.unhappinessWeeks <= 52,
+                   "Las semanas de descontento deben quedar acotadas.");
+        }
     }
 }
 
@@ -1786,6 +1822,57 @@ void testSaveCareerCreatesNestedDirectory() {
     std::remove((savePath + ".bak").c_str());
 }
 
+void testSaveCareerOverwriteDoesNotKeepTrailingBlocks() {
+    const string savePath = "saves/test_overwrite_structure_save.txt";
+    const string resolvedSavePath = resolveProjectPath(savePath);
+    std::remove(resolvedSavePath.c_str());
+    std::remove((resolvedSavePath + ".bak").c_str());
+
+    Career large;
+    large.currentSeason = 2;
+    large.currentWeek = 6;
+    large.allTeams.push_back(makeTeam("Grande FC", "primera division", 72, 3, 3, "Balanced", "Equilibrado", 900000));
+    large.allTeams.push_back(makeTeam("Grande Rival", "primera division", 69, 3, 3, "Balanced", "Equilibrado", 820000));
+    large.allTeams.push_back(makeTeam("Grande Tercero", "primera division", 67, 2, 2, "Balanced", "Equilibrado", 760000));
+    large.setActiveDivision("primera division");
+    large.myTeam = large.findTeamByName("Grande FC");
+    expect(large.myTeam != nullptr, "La prueba de overwrite necesita club usuario en el save grande.");
+    large.saveFile = savePath;
+    expect(large.saveCareer(), "El save grande debe escribirse correctamente.");
+
+    Career compact;
+    compact.currentSeason = 3;
+    compact.currentWeek = 2;
+    compact.allTeams.push_back(makeTeam("Compacto FC", "primera division", 68, 3, 3, "Balanced", "Equilibrado", 700000));
+    compact.allTeams.push_back(makeTeam("Compacto Rival", "primera division", 66, 2, 2, "Balanced", "Equilibrado", 620000));
+    compact.setActiveDivision("primera division");
+    compact.myTeam = compact.findTeamByName("Compacto FC");
+    expect(compact.myTeam != nullptr, "La prueba de overwrite necesita club usuario en el save compacto.");
+    compact.saveFile = savePath;
+    expect(compact.saveCareer(), "El save compacto debe sobrescribir el archivo previo.");
+
+    vector<string> lines;
+    expect(readTextFileLines(savePath, lines), "La prueba de overwrite necesita leer el save resultante.");
+
+    int declaredTeams = -1;
+    int declaredPlayers = 0;
+    for (const string& line : lines) {
+        if (line.rfind("TEAMS ", 0) == 0) declaredTeams = stoi(trim(line.substr(6)));
+        if (line.rfind("PLAYERS ", 0) == 0) declaredPlayers += stoi(trim(line.substr(8)));
+    }
+
+    expect(declaredTeams == 2, "El save compacto debe declarar exactamente dos equipos.");
+    expect(countLinesStartingWith(lines, "TEAM ") == declaredTeams,
+           "El archivo final no debe conservar bloques TEAM sobrantes.");
+    expect(countLinesStartingWith(lines, "ENDTEAM") == declaredTeams,
+           "El archivo final no debe conservar cierres ENDTEAM sobrantes.");
+    expect(countLinesStartingWith(lines, "PLAYER ") == declaredPlayers,
+           "El archivo final no debe conservar lineas PLAYER sobrantes tras sobrescribir.");
+
+    std::remove(resolvedSavePath.c_str());
+    std::remove((resolvedSavePath + ".bak").c_str());
+}
+
 void testProjectPathsResolveFromNestedWorkingDirectory() {
     const string probeDir = resolveProjectPath("saves/runtime_cwd_probe/nested");
     expect(ensureDirectory(probeDir), "La prueba de cwd necesita crear un directorio de trabajo anidado.");
@@ -1830,6 +1917,7 @@ void testProjectPathsResolveFromNestedWorkingDirectory() {
 int main() {
     const vector<pair<string, void (*)()>> tests = {
         {"validation_suite", testValidationSuiteReflectsRosterAudit},
+        {"loaded_player_profiles", testLoadedPlayersHaveBoundedProfileMetrics},
         {"match_engine_structure", testMatchSimulationProducesStructuredPhases},
         {"tactical_fatigue", testHighPressRaisesPhaseFatigue},
         {"low_block_chance_quality", testLowBlockSuppressesChanceQuality},
@@ -1879,6 +1967,7 @@ int main() {
         {"teams_txt_folder_aliases", testTeamsTxtFolderAliasesDoNotTriggerOrphanWarnings},
         {"negotiation_agent_costs", testNegotiationTracksAgentCosts},
         {"save_backup", testSaveCareerCreatesBackup},
+        {"save_overwrite_structure", testSaveCareerOverwriteDoesNotKeepTrailingBlocks},
         {"save_nested_directory", testSaveCareerCreatesNestedDirectory},
         {"project_root_paths", testProjectPathsResolveFromNestedWorkingDirectory},
         {"simulate_match_state", testSimulateMatchAppliesPostProcessState},

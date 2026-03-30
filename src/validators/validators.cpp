@@ -1054,6 +1054,14 @@ DataValidationReport buildRosterDataValidationReport() {
             checkRange(player.fitness, "Fitness", 1, 100);
             checkRange(player.skill, "Media", 1, 100);
             checkRange(player.potential, "Potencial", 1, 100);
+            checkRange(player.consistency, "Consistencia", 1, 100);
+            checkRange(player.bigMatches, "Partidos grandes", 1, 100);
+            checkRange(player.currentForm, "Forma actual", 1, 100);
+            checkRange(player.tacticalDiscipline, "Disciplina tactica", 1, 100);
+            checkRange(player.versatility, "Versatilidad", 1, 100);
+            checkRange(player.moraleMomentum, "Impulso moral", -25, 25);
+            checkRange(player.fatigueLoad, "Carga de fatiga", 0, 100);
+            checkRange(player.unhappinessWeeks, "Semanas de descontento", 0, 52);
             if (player.potential < player.skill) {
                 addDataIssue(report,
                              "ERROR",

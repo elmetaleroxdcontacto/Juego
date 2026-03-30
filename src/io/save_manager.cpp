@@ -54,14 +54,12 @@ bool replaceFileAtomically(const string& sourcePath, const string& targetPath) {
     const wstring wideTarget = utf8ToWidePath(targetPath);
     if (wideSource.empty() || wideTarget.empty()) return false;
 
-    if (MoveFileExW(wideSource.c_str(),
-                    wideTarget.c_str(),
-                    MOVEFILE_REPLACE_EXISTING | MOVEFILE_COPY_ALLOWED | MOVEFILE_WRITE_THROUGH) != 0) {
-        return true;
-    }
-
     const DWORD targetAttributes = GetFileAttributesW(wideTarget.c_str());
     if (targetAttributes != INVALID_FILE_ATTRIBUTES) {
+        if ((targetAttributes & FILE_ATTRIBUTE_READONLY) != 0) {
+            SetFileAttributesW(wideTarget.c_str(), targetAttributes & ~FILE_ATTRIBUTE_READONLY);
+        }
+
         if (ReplaceFileW(wideTarget.c_str(),
                          wideSource.c_str(),
                          nullptr,
@@ -71,13 +69,12 @@ bool replaceFileAtomically(const string& sourcePath, const string& targetPath) {
             return true;
         }
 
-        if ((targetAttributes & FILE_ATTRIBUTE_READONLY) != 0) {
-            SetFileAttributesW(wideTarget.c_str(), targetAttributes & ~FILE_ATTRIBUTE_READONLY);
-        }
         DeleteFileW(wideTarget.c_str());
         if (MoveFileExW(wideSource.c_str(), wideTarget.c_str(), MOVEFILE_WRITE_THROUGH) != 0) {
             return true;
         }
+    } else if (MoveFileExW(wideSource.c_str(), wideTarget.c_str(), MOVEFILE_WRITE_THROUGH) != 0) {
+        return true;
     }
 
     std::remove(targetPath.c_str());
