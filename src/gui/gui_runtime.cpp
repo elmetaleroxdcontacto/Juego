@@ -654,6 +654,7 @@ void queuePageTransition(AppState& state, GuiPage page) {
     if (state.pageChangeQueued && state.queuedPage == page) return;
     state.queuedPage = page;
     state.pageChangeQueued = true;
+    setCurrentPage(state, page); // cambiar ahora para evitar que el menu principal quede mostrado momentáneamente
     PostMessageW(state.window, kGuiPageTransitionMessage, static_cast<WPARAM>(static_cast<int>(page)), 0);
 }
 

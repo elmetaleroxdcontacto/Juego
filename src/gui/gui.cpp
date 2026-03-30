@@ -674,7 +674,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                     continueCareer(*state);
                     return 0;
                 case IDC_MENU_PLAY_BUTTON:
-                    queuePageTransition(*state, GuiPage::Dashboard);
+                    setCurrentPage(*state, GuiPage::Dashboard); // evitar que MainMenu se superponga al iniciar
                     setStatus(*state, "Flujo principal abierto. Ya puedes crear o cargar una carrera.");
                     return 0;
                 case IDC_MENU_SETTINGS_BUTTON:
