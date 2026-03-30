@@ -184,6 +184,47 @@ struct InsightHotspot {
     std::wstring hint;
 };
 
+struct PanelBounds {
+    RECT outer{};
+    RECT title{};
+    RECT body{};
+    bool visible = false;
+};
+
+struct LayoutSnapshot {
+    RECT client{};
+    RECT topBar{};
+    RECT sideMenu{};
+    RECT sideMenuTitle{};
+    RECT contentShell{};
+    RECT shellInner{};
+    RECT pageHeader{};
+    RECT headerTextArea{};
+    RECT headerFilterArea{};
+    RECT breadcrumb{};
+    RECT pageTitle{};
+    RECT infoLine{};
+    RECT filterLabel{};
+    RECT filterField{};
+    RECT actionStrip{};
+    RECT scrollViewport{};
+    RECT spotlightBand{};
+    RECT mainArea{};
+    RECT centerColumn{};
+    RECT rightColumn{};
+    RECT statusBar{};
+    RECT contextCard{};
+    PanelBounds summaryPanel;
+    PanelBounds primaryPanel;
+    PanelBounds secondaryPanel;
+    PanelBounds footerPanel;
+    PanelBounds detailPanel;
+    PanelBounds newsPanel;
+    bool frontMenuPage = false;
+    bool dashboardPage = false;
+    bool dashboardEmptyState = false;
+};
+
 struct AppState {
     HINSTANCE instance = nullptr;
     HWND window = nullptr;
@@ -229,8 +270,11 @@ struct AppState {
     std::map<std::string, std::vector<int> > columnWidthMemory;
     std::map<std::string, GuiPageModel> modelCache;
     std::map<std::string, std::string> modelCacheSignatures;
+    std::map<std::string, int> teamLogoImageIndices;
     std::map<int, long long> pageTraceMs;
     std::string lastPageTrace;
+    HIMAGELIST teamLogoImageList = nullptr;
+    LayoutSnapshot layout;
 
     HWND divisionCombo = nullptr;
     HWND teamCombo = nullptr;
@@ -338,6 +382,7 @@ void hideControlAndInvalidate(AppState& state, HWND hwnd, int padX = 8, int padY
 void showControlAndInvalidate(AppState& state, HWND hwnd, int padX = 8, int padY = 6);
 void setControlVisibility(AppState& state, HWND hwnd, bool visible, int padX = 8, int padY = 6);
 void moveControlAndInvalidate(AppState& state, HWND hwnd, int x, int y, int width, int height, int padX = 10, int padY = 8);
+void applyEditInteriorPadding(AppState& state, HWND hwnd, int horizontalPadding, int verticalPadding);
 HWND createControl(AppState& state,
                    DWORD exStyle,
                    const wchar_t* className,
@@ -364,6 +409,10 @@ void drawPitchOverlay(HDC hdc, const RECT& rect);
 void drawSectionHeader(HDC hdc, const RECT& rect, const std::wstring& title);
 void drawStatBar(HDC hdc, const RECT& rect, const std::wstring& label, int value, int maxValue, COLORREF accent);
 int scaleByDpi(const AppState& state, int value);
+void rebuildTeamLogoImageList(AppState& state);
+void applyTeamLogosToList(AppState& state, HWND list, const ListPanelModel& model);
+void drawContextTeamLogo(AppState& state, HDC hdc);
+const Team* currentContextTeam(const AppState& state);
 
 GuiPage pageForControlId(int id);
 bool isPageButtonId(int id);

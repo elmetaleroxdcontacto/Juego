@@ -151,6 +151,7 @@ if(WIN32)
         src/gui/gui_layout.cpp
         src/gui/gui_runtime.cpp
         src/gui/gui_shared.cpp
+        src/gui/gui_team_logos.cpp
         src/gui/gui_view_common.cpp
         src/gui/gui_view_menu.cpp
         src/gui/gui_view_competition.cpp

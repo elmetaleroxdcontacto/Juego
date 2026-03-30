@@ -4139,3 +4139,82 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 
 - Añadir una prueba visual automatizada o smoke test de navegacion entre `MainMenu`, `Dashboard` vacio y `Dashboard` con carrera para detectar fantasmas de repintado.
 - Separar aun mas el area scrollable en una region dedicada para que el `WM_MOUSEWHEEL` pueda discriminar mejor entre panel principal y listas internas.
+
+## Corrección integral de layout y render UI
+
+- Causa del error:
+  - La pantalla principal mezclaba varias fuentes de geometría: `layoutWindow` movía controles con una lógica y `paintWindowChrome` reconstruía paneles desde `childRectOnParent(...)` y offsets hardcodeados.
+  - El layout imponía anchos mínimos que podían exceder el viewport real, provocando invasión entre columna central y panel derecho.
+  - El scroll se calculaba contra la ventana completa en vez del viewport realmente scrolleable, contaminando headers fijos y reservas verticales.
+  - Los títulos y cuerpos de panel no estaban modelados como bounds separados, por lo que el sistema dependía de offsets manuales frágiles.
+
+- Solución aplicada:
+  - Se introdujo un `LayoutSnapshot` compartido entre layout y paint para que la UI use una sola geometría fuente.
+  - Se separaron bounds de panel en `outer/title/body` con `PanelBounds`, reservando espacio real para títulos antes de posicionar el contenido.
+  - Se corrigió el cálculo del viewport de scroll para que solo afecte el contenido interior y no la cabecera fija, sidebar ni status bar.
+  - Se reemplazó la pintura basada en rectángulos derivados de hijos por bounds persistidos en `state.layout` para sidebar, shell, paneles, status y tarjeta contextual.
+  - Se eliminó el doble rotulado visual en paneles owner-draw y se movió el board táctico al body real del panel para evitar superposición con títulos.
+  - Se ajustó la cabecera superior para usar distribución más robusta de filtros, acciones y combos con popup height y padding interior consistente.
+
+- Utilidades nuevas creadas:
+  - `PanelBounds`
+  - `LayoutSnapshot`
+  - `makeRect`
+  - `shrinkRect`
+  - `RectCursor`
+  - `takeTop`
+  - `takeRight`
+  - `buildPanelBounds`
+  - `viewportRect`
+  - `projectPanelBounds`
+  - `ScopedClipRect`
+  - `applyEditInteriorPadding`
+
+- Pantallas afectadas:
+  - Dashboard / resumen del club
+  - Tácticas
+  - Vistas que comparten shell principal: plantilla, finanzas, fichajes, directiva, noticias y dashboard vacío
+  - Panel contextual de escudo / estado
+
+- Mejoras pendientes si las hubiera:
+  - Afinar visualmente la posición de la tarjeta contextual cuando la ventana es muy angosta para decidir si conviene apilarla siempre debajo del contenido principal.
+  - Llevar el mismo nivel de modelado de bounds al frontend de portada si más adelante se quiere unificar completamente menú y shell interna.
+
+## Auditoría técnica completa del repositorio
+
+- Fecha y hora:
+  - `2026-03-30 11:14:45 -03:00`
+
+- Auditoría realizada:
+  - Revisión de entrypoints CLI/GUI, flujo `GameController`, servicios de carrera, guardado/carga, validadores, tests, `CMakeLists.txt` y `build.bat`.
+  - Ejecución de build incremental de `FootballManager`, `FootballManagerCLI` y `FootballManagerTests`.
+  - Ejecución de `FootballManagerCLI.exe --validate` y `FootballManagerTests.exe`.
+  - Intento de build limpio con `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests --clean-first`.
+  - Intento de configuración limpia en `build-audit`.
+  - Reproducción en CLI del bug de loop infinito al agotarse `stdin`.
+
+- Errores encontrados:
+  - El build limpio no es confiable en este workspace con MinGW/CMake: la recompilación completa falla al enlazar por `ar.exe: unable to rename ... objects.a; reason: Permission denied`.
+  - La CLI entra en loop infinito cuando `stdin` llega a EOF porque `readInt` y `readLongLong` no cortan ni propagan error al fallar `getline`.
+  - `startCareerService` cae silenciosamente al primer club de la división si el nombre pedido no existe, en vez de fallar.
+  - El cargador de saves acepta campos dañados o incompletos y los reemplaza por defaults silenciosos; varios de esos defaults son aleatorios, por lo que una carga legacy/corrupta puede no ser determinista.
+
+- Fixes aplicados:
+  - No se aplicaron fixes de código en esta auditoría; se dejó evidencia y priorización para corrección.
+
+- Módulos afectados:
+  - `src/utils/utils.cpp`
+  - `src/career/app_services.cpp`
+  - `src/io/save_serialization.cpp`
+  - `src/io/save_manager.cpp`
+  - `src/engine/career_state.cpp`
+  - `src/engine/models.cpp`
+  - `src/engine/game_controller.cpp`
+  - `CMakeLists.txt`
+  - `build.bat`
+  - `tests/project_tests.cpp`
+
+- Deuda técnica detectada:
+  - Persisten archivos monolíticos y de transición (`models.cpp`, `app_services.cpp`, `save_serialization.cpp`, `project_tests.cpp`).
+  - El repo mantiene código legacy paralelo al stack nuevo de estado/serialización, incluyendo una versión de save antigua todavía presente en `models.cpp`.
+  - La suite automatizada cubre bastante lógica de dominio, pero no incluye GUI Win32 ni flujos interactivos reales de CLI, por lo que regresiones de layout, fullscreen, scroll e input no quedan protegidas.

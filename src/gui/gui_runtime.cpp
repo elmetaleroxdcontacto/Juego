@@ -263,6 +263,7 @@ void renderListPanel(AppState& state, HWND label, HWND list, const ListPanelMode
     for (const auto& row : model.rows) {
         addListViewRow(list, row);
     }
+    applyTeamLogosToList(state, list, model);
 }
 
 void autosizeVisibleLists(AppState& state) {
@@ -678,6 +679,10 @@ void handleListSelectionChange(AppState& state, int controlId) {
         state.selectedTransferPlayer = listViewText(state.squadList, row, 0);
         state.selectedTransferClub = listViewText(state.squadList, row, 10);
         refreshCurrentPage(state);
+        return;
+    }
+    if ((state.currentPage == GuiPage::League || state.currentPage == GuiPage::Calendar) && controlId == IDC_TABLE_LIST) {
+        InvalidateRect(state.window, nullptr, TRUE);
     }
 }
 

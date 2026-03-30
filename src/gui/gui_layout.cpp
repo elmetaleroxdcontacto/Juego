@@ -40,9 +40,16 @@ constexpr int kSideRailCompactWidth = 168;
 constexpr int kContentGap = 16;
 constexpr int kMetricGap = 14;
 constexpr int kMetricHeight = 58;
-constexpr int kPanelLabelHeight = 22;
-constexpr int kPanelBodyOffset = 24;
-constexpr int kPanelSectionGap = 46;
+constexpr int kShellPadding = 16;
+constexpr int kPageSectionGap = 18;
+constexpr int kPanelGap = 16;
+constexpr int kPanelTitleHeight = 24;
+constexpr int kPanelHeaderGap = 8;
+constexpr int kPanelContentPadding = 12;
+constexpr int kPanelRowGap = 18;
+constexpr int kPanelLabelHeight = kPanelTitleHeight;
+constexpr int kPanelBodyOffset = kPanelTitleHeight + kPanelHeaderGap;
+constexpr int kPanelSectionGap = kPanelGap;
 constexpr int kStatusHeight = 28;
 constexpr int kHeaderFieldHeight = 32;
 constexpr int kHeaderHintHeight = 18;
@@ -53,6 +60,16 @@ constexpr int kDashboardSpotlightWideReserve = 96;
 constexpr int kDashboardSpotlightCompactReserve = 150;
 constexpr int kInsightStripWideReserve = 88;
 constexpr int kInsightStripCompactReserve = 134;
+constexpr int kPageHeaderHeight = 94;
+constexpr int kBreadcrumbHeight = 20;
+constexpr int kPageTitleHeight = 32;
+constexpr int kPageInfoHeight = 24;
+constexpr int kActionButtonHeight = 28;
+constexpr int kActionRowGap = 8;
+constexpr int kRightRailMinWidth = 240;
+constexpr int kCenterColumnMinWidth = 360;
+constexpr int kContextCardHeight = 154;
+constexpr int kComboPopupHeight = 260;
 
 struct HeaderLayoutProfile {
     int sideWidth = kSideRailWideWidth;
@@ -78,6 +95,102 @@ struct PageLayoutProfile {
     int footerMinHeight = 150;
     int dashboardDetailHeight = 148;
     int nonDashboardDetailExtra = 132;
+};
+
+int rectWidth(const RECT& rect) {
+    return std::max(0L, rect.right - rect.left);
+}
+
+int rectHeight(const RECT& rect) {
+    return std::max(0L, rect.bottom - rect.top);
+}
+
+RECT makeRect(int left, int top, int width, int height) {
+    RECT rect{left, top, left + std::max(0, width), top + std::max(0, height)};
+    return rect;
+}
+
+RECT shrinkRect(const RECT& rect, int horizontal, int vertical) {
+    RECT out = rect;
+    out.left += horizontal;
+    out.right -= horizontal;
+    out.top += vertical;
+    out.bottom -= vertical;
+    if (out.right < out.left) out.right = out.left;
+    if (out.bottom < out.top) out.bottom = out.top;
+    return out;
+}
+
+RECT offsetRectCopy(const RECT& rect, int dx, int dy) {
+    RECT out = rect;
+    OffsetRect(&out, dx, dy);
+    return out;
+}
+
+struct RectCursor {
+    RECT remaining{};
+};
+
+RECT takeTop(RectCursor& cursor, int height, int gap = 0) {
+    height = std::max(0, std::min(height, rectHeight(cursor.remaining)));
+    RECT taken{cursor.remaining.left, cursor.remaining.top, cursor.remaining.right, cursor.remaining.top + height};
+    cursor.remaining.top = std::min(cursor.remaining.bottom, taken.bottom + std::max(0, gap));
+    return taken;
+}
+
+RECT takeRight(RectCursor& cursor, int width, int gap = 0) {
+    width = std::max(0, std::min(width, rectWidth(cursor.remaining)));
+    RECT taken{cursor.remaining.right - width, cursor.remaining.top, cursor.remaining.right, cursor.remaining.bottom};
+    cursor.remaining.right = std::max(cursor.remaining.left, taken.left - std::max(0, gap));
+    return taken;
+}
+
+PanelBounds buildPanelBounds(const RECT& outer, int titleHeight, int contentPadding, int titleGap) {
+    PanelBounds panel;
+    panel.outer = outer;
+    panel.visible = rectWidth(outer) > 0 && rectHeight(outer) > 0;
+    RECT inner = shrinkRect(outer, contentPadding, contentPadding);
+    RectCursor cursor{inner};
+    panel.title = takeTop(cursor, titleHeight, titleGap);
+    panel.body = cursor.remaining;
+    return panel;
+}
+
+RECT controlRectForCombo(const RECT& fieldRect, int popupHeight) {
+    RECT combo = fieldRect;
+    combo.bottom = combo.top + popupHeight;
+    return combo;
+}
+
+RECT viewportRect(const AppState& state, const RECT& docRect, bool scrollable) {
+    return scrollable ? offsetRectCopy(docRect, 0, -state.pageScrollY) : docRect;
+}
+
+PanelBounds projectPanelBounds(const AppState& state, const PanelBounds& panel, bool scrollable) {
+    PanelBounds projected = panel;
+    projected.outer = viewportRect(state, panel.outer, scrollable);
+    projected.title = viewportRect(state, panel.title, scrollable);
+    projected.body = viewportRect(state, panel.body, scrollable);
+    return projected;
+}
+
+bool rectHasArea(const RECT& rect) {
+    return rectWidth(rect) > 0 && rectHeight(rect) > 0;
+}
+
+class ScopedClipRect {
+public:
+    ScopedClipRect(HDC hdc, const RECT& rect) : hdc_(hdc), savedDc_(SaveDC(hdc)) {
+        IntersectClipRect(hdc_, rect.left, rect.top, rect.right, rect.bottom);
+    }
+
+    ~ScopedClipRect() {
+        RestoreDC(hdc_, savedDc_);
+    }
+
+private:
+    HDC hdc_;
+    int savedDc_ = 0;
 };
 
 HeaderLayoutProfile buildHeaderLayout(const RECT& client) {
@@ -503,32 +616,6 @@ std::vector<DashboardSpotlightCard> buildContextInsightCards(const AppState& sta
     return cards;
 }
 
-RECT dashboardSpotlightBand(const AppState& state, const RECT& contentShell, const RECT& summaryCard) {
-    const auto s = [&](int value) { return scaleByDpi(state, value); };
-    RECT band{contentShell.left + s(16), contentShell.top + s(110), contentShell.right - s(16), summaryCard.top - s(12)};
-
-    RECT infoRect = childRectOnParent(state.infoLabel, state.window);
-    if (infoRect.bottom > 0) {
-        band.top = std::max(band.top, infoRect.bottom + s(18));
-    }
-
-    const std::array<HWND, 13> actionButtons = {
-        state.scoutActionButton, state.shortlistButton, state.followShortlistButton, state.buyButton,
-        state.preContractButton, state.renewButton, state.sellButton, state.planButton, state.instructionButton,
-        state.youthUpgradeButton, state.trainingUpgradeButton, state.scoutingUpgradeButton, state.stadiumUpgradeButton
-    };
-    for (HWND button : actionButtons) {
-        if (!button || !IsWindowVisible(button)) continue;
-        RECT rect = childRectOnParent(button, state.window);
-        band.top = std::max(band.top, rect.bottom + s(14));
-    }
-
-    if (band.bottom < band.top + s(54)) {
-        SetRectEmpty(&band);
-    }
-    return band;
-}
-
 void rememberInsightHotspot(AppState& state, const RECT& rect, const DashboardSpotlightCard& card) {
     if (card.action == InsightAction::None) return;
     InsightHotspot hotspot;
@@ -643,21 +730,6 @@ void drawContextSpotlights(AppState& state, HDC hdc, const RECT& band) {
         };
         drawInsightCard(state, hdc, card, cards[i]);
     }
-}
-
-void drawDashboardCardCap(const AppState& state, HDC hdc, const RECT& card, COLORREF accent, const std::wstring& caption) {
-    const auto s = [&](int value) { return scaleByDpi(state, value); };
-    RECT cap{card.left + s(12), card.top + s(10), card.right - s(12), card.top + s(30)};
-    RECT line{cap.left, cap.bottom - s(2), cap.left + s(56), cap.bottom + s(2)};
-    HBRUSH lineBrush = CreateSolidBrush(accent);
-    FillRect(hdc, &line, lineBrush);
-    DeleteObject(lineBrush);
-
-    SetBkMode(hdc, TRANSPARENT);
-    SetTextColor(hdc, RGB(196, 212, 222));
-    HGDIOBJ oldFont = SelectObject(hdc, state.font ? state.font : static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT)));
-    DrawTextW(hdc, caption.c_str(), -1, &cap, DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
-    SelectObject(hdc, oldFont);
 }
 
 void drawTacticsBoard(AppState& state, HDC hdc, const RECT& rect) {
@@ -894,6 +966,9 @@ void layoutWindow(AppState& state) {
     RECT client{};
     GetClientRect(state.window, &client);
 
+    state.layout = {};
+    state.layout.client = client;
+
     const auto s = [&](int value) { return scaleByDpi(state, value); };
     const HeaderLayoutProfile header = buildHeaderLayout(client);
     const PageLayoutProfile pageLayout = buildPageLayoutProfile(state.currentPage);
@@ -901,24 +976,34 @@ void layoutWindow(AppState& state) {
     const int sideWidth = s(header.sideWidth);
     const int topBarHeight = s(header.topBarHeight);
     const int contentLeft = padding + sideWidth + s(kContentGap);
-    const int contentTop = topBarHeight + s(68);
-    const int availableMainWidth = std::max(760, static_cast<int>(client.right - contentLeft - padding * 2));
-    int infoWidth = clampValue(s(pageLayout.preferredInfoWidth), s(260), std::max(s(260), availableMainWidth / 2 - s(24)));
-    int contentWidth = availableMainWidth - infoWidth - padding;
-    if (contentWidth < s(460)) {
-        infoWidth = std::max(s(260), infoWidth - (s(460) - contentWidth));
-        contentWidth = availableMainWidth - infoWidth - padding;
+    int availableMainWidth = std::max(s(360), static_cast<int>(client.right - contentLeft - padding));
+    int infoWidth = clampValue(s(pageLayout.preferredInfoWidth),
+                               std::min(availableMainWidth, s(220)),
+                               std::max(std::min(availableMainWidth, s(220)), availableMainWidth - s(320)));
+    int contentWidth = availableMainWidth - infoWidth - s(kPanelGap);
+    bool stackedMainColumns = contentWidth < s(kCenterColumnMinWidth);
+    if (stackedMainColumns) {
+        infoWidth = availableMainWidth;
+        contentWidth = availableMainWidth;
+    } else if (contentWidth < s(460)) {
+        infoWidth = std::max(std::min(availableMainWidth, s(220)), infoWidth - (s(460) - contentWidth));
+        contentWidth = availableMainWidth - infoWidth - s(kPanelGap);
     }
-    const int infoLeft = contentLeft + contentWidth + padding;
+    const int infoLeft = stackedMainColumns ? contentLeft : contentLeft + contentWidth + s(kPanelGap);
     const bool dashboardLayout = state.currentPage == GuiPage::Dashboard;
     const bool dashboardEmptyState = dashboardLayout && !state.career.myTeam;
-    const int summaryWidth = clampValue(contentWidth * pageLayout.summaryPercent / 100,
-                                        std::min(s(280), contentWidth - padding - s(220)),
-                                        std::max(s(280), contentWidth - padding - s(220)));
-    const int tableWidth = contentWidth - summaryWidth - padding;
+    const int summaryWidth = stackedMainColumns
+        ? contentWidth
+        : clampValue(contentWidth * pageLayout.summaryPercent / 100,
+                     std::min(s(280), std::max(s(220), contentWidth - s(220) - s(kPanelGap))),
+                     std::max(s(280), contentWidth - s(220) - s(kPanelGap)));
+    const int tableWidth = stackedMainColumns ? contentWidth : std::max(s(220), contentWidth - summaryWidth - s(kPanelGap));
     const int topPanelHeight = s(pageLayout.topPanelHeight);
     const int midPanelHeight = s(pageLayout.midPanelHeight);
     const bool frontMenuPage = isFrontMenuPage(state.currentPage);
+    state.layout.frontMenuPage = frontMenuPage;
+    state.layout.dashboardPage = dashboardLayout;
+    state.layout.dashboardEmptyState = dashboardEmptyState;
 
     const std::array<HWND, 5> topControls = {
         state.divisionCombo, state.teamCombo, state.managerEdit, state.filterCombo, state.displayModeButton
@@ -934,6 +1019,8 @@ void layoutWindow(AppState& state) {
         state.newCareerButton, state.loadButton, state.saveButton, state.simulateButton, state.frontMenuButton
     };
     int maxContentBottom = 0;
+    int scrollViewportTop = 0;
+    int scrollViewportBottom = static_cast<int>(client.bottom);
     auto recordBottom = [&](int y, int height) {
         maxContentBottom = std::max(maxContentBottom, y + height);
     };
@@ -950,8 +1037,11 @@ void layoutWindow(AppState& state) {
         placeWindowWithMode(hwnd, x, y, width, height, true);
     };
     auto syncScrollState = [&]() -> bool {
-        const int contentHeight = std::max(static_cast<int>(client.bottom), maxContentBottom + s(6));
-        const int maxScroll = std::max(0, contentHeight - static_cast<int>(client.bottom));
+        scrollViewportBottom = std::max(scrollViewportTop + 1, scrollViewportBottom);
+        const int viewportHeight = std::max(1, scrollViewportBottom - scrollViewportTop);
+        const int contentBottom = std::max(scrollViewportBottom, maxContentBottom + s(6));
+        const int contentHeight = std::max(viewportHeight, contentBottom - scrollViewportTop);
+        const int maxScroll = std::max(0, contentBottom - scrollViewportBottom);
         const int clamped = clampValue(state.pageScrollY, 0, maxScroll);
         state.pageContentHeight = contentHeight;
         state.maxPageScrollY = maxScroll;
@@ -961,7 +1051,7 @@ void layoutWindow(AppState& state) {
         info.fMask = SIF_RANGE | SIF_PAGE | SIF_POS | SIF_DISABLENOSCROLL;
         info.nMin = 0;
         info.nMax = std::max(0, contentHeight - 1);
-        info.nPage = std::max(1, static_cast<int>(client.bottom));
+        info.nPage = viewportHeight;
         info.nPos = clamped;
         SetScrollInfo(state.window, SB_VERT, &info, TRUE);
 
@@ -1013,6 +1103,8 @@ void layoutWindow(AppState& state) {
         const int rightWidth = shellWidth - leftWidth - s(18);
         const int summaryHeight = std::max(s(230), static_cast<int>(client.bottom - panelsTop - s(100)));
         const int detailHeight = std::max(s(170), (summaryHeight - s(40)) / 2);
+        scrollViewportTop = panelsTop;
+        scrollViewportBottom = client.bottom - s(kStatusHeight) - s(8);
 
         placeScrollableWindow(state.summaryLabel, shellLeft + s(16), panelsTop, leftWidth, s(kPanelLabelHeight));
         placeScrollableWindow(state.summaryEdit, shellLeft + s(16), panelsTop + s(kPanelBodyOffset), leftWidth, summaryHeight);
@@ -1111,7 +1203,18 @@ void layoutWindow(AppState& state) {
             setControlVisibility(state, state.menuAudioFadeButton, false);
         }
 
-        placeFixedWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20));
+        state.layout.statusBar = makeRect(padding,
+                                          static_cast<int>(client.bottom) - s(kStatusHeight),
+                                          std::max(0, static_cast<int>(client.right) - padding * 2),
+                                          s(22));
+        placeFixedWindow(state.statusLabel,
+                         state.layout.statusBar.left,
+                         state.layout.statusBar.top,
+                         rectWidth(state.layout.statusBar),
+                         s(20));
+        applyEditInteriorPadding(state, state.summaryEdit, 10, 8);
+        applyEditInteriorPadding(state, state.detailEdit, 10, 8);
+        applyEditInteriorPadding(state, state.managerEdit, 8, 0);
         if (syncScrollState()) return;
         return;
     }
@@ -1161,28 +1264,34 @@ void layoutWindow(AppState& state) {
     int managerFieldTop = fieldTop;
     int managerFieldWidth = s(240);
 
-    auto placeFieldBlock = [&](HWND label, int labelWidth, HWND field, int inputOffset, int x, int y, int width, int controlHeight) {
+    auto placeFieldBlock = [&](HWND label, int labelWidth, HWND field, int inputOffset, int x, int y, int width, bool comboField) {
         int fieldWidth = std::max(s(150), width - inputOffset);
         placeFixedWindow(label, x, y + s(4), labelWidth, s(22));
-        placeFixedWindow(field, x + inputOffset, y, fieldWidth, controlHeight);
+        RECT fieldRect = makeRect(x + inputOffset, y, fieldWidth, fieldHeight);
+        if (comboField) {
+            RECT comboRect = controlRectForCombo(fieldRect, s(kComboPopupHeight));
+            placeFixedWindow(field, comboRect.left, comboRect.top, rectWidth(comboRect), rectHeight(comboRect));
+        } else {
+            placeFixedWindow(field, fieldRect.left, fieldRect.top, rectWidth(fieldRect), rectHeight(fieldRect));
+        }
         if (field == state.managerEdit) {
-            managerFieldLeft = x + inputOffset;
-            managerFieldTop = y;
+            managerFieldLeft = fieldRect.left;
+            managerFieldTop = fieldRect.top;
             managerFieldWidth = fieldWidth;
         }
     };
 
     if (header.stackedControls) {
-        placeFieldBlock(state.divisionLabel, s(78), state.divisionCombo, s(90), s(20), fieldTop, headerAvailableWidth, s(420));
-        placeFieldBlock(state.teamLabel, s(46), state.teamCombo, s(56), s(20), rowTwoTop, headerAvailableWidth, s(420));
-        placeFieldBlock(state.managerLabel, s(78), state.managerEdit, s(86), s(20), rowThreeTop, std::min(s(430), headerAvailableWidth), fieldHeight);
+        placeFieldBlock(state.divisionLabel, s(78), state.divisionCombo, s(90), s(20), fieldTop, headerAvailableWidth, true);
+        placeFieldBlock(state.teamLabel, s(46), state.teamCombo, s(56), s(20), rowTwoTop, headerAvailableWidth, true);
+        placeFieldBlock(state.managerLabel, s(78), state.managerEdit, s(86), s(20), rowThreeTop, std::min(s(430), headerAvailableWidth), false);
     } else if (header.splitControls) {
         int rowOneWidth = headerAvailableWidth - blockGap;
         int divisionBlockWidth = std::max(s(250), rowOneWidth * 40 / 100);
         int teamBlockWidth = rowOneWidth - divisionBlockWidth;
-        placeFieldBlock(state.divisionLabel, s(78), state.divisionCombo, s(90), s(20), fieldTop, divisionBlockWidth, s(420));
-        placeFieldBlock(state.teamLabel, s(46), state.teamCombo, s(56), s(20) + divisionBlockWidth + blockGap, fieldTop, teamBlockWidth, s(420));
-        placeFieldBlock(state.managerLabel, s(78), state.managerEdit, s(86), s(20), rowTwoTop, std::min(s(440), headerAvailableWidth), fieldHeight);
+        placeFieldBlock(state.divisionLabel, s(78), state.divisionCombo, s(90), s(20), fieldTop, divisionBlockWidth, true);
+        placeFieldBlock(state.teamLabel, s(46), state.teamCombo, s(56), s(20) + divisionBlockWidth + blockGap, fieldTop, teamBlockWidth, true);
+        placeFieldBlock(state.managerLabel, s(78), state.managerEdit, s(86), s(20), rowTwoTop, std::min(s(440), headerAvailableWidth), false);
     } else {
         int rowOneWidth = headerAvailableWidth - blockGap * 2;
         int divisionBlockWidth = clampValue(rowOneWidth * 28 / 100, s(300), s(360));
@@ -1191,32 +1300,127 @@ void layoutWindow(AppState& state) {
         int divisionX = s(20);
         int teamX = divisionX + divisionBlockWidth + blockGap;
         int managerX = teamX + teamBlockWidth + blockGap;
-        placeFieldBlock(state.divisionLabel, s(78), state.divisionCombo, s(90), divisionX, fieldTop, divisionBlockWidth, s(420));
-        placeFieldBlock(state.teamLabel, s(46), state.teamCombo, s(56), teamX, fieldTop, teamBlockWidth, s(420));
-        placeFieldBlock(state.managerLabel, s(78), state.managerEdit, s(86), managerX, fieldTop, managerBlockWidth, fieldHeight);
+        placeFieldBlock(state.divisionLabel, s(78), state.divisionCombo, s(90), divisionX, fieldTop, divisionBlockWidth, true);
+        placeFieldBlock(state.teamLabel, s(46), state.teamCombo, s(56), teamX, fieldTop, teamBlockWidth, true);
+        placeFieldBlock(state.managerLabel, s(78), state.managerEdit, s(86), managerX, fieldTop, managerBlockWidth, false);
     }
     placeFixedWindow(state.managerHelpLabel,
                 managerFieldLeft,
                 managerFieldTop + fieldHeight + s(3),
                 managerFieldWidth,
                 hintHeight);
+    applyEditInteriorPadding(state, state.managerEdit, 8, 0);
 
-    const int sideX = padding;
-    int navY = topBarHeight + s(12);
+    state.layout.topBar = makeRect(0, 0, static_cast<int>(client.right), topBarHeight);
+    state.layout.statusBar = makeRect(padding,
+                                      static_cast<int>(client.bottom) - s(kStatusHeight),
+                                      std::max(0, static_cast<int>(client.right) - padding * 2),
+                                      s(22));
+    const int chromeBottom = std::max(topBarHeight + s(180), static_cast<int>(state.layout.statusBar.top) - s(10));
+    state.layout.sideMenu = makeRect(padding, topBarHeight, sideWidth, chromeBottom - topBarHeight);
+    state.layout.sideMenuTitle = makeRect(state.layout.sideMenu.left + s(12),
+                                          state.layout.sideMenu.top + s(10),
+                                          std::max(0, rectWidth(state.layout.sideMenu) - s(24)),
+                                          s(24));
+    state.layout.contentShell = makeRect(state.layout.sideMenu.right + s(kContentGap),
+                                         topBarHeight,
+                                         std::max(0, static_cast<int>(client.right) - (static_cast<int>(state.layout.sideMenu.right) + s(kContentGap)) - padding),
+                                         chromeBottom - topBarHeight);
+    state.layout.shellInner = shrinkRect(state.layout.contentShell, s(kShellPadding), s(kShellPadding));
+
+    const int sideX = state.layout.sideMenu.left;
+    int navY = state.layout.sideMenuTitle.bottom + s(12);
+    int navButtonHeight = s(40);
+    int navGap = s(8);
+    const int navAvailableHeight = std::max(s(220), static_cast<int>(state.layout.sideMenu.bottom) - navY - s(12));
+    if (!navButtons.empty()) {
+        const int minButtonHeight = s(32);
+        navGap = std::max(s(4),
+                          std::min(navGap,
+                                   std::max(0, navAvailableHeight - static_cast<int>(navButtons.size()) * minButtonHeight) /
+                                       std::max(1, static_cast<int>(navButtons.size()) - 1)));
+        navButtonHeight = std::max(minButtonHeight,
+                                   (navAvailableHeight - navGap * std::max(0, static_cast<int>(navButtons.size()) - 1)) /
+                                       std::max(1, static_cast<int>(navButtons.size())));
+    }
     std::array<HWND, 10> pages = {
         state.dashboardButton, state.squadButton, state.tacticsButton, state.calendarButton, state.leagueButton,
         state.transfersButton, state.financesButton, state.youthButton, state.boardButton, state.newsButton
     };
     for (HWND button : pages) {
-        placeFixedWindow(button, sideX, navY, sideWidth, s(40));
-        navY += s(48);
+        placeFixedWindow(button, sideX, navY, rectWidth(state.layout.sideMenu), navButtonHeight);
+        navY += navButtonHeight + navGap;
     }
 
-    placeFixedWindow(state.breadcrumbLabel, contentLeft, topBarHeight + s(12), contentWidth, s(20));
-    placeFixedWindow(state.pageTitleLabel, contentLeft, topBarHeight + s(38), contentWidth, s(32));
-    placeFixedWindow(state.infoLabel, contentLeft, topBarHeight + s(74), contentWidth, s(24));
-    placeFixedWindow(state.filterLabel, infoLeft + s(6), topBarHeight + s(40), s(56), s(20));
-    placeFixedWindow(state.filterCombo, infoLeft + s(68), topBarHeight + s(36), infoWidth - s(68), s(320));
+    RectCursor shellCursor{state.layout.shellInner};
+    const bool filterVisible = state.filterCombo && IsWindowVisible(state.filterCombo);
+    const bool stackHeaderFilter = filterVisible && rectWidth(state.layout.shellInner) < s(1040);
+    const int pageHeaderHeight = s(kPageHeaderHeight) + (filterVisible && stackHeaderFilter ? s(kHeaderFieldHeight + 18) : 0);
+    state.layout.pageHeader = takeTop(shellCursor, pageHeaderHeight, s(kPageSectionGap));
+    state.layout.headerTextArea = state.layout.pageHeader;
+    if (filterVisible) {
+        if (stackHeaderFilter) {
+            const int filterAreaHeight = s(kHeaderFieldHeight + 10);
+            state.layout.headerFilterArea = makeRect(state.layout.pageHeader.left,
+                                                     state.layout.pageHeader.bottom - filterAreaHeight,
+                                                     rectWidth(state.layout.pageHeader),
+                                                     filterAreaHeight);
+            state.layout.headerTextArea.bottom = std::max(state.layout.headerTextArea.top,
+                                                          state.layout.headerFilterArea.top - s(8));
+        } else {
+            RectCursor headerCursor{state.layout.pageHeader};
+            const int minFilterWidth = std::min(rectWidth(state.layout.pageHeader), s(250));
+            const int preferredFilterWidth = std::max(minFilterWidth, rectWidth(state.layout.pageHeader) / 3);
+            const int maxFilterWidth = std::max(minFilterWidth, rectWidth(state.layout.pageHeader) - s(320));
+            const int filterWidth = clampValue(preferredFilterWidth, minFilterWidth, maxFilterWidth);
+            state.layout.headerFilterArea = takeRight(headerCursor, filterWidth, s(kPanelGap));
+            state.layout.headerTextArea = headerCursor.remaining;
+        }
+    }
+
+    RectCursor headerTextCursor{state.layout.headerTextArea};
+    state.layout.breadcrumb = takeTop(headerTextCursor, s(kBreadcrumbHeight), s(4));
+    state.layout.pageTitle = takeTop(headerTextCursor, s(kPageTitleHeight), s(6));
+    state.layout.infoLine = takeTop(headerTextCursor, s(kPageInfoHeight), 0);
+    placeFixedWindow(state.breadcrumbLabel,
+                     state.layout.breadcrumb.left,
+                     state.layout.breadcrumb.top,
+                     rectWidth(state.layout.breadcrumb),
+                     rectHeight(state.layout.breadcrumb));
+    placeFixedWindow(state.pageTitleLabel,
+                     state.layout.pageTitle.left,
+                     state.layout.pageTitle.top,
+                     rectWidth(state.layout.pageTitle),
+                     rectHeight(state.layout.pageTitle));
+    placeFixedWindow(state.infoLabel,
+                     state.layout.infoLine.left,
+                     state.layout.infoLine.top,
+                     rectWidth(state.layout.infoLine),
+                     rectHeight(state.layout.infoLine));
+    if (filterVisible) {
+        const int filterLabelWidth = s(56);
+        const int filterTop = state.layout.headerFilterArea.top +
+                              std::max(0, (rectHeight(state.layout.headerFilterArea) - fieldHeight) / 2);
+        state.layout.filterLabel = makeRect(state.layout.headerFilterArea.left,
+                                            filterTop + s(4),
+                                            filterLabelWidth,
+                                            s(20));
+        RECT filterFieldRect = makeRect(state.layout.headerFilterArea.left + filterLabelWidth + s(10),
+                                        filterTop,
+                                        std::max(s(140), rectWidth(state.layout.headerFilterArea) - filterLabelWidth - s(10)),
+                                        fieldHeight);
+        state.layout.filterField = controlRectForCombo(filterFieldRect, s(kComboPopupHeight));
+        placeFixedWindow(state.filterLabel,
+                         state.layout.filterLabel.left,
+                         state.layout.filterLabel.top,
+                         rectWidth(state.layout.filterLabel),
+                         rectHeight(state.layout.filterLabel));
+        placeFixedWindow(state.filterCombo,
+                         state.layout.filterField.left,
+                         state.layout.filterField.top,
+                         rectWidth(state.layout.filterField),
+                         rectHeight(state.layout.filterField));
+    }
 
     showActionButtonsForPage(state);
     std::vector<ActionButtonRef> visibleButtons = {
@@ -1227,21 +1431,46 @@ void layoutWindow(AppState& state) {
         {state.scoutingUpgradeButton, 94}, {state.stadiumUpgradeButton, 96}
     };
 
-    int actionX = contentLeft;
-    int actionY = topBarHeight + s(106);
-    bool hasVisibleActionButtons = false;
-    int lastActionBottom = 0;
+    std::vector<std::vector<ActionButtonRef> > actionRows;
+    std::vector<ActionButtonRef> currentActionRow;
+    const int actionAvailableWidth = std::max(s(140), rectWidth(shellCursor.remaining));
+    const int actionGap = s(10);
+    const int actionRowGap = s(kActionRowGap);
+    const int actionButtonHeight = s(kActionButtonHeight);
+    int currentActionWidth = 0;
     for (const auto& action : visibleButtons) {
         if (!action.hwnd || !IsWindowVisible(action.hwnd)) continue;
-        hasVisibleActionButtons = true;
-        if (actionX + action.width > contentLeft + contentWidth) {
-            actionX = contentLeft;
-            actionY += s(36);
+        const int width = s(action.width);
+        const int nextWidth = currentActionRow.empty() ? width : currentActionWidth + actionGap + width;
+        if (!currentActionRow.empty() && nextWidth > actionAvailableWidth) {
+            actionRows.push_back(currentActionRow);
+            currentActionRow.clear();
+            currentActionWidth = 0;
         }
-        placeFixedWindow(action.hwnd, actionX, actionY, action.width, s(28));
-        actionX += action.width + s(10);
-        lastActionBottom = actionY + s(28);
+        currentActionRow.push_back({action.hwnd, width});
+        currentActionWidth = currentActionRow.size() == 1 ? width : currentActionWidth + actionGap + width;
     }
+    if (!currentActionRow.empty()) actionRows.push_back(currentActionRow);
+
+    if (!actionRows.empty()) {
+        const int actionStripHeight = static_cast<int>(actionRows.size()) * actionButtonHeight +
+                                      std::max(0, static_cast<int>(actionRows.size()) - 1) * actionRowGap;
+        state.layout.actionStrip = takeTop(shellCursor, actionStripHeight, s(kPageSectionGap));
+        int rowTop = state.layout.actionStrip.top;
+        for (const auto& row : actionRows) {
+            int x = state.layout.actionStrip.left;
+            for (const auto& action : row) {
+                placeFixedWindow(action.hwnd, x, rowTop, action.width, actionButtonHeight);
+                x += action.width + actionGap;
+            }
+            rowTop += actionButtonHeight + actionRowGap;
+        }
+    }
+
+    state.layout.scrollViewport = shellCursor.remaining;
+    state.layout.mainArea = state.layout.scrollViewport;
+    scrollViewportTop = state.layout.scrollViewport.top;
+    scrollViewportBottom = state.layout.scrollViewport.bottom;
 
     const bool contextualInsightStrip = pageUsesInsightStrip(state) && state.currentPage != GuiPage::Dashboard;
     const int dashboardSpotlightReserve = dashboardLayout
@@ -1250,69 +1479,183 @@ void layoutWindow(AppState& state) {
     const int contextualInsightReserve = contextualInsightStrip
         ? s((client.right - client.left) < s(1380) ? kInsightStripCompactReserve : kInsightStripWideReserve)
         : 0;
-    int panelsTop = hasVisibleActionButtons ? lastActionBottom + s(18) : contentTop + s(28);
+    int panelsTop = scrollViewportTop;
     panelsTop += dashboardSpotlightReserve + contextualInsightReserve;
-    const int footerHeight = std::max(s(pageLayout.footerMinHeight),
-                                      static_cast<int>(client.bottom - (panelsTop + topPanelHeight + midPanelHeight + s(150))));
+    const int footerHeight = std::max(s(pageLayout.footerMinHeight), s(150));
+    auto placeScrollablePanel = [&](PanelBounds& snapshotPanel, HWND label, HWND body, const RECT& docOuter) {
+        const bool labelVisible = label && IsWindowVisible(label);
+        const int titleHeight = labelVisible ? s(kPanelTitleHeight) : 0;
+        const int titleGap = labelVisible ? s(kPanelHeaderGap) : 0;
+        PanelBounds docPanel = buildPanelBounds(docOuter, titleHeight, s(kPanelContentPadding), titleGap);
+        snapshotPanel = projectPanelBounds(state, docPanel, true);
+        if (label) {
+            placeScrollableWindow(label,
+                                  docPanel.title.left,
+                                  docPanel.title.top,
+                                  rectWidth(docPanel.title),
+                                  rectHeight(docPanel.title));
+        }
+        if (body) {
+            placeScrollableWindow(body,
+                                  docPanel.body.left,
+                                  docPanel.body.top,
+                                  rectWidth(docPanel.body),
+                                  rectHeight(docPanel.body));
+        }
+        recordBottom(docOuter.top, rectHeight(docOuter));
+        return docPanel;
+    };
 
     if (dashboardEmptyState) {
-        int summaryHeight = std::max(s(380), static_cast<int>(client.bottom) - panelsTop - s(82));
-        int sideHeight = std::max(s(170), (summaryHeight - s(34)) / 2);
-        const int buttonWidth = clampValue((contentWidth - s(48)) / 2, s(164), s(212));
-        const int emptyButtonTop = panelsTop + summaryHeight - s(62);
+        const int summaryHeight = std::max(s(380), rectHeight(state.layout.scrollViewport) - s(18));
+        const int summaryWidth = stackedMainColumns ? availableMainWidth : contentWidth;
+        const int rightColumnWidth = stackedMainColumns ? availableMainWidth : infoWidth;
+        const int rightColumnX = stackedMainColumns ? contentLeft : infoLeft;
+        const int rightColumnTop = stackedMainColumns ? panelsTop + summaryHeight + s(kPanelGap) : panelsTop;
+        const int sideHeight = std::max(s(170), (summaryHeight - s(34)) / 2);
+        RECT summaryDoc{contentLeft, panelsTop, contentLeft + summaryWidth, panelsTop + summaryHeight};
+        PanelBounds summaryDocPanel = placeScrollablePanel(state.layout.summaryPanel, state.summaryLabel, nullptr, summaryDoc);
+        const bool stackEmptyButtons = rectWidth(summaryDocPanel.body) < s(420);
+        const int buttonGap = s(12);
+        const int buttonHeight = s(34);
+        const int buttonRows = stackEmptyButtons ? 2 : 1;
+        const int buttonBlockHeight = buttonRows * buttonHeight + (buttonRows - 1) * buttonGap;
+        RECT summaryEditDoc = summaryDocPanel.body;
+        summaryEditDoc.bottom = std::max(summaryEditDoc.top, summaryDocPanel.body.bottom - buttonBlockHeight - s(12));
+        placeScrollableWindow(state.summaryEdit,
+                              summaryEditDoc.left,
+                              summaryEditDoc.top,
+                              rectWidth(summaryEditDoc),
+                              rectHeight(summaryEditDoc));
 
-        placeScrollableWindow(state.summaryLabel, contentLeft, panelsTop, contentWidth, s(kPanelLabelHeight));
-        placeScrollableWindow(state.summaryEdit, contentLeft, panelsTop + s(kPanelBodyOffset), contentWidth, summaryHeight);
+        RECT detailDoc{rightColumnX, rightColumnTop, rightColumnX + rightColumnWidth, rightColumnTop + sideHeight};
+        PanelBounds detailDocPanel = placeScrollablePanel(state.layout.detailPanel, state.detailLabel, state.detailEdit, detailDoc);
+        const int newsTop = detailDoc.bottom + s(kPanelGap);
+        RECT newsDoc{rightColumnX,
+                     newsTop,
+                     rightColumnX + rightColumnWidth,
+                     newsTop + std::max(s(188), summaryHeight - sideHeight - s(28))};
+        PanelBounds newsDocPanel = placeScrollablePanel(state.layout.newsPanel, state.newsLabel, state.newsList, newsDoc);
+        (void)detailDocPanel;
+        (void)newsDocPanel;
 
-        placeScrollableWindow(state.detailLabel, infoLeft, panelsTop, infoWidth, s(kPanelLabelHeight));
-        placeScrollableWindow(state.detailEdit, infoLeft, panelsTop + s(kPanelBodyOffset), infoWidth, sideHeight);
-
-        int newsTop = panelsTop + sideHeight + s(kPanelSectionGap);
-        placeScrollableWindow(state.newsLabel, infoLeft, newsTop, infoWidth, s(kPanelLabelHeight));
-        placeScrollableWindow(state.newsList, infoLeft, newsTop + s(kPanelBodyOffset), infoWidth, summaryHeight - sideHeight - s(28));
-        placeScrollableWindow(state.emptyNewButton, contentLeft + s(20), emptyButtonTop, buttonWidth, s(34));
-        placeScrollableWindow(state.emptyLoadButton, contentLeft + s(28) + buttonWidth, emptyButtonTop, buttonWidth, s(34));
         setControlVisibility(state, state.emptyNewButton, true);
         setControlVisibility(state, state.emptyLoadButton, true);
         setControlVisibility(state, state.emptyValidateButton, false);
+        if (stackEmptyButtons) {
+            placeScrollableWindow(state.emptyNewButton,
+                                  summaryDocPanel.body.left,
+                                  summaryEditDoc.bottom + s(12),
+                                  rectWidth(summaryDocPanel.body),
+                                  buttonHeight);
+            placeScrollableWindow(state.emptyLoadButton,
+                                  summaryDocPanel.body.left,
+                                  summaryEditDoc.bottom + s(12) + buttonHeight + buttonGap,
+                                  rectWidth(summaryDocPanel.body),
+                                  buttonHeight);
+        } else {
+            const int buttonWidth = std::max(s(164), (rectWidth(summaryDocPanel.body) - buttonGap) / 2);
+            placeScrollableWindow(state.emptyNewButton,
+                                  summaryDocPanel.body.left,
+                                  summaryEditDoc.bottom + s(12),
+                                  buttonWidth,
+                                  buttonHeight);
+            placeScrollableWindow(state.emptyLoadButton,
+                                  summaryDocPanel.body.left + buttonWidth + buttonGap,
+                                  summaryEditDoc.bottom + s(12),
+                                  buttonWidth,
+                                  buttonHeight);
+        }
 
-        placeFixedWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20));
+        state.layout.centerColumn = projectPanelBounds(state, buildPanelBounds(summaryDoc, 0, 0, 0), true).outer;
+        RECT rightColumnDoc{rightColumnX,
+                            rightColumnTop,
+                            rightColumnX + rightColumnWidth,
+                            newsDoc.bottom};
+        state.layout.rightColumn = viewportRect(state, rightColumnDoc, true);
+
+        placeFixedWindow(state.statusLabel,
+                         state.layout.statusBar.left,
+                         state.layout.statusBar.top,
+                         rectWidth(state.layout.statusBar),
+                         s(20));
+        applyEditInteriorPadding(state, state.summaryEdit, 10, 8);
+        applyEditInteriorPadding(state, state.detailEdit, 10, 8);
         if (syncScrollState()) return;
         return;
     }
 
-    ShowWindow(state.emptyNewButton, SW_HIDE);
-    ShowWindow(state.emptyLoadButton, SW_HIDE);
-    ShowWindow(state.emptyValidateButton, SW_HIDE);
+    setControlVisibility(state, state.emptyNewButton, false);
+    setControlVisibility(state, state.emptyLoadButton, false);
+    setControlVisibility(state, state.emptyValidateButton, false);
 
-    placeScrollableWindow(state.summaryLabel, contentLeft, panelsTop, summaryWidth, s(kPanelLabelHeight));
-    placeScrollableWindow(state.summaryEdit, contentLeft, panelsTop + s(kPanelBodyOffset), summaryWidth, topPanelHeight);
-    placeScrollableWindow(state.tableLabel, contentLeft + summaryWidth + padding, panelsTop, tableWidth, s(kPanelLabelHeight));
-    placeScrollableWindow(state.tableList, contentLeft + summaryWidth + padding, panelsTop + s(kPanelBodyOffset), tableWidth, topPanelHeight);
-
-    int secondTop = panelsTop + topPanelHeight + s(kPanelSectionGap);
-    placeScrollableWindow(state.squadLabel, contentLeft, secondTop, contentWidth, s(kPanelLabelHeight));
-    placeScrollableWindow(state.squadList, contentLeft, secondTop + s(kPanelBodyOffset), contentWidth, midPanelHeight);
-
-    int footerTop = secondTop + midPanelHeight + s(kPanelSectionGap);
-    placeScrollableWindow(state.transferLabel, contentLeft, footerTop, contentWidth, s(kPanelLabelHeight));
-    placeScrollableWindow(state.transferList, contentLeft, footerTop + s(kPanelBodyOffset), contentWidth, footerHeight);
-
-    if (dashboardLayout) {
-        placeScrollableWindow(state.detailLabel, infoLeft, secondTop, infoWidth, s(kPanelLabelHeight));
-        placeScrollableWindow(state.detailEdit, infoLeft, secondTop + s(kPanelBodyOffset), infoWidth, s(pageLayout.dashboardDetailHeight));
-        int newsTop = secondTop + s(kPanelBodyOffset) + s(pageLayout.dashboardDetailHeight) + s(26);
-        placeScrollableWindow(state.newsLabel, infoLeft, newsTop, infoWidth, s(kPanelLabelHeight));
-        placeScrollableWindow(state.newsList, infoLeft, newsTop + s(kPanelBodyOffset), infoWidth, client.bottom - (newsTop + s(kPanelBodyOffset)) - s(58));
+    const bool stackTopPanels = stackedMainColumns || contentWidth < s(pageLayout.summaryMinWidth + 280 + kPanelGap);
+    RECT summaryDoc{};
+    RECT primaryDoc{};
+    if (stackTopPanels) {
+        summaryDoc = RECT{contentLeft, panelsTop, contentLeft + contentWidth, panelsTop + topPanelHeight};
+        primaryDoc = RECT{contentLeft, summaryDoc.bottom + s(kPanelGap), contentLeft + contentWidth, summaryDoc.bottom + s(kPanelGap) + topPanelHeight};
     } else {
-        placeScrollableWindow(state.detailLabel, infoLeft, panelsTop, infoWidth, s(kPanelLabelHeight));
-        placeScrollableWindow(state.detailEdit, infoLeft, panelsTop + s(kPanelBodyOffset), infoWidth, topPanelHeight + s(pageLayout.nonDashboardDetailExtra));
-        int feedTop = panelsTop + topPanelHeight + s(pageLayout.nonDashboardDetailExtra) + s(42);
-        placeScrollableWindow(state.newsLabel, infoLeft, feedTop, infoWidth, s(kPanelLabelHeight));
-        placeScrollableWindow(state.newsList, infoLeft, feedTop + s(kPanelBodyOffset), infoWidth, client.bottom - feedTop - s(60));
+        summaryDoc = RECT{contentLeft, panelsTop, contentLeft + summaryWidth, panelsTop + topPanelHeight};
+        primaryDoc = RECT{summaryDoc.right + s(kPanelGap), panelsTop, summaryDoc.right + s(kPanelGap) + tableWidth, panelsTop + topPanelHeight};
     }
 
-    placeFixedWindow(state.statusLabel, padding, client.bottom - s(kStatusHeight), client.right - padding * 2, s(20));
+    PanelBounds summaryDocPanel = placeScrollablePanel(state.layout.summaryPanel, state.summaryLabel, state.summaryEdit, summaryDoc);
+    PanelBounds primaryDocPanel = placeScrollablePanel(state.layout.primaryPanel, state.tableLabel, state.tableList, primaryDoc);
+    (void)summaryDocPanel;
+    (void)primaryDocPanel;
+
+    const int secondTop = primaryDoc.bottom + s(kPanelGap);
+    RECT secondaryDoc{contentLeft, secondTop, contentLeft + contentWidth, secondTop + midPanelHeight};
+    PanelBounds secondaryDocPanel = placeScrollablePanel(state.layout.secondaryPanel, state.squadLabel, state.squadList, secondaryDoc);
+    (void)secondaryDocPanel;
+
+    const int footerTop = secondaryDoc.bottom + s(kPanelGap);
+    RECT footerDoc{contentLeft, footerTop, contentLeft + contentWidth, footerTop + footerHeight};
+    PanelBounds footerDocPanel = placeScrollablePanel(state.layout.footerPanel, state.transferLabel, state.transferList, footerDoc);
+    (void)footerDocPanel;
+
+    const int rightColumnX = stackedMainColumns ? contentLeft : infoLeft;
+    const int rightColumnWidth = stackedMainColumns ? availableMainWidth : infoWidth;
+    const int rightStartTop = stackedMainColumns ? footerDoc.bottom + s(kPanelGap) : (dashboardLayout ? secondTop : panelsTop);
+    RECT detailDoc{rightColumnX,
+                   rightStartTop,
+                   rightColumnX + rightColumnWidth,
+                   rightStartTop + (dashboardLayout ? s(pageLayout.dashboardDetailHeight)
+                                                    : topPanelHeight + s(pageLayout.nonDashboardDetailExtra))};
+    PanelBounds detailDocPanel = placeScrollablePanel(state.layout.detailPanel, state.detailLabel, state.detailEdit, detailDoc);
+    (void)detailDocPanel;
+    const int newsHeight = std::max(s(210),
+                                    dashboardLayout ? midPanelHeight : topPanelHeight);
+    RECT newsDoc{rightColumnX,
+                 detailDoc.bottom + s(kPanelGap),
+                 rightColumnX + rightColumnWidth,
+                 detailDoc.bottom + s(kPanelGap) + newsHeight};
+    PanelBounds newsDocPanel = placeScrollablePanel(state.layout.newsPanel, state.newsLabel, state.newsList, newsDoc);
+    (void)newsDocPanel;
+
+    state.layout.centerColumn = viewportRect(state,
+                                             RECT{contentLeft, panelsTop, contentLeft + contentWidth, footerDoc.bottom},
+                                             true);
+    state.layout.rightColumn = viewportRect(state,
+                                            RECT{rightColumnX, rightStartTop, rightColumnX + rightColumnWidth, newsDoc.bottom},
+                                            true);
+    if (currentContextTeam(state)) {
+        const int contextTop = stackedMainColumns ? panelsTop - s(kContextCardHeight + kPanelGap) : panelsTop;
+        RECT contextDoc{rightColumnX,
+                        std::max(scrollViewportTop, contextTop),
+                        rightColumnX + rightColumnWidth,
+                        std::max(scrollViewportTop, contextTop) + s(kContextCardHeight)};
+        state.layout.contextCard = viewportRect(state, contextDoc, true);
+    }
+
+    placeFixedWindow(state.statusLabel,
+                     state.layout.statusBar.left,
+                     state.layout.statusBar.top,
+                     rectWidth(state.layout.statusBar),
+                     s(20));
+    applyEditInteriorPadding(state, state.summaryEdit, 10, 8);
+    applyEditInteriorPadding(state, state.detailEdit, 10, 8);
     if (syncScrollState()) return;
 }
 
@@ -1426,7 +1769,7 @@ void initializeInterface(AppState& state) {
 
     applyInterfaceFonts(state);
 
-    DWORD styles = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_DOUBLEBUFFER;
+    DWORD styles = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_DOUBLEBUFFER | LVS_EX_SUBITEMIMAGES;
     ListView_SetExtendedListViewStyle(state.tableList, styles);
     ListView_SetExtendedListViewStyle(state.squadList, styles);
     ListView_SetExtendedListViewStyle(state.transferList, styles);
@@ -1439,6 +1782,7 @@ void initializeInterface(AppState& state) {
     ListView_SetTextColor(state.tableList, kThemeText);
     ListView_SetTextColor(state.squadList, kThemeText);
     ListView_SetTextColor(state.transferList, kThemeText);
+    rebuildTeamLogoImageList(state);
     state.career.initializeLeague();
     fillDivisionCombo(state, state.gameSetup.division);
     fillTeamCombo(state, state.gameSetup.division, state.gameSetup.club);
@@ -1453,7 +1797,6 @@ void paintWindowChrome(AppState& state, HDC hdc) {
     RECT client{};
     GetClientRect(state.window, &client);
     const auto s = [&](int value) { return scaleByDpi(state, value); };
-    const HeaderLayoutProfile header = buildHeaderLayout(client);
     FillRect(hdc, &client, state.backgroundBrush ? state.backgroundBrush : static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
     state.insightHotspots.clear();
 
@@ -1547,59 +1890,56 @@ void paintWindowChrome(AppState& state, HDC hdc) {
         return;
     }
 
-    RECT topBar{0, 0, client.right, s(header.topBarHeight) - s(10)};
+    RECT topBar = state.layout.topBar;
     FillRect(hdc, &topBar, state.headerBrush ? state.headerBrush : state.backgroundBrush);
-    drawRoundedPanel(hdc, RECT{s(8), s(8), client.right - s(8), s(header.topBarHeight) - s(12)}, RGB(10, 23, 30), RGB(28, 53, 65), s(18));
+    drawRoundedPanel(hdc,
+                     RECT{s(8), s(8), client.right - s(8), std::max(s(24), static_cast<int>(state.layout.topBar.bottom) - s(12))},
+                     RGB(10, 23, 30),
+                     RGB(28, 53, 65),
+                     s(18));
     drawTopMetrics(state, hdc, client);
 
-    RECT sideMenu{ s(8), s(header.topBarHeight), s(8) + s(header.sideWidth), client.bottom - s(34) };
-    drawRoundedPanel(hdc, sideMenu, RGB(12, 23, 31), RGB(34, 57, 70), s(18));
+    drawRoundedPanel(hdc, state.layout.sideMenu, RGB(12, 23, 31), RGB(34, 57, 70), s(18));
+    drawRoundedPanel(hdc, state.layout.contentShell, RGB(10, 21, 29), RGB(32, 53, 66), s(22));
+    if (rectHasArea(state.layout.summaryPanel.outer) && IsWindowVisible(state.summaryEdit)) {
+        drawRoundedPanel(hdc, state.layout.summaryPanel.outer, kThemePanel, RGB(40, 64, 79), s(16));
+    }
+    if (rectHasArea(state.layout.primaryPanel.outer) && (IsWindowVisible(state.tableList) || state.currentPage == GuiPage::Tactics)) {
+        drawRoundedPanel(hdc, state.layout.primaryPanel.outer, kThemePanel, RGB(40, 64, 79), s(16));
+    }
+    if (rectHasArea(state.layout.secondaryPanel.outer) && IsWindowVisible(state.squadList)) {
+        drawRoundedPanel(hdc, state.layout.secondaryPanel.outer, kThemePanel, RGB(40, 64, 79), s(16));
+    }
+    if (rectHasArea(state.layout.footerPanel.outer) && IsWindowVisible(state.transferList)) {
+        drawRoundedPanel(hdc, state.layout.footerPanel.outer, kThemePanel, RGB(40, 64, 79), s(16));
+    }
+    if (rectHasArea(state.layout.detailPanel.outer) && IsWindowVisible(state.detailEdit)) {
+        drawRoundedPanel(hdc, state.layout.detailPanel.outer, RGB(15, 27, 37), RGB(44, 72, 90), s(16));
+    }
+    if (rectHasArea(state.layout.newsPanel.outer) && IsWindowVisible(state.newsList)) {
+        drawRoundedPanel(hdc, state.layout.newsPanel.outer, RGB(15, 27, 37), RGB(44, 72, 90), s(16));
+    }
+    if (rectHasArea(state.layout.statusBar)) {
+        drawRoundedPanel(hdc, state.layout.statusBar, RGB(11, 23, 31), RGB(39, 65, 79), s(12));
+    }
 
-    RECT contentShell{ s(kWindowPadding + header.sideWidth + 6), s(header.topBarHeight), client.right - s(kWindowPadding), client.bottom - s(34) };
-    drawRoundedPanel(hdc, contentShell, RGB(10, 21, 29), RGB(32, 53, 66), s(22));
-
-    RECT summaryCard = expandedRect(childRectOnParent(state.summaryEdit, state.window), s(8), s(24));
-    RECT tableCard = expandedRect(childRectOnParent(state.tableList, state.window), s(8), s(24));
-    RECT squadCard = expandedRect(childRectOnParent(state.squadList, state.window), s(8), s(24));
-    RECT transferCard = expandedRect(childRectOnParent(state.transferList, state.window), s(8), s(24));
-    RECT detailCard = expandedRect(childRectOnParent(state.detailEdit, state.window), s(8), s(24));
-    RECT newsCard = expandedRect(childRectOnParent(state.newsList, state.window), s(8), s(24));
-    RECT statusCard = expandedRect(childRectOnParent(state.statusLabel, state.window), s(6), s(8));
-    if (IsWindowVisible(state.summaryEdit)) drawRoundedPanel(hdc, summaryCard, kThemePanel, RGB(40, 64, 79), s(16));
-    if (IsWindowVisible(state.tableList)) drawRoundedPanel(hdc, tableCard, kThemePanel, RGB(40, 64, 79), s(16));
-    if (IsWindowVisible(state.squadList)) drawRoundedPanel(hdc, squadCard, kThemePanel, RGB(40, 64, 79), s(16));
-    if (IsWindowVisible(state.transferList)) drawRoundedPanel(hdc, transferCard, kThemePanel, RGB(40, 64, 79), s(16));
-    if (IsWindowVisible(state.detailEdit)) drawRoundedPanel(hdc, detailCard, RGB(15, 27, 37), RGB(44, 72, 90), s(16));
-    if (IsWindowVisible(state.newsList)) drawRoundedPanel(hdc, newsCard, RGB(15, 27, 37), RGB(44, 72, 90), s(16));
-    drawRoundedPanel(hdc, statusCard, RGB(11, 23, 31), RGB(39, 65, 79), s(12));
-
-    if (state.currentPage == GuiPage::Dashboard) {
-        RECT spotlightBand = dashboardSpotlightBand(state, contentShell, summaryCard);
-        drawDashboardSpotlights(state, hdc, spotlightBand);
-        if (state.career.myTeam) {
-            if (IsWindowVisible(state.summaryEdit)) drawDashboardCardCap(state, hdc, summaryCard, kThemeAccentBlue, L"mesa de partido");
-            if (IsWindowVisible(state.detailEdit)) drawDashboardCardCap(state, hdc, detailCard, kThemeAccentGreen, L"vestuario");
-            if (IsWindowVisible(state.newsList)) drawDashboardCardCap(state, hdc, newsCard, kThemeAccent, L"pulso mundial");
-        }
-    } else if (pageUsesInsightStrip(state)) {
-        RECT spotlightBand = dashboardSpotlightBand(state, contentShell, summaryCard);
-        drawContextSpotlights(state, hdc, spotlightBand);
-        if (state.currentPage == GuiPage::Transfers) {
-            if (IsWindowVisible(state.summaryEdit)) drawDashboardCardCap(state, hdc, summaryCard, kThemeAccentBlue, L"radar");
-            if (IsWindowVisible(state.detailEdit)) drawDashboardCardCap(state, hdc, detailCard, kThemeAccentGreen, L"objetivo");
-            if (IsWindowVisible(state.newsList)) drawDashboardCardCap(state, hdc, newsCard, kThemeAccent, L"mercado");
-        } else if (state.currentPage == GuiPage::Finances) {
-            if (IsWindowVisible(state.summaryEdit)) drawDashboardCardCap(state, hdc, summaryCard, kThemeAccentGreen, L"caja");
-            if (IsWindowVisible(state.detailEdit)) drawDashboardCardCap(state, hdc, detailCard, kThemeAccentBlue, L"flujo");
-            if (IsWindowVisible(state.newsList)) drawDashboardCardCap(state, hdc, newsCard, kThemeAccent, L"riesgo");
-        } else if (state.currentPage == GuiPage::Board) {
-            if (IsWindowVisible(state.summaryEdit)) drawDashboardCardCap(state, hdc, summaryCard, kThemeAccentBlue, L"mandato");
-            if (IsWindowVisible(state.detailEdit)) drawDashboardCardCap(state, hdc, detailCard, kThemeAccentGreen, L"reporte");
-            if (IsWindowVisible(state.newsList)) drawDashboardCardCap(state, hdc, newsCard, kThemeAccent, L"presion");
+    if (rectHasArea(state.layout.scrollViewport)) {
+        ScopedClipRect scrollClip(hdc, state.layout.scrollViewport);
+        if (state.currentPage == GuiPage::Dashboard && rectHasArea(state.layout.spotlightBand)) {
+            drawDashboardSpotlights(state, hdc, state.layout.spotlightBand);
+        } else if (pageUsesInsightStrip(state) && rectHasArea(state.layout.spotlightBand)) {
+            drawContextSpotlights(state, hdc, state.layout.spotlightBand);
         }
     }
 
-    RECT menuTitle{ s(20), s(header.topBarHeight + 10), s(header.sideWidth - 10), s(header.topBarHeight + 34) };
+    if (rectHasArea(state.layout.scrollViewport) && rectHasArea(state.layout.contextCard)) {
+        ScopedClipRect contextClip(hdc, state.layout.scrollViewport);
+        drawContextTeamLogo(state, hdc);
+    } else {
+        drawContextTeamLogo(state, hdc);
+    }
+
+    RECT menuTitle = state.layout.sideMenuTitle;
     SetBkMode(hdc, TRANSPARENT);
     SetTextColor(hdc, kThemeMuted);
     HGDIOBJ oldFont = SelectObject(hdc, state.sectionFont ? state.sectionFont : state.font);
@@ -1607,8 +1947,11 @@ void paintWindowChrome(AppState& state, HDC hdc) {
     SelectObject(hdc, oldFont);
 
     if (state.currentPage == GuiPage::Tactics) {
-        RECT boardRect = expandedRect(childRectOnParent(state.tableList, state.window), 8, 24);
-        drawTacticsBoard(state, hdc, boardRect);
+        RECT boardRect = shrinkRect(state.layout.primaryPanel.body, s(2), s(2));
+        if (rectHasArea(boardRect)) {
+            ScopedClipRect boardClip(hdc, state.layout.primaryPanel.body);
+            drawTacticsBoard(state, hdc, boardRect);
+        }
     }
 }
 

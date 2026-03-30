@@ -140,6 +140,30 @@ void moveControlAndInvalidate(AppState& state, HWND hwnd, int x, int y, int widt
     InvalidateRect(hwnd, nullptr, TRUE);
 }
 
+void applyEditInteriorPadding(AppState& state, HWND hwnd, int horizontalPadding, int verticalPadding) {
+    if (!hwnd || !IsWindow(hwnd)) return;
+
+    const LONG_PTR style = GetWindowLongPtrW(hwnd, GWL_STYLE);
+    const int hPad = std::max(0, scaleByDpi(state, horizontalPadding));
+    const int vPad = std::max(0, scaleByDpi(state, verticalPadding));
+    if ((style & ES_MULTILINE) != 0) {
+        RECT client{};
+        GetClientRect(hwnd, &client);
+        RECT textRect{
+            client.left + hPad,
+            client.top + vPad,
+            std::max(client.left + hPad, client.right - hPad),
+            std::max(client.top + vPad, client.bottom - vPad)
+        };
+        SendMessageW(hwnd, EM_SETRECTNP, 0, reinterpret_cast<LPARAM>(&textRect));
+    } else {
+        SendMessageW(hwnd,
+                     EM_SETMARGINS,
+                     EC_LEFTMARGIN | EC_RIGHTMARGIN,
+                     MAKELPARAM(hPad, hPad));
+    }
+}
+
 HWND createControl(AppState& state,
                    DWORD exStyle,
                    const wchar_t* className,

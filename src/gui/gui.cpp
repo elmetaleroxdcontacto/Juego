@@ -459,6 +459,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 state->dpi = HIWORD(wParam) ? HIWORD(wParam) : queryWindowDpi(hwnd);
                 rebuildFonts(*state);
                 applyInterfaceFonts(*state);
+                rebuildTeamLogoImageList(*state);
                 auto* suggested = reinterpret_cast<const RECT*>(lParam);
                 if (suggested) {
                     SetWindowPos(hwnd,
@@ -469,10 +470,8 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                                  suggested->bottom - suggested->top,
                                  SWP_NOZORDER | SWP_NOACTIVATE);
                 }
-                layoutWindow(*state);
-                autosizeCurrentLists(*state);
                 syncDisplayModeButton(*state);
-                InvalidateRect(hwnd, nullptr, TRUE);
+                refreshCurrentPage(*state);
             }
             return 0;
         case WM_SETCURSOR:
@@ -831,6 +830,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
         case WM_DESTROY:
             if (state) {
                 shutdownMenuMusic(*state);
+                if (state->teamLogoImageList) ImageList_Destroy(state->teamLogoImageList);
                 if (state->font) DeleteObject(state->font);
                 if (state->titleFont) DeleteObject(state->titleFont);
                 if (state->heroFont) DeleteObject(state->heroFont);
@@ -849,6 +849,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 state->panelBrush = nullptr;
                 state->headerBrush = nullptr;
                 state->inputBrush = nullptr;
+                state->teamLogoImageList = nullptr;
             }
             PostQuitMessage(0);
             return 0;
