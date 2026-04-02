@@ -1,5 +1,6 @@
 #include "engine/game_controller.h"
 
+#include "career/career_runtime.h"
 #include "engine/front_menu.h"
 #include "gui.h"
 #include "io.h"
@@ -291,7 +292,12 @@ void GameController::runCareerLoop() {
             case 2: trainPlayer(*career.myTeam, career.currentSeason, career.currentWeek); break;
             case 3: changeTactics(*career.myTeam); break;
             case 4: {
+                const WeekSimulationPresentation previousPresentation = weekSimulationPresentation();
+                setWeekSimulationPresentation(game_settings::isDetailedSimulation(settings_)
+                                                  ? WeekSimulationPresentation::Detailed
+                                                  : WeekSimulationPresentation::Compact);
                 ServiceResult simResult = engine_.simulateCareerWeek();
+                setWeekSimulationPresentation(previousPresentation);
                 for (const auto& message : simResult.messages) cout << message << endl;
                 break;
             }

@@ -10,6 +10,11 @@ struct IncomingOfferDecision {
     long long counterOffer = 0;
 };
 
+enum class WeekSimulationPresentation {
+    Compact,
+    Detailed
+};
+
 using ManagerJobSelectionCallback = int (*)(const Career& career, const std::vector<Team*>& jobs);
 using UiMessageCallback = void (*)(const std::string& message);
 using IncomingOfferDecisionCallback = IncomingOfferDecision (*)(const Career& career,
@@ -27,10 +32,12 @@ void setManagerJobSelectionCallback(ManagerJobSelectionCallback callback);
 void setUiMessageCallback(UiMessageCallback callback);
 void setIncomingOfferDecisionCallback(IncomingOfferDecisionCallback callback);
 void setContractRenewalDecisionCallback(ContractRenewalDecisionCallback callback);
+void setWeekSimulationPresentation(WeekSimulationPresentation presentation);
 
 ManagerJobSelectionCallback managerJobSelectionCallback();
 UiMessageCallback uiMessageCallback();
 IncomingOfferDecisionCallback incomingOfferDecisionCallback();
 ContractRenewalDecisionCallback contractRenewalDecisionCallback();
+WeekSimulationPresentation weekSimulationPresentation();
 
 void emitUiMessage(const std::string& message);
