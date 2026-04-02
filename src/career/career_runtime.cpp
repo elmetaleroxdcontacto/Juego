@@ -10,6 +10,7 @@ ManagerJobSelectionCallback g_managerJobSelectionCallback = nullptr;
 UiMessageCallback g_uiMessageCallback = nullptr;
 IncomingOfferDecisionCallback g_incomingOfferDecisionCallback = nullptr;
 ContractRenewalDecisionCallback g_contractRenewalDecisionCallback = nullptr;
+WeekSimulationPresentation g_weekSimulationPresentation = WeekSimulationPresentation::Detailed;
 
 }  // namespace
 
@@ -29,6 +30,10 @@ void setContractRenewalDecisionCallback(ContractRenewalDecisionCallback callback
     g_contractRenewalDecisionCallback = callback;
 }
 
+void setWeekSimulationPresentation(WeekSimulationPresentation presentation) {
+    g_weekSimulationPresentation = presentation;
+}
+
 ManagerJobSelectionCallback managerJobSelectionCallback() {
     return g_managerJobSelectionCallback;
 }
@@ -43,6 +48,10 @@ IncomingOfferDecisionCallback incomingOfferDecisionCallback() {
 
 ContractRenewalDecisionCallback contractRenewalDecisionCallback() {
     return g_contractRenewalDecisionCallback;
+}
+
+WeekSimulationPresentation weekSimulationPresentation() {
+    return g_weekSimulationPresentation;
 }
 
 void emitUiMessage(const string& message) {

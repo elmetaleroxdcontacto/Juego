@@ -3,6 +3,7 @@
 
 #ifdef _WIN32
 
+#include "career/career_runtime.h"
 #include "engine/game_settings.h"
 
 #include <sstream>
@@ -236,7 +237,11 @@ void simulateWeek(AppState& state) {
                   " a velocidad " + game_settings::simulationSpeedLabel(state.settings.simulationSpeed) + "...");
     UpdateWindow(state.window);
     pulseFrontendTiming(state);
+    const WeekSimulationPresentation previousPresentation = weekSimulationPresentation();
+    // La GUI no muestra el volcado crudo del partido; el detalle ya vive en el match center.
+    setWeekSimulationPresentation(WeekSimulationPresentation::Compact);
     ServiceResult result = simulateCareerWeekService(state.career);
+    setWeekSimulationPresentation(previousPresentation);
     syncCombosFromCareer(state);
     refreshAll(state);
     setStatus(state, result.messages.empty() ? "Semana simulada." : result.messages.back());

@@ -1013,7 +1013,9 @@ void simulateCareerWeek(Career& career) {
     for (const auto& match : matches) {
         Team* home = career.activeTeams[static_cast<size_t>(match.first)];
         Team* away = career.activeTeams[static_cast<size_t>(match.second)];
-        bool verbose = (home == career.myTeam || away == career.myTeam);
+        const bool userControlledMatch = (home == career.myTeam || away == career.myTeam);
+        const bool verbose =
+            userControlledMatch && weekSimulationPresentation() == WeekSimulationPresentation::Detailed;
         team_ai::adjustCpuTactics(*home, *away, career.myTeam);
         team_ai::adjustCpuTactics(*away, *home, career.myTeam);
 
