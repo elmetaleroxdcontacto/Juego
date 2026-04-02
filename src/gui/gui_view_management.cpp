@@ -12,6 +12,36 @@
 #include <algorithm>
 #include <sstream>
 
+namespace {
+
+bool lineMatchesAnyKeyword(const std::string& line, const std::vector<std::string>& keywords) {
+    const std::string lower = toLower(line);
+    for (const std::string& keyword : keywords) {
+        if (lower.find(keyword) != std::string::npos) return true;
+    }
+    return false;
+}
+
+std::vector<std::string> selectFeedLines(const std::vector<std::string>& source,
+                                         const std::vector<std::string>& keywords,
+                                         std::size_t limit,
+                                         const std::vector<std::string>& fallback) {
+    std::vector<std::string> out;
+    for (const std::string& line : source) {
+        if (!lineMatchesAnyKeyword(line, keywords)) continue;
+        out.push_back(line);
+        if (out.size() >= limit) return out;
+    }
+    if (!fallback.empty()) {
+        const std::size_t copyCount = std::min(limit, fallback.size());
+        out.insert(out.end(), fallback.begin(), fallback.begin() + static_cast<long long>(copyCount));
+    }
+    if (out.empty()) out.push_back("No hay entradas para el filtro actual.");
+    return out;
+}
+
+}  // namespace
+
 namespace gui_win32 {
 
 GuiPageModel buildTransfersModel(AppState& state) {
@@ -33,7 +63,7 @@ GuiPageModel buildTransfersModel(AppState& state) {
     model.footer = buildTransferPipelineModel(state.career);
     model.detail.title = "TransferTargetCard";
     model.feed.title = "NewsFeedPanel";
-    model.feed.lines = buildFeedLines(state.career, state.currentFilter == "Todos" ? "Mercado" : "");
+    model.feed.lines = buildFeedLines(state.career, "Mercado");
 
     if (!state.career.myTeam) {
         model.summary.content = "Sin carrera activa.";
@@ -143,32 +173,48 @@ GuiPageModel buildFinancesModel(AppState& state) {
 
     Team& team = *state.career.myTeam;
     WeeklyFinanceReport finance = finance_system::projectWeeklyReport(team);
-    model.summary.content = buildClubSummaryService(state.career);
-    model.primary.rows.push_back({"Presupuesto", formatMoneyValue(team.budget), team.budget >= 0 ? "Caja operativa positiva" : "Caja comprometida"});
-    model.primary.rows.push_back({"Deuda", formatMoneyValue(team.debt), team.debt > 0 ? "Vigilar amortizacion" : "Sin deuda relevante"});
-    model.primary.rows.push_back({"Sponsor semanal", formatMoneyValue(finance.sponsorIncome), "Ingreso fijo"});
-    model.primary.rows.push_back({"Taquilla estimada", formatMoneyValue(finance.matchdayIncome), "Proyeccion de partido local"});
-    model.primary.rows.push_back({"Merchandising", formatMoneyValue(finance.merchandisingIncome), "Pulso comercial del club"});
-    model.primary.rows.push_back({"Bonos variables", formatMoneyValue(finance.bonusIncome), "Premios por rendimiento"});
-    model.primary.rows.push_back({"Masa salarial", formatMoneyValue(finance.wageBill), "Costo semanal proyectado"});
-    model.primary.rows.push_back({"Buffer de mercado", formatMoneyValue(finance.transferBuffer), finance.riskLevel});
+    model.summary.content = buildClubSummaryService(state.career) + "\r\nFiltro actual: " + state.currentFilter;
+
+    const std::vector<std::vector<std::string> > financeRows = {
+        {"Presupuesto", formatMoneyValue(team.budget), team.budget >= 0 ? "Caja operativa positiva" : "Caja comprometida"},
+        {"Deuda", formatMoneyValue(team.debt), team.debt > 0 ? "Vigilar amortizacion" : "Sin deuda relevante"},
+        {"Sponsor semanal", formatMoneyValue(finance.sponsorIncome), "Ingreso fijo"},
+        {"Taquilla estimada", formatMoneyValue(finance.matchdayIncome), "Proyeccion de partido local"},
+        {"Merchandising", formatMoneyValue(finance.merchandisingIncome), "Pulso comercial del club"},
+        {"Bonos variables", formatMoneyValue(finance.bonusIncome), "Premios por rendimiento"},
+        {"Masa salarial", formatMoneyValue(finance.wageBill), "Costo semanal proyectado"},
+        {"Buffer de mercado", formatMoneyValue(finance.transferBuffer), finance.riskLevel}
+    };
 
     std::vector<const Player*> players;
     for (const auto& player : team.players) players.push_back(&player);
     std::sort(players.begin(), players.end(), [](const Player* left, const Player* right) { return left->wage > right->wage; });
+    std::vector<std::vector<std::string> > salaryRows;
     for (size_t i = 0; i < players.size() && i < 14; ++i) {
         const Player& player = *players[i];
         std::string risk = player.contractWeeks <= 12 ? "Vence pronto" : (player.wantsToLeave ? "Quiere salir" : "Controlado");
-        model.secondary.rows.push_back({
+        salaryRows.push_back({
             player.name, formatMoneyValue(player.wage), std::to_string(player.contractWeeks), player.promisedRole, risk
         });
     }
-    model.footer.rows.push_back({"Cantera", std::to_string(team.youthFacilityLevel), team.youthCoachName, "Coach " + std::to_string(team.youthCoach) + " | impacta intake y potencial"});
-    model.footer.rows.push_back({"Entrenamiento", std::to_string(team.trainingFacilityLevel), team.fitnessCoachName, "Coach " + std::to_string(team.fitnessCoach) + " | progreso y recuperacion"});
-    model.footer.rows.push_back({"Arqueros", std::to_string(team.goalkeepingCoach), team.goalkeepingCoachName, "Sostiene rendimiento del portero"});
-    model.footer.rows.push_back({"Scouting", std::to_string(team.scoutingChief), team.scoutingChiefName, "Mercado, cobertura e informes"});
-    model.footer.rows.push_back({"Analisis", std::to_string(team.performanceAnalyst), team.performanceAnalystName, "Microciclo y preparacion rival"});
-    model.footer.rows.push_back({"Estadio", std::to_string(team.stadiumLevel), std::to_string(team.fanBase), "Impacta recaudacion"});
+    std::vector<std::vector<std::string> > infrastructureRows = {
+        {"Cantera", std::to_string(team.youthFacilityLevel), team.youthCoachName, "Coach " + std::to_string(team.youthCoach) + " | impacta intake y potencial"},
+        {"Entrenamiento", std::to_string(team.trainingFacilityLevel), team.fitnessCoachName, "Coach " + std::to_string(team.fitnessCoach) + " | progreso y recuperacion"},
+        {"Arqueros", std::to_string(team.goalkeepingCoach), team.goalkeepingCoachName, "Sostiene rendimiento del portero"},
+        {"Scouting", std::to_string(team.scoutingChief), team.scoutingChiefName, "Mercado, cobertura e informes"},
+        {"Analisis", std::to_string(team.performanceAnalyst), team.performanceAnalystName, "Microciclo y preparacion rival"},
+        {"Estadio", std::to_string(team.stadiumLevel), std::to_string(team.fanBase), "Impacta recaudacion"}
+    };
+
+    std::vector<std::string> infrastructureFeed = {
+        "Cantera nivel " + std::to_string(team.youthFacilityLevel) + " con " + team.youthCoachName + " al mando.",
+        "Entrenamiento nivel " + std::to_string(team.trainingFacilityLevel) + " | coach " + team.fitnessCoachName + ".",
+        "Scouting " + std::to_string(team.scoutingChief) + " | cobertura " +
+            (team.scoutingRegions.empty() ? std::string("local") : joinStringValues(team.scoutingRegions, ", ")),
+        "Analisis " + std::to_string(team.performanceAnalyst) + " | microciclo y rival."
+    };
+    const std::vector<std::string> salaryFeed =
+        selectFeedLines(alerts, {"contrato", "salida"}, 8, alerts);
 
     model.detail.content = "Presupuesto " + formatMoneyValue(team.budget) +
                            "\r\nDeuda " + formatMoneyValue(team.debt) +
@@ -178,6 +224,52 @@ GuiPageModel buildFinancesModel(AppState& state) {
                            "\r\nBonos variables " + formatMoneyValue(finance.bonusIncome) +
                            "\r\nBuffer de mercado " + formatMoneyValue(finance.transferBuffer) +
                            "\r\nRiesgo " + finance.riskLevel;
+
+    if (state.currentFilter == "Salarios") {
+        model.infoLine = "Masa salarial, contratos cortos y riesgo de salida.";
+        model.primary.title = "SalaryTable";
+        model.primary.columns = {{L"Jugador", 200}, {L"Salario", 110}, {L"Contrato", 70}, {L"Rol", 110}, {L"Riesgo", 160}};
+        model.primary.rows = salaryRows;
+        model.secondary.title = "FinanceBreakdown";
+        model.secondary.columns = {{L"Cuenta", 180}, {L"Valor", 140}, {L"Lectura", 280}};
+        model.secondary.rows = financeRows;
+        model.footer.title = "Infrastructure";
+        model.footer.columns = {{L"Area", 160}, {L"Nivel", 70}, {L"Staff", 80}, {L"Impacto", 260}};
+        model.footer.rows = infrastructureRows;
+        model.feed.lines = salaryFeed;
+        model.detail.content =
+            "Masa salarial " + formatMoneyValue(finance.wageBill) +
+            "\r\nJugadores monitorizados " + std::to_string(salaryRows.size()) +
+            "\r\nContratos cortos " + std::to_string(std::count_if(team.players.begin(),
+                                                                     team.players.end(),
+                                                                     [](const Player& player) { return player.contractWeeks <= 12; })) +
+            "\r\nFiltro salarial activo";
+    } else if (state.currentFilter == "Infraestructura") {
+        model.infoLine = "Instalaciones, staff y estructura de soporte del club.";
+        model.primary.title = "Infrastructure";
+        model.primary.columns = {{L"Area", 160}, {L"Nivel", 70}, {L"Staff", 80}, {L"Impacto", 260}};
+        model.primary.rows = infrastructureRows;
+        model.secondary.title = "FinanceBreakdown";
+        model.secondary.columns = {{L"Cuenta", 180}, {L"Valor", 140}, {L"Lectura", 280}};
+        model.secondary.rows = financeRows;
+        model.footer.title = "SalaryTable";
+        model.footer.columns = {{L"Jugador", 200}, {L"Salario", 110}, {L"Contrato", 70}, {L"Rol", 110}, {L"Riesgo", 160}};
+        model.footer.rows.assign(salaryRows.begin(),
+                                 salaryRows.begin() + static_cast<long long>(std::min<std::size_t>(salaryRows.size(), 8)));
+        model.feed.lines = infrastructureFeed;
+        model.detail.content =
+            "Cantera nivel " + std::to_string(team.youthFacilityLevel) +
+            "\r\nEntrenamiento nivel " + std::to_string(team.trainingFacilityLevel) +
+            "\r\nScouting " + std::to_string(team.scoutingChief) +
+            "\r\nAnalisis " + std::to_string(team.performanceAnalyst) +
+            "\r\nFiltro de infraestructura activo";
+    } else {
+        model.primary.rows = financeRows;
+        model.secondary.rows = salaryRows;
+        model.footer.rows = infrastructureRows;
+        model.feed.lines = alerts;
+    }
+
     if (!actionLines.empty()) {
         model.detail.content += "\r\n\r\nAcciones sugeridas";
         for (const auto& line : actionLines) model.detail.content += "\r\n- " + line;
@@ -220,29 +312,70 @@ GuiPageModel buildBoardModel(AppState& state) {
         for (const auto& line : storyLines) model.detail.content += "\r\n- " + line;
     }
 
+    std::vector<std::vector<std::string> > objectiveRows;
+    std::vector<std::vector<std::string> > profileRows;
+    std::vector<std::vector<std::string> > historyRows;
+
     if (state.career.myTeam) {
-        model.primary.rows.push_back({"Puesto esperado", std::to_string(state.career.boardExpectedFinish), "Meta de temporada"});
-        model.primary.rows.push_back({"Objetivo mensual", state.career.boardMonthlyObjective.empty() ? "Sin objetivo" : state.career.boardMonthlyObjective,
-                                      std::to_string(state.career.boardMonthlyProgress) + "/" + std::to_string(state.career.boardMonthlyTarget)});
-        model.primary.rows.push_back({"Confianza", std::to_string(state.career.boardConfidence) + "/100", boardStatusLabel(state.career.boardConfidence)});
-        model.primary.rows.push_back({"Advertencias", std::to_string(state.career.boardWarningWeeks), "Semanas bajo revision"});
+        objectiveRows.push_back({"Puesto esperado", std::to_string(state.career.boardExpectedFinish), "Meta de temporada"});
+        objectiveRows.push_back({"Objetivo mensual", state.career.boardMonthlyObjective.empty() ? "Sin objetivo" : state.career.boardMonthlyObjective,
+                                 std::to_string(state.career.boardMonthlyProgress) + "/" + std::to_string(state.career.boardMonthlyTarget)});
+        objectiveRows.push_back({"Confianza", std::to_string(state.career.boardConfidence) + "/100", boardStatusLabel(state.career.boardConfidence)});
+        objectiveRows.push_back({"Advertencias", std::to_string(state.career.boardWarningWeeks), "Semanas bajo revision"});
 
         Team& team = *state.career.myTeam;
-        model.secondary.rows.push_back({"Expectativa", teamExpectationLabel(team), "Perfil de club"});
-        model.secondary.rows.push_back({"Prestigio", std::to_string(team.clubPrestige), "Influye en fichajes"});
-        model.secondary.rows.push_back({"DT del club", team.headCoachName, team.headCoachStyle});
-        model.secondary.rows.push_back({"Antiguedad DT", std::to_string(team.headCoachTenureWeeks) + " sem", "Tiempo del proyecto actual"});
-        model.secondary.rows.push_back({"Seguridad", std::to_string(team.jobSecurity), "Estabilidad del banquillo"});
-        model.secondary.rows.push_back({"Politica", team.transferPolicy, "Mercado del club"});
-        model.secondary.rows.push_back({"Red scouting", team.scoutingRegions.empty() ? std::string("-") : joinStringValues(team.scoutingRegions, ", "), "Cobertura activa"});
-        model.secondary.rows.push_back({"Identidad cantera", team.youthIdentity, "Condiciona objetivos"});
-        model.secondary.rows.push_back({"Estilo", team.clubStyle, "Contexto institucional"});
+        profileRows.push_back({"Expectativa", teamExpectationLabel(team), "Perfil de club"});
+        profileRows.push_back({"Prestigio", std::to_string(team.clubPrestige), "Influye en fichajes"});
+        profileRows.push_back({"DT del club", team.headCoachName, team.headCoachStyle});
+        profileRows.push_back({"Antiguedad DT", std::to_string(team.headCoachTenureWeeks) + " sem", "Tiempo del proyecto actual"});
+        profileRows.push_back({"Seguridad", std::to_string(team.jobSecurity), "Estabilidad del banquillo"});
+        profileRows.push_back({"Politica", team.transferPolicy, "Mercado del club"});
+        profileRows.push_back({"Red scouting", team.scoutingRegions.empty() ? std::string("-") : joinStringValues(team.scoutingRegions, ", "), "Cobertura activa"});
+        profileRows.push_back({"Identidad cantera", team.youthIdentity, "Condiciona objetivos"});
+        profileRows.push_back({"Estilo", team.clubStyle, "Contexto institucional"});
     }
-    for (auto it = state.career.history.rbegin(); it != state.career.history.rend() && model.footer.rows.size() < 8; ++it) {
-        model.footer.rows.push_back({
+    for (auto it = state.career.history.rbegin(); it != state.career.history.rend() && historyRows.size() < 8; ++it) {
+        historyRows.push_back({
             std::to_string(it->season), it->club, std::to_string(it->finish), it->champion, it->note
         });
     }
+
+    const std::vector<std::string> objectiveFeed =
+        selectFeedLines(alerts, {"directiva", "objetivo", "promesa"}, 8, alerts);
+    std::vector<std::string> historyFeed;
+    for (auto it = state.career.history.rbegin(); it != state.career.history.rend() && historyFeed.size() < 8; ++it) {
+        historyFeed.push_back("T" + std::to_string(it->season) + " | " + it->club + " | puesto " +
+                              std::to_string(it->finish) + " | campeon " + it->champion);
+    }
+    if (historyFeed.empty()) historyFeed = alerts;
+
+    if (state.currentFilter == "Objetivos") {
+        model.infoLine = "Seguimiento fino de metas, confianza y riesgo institucional.";
+        model.primary.rows = objectiveRows;
+        model.secondary.rows = profileRows;
+        model.footer.rows = historyRows;
+        model.feed.lines = objectiveFeed;
+        model.detail.content = buildBoardSummaryService(state.career) + "\r\n\r\nVista priorizada: objetivos y riesgo de directiva.";
+    } else if (state.currentFilter == "Historial") {
+        model.infoLine = "Memoria del proyecto: temporadas previas y contexto institucional.";
+        model.primary.title = "CoachHistory";
+        model.primary.columns = {{L"Temp", 60}, {L"Club", 170}, {L"Puesto", 60}, {L"Campeon", 180}, {L"Nota", 240}};
+        model.primary.rows = historyRows;
+        model.secondary.title = "BoardObjectiveTable";
+        model.secondary.columns = {{L"Objetivo", 220}, {L"Estado", 120}, {L"Contexto", 220}};
+        model.secondary.rows = objectiveRows;
+        model.footer.title = "ClubProfile";
+        model.footer.columns = {{L"Perfil", 160}, {L"Valor", 120}, {L"Lectura", 220}};
+        model.footer.rows = profileRows;
+        model.feed.lines = historyFeed;
+        model.detail.content = buildBoardSummaryService(state.career) + "\r\n\r\nVista historica priorizada.";
+    } else {
+        model.primary.rows = objectiveRows;
+        model.secondary.rows = profileRows;
+        model.footer.rows = historyRows;
+    }
+
+    model.summary.content += "\r\nFiltro actual: " + state.currentFilter;
     return model;
 }
 

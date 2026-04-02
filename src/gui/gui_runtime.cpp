@@ -145,7 +145,9 @@ public:
         for (HWND target : targets_) {
             if (!target || !IsWindow(target)) continue;
             SendMessageW(target, WM_SETREDRAW, TRUE, 0);
-            RedrawWindow(target, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_UPDATENOW);
+            if (IsWindowVisible(target)) {
+                RedrawWindow(target, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_UPDATENOW);
+            }
         }
         if (state_.window) {
             SendMessageW(state_.window, WM_SETREDRAW, TRUE, 0);

@@ -201,7 +201,8 @@ void loanOutPlayerUi(Career& career) {
              << " Hab " << player.skill << " | Edad " << player.age << endl;
     }
     int playerChoice = readInt("Jugador (0 para cancelar): ", 0, static_cast<int>(candidates.size()));
-    if (playerChoice == 0) return;
+    if (playerChoice == 0 || candidates.empty()) return;
+    if (playerChoice - 1 >= static_cast<int>(candidates.size())) return;
 
     vector<Team*> destinations;
     for (auto* team : career.activeTeams) {

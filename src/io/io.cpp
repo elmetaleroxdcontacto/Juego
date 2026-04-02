@@ -639,7 +639,7 @@ DivisionLoadResult loadDivisionFromFolder(const string& folder, const string& di
             }
         }
 
-        finalizeLoadedTeam(team);
+        if (!loaded) finalizeLoadedTeam(team);
 
         int divisor = getCompetitionConfig(divisionId).budgetDivisor;
         if (divisor <= 0) divisor = 6;

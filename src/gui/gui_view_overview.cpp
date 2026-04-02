@@ -14,6 +14,29 @@
 #include <map>
 #include <sstream>
 
+namespace {
+
+std::vector<std::string> focusedAlertLines(const std::vector<std::string>& alerts,
+                                           const std::vector<std::string>& keywords) {
+    std::vector<std::string> out;
+    for (const std::string& line : alerts) {
+        const std::string lower = toLower(line);
+        bool match = false;
+        for (const std::string& keyword : keywords) {
+            if (lower.find(keyword) != std::string::npos) {
+                match = true;
+                break;
+            }
+        }
+        if (!match) continue;
+        out.push_back(line);
+        if (out.size() >= 8) break;
+    }
+    return out.empty() ? alerts : out;
+}
+
+}  // namespace
+
 namespace gui_win32 {
 
 GuiPageModel buildDashboardModel(AppState& state) {
@@ -233,7 +256,13 @@ GuiPageModel buildTacticsModel(AppState& state) {
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state, alerts);
-    model.infoLine = "Lee el plan tactico, el once inicial y el impacto esperado de cada ajuste.";
+    const bool highPressFocus = state.currentFilter == "Presion alta";
+    const bool lowBlockFocus = state.currentFilter == "Bloque bajo";
+    model.infoLine = highPressFocus
+        ? "Enfoque en presion alta: recuperacion, desgaste y riesgo a la espalda."
+        : (lowBlockFocus
+               ? "Enfoque en bloque bajo: proteccion del area, centros rivales y salida tras recuperacion."
+               : "Lee el plan tactico, el once inicial y el impacto esperado de cada ajuste.");
     model.summary.title = "TacticalSummary";
     model.primary.title = "TacticsBoard";
     model.primary.columns = {{L"Variable", 120}, {L"Valor", 90}, {L"Efecto estimado", 260}};
@@ -243,7 +272,8 @@ GuiPageModel buildTacticsModel(AppState& state) {
     model.footer.columns = {{L"Area", 130}, {L"Lectura", 220}, {L"Riesgo", 220}};
     model.detail.title = "MatchAnalysisPanel";
     model.feed.title = "AlertPanel";
-    model.feed.lines = alerts;
+    model.feed.lines = highPressFocus ? focusedAlertLines(alerts, {"fatiga", "lesion"})
+                                      : (lowBlockFocus ? buildFeedLines(state.career, "Resultados", 8) : alerts);
 
     if (!state.career.myTeam) {
         model.summary.content = "No hay equipo para editar tactica.";
@@ -260,7 +290,8 @@ GuiPageModel buildTacticsModel(AppState& state) {
         " | Anchura " + std::to_string(team.width) +
         " | Linea " + std::to_string(team.defensiveLine) +
         "\r\nInstruccion actual: " + team.matchInstruction +
-        " | Plan semanal: " + team.trainingFocus;
+        " | Plan semanal: " + team.trainingFocus +
+        "\r\nFiltro tactico: " + state.currentFilter;
 
     model.primary.rows.push_back({"Presion", std::to_string(team.pressingIntensity),
                                   team.pressingIntensity >= 4 ? "Recupera arriba, sube fatiga" : "Presion mas contenida"});
@@ -294,12 +325,27 @@ GuiPageModel buildTacticsModel(AppState& state) {
         }
     }
 
+    model.footer.rows.push_back({"Enfoque",
+                                 highPressFocus ? "Presion alta" : (lowBlockFocus ? "Bloque bajo" : "Balanceado"),
+                                 highPressFocus ? "Sube robos y desgaste"
+                                                : (lowBlockFocus ? "Protege espalda y concede centros"
+                                                                 : "Vista transversal del plan")});
     model.footer.rows.push_back({"Posesion", team.tempo >= 4 ? "Vertical" : "Controlada", team.pressingIntensity >= 4 ? "Transiciones largas" : "Menor recuperacion alta"});
     model.footer.rows.push_back({"Ocasiones", team.width >= 4 ? "Ataque por fuera" : "Juego interior", team.tempo >= 4 ? "Mas error tecnico" : "Menos volumen"});
     model.footer.rows.push_back({"Defensa", team.defensiveLine >= 4 ? "Bloque adelantado" : "Bloque medio/bajo", team.defensiveLine >= 4 ? "Espalda expuesta" : "Mayor asedio rival"});
     model.footer.rows.push_back({"Fatiga", congestedWeek ? "Gestion conservadora" : "Carga normal", team.pressingIntensity >= 4 ? "El XI llega mas exigido" : "Riesgo medio"});
 
     std::ostringstream detail;
+    if (highPressFocus) {
+        detail << "Enfoque activo: presion alta.\r\n";
+        detail << "Prioriza distancia corta entre lineas, piernas frescas y suplentes listos para sostener la agresividad.\r\n\r\n";
+    } else if (lowBlockFocus) {
+        detail << "Enfoque activo: bloque bajo.\r\n";
+        detail << "Prioriza proteger el area, vigilar segundas jugadas y preparar transiciones mas limpias tras recuperar.\r\n\r\n";
+    } else {
+        detail << "Enfoque activo: balanceado.\r\n";
+        detail << "La vista mezcla presion, ritmo y proteccion del bloque para leer el plan completo.\r\n\r\n";
+    }
     detail << "Presion alta aumenta recuperaciones, pero castiga a jugadores con fisico bajo.\r\n";
     detail << "Ritmo alto acelera la llegada, aunque empeora la precision en equipos con forma baja.\r\n";
     detail << "Bloque bajo reduce espacio interior y aumenta probabilidad de centros rivales.\r\n\r\n";

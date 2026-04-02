@@ -382,6 +382,7 @@ void hideControlAndInvalidate(AppState& state, HWND hwnd, int padX = 8, int padY
 void showControlAndInvalidate(AppState& state, HWND hwnd, int padX = 8, int padY = 6);
 void setControlVisibility(AppState& state, HWND hwnd, bool visible, int padX = 8, int padY = 6);
 void moveControlAndInvalidate(AppState& state, HWND hwnd, int x, int y, int width, int height, int padX = 10, int padY = 8);
+void applyControlViewportClip(AppState& state, HWND hwnd, const RECT* clipRect);
 void applyEditInteriorPadding(AppState& state, HWND hwnd, int horizontalPadding, int verticalPadding);
 HWND createControl(AppState& state,
                    DWORD exStyle,

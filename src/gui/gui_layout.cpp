@@ -1021,6 +1021,7 @@ void layoutWindow(AppState& state) {
     int maxContentBottom = 0;
     int scrollViewportTop = 0;
     int scrollViewportBottom = static_cast<int>(client.bottom);
+    RECT scrollClipViewport{0, 0, client.right, client.bottom};
     auto recordBottom = [&](int y, int height) {
         maxContentBottom = std::max(maxContentBottom, y + height);
     };
@@ -1028,6 +1029,7 @@ void layoutWindow(AppState& state) {
         if (!hwnd) return;
         const int targetY = scrollable ? (y - state.pageScrollY) : y;
         moveControlAndInvalidate(state, hwnd, x, targetY, width, height);
+        applyControlViewportClip(state, hwnd, scrollable ? &scrollClipViewport : nullptr);
         if (scrollable && IsWindowVisible(hwnd)) recordBottom(y, height);
     };
     auto placeFixedWindow = [&](HWND hwnd, int x, int y, int width, int height) {
@@ -1105,6 +1107,7 @@ void layoutWindow(AppState& state) {
         const int detailHeight = std::max(s(170), (summaryHeight - s(40)) / 2);
         scrollViewportTop = panelsTop;
         scrollViewportBottom = client.bottom - s(kStatusHeight) - s(8);
+        scrollClipViewport = RECT{shellLeft + s(8), scrollViewportTop, shellLeft + shellWidth - s(8), scrollViewportBottom};
 
         placeScrollableWindow(state.summaryLabel, shellLeft + s(16), panelsTop, leftWidth, s(kPanelLabelHeight));
         placeScrollableWindow(state.summaryEdit, shellLeft + s(16), panelsTop + s(kPanelBodyOffset), leftWidth, summaryHeight);
@@ -1471,6 +1474,7 @@ void layoutWindow(AppState& state) {
     state.layout.mainArea = state.layout.scrollViewport;
     scrollViewportTop = state.layout.scrollViewport.top;
     scrollViewportBottom = state.layout.scrollViewport.bottom;
+    scrollClipViewport = state.layout.scrollViewport;
 
     const bool contextualInsightStrip = pageUsesInsightStrip(state) && state.currentPage != GuiPage::Dashboard;
     const int dashboardSpotlightReserve = dashboardLayout

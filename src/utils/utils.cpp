@@ -567,6 +567,23 @@ string divisionDisplay(const string& id) {
     return divisionDisplayName(id);
 }
 
+// Safe conversion functions with exception handling
+int safeStoi(const string& str, int defaultValue) {
+    try {
+        return stoi(str);
+    } catch (const exception&) {
+        return defaultValue;
+    }
+}
+
+long long safeStoLL(const string& str, long long defaultValue) {
+    try {
+        return stoll(str);
+    } catch (const exception&) {
+        return defaultValue;
+    }
+}
+
 string readLine(const string& prompt) {
     cout << prompt;
     string line;

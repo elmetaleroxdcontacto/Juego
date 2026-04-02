@@ -126,29 +126,36 @@ int divisionIndex(const string& id) {
     return -1;
 }
 
-vector<Team*> topByValue(vector<Team*> teams, int count) {
-    sort(teams.begin(), teams.end(), [](Team* a, Team* b) {
-        return a->getSquadValue() > b->getSquadValue();
-    });
+LeagueTable buildRankedTable(const vector<Team*>& teams, const string& title, const string& ruleId) {
+    LeagueTable table;
+    table.title = title.empty() ? divisionDisplay(ruleId) : title;
+    table.ruleId = ruleId;
+    for (Team* team : teams) {
+        if (team) table.addTeam(team);
+    }
+    table.sortTable();
+    return table;
+}
+
+vector<Team*> rankedDivisionTeams(Career& career, const string& divisionId) {
+    return buildRankedTable(career.getDivisionTeams(divisionId), divisionDisplay(divisionId), divisionId).teams;
+}
+
+vector<Team*> topByStandings(Career& career, const string& divisionId, int count) {
+    vector<Team*> teams = rankedDivisionTeams(career, divisionId);
     if (count < 0) count = 0;
     if (static_cast<int>(teams.size()) > count) teams.resize(count);
     return teams;
 }
 
-vector<Team*> sortByValue(vector<Team*> teams) {
-    sort(teams.begin(), teams.end(), [](Team* a, Team* b) {
-        return a->getSquadValue() > b->getSquadValue();
-    });
-    return teams;
-}
-
-vector<Team*> bottomByValue(vector<Team*> teams, int count) {
-    sort(teams.begin(), teams.end(), [](Team* a, Team* b) {
-        return a->getSquadValue() < b->getSquadValue();
-    });
-    if (count < 0) count = 0;
-    if (static_cast<int>(teams.size()) > count) teams.resize(count);
-    return teams;
+vector<Team*> bottomByStandings(Career& career, const string& divisionId, int count) {
+    vector<Team*> ranked = rankedDivisionTeams(career, divisionId);
+    if (count <= 0 || ranked.empty()) return {};
+    vector<Team*> out;
+    for (int i = 0; i < count && i < static_cast<int>(ranked.size()); ++i) {
+        out.push_back(ranked[ranked.size() - 1 - static_cast<size_t>(i)]);
+    }
+    return out;
 }
 
 void addMovementLines(SeasonTransitionSummary& summary,
@@ -392,30 +399,33 @@ TerceraBSeasonOutcome resolveTerceraBSeason(const vector<Team*>& northRanked,
     return out;
 }
 
-TerceraBSeasonOutcome inferTerceraBSeasonByValue(Career& career, SeasonTransitionSummary& summary) {
+TerceraBSeasonOutcome inferTerceraBSeasonFromStandings(Career& career, SeasonTransitionSummary& summary) {
     vector<Team*> teams = career.getDivisionTeams("tercera division b");
     vector<Team*> north;
     vector<Team*> south;
+    int groupSize = getCompetitionConfig("tercera division b").groups.groupSize;
+    if (groupSize <= 0) groupSize = max(1, static_cast<int>(teams.size()) / 2);
     for (size_t i = 0; i < teams.size(); ++i) {
-        if (i < 14) north.push_back(teams[i]);
-        else if (i < 28) south.push_back(teams[i]);
+        if (static_cast<int>(i) < groupSize) north.push_back(teams[i]);
+        else south.push_back(teams[i]);
     }
-    north = sortByValue(north);
-    south = sortByValue(south);
-    return resolveTerceraBSeason(north, south, true, summary);
+
+    LeagueTable northTable = buildRankedTable(north, competitionGroupTitle("tercera division b", true), "tercera division b");
+    LeagueTable southTable = buildRankedTable(south, competitionGroupTitle("tercera division b", false), "tercera division b");
+    return resolveTerceraBSeason(northTable.teams, southTable.teams, true, summary);
 }
 
-TerceraARelegationOutcome getInactiveTerceraARelegationByValue(Career& career) {
+TerceraARelegationOutcome getInactiveTerceraARelegationByStandings(Career& career) {
     TerceraARelegationOutcome out;
-    vector<Team*> teams = career.getDivisionTeams("tercera division a");
-    teams = bottomByValue(teams, 4);
-    if (!teams.empty()) out.directRelegated.push_back(teams[0]);
-    if (teams.size() > 1) out.directRelegated.push_back(teams[1]);
-    if (teams.size() > 3) {
-        out.promotionTeams.push_back(teams[3]);
-        out.promotionTeams.push_back(teams[2]);
-    } else if (teams.size() > 2) {
-        out.promotionTeams.push_back(teams[2]);
+    vector<Team*> ranked = rankedDivisionTeams(career, "tercera division a");
+    const int teamCount = static_cast<int>(ranked.size());
+    if (teamCount > 0) out.directRelegated.push_back(ranked[static_cast<size_t>(teamCount - 1)]);
+    if (teamCount > 1) out.directRelegated.push_back(ranked[static_cast<size_t>(teamCount - 2)]);
+    if (teamCount > 3) {
+        out.promotionTeams.push_back(ranked[static_cast<size_t>(teamCount - 4)]);
+        out.promotionTeams.push_back(ranked[static_cast<size_t>(teamCount - 3)]);
+    } else if (teamCount > 2) {
+        out.promotionTeams.push_back(ranked[static_cast<size_t>(teamCount - 3)]);
     }
     return out;
 }
@@ -628,9 +638,9 @@ SeasonTransitionSummary endSeasonSegundaDivision(Career& career) {
     if (!higher.empty() && champion) promote.push_back(champion);
 
     vector<Team*> fromHigher =
-        higher.empty() ? vector<Team*>() : bottomByValue(career.getDivisionTeams(higher), static_cast<int>(promote.size()));
+        higher.empty() ? vector<Team*>() : bottomByStandings(career, higher, static_cast<int>(promote.size()));
     vector<Team*> fromLower =
-        lower.empty() ? vector<Team*>() : topByValue(career.getDivisionTeams(lower), static_cast<int>(relegate.size()));
+        lower.empty() ? vector<Team*>() : topByStandings(career, lower, static_cast<int>(relegate.size()));
 
     for (Team* team : promote) {
         if (!higher.empty()) {
@@ -742,9 +752,9 @@ SeasonTransitionSummary endSeasonPrimeraB(Career& career) {
     if (!lower.empty() && relegated) relegate.push_back(relegated);
 
     vector<Team*> fromHigher =
-        higher.empty() ? vector<Team*>() : bottomByValue(career.getDivisionTeams(higher), static_cast<int>(promote.size()));
+        higher.empty() ? vector<Team*>() : bottomByStandings(career, higher, static_cast<int>(promote.size()));
     vector<Team*> fromLower =
-        lower.empty() ? vector<Team*>() : topByValue(career.getDivisionTeams(lower), static_cast<int>(relegate.size()));
+        lower.empty() ? vector<Team*>() : topByStandings(career, lower, static_cast<int>(relegate.size()));
 
     for (Team* team : promote) {
         if (!higher.empty()) {
@@ -808,7 +818,7 @@ SeasonTransitionSummary endSeasonTerceraA(Career& career) {
         directRelegated.push_back(table.back());
     }
 
-    TerceraBSeasonOutcome lowerOutcome = inferTerceraBSeasonByValue(career, summary);
+    TerceraBSeasonOutcome lowerOutcome = inferTerceraBSeasonFromStandings(career, summary);
     vector<Team*> promotedByPromotion;
     vector<Team*> relegatedByPromotion;
     int promotionTies =
@@ -838,7 +848,7 @@ SeasonTransitionSummary endSeasonTerceraA(Career& career) {
     }
 
     vector<Team*> fromHigher =
-        higher.empty() ? vector<Team*>() : bottomByValue(career.getDivisionTeams(higher), static_cast<int>(promote.size()));
+        higher.empty() ? vector<Team*>() : bottomByStandings(career, higher, static_cast<int>(promote.size()));
     vector<Team*> fromLower = lowerOutcome.directPromoted;
 
     for (Team* team : promote) {
@@ -904,7 +914,7 @@ SeasonTransitionSummary endSeasonTerceraB(Career& career) {
     LeagueTable south = buildCompetitionGroupTable(career, false);
 
     TerceraBSeasonOutcome outcome = resolveTerceraBSeason(north.teams, south.teams, true, summary);
-    TerceraARelegationOutcome higherOutcome = getInactiveTerceraARelegationByValue(career);
+    TerceraARelegationOutcome higherOutcome = getInactiveTerceraARelegationByStandings(career);
 
     vector<Team*> promotedByPromotion;
     vector<Team*> relegatedByPromotion;
@@ -1010,18 +1020,18 @@ SeasonTransitionSummary endSeason(Career& career) {
     }
 
     vector<Team*> fromHigher =
-        higher.empty() ? vector<Team*>() : bottomByValue(career.getDivisionTeams(higher), actualPromote);
+        higher.empty() ? vector<Team*>() : bottomByStandings(career, higher, actualPromote);
     vector<Team*> fromLower;
     if (!lower.empty() && config.seasonHandler == CompetitionSeasonHandler::PrimeraDivision &&
         getCompetitionConfig(lower).seasonHandler == CompetitionSeasonHandler::PrimeraB) {
-        vector<Team*> pbTable = sortByValue(career.getDivisionTeams(lower));
+        vector<Team*> pbTable = rankedDivisionTeams(career, lower);
         Team* regularChampion = pbTable.empty() ? nullptr : pbTable.front();
         Team* pbPlayoff = liguillaAscensoPrimeraB(pbTable, summary);
         if (regularChampion) fromLower.push_back(regularChampion);
         if (pbPlayoff && pbPlayoff != regularChampion) fromLower.push_back(pbPlayoff);
         if (static_cast<int>(fromLower.size()) > relegateCount) fromLower.resize(static_cast<size_t>(relegateCount));
     } else {
-        fromLower = lower.empty() ? vector<Team*>() : topByValue(career.getDivisionTeams(lower), relegateCount);
+        fromLower = lower.empty() ? vector<Team*>() : topByStandings(career, lower, relegateCount);
     }
 
     for (Team* team : promote) {

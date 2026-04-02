@@ -13,8 +13,14 @@ using namespace std;
 
 namespace {
 
-const char* kLeagueRegistryPath = "data/configs/league_registry.csv";
-const char* kFallbackCompetitionRulesPath = "data/LigaChilena/competition_rules.csv";
+// Helper functions to get resolved paths
+static string getLeagueRegistryPath() {
+    return resolveProjectPath("data/configs/league_registry.csv");
+}
+
+static string getFallbackCompetitionRulesPath() {
+    return resolveProjectPath("data/LigaChilena/competition_rules.csv");
+}
 
 vector<DivisionInfo> defaultDivisions() {
     return {
@@ -30,7 +36,7 @@ struct LeagueRegistryCache {
     bool loaded = false;
     vector<DivisionInfo> divisions;
     vector<string> warnings;
-    string competitionRulesPath = kFallbackCompetitionRulesPath;
+    string competitionRulesPath = getFallbackCompetitionRulesPath();
 };
 
 LeagueRegistryCache& registryCache() {
@@ -74,11 +80,12 @@ bool reloadLeagueRegistry() {
     cache.loaded = true;
     cache.divisions = defaultDivisions();
     cache.warnings.clear();
-    cache.competitionRulesPath = kFallbackCompetitionRulesPath;
+    cache.competitionRulesPath = getFallbackCompetitionRulesPath();
 
     vector<string> lines;
-    if (!readTextFileLines(kLeagueRegistryPath, lines) || lines.size() <= 1) {
-        cache.warnings.push_back(string("No se pudo cargar ") + kLeagueRegistryPath + ". Se usa el registro integrado.");
+    string registryPath = getLeagueRegistryPath();
+    if (!readTextFileLines(registryPath, lines) || lines.size() <= 1) {
+        cache.warnings.push_back(string("No se pudo cargar ") + registryPath + ". Se usa el registro integrado.");
         return false;
     }
 

@@ -12,8 +12,14 @@ using namespace std;
 
 namespace {
 
-const char* kWorldRulesPath = "data/configs/world_rules.csv";
-const char* kScoutingRegionsPath = "data/configs/scouting_regions.csv";
+// Helper functions to get resolved paths
+static string getWorldRulesPath() {
+    return resolveProjectPath("data/configs/world_rules.csv");
+}
+
+static string getScoutingRegionsPath() {
+    return resolveProjectPath("data/configs/scouting_regions.csv");
+}
 
 struct WorldConfigCache {
     bool loaded = false;
@@ -49,7 +55,7 @@ void loadConfiguredWorldData() {
     cache.scoutingRegions = {"Metropolitana", "Centro", "Sur", "Norte", "Patagonia", "Internacional"};
 
     vector<string> lines;
-    if (readTextFileLines(kWorldRulesPath, lines) && lines.size() > 1) {
+    if (readTextFileLines(getWorldRulesPath(), lines) && lines.size() > 1) {
         for (size_t i = 1; i < lines.size(); ++i) {
             const string line = trim(lines[i]);
             if (line.empty()) continue;
@@ -62,7 +68,7 @@ void loadConfiguredWorldData() {
     }
 
     lines.clear();
-    if (readTextFileLines(kScoutingRegionsPath, lines) && lines.size() > 1) {
+    if (readTextFileLines(getScoutingRegionsPath(), lines) && lines.size() > 1) {
         cache.scoutingRegions.clear();
         for (size_t i = 1; i < lines.size(); ++i) {
             const string line = trim(lines[i]);

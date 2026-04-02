@@ -21,6 +21,9 @@
 #include "development/training_impact_system.h"
 #include "engine/models.h"
 #include "engine/game_settings.h"
+#ifdef _WIN32
+#include "gui/gui_view_builders.h"
+#endif
 #include "io/save_serialization.h"
 #include "io/io.h"
 #include "simulation/match_context.h"
@@ -601,6 +604,66 @@ void testSeasonTransitionAdvancesCareerWithoutUiDependencies() {
     expect(career.activeDivision == career.myTeam->division,
            "Tras la transicion la carrera debe seguir la division real del club usuario.");
     expect(!career.schedule.empty(), "La nueva temporada debe reconstruir su calendario.");
+}
+
+void testSeasonTransitionPromotesByStandingsNotSquadValue() {
+    Career career;
+    career.currentSeason = 4;
+    career.currentWeek = 34;
+    career.managerName = "Standing Manager";
+
+    career.allTeams.push_back(makeTeam("Primera Lider", "primera division", 74, 3, 3, "Balanced", "Equilibrado", 950000));
+    career.allTeams.push_back(makeTeam("Primera Medio", "primera division", 71, 3, 3, "Balanced", "Equilibrado", 820000));
+    career.allTeams.push_back(makeTeam("Primera Tenso", "primera division", 68, 2, 2, "Defensive", "Bloque bajo", 540000));
+    career.allTeams.push_back(makeTeam("Primera Descenso", "primera division", 67, 2, 2, "Defensive", "Pausar juego", 500000));
+
+    career.allTeams.push_back(makeTeam("Primera B Lider", "primera b", 71, 3, 3, "Balanced", "Equilibrado", 430000));
+    career.allTeams.push_back(makeTeam("Primera B Liguilla", "primera b", 69, 3, 3, "Balanced", "Equilibrado", 410000));
+    career.allTeams.push_back(makeTeam("Primera B Medio", "primera b", 66, 2, 2, "Balanced", "Equilibrado", 360000));
+    career.allTeams.push_back(makeTeam("Primera B Fondo", "primera b", 64, 2, 2, "Defensive", "Bloque bajo", 320000));
+
+    career.allTeams.push_back(makeTeam("Segunda Deportivo", "segunda division", 63, 3, 3, "Balanced", "Equilibrado", 260000));
+    career.allTeams.push_back(makeTeam("Segunda Rico", "segunda division", 72, 3, 3, "Balanced", "Equilibrado", 980000));
+    career.allTeams.push_back(makeTeam("Segunda Centro", "segunda division", 66, 2, 2, "Balanced", "Equilibrado", 420000));
+    career.allTeams.push_back(makeTeam("Segunda Fondo", "segunda division", 61, 2, 2, "Defensive", "Pausar juego", 240000));
+
+    auto setStanding = [](Team* team, int points, int wins, int draws, int goalsFor, int goalsAgainst) {
+        expect(team != nullptr, "La prueba de ascensos por tabla necesita equipos existentes.");
+        team->points = points;
+        team->wins = wins;
+        team->draws = draws;
+        team->losses = max(0, 30 - wins - draws);
+        team->goalsFor = goalsFor;
+        team->goalsAgainst = goalsAgainst;
+    };
+
+    setStanding(career.findTeamByName("Primera Lider"), 68, 21, 5, 52, 24);
+    setStanding(career.findTeamByName("Primera Medio"), 56, 17, 5, 45, 28);
+    setStanding(career.findTeamByName("Primera Tenso"), 31, 8, 7, 27, 43);
+    setStanding(career.findTeamByName("Primera Descenso"), 22, 5, 7, 21, 49);
+
+    setStanding(career.findTeamByName("Segunda Deportivo"), 61, 18, 7, 46, 24);
+    setStanding(career.findTeamByName("Segunda Rico"), 34, 9, 7, 33, 37);
+    setStanding(career.findTeamByName("Segunda Centro"), 49, 14, 7, 41, 31);
+    setStanding(career.findTeamByName("Segunda Fondo"), 20, 5, 5, 22, 48);
+
+    career.setActiveDivision("primera b");
+    career.myTeam = career.findTeamByName("Primera B Lider");
+    expect(career.myTeam != nullptr, "La prueba de ascensos por tabla necesita club usuario.");
+
+    setStanding(career.findTeamByName("Primera B Lider"), 67, 20, 7, 51, 22);
+    setStanding(career.findTeamByName("Primera B Liguilla"), 59, 17, 8, 44, 29);
+    setStanding(career.findTeamByName("Primera B Medio"), 38, 10, 8, 31, 38);
+    setStanding(career.findTeamByName("Primera B Fondo"), 21, 5, 6, 20, 47);
+    career.leagueTable.sortTable();
+
+    SeasonTransitionSummary summary = endSeason(career);
+
+    expect(!summary.lines.empty(), "La transicion debe seguir devolviendo resumen legible.");
+    expect(career.findTeamByName("Segunda Deportivo")->division == "primera b",
+           "El ascenso desde Segunda debe seguir la tabla y no el valor del plantel.");
+    expect(career.findTeamByName("Segunda Rico")->division == "segunda division",
+           "Un club mas caro no debe ascender si su rendimiento fue inferior.");
 }
 
 void testSeasonServiceReturnsStructuredWeekResult() {
@@ -1753,6 +1816,87 @@ void testMatchCenterAddsRecommendedAdjustments() {
            "Los ajustes sugeridos deben explicar que corregir tras el partido.");
 }
 
+void testClubPrestigeUsesCanonicalTerceraDivisionIds() {
+    Team terceraA = makeTeam("Prestigio A", "tercera division a", 60, 3, 3, "Balanced", "Equilibrado", 260000);
+    Team terceraB = terceraA;
+    terceraB.name = "Prestigio B";
+    terceraB.division = "tercera division b";
+
+    expect(teamPrestigeScore(terceraA) > teamPrestigeScore(terceraB),
+           "Las divisiones canonicas de Tercera deben conservar escalones distintos de prestigio.");
+}
+
+#ifdef _WIN32
+void testManagementViewFiltersChangeVisibleContent() {
+    gui_win32::AppState state;
+    state.currentPage = gui_win32::GuiPage::Finances;
+    state.career.allTeams.push_back(makeTeam("Filtro Club", "primera division", 69, 3, 3, "Balanced", "Equilibrado", 850000));
+    state.career.allTeams.push_back(makeTeam("Filtro Rival", "primera division", 67, 2, 2, "Defensive", "Bloque bajo", 620000));
+    state.career.setActiveDivision("primera division");
+    state.career.myTeam = state.career.findTeamByName("Filtro Club");
+    expect(state.career.myTeam != nullptr, "La prueba de filtros GUI necesita club usuario.");
+
+    Team& team = *state.career.myTeam;
+    team.players[0].contractWeeks = 8;
+    team.players[0].wantsToLeave = true;
+    team.headCoachTenureWeeks = 18;
+    state.career.boardMonthlyObjective = "Entrar al top 3";
+    state.career.boardMonthlyTarget = 3;
+    state.career.boardMonthlyProgress = 1;
+    state.career.boardWarningWeeks = 2;
+    state.career.history.push_back({3, "primera division", "Filtro Club", 5, "Campeon Historico", "Ascenso", "Descenso", "Nota de temporada"});
+
+    state.currentFilter = "Salarios";
+    const gui_win32::GuiPageModel salaryFinance = gui_win32::buildFinancesModel(state);
+    expect(salaryFinance.primary.title == "SalaryTable",
+           "El filtro Salarios debe llevar la tabla salarial al panel principal.");
+
+    state.currentFilter = "Infraestructura";
+    const gui_win32::GuiPageModel infraFinance = gui_win32::buildFinancesModel(state);
+    expect(infraFinance.primary.title == "Infrastructure",
+           "El filtro Infraestructura debe priorizar instalaciones y staff.");
+
+    state.currentPage = gui_win32::GuiPage::Board;
+    state.currentFilter = "Historial";
+    const gui_win32::GuiPageModel boardHistory = gui_win32::buildBoardModel(state);
+    expect(boardHistory.primary.title == "CoachHistory",
+           "El filtro Historial debe mover el historial al panel principal.");
+
+    state.currentPage = gui_win32::GuiPage::Tactics;
+    state.currentFilter = "Presion alta";
+    const gui_win32::GuiPageModel pressModel = gui_win32::buildTacticsModel(state);
+    state.currentFilter = "Bloque bajo";
+    const gui_win32::GuiPageModel blockModel = gui_win32::buildTacticsModel(state);
+    expect(pressModel.infoLine != blockModel.infoLine,
+           "Los filtros tacticos deben cambiar el enfoque visible de la pagina.");
+}
+
+void testTransferFeedStaysMarketFocusedAcrossFilters() {
+    gui_win32::AppState state;
+    state.currentPage = gui_win32::GuiPage::Transfers;
+    state.career.allTeams.push_back(makeTeam("Mercado Club", "primera division", 69, 3, 3, "Balanced", "Equilibrado", 900000));
+    state.career.allTeams.push_back(makeTeam("Mercado Rival", "primera division", 72, 3, 3, "Balanced", "Equilibrado", 720000));
+    state.career.setActiveDivision("primera division");
+    state.career.myTeam = state.career.findTeamByName("Mercado Club");
+    expect(state.career.myTeam != nullptr, "La prueba del feed de mercado necesita club usuario.");
+
+    state.career.newsFeed.push_back("T4-F8: Resultado de copa sin novedades de mercado.");
+    state.career.newsFeed.push_back("T4-F8: Rumor de fichaje por un delantero internacional.");
+
+    state.currentFilter = "Todos";
+    const gui_win32::GuiPageModel allModel = gui_win32::buildTransfersModel(state);
+    state.currentFilter = "DEF";
+    const gui_win32::GuiPageModel defModel = gui_win32::buildTransfersModel(state);
+
+    const string allFeed = joinLines(allModel.feed.lines);
+    const string defFeed = joinLines(defModel.feed.lines);
+    expect(allFeed.find("fichaje") != string::npos,
+           "La vista de mercado debe seguir mostrando noticias de fichajes con el filtro general.");
+    expect(allFeed.find("Resultado de copa") == string::npos && defFeed.find("Resultado de copa") == string::npos,
+           "El feed de Transfers no debe abrirse a noticias generales por cambiar el filtro de jugadores.");
+}
+#endif
+
 void testIgnoredArchivedFoldersConfigSuppressesKnownWarnings() {
     const DataValidationReport report = buildRosterDataValidationReport();
     const string issueDump = joinLines(report.lines);
@@ -1932,6 +2076,7 @@ int main() {
         {"squad_sale_candidates", testSquadPlannerFlagsUnusedSeniorSaleCandidates},
         {"transfer_negotiation", testTransferNegotiationBuildsStructuredDeal},
         {"season_transition", testSeasonTransitionAdvancesCareerWithoutUiDependencies},
+        {"season_transition_standings", testSeasonTransitionPromotesByStandingsNotSquadValue},
         {"season_service", testSeasonServiceReturnsStructuredWeekResult},
         {"opponent_report", testOpponentReportExplainsNextFixture},
         {"match_analysis_store", testMatchAnalysisStoreProducesStructuredCareerData},
@@ -1950,6 +2095,7 @@ int main() {
         {"scouting_assignments", testScoutingAssignmentShowsInReport},
         {"role_duty_snapshot", testRoleDutyShapesMatchSnapshot},
         {"club_world_metadata", testTeamIdentitySeedsWorldMetadata},
+        {"club_prestige_divisions", testClubPrestigeUsesCanonicalTerceraDivisionIds},
         {"manager_inbox", testManagerInboxTracksNewsAndScouting},
         {"configured_world_data", testConfiguredWorldDataLoads},
         {"league_registry_data", testLeagueRegistryLoadsConfiguredData},
@@ -1974,6 +2120,10 @@ int main() {
         {"save_load_roundtrip", testSaveLoadRoundTripPreservesCareerState},
         {"legacy_division_ids", testLegacyDivisionIdentifiersCanonicalizeOnLoad},
         {"loader_fallback", testLoadTeamFromDirectoryFallsBackAndResolvesRawPositions},
+#ifdef _WIN32
+        {"management_view_filters", testManagementViewFiltersChangeVisibleContent},
+        {"transfer_feed_focus", testTransferFeedStaysMarketFocusedAcrossFilters},
+#endif
     };
 
     int failures = 0;

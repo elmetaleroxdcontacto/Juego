@@ -187,12 +187,13 @@ string playerFormLabel(const Player& p) {
 }
 
 static int divisionPrestigeBase(const string& division) {
-    string id = toLower(trim(division));
+    string id = canonicalDivisionId(division);
+    if (id.empty()) id = toLower(trim(division));
     if (id == "primera division") return 68;
     if (id == "primera b") return 56;
     if (id == "segunda division") return 48;
-    if (id == "tercera a") return 40;
-    if (id == "tercera b") return 32;
+    if (id == "tercera division a" || id == "tercera a") return 40;
+    if (id == "tercera division b" || id == "tercera b") return 32;
     return 36;
 }
 
@@ -775,10 +776,8 @@ static void decodeHeadToHead(const string& encoded, Team& team) {
         string opponent = trim(token.substr(0, eq));
         string pointsStr = trim(token.substr(eq + 1));
         if (opponent.empty() || pointsStr.empty()) continue;
-        try {
-            team.headToHead.push_back({opponent, stoi(pointsStr)});
-        } catch (...) {
-        }
+        int points = safeStoi(pointsStr);
+        team.headToHead.push_back({opponent, points});
     }
 }
 
@@ -836,20 +835,20 @@ static MatchCenterSnapshot decodeMatchCenterSnapshot(const string& encoded) {
     if (idx < fields.size()) snapshot.competitionLabel = fields[idx++]; else return snapshot;
     if (idx < fields.size()) snapshot.opponentName = fields[idx++];
     if (idx < fields.size()) snapshot.venueLabel = fields[idx++];
-    if (idx < fields.size()) snapshot.myGoals = stoi(fields[idx++]);
-    if (idx < fields.size()) snapshot.oppGoals = stoi(fields[idx++]);
-    if (idx < fields.size()) snapshot.myShots = stoi(fields[idx++]);
-    if (idx < fields.size()) snapshot.oppShots = stoi(fields[idx++]);
-    if (idx < fields.size()) snapshot.myShotsOnTarget = stoi(fields[idx++]);
-    if (idx < fields.size()) snapshot.oppShotsOnTarget = stoi(fields[idx++]);
-    if (idx < fields.size()) snapshot.myPossession = stoi(fields[idx++]);
-    if (idx < fields.size()) snapshot.oppPossession = stoi(fields[idx++]);
-    if (idx < fields.size()) snapshot.myCorners = stoi(fields[idx++]);
-    if (idx < fields.size()) snapshot.oppCorners = stoi(fields[idx++]);
-    if (idx < fields.size()) snapshot.mySubstitutions = stoi(fields[idx++]);
-    if (idx < fields.size()) snapshot.oppSubstitutions = stoi(fields[idx++]);
-    if (idx < fields.size()) snapshot.myExpectedGoalsTenths = stoi(fields[idx++]);
-    if (idx < fields.size()) snapshot.oppExpectedGoalsTenths = stoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.myGoals = safeStoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.oppGoals = safeStoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.myShots = safeStoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.oppShots = safeStoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.myShotsOnTarget = safeStoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.oppShotsOnTarget = safeStoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.myPossession = safeStoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.oppPossession = safeStoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.myCorners = safeStoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.oppCorners = safeStoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.mySubstitutions = safeStoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.oppSubstitutions = safeStoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.myExpectedGoalsTenths = safeStoi(fields[idx++]);
+    if (idx < fields.size()) snapshot.oppExpectedGoalsTenths = safeStoi(fields[idx++]);
     if (idx < fields.size()) snapshot.weather = fields[idx++];
     if (idx < fields.size()) snapshot.dominanceSummary = fields[idx++];
     if (idx < fields.size()) snapshot.tacticalSummary = fields[idx++];
@@ -877,10 +876,10 @@ static vector<SeasonHistoryEntry> decodeHistory(const string& encoded) {
         auto parts = splitByDelimiter(token, '^');
         if (parts.size() < 8) continue;
         SeasonHistoryEntry e;
-        e.season = stoi(parts[0]);
+        e.season = safeStoi(parts[0]);
         e.division = parts[1];
         e.club = parts[2];
-        e.finish = stoi(parts[3]);
+        e.finish = safeStoi(parts[3]);
         e.champion = parts[4];
         e.promoted = parts[5];
         e.relegated = parts[6];
@@ -914,12 +913,12 @@ static vector<PendingTransfer> decodePendingTransfers(const string& encoded) {
         e.playerName = parts[0];
         e.fromTeam = parts[1];
         e.toTeam = parts[2];
-        e.effectiveSeason = stoi(parts[3]);
-        e.loanWeeks = stoi(parts[4]);
-        e.fee = stoll(parts[5]);
+        e.effectiveSeason = safeStoi(parts[3]);
+        e.loanWeeks = safeStoi(parts[4]);
+        e.fee = safeStoLL(parts[5]);
         if (parts.size() >= 10) {
-            e.wage = stoll(parts[6]);
-            e.contractWeeks = stoi(parts[7]);
+            e.wage = safeStoLL(parts[6]);
+            e.contractWeeks = safeStoi(parts[7]);
             e.preContract = (parts[8] == "1");
             e.loan = (parts[9] == "1");
             e.promisedRole = (parts.size() > 10) ? parts[10] : "Sin promesa";
@@ -1296,23 +1295,23 @@ static Player decodePlayerFields(const vector<string>& pf) {
     bool hasLoanState = pf.size() >= 30;
     if (idx < pf.size()) p.name = pf[idx++];
     if (idx < pf.size()) p.position = pf[idx++];
-    if (idx < pf.size()) p.attack = stoi(pf[idx++]); else p.attack = 40;
-    if (idx < pf.size()) p.defense = stoi(pf[idx++]); else p.defense = 40;
-    if (idx < pf.size()) p.stamina = stoi(pf[idx++]); else p.stamina = 60;
+    if (idx < pf.size()) p.attack = safeStoi(pf[idx++]); else p.attack = 40;
+    if (idx < pf.size()) p.defense = safeStoi(pf[idx++]); else p.defense = 40;
+    if (idx < pf.size()) p.stamina = safeStoi(pf[idx++]); else p.stamina = 60;
 
     bool hasFitness = (pf.size() >= 16);
-    if (hasFitness && idx < pf.size()) p.fitness = stoi(pf[idx++]);
+    if (hasFitness && idx < pf.size()) p.fitness = safeStoi(pf[idx++]);
     else p.fitness = p.stamina;
 
-    if (idx < pf.size()) p.skill = stoi(pf[idx++]); else p.skill = (p.attack + p.defense) / 2;
+    if (idx < pf.size()) p.skill = safeStoi(pf[idx++]); else p.skill = (p.attack + p.defense) / 2;
 
     size_t remaining = (idx <= pf.size()) ? (pf.size() - idx) : 0;
     bool hasPotential = (remaining >= 11);
-    if (hasPotential && idx < pf.size()) p.potential = stoi(pf[idx++]);
+    if (hasPotential && idx < pf.size()) p.potential = safeStoi(pf[idx++]);
     else p.potential = clampInt(p.skill + randInt(0, 8), p.skill, 95);
 
-    if (idx < pf.size()) p.age = stoi(pf[idx++]); else p.age = 24;
-    if (idx < pf.size()) p.value = stoll(pf[idx++]); else p.value = static_cast<long long>(p.skill) * 10000;
+    if (idx < pf.size()) p.age = safeStoi(pf[idx++]); else p.age = 24;
+    if (idx < pf.size()) p.value = safeStoLL(pf[idx++]); else p.value = static_cast<long long>(p.skill) * 10000;
     if (hasLoanState && idx < pf.size()) {
         string loanStr = toLower(pf[idx++]);
         p.onLoan = (loanStr == "1" || loanStr == "true");
@@ -1321,7 +1320,7 @@ static Player decodePlayerFields(const vector<string>& pf) {
     }
     if (hasLoanState && idx < pf.size()) p.parentClub = pf[idx++];
     else p.parentClub.clear();
-    if (hasLoanState && idx < pf.size()) p.loanWeeksRemaining = stoi(pf[idx++]);
+    if (hasLoanState && idx < pf.size()) p.loanWeeksRemaining = safeStoi(pf[idx++]);
     else p.loanWeeksRemaining = 0;
 
     string injuredStr = (idx < pf.size()) ? toLower(pf[idx++]) : "0";
@@ -1329,25 +1328,25 @@ static Player decodePlayerFields(const vector<string>& pf) {
 
     if (hasPotential && idx < pf.size()) p.injuryType = pf[idx++];
     else p.injuryType = p.injured ? "Leve" : "";
-    if (idx < pf.size()) p.injuryWeeks = stoi(pf[idx++]); else p.injuryWeeks = 0;
-    if (idx < pf.size()) p.goals = stoi(pf[idx++]); else p.goals = 0;
-    if (idx < pf.size()) p.assists = stoi(pf[idx++]); else p.assists = 0;
-    if (idx < pf.size()) p.matchesPlayed = stoi(pf[idx++]); else p.matchesPlayed = 0;
+    if (idx < pf.size()) p.injuryWeeks = safeStoi(pf[idx++]); else p.injuryWeeks = 0;
+    if (idx < pf.size()) p.goals = safeStoi(pf[idx++]); else p.goals = 0;
+    if (idx < pf.size()) p.assists = safeStoi(pf[idx++]); else p.assists = 0;
+    if (idx < pf.size()) p.matchesPlayed = safeStoi(pf[idx++]); else p.matchesPlayed = 0;
     if (idx + 1 < pf.size()) {
-        p.lastTrainedSeason = stoi(pf[idx++]);
-        p.lastTrainedWeek = stoi(pf[idx++]);
+        p.lastTrainedSeason = safeStoi(pf[idx++]);
+        p.lastTrainedWeek = safeStoi(pf[idx++]);
     } else {
         p.lastTrainedSeason = -1;
         p.lastTrainedWeek = -1;
     }
 
-    if (idx < pf.size()) p.wage = stoll(pf[idx++]);
+    if (idx < pf.size()) p.wage = safeStoLL(pf[idx++]);
     else p.wage = static_cast<long long>(p.skill) * 150 + randInt(0, 800);
-    if (idx < pf.size()) p.releaseClause = stoll(pf[idx++]);
+    if (idx < pf.size()) p.releaseClause = safeStoLL(pf[idx++]);
     else p.releaseClause = max(50000LL, p.value * 2);
-    if (idx < pf.size()) p.contractWeeks = stoi(pf[idx++]);
+    if (idx < pf.size()) p.contractWeeks = safeStoi(pf[idx++]);
     else p.contractWeeks = randInt(52, 156);
-    if (idx < pf.size()) p.injuryHistory = stoi(pf[idx++]);
+    if (idx < pf.size()) p.injuryHistory = safeStoi(pf[idx++]);
     else p.injuryHistory = 0;
     if (idx < pf.size()) p.yellowAccumulation = stoi(pf[idx++]);
     else p.yellowAccumulation = 0;

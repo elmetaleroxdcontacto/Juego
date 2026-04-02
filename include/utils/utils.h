@@ -34,6 +34,10 @@ std::vector<std::string> listDirectories(const std::string& root);
 std::vector<std::string> splitCsvLine(const std::string& line);
 std::vector<std::string> splitByDelimiter(const std::string& line, char delim);
 
+// Safe conversion functions with exception handling
+int safeStoi(const std::string& str, int defaultValue = 0);
+long long safeStoLL(const std::string& str, long long defaultValue = 0);
+
 int clampInt(int v, int lo, int hi);
 
 std::string normalizePosition(std::string raw);

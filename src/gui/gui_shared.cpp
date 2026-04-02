@@ -11,6 +11,17 @@
 
 namespace gui_win32 {
 
+namespace {
+
+constexpr int kHiddenControlOrigin = -32000;
+
+void clearWindowRegion(HWND hwnd) {
+    if (!hwnd || !IsWindow(hwnd)) return;
+    SetWindowRgn(hwnd, nullptr, TRUE);
+}
+
+}  // namespace
+
 int scaleByDpi(const AppState& state, int value) {
     UINT dpi = state.dpi == 0 ? 96 : state.dpi;
     return MulDiv(value, static_cast<int>(dpi), 96);
@@ -98,7 +109,15 @@ void hideControlAndInvalidate(AppState& state, HWND hwnd, int padX, int padY) {
     if (!hwnd || !IsWindow(hwnd)) return;
 
     RECT rect = childRectOnParent(hwnd, state.window);
+    clearWindowRegion(hwnd);
     ShowWindow(hwnd, SW_HIDE);
+    SetWindowPos(hwnd,
+                 nullptr,
+                 kHiddenControlOrigin,
+                 kHiddenControlOrigin,
+                 0,
+                 0,
+                 SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOSENDCHANGING);
     if (state.window && IsWindow(state.window)) {
         InflateRect(&rect, scaleByDpi(state, padX), scaleByDpi(state, padY));
         InvalidateRect(state.window, &rect, TRUE);
@@ -107,6 +126,7 @@ void hideControlAndInvalidate(AppState& state, HWND hwnd, int padX, int padY) {
 
 void showControlAndInvalidate(AppState& state, HWND hwnd, int padX, int padY) {
     if (!hwnd || !IsWindow(hwnd)) return;
+    clearWindowRegion(hwnd);
     ShowWindow(hwnd, SW_SHOW);
     RECT rect = childRectOnParent(hwnd, state.window);
     if (state.window && IsWindow(state.window)) {
@@ -138,6 +158,42 @@ void moveControlAndInvalidate(AppState& state, HWND hwnd, int x, int y, int widt
         InvalidateRect(state.window, &newRect, TRUE);
     }
     InvalidateRect(hwnd, nullptr, TRUE);
+}
+
+void applyControlViewportClip(AppState& state, HWND hwnd, const RECT* clipRect) {
+    if (!hwnd || !IsWindow(hwnd)) return;
+    if (!clipRect || !state.window || !IsWindow(state.window)) {
+        clearWindowRegion(hwnd);
+        return;
+    }
+
+    RECT windowRect = childRectOnParent(hwnd, state.window);
+    RECT visibleRect{};
+    if (!IntersectRect(&visibleRect, &windowRect, clipRect)) {
+        HRGN emptyRegion = CreateRectRgn(0, 0, 0, 0);
+        if (SetWindowRgn(hwnd, emptyRegion, TRUE) == 0) {
+            DeleteObject(emptyRegion);
+        }
+        return;
+    }
+
+    const int left = static_cast<int>(std::max<LONG>(0, visibleRect.left - windowRect.left));
+    const int top = static_cast<int>(std::max<LONG>(0, visibleRect.top - windowRect.top));
+    const int right = std::max(left, static_cast<int>(visibleRect.right - windowRect.left));
+    const int bottom = std::max(top, static_cast<int>(visibleRect.bottom - windowRect.top));
+    const bool fullWindowVisible = left == 0 &&
+                                   top == 0 &&
+                                   right >= (windowRect.right - windowRect.left) &&
+                                   bottom >= (windowRect.bottom - windowRect.top);
+    if (fullWindowVisible) {
+        clearWindowRegion(hwnd);
+        return;
+    }
+
+    HRGN clipRegion = CreateRectRgn(left, top, right, bottom);
+    if (SetWindowRgn(hwnd, clipRegion, TRUE) == 0) {
+        DeleteObject(clipRegion);
+    }
 }
 
 void applyEditInteriorPadding(AppState& state, HWND hwnd, int horizontalPadding, int verticalPadding) {
@@ -811,6 +867,26 @@ static bool isFrontMenuMainActionButtonId(int id) {
            id == IDC_MENU_BACK_BUTTON;
 }
 
+static bool shouldRenderButtonOnCurrentPage(const AppState& state, int id) {
+    if (id == IDC_MENU_CONTINUE_BUTTON || id == IDC_MENU_PLAY_BUTTON || id == IDC_MENU_LOAD_BUTTON ||
+        id == IDC_MENU_SETTINGS_BUTTON || id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON) {
+        return state.currentPage == GuiPage::MainMenu;
+    }
+    if (isFrontMenuSettingButtonId(id)) {
+        return state.currentPage == GuiPage::Settings;
+    }
+    if (id == IDC_MENU_BACK_BUTTON) {
+        return state.currentPage == GuiPage::Settings || state.currentPage == GuiPage::Credits;
+    }
+    if (id == IDC_NEW_CAREER_BUTTON || id == IDC_LOAD_BUTTON || id == IDC_SAVE_BUTTON ||
+        id == IDC_SIMULATE_BUTTON || id == IDC_VALIDATE_BUTTON || id == IDC_DISPLAY_MODE_BUTTON ||
+        id == IDC_FRONT_MENU_BUTTON || id == IDC_EMPTY_NEW_BUTTON || id == IDC_EMPTY_LOAD_BUTTON ||
+        id == IDC_EMPTY_VALIDATE_BUTTON || isPageButtonId(id) || isActionButtonId(id)) {
+        return !isFrontMenuPage(state.currentPage);
+    }
+    return true;
+}
+
 static wchar_t buttonBadgeGlyph(int id, DisplayMode displayMode) {
     if (id == IDC_DISPLAY_MODE_BUTTON) {
         return displayMode == DisplayMode::BorderlessFullscreen ? L'W'
@@ -829,9 +905,13 @@ static wchar_t buttonBadgeGlyph(int id, DisplayMode displayMode) {
 
 void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     if (!drawItem) return;
+    int id = static_cast<int>(drawItem->CtlID);
+    if (!IsWindow(drawItem->hwndItem) || !IsWindowVisible(drawItem->hwndItem) ||
+        !shouldRenderButtonOnCurrentPage(state, id)) {
+        return;
+    }
     HDC hdc = drawItem->hDC;
     RECT rect = drawItem->rcItem;
-    int id = static_cast<int>(drawItem->CtlID);
     bool pressed = (drawItem->itemState & ODS_SELECTED) != 0;
     bool disabled = (drawItem->itemState & ODS_DISABLED) != 0;
     bool activePage = isActivePageButton(state, id);

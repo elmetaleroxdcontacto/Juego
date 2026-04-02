@@ -233,6 +233,7 @@ if(BUILD_TESTING)
         tests/project_tests.cpp
         ${FM_CORE_SOURCES}
         ${FM_VALIDATOR_SOURCES}
+        ${FM_GUI_SOURCES}
     )
     fm_configure_target(FootballManagerTests)
     add_test(NAME FootballManagerTests COMMAND FootballManagerTests)
