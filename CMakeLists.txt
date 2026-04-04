@@ -39,6 +39,7 @@ set(FM_CAREER_SOURCES
     src/career/team_management.cpp
     src/career/week_simulation.cpp
     src/career/world_state_service.cpp
+    src/career/game_events_system.cpp
 )
 
 set(FM_AI_SOURCES
@@ -136,6 +137,7 @@ set(FM_CONSOLE_UI_SOURCES
     src/ui/market_ui.cpp
     src/ui/team_ui.cpp
     src/ui/ui.cpp
+    src/ui/global_search.cpp
 )
 
 set(FM_CONSOLE_ENTRY_SOURCES

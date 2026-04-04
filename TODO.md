@@ -3823,6 +3823,118 @@ No se detectaron bugs funcionales durante el análisis. El proyecto estaba en bu
 1. **Refactor futuro de app_services.cpp**:
    - Convertir funciones libres en métodos de clase `CareerServiceProvider`
    - Mejorar cohesión de servicios relacionados
+
+---
+
+## NUEVA IMPLEMENTACIÓN: Sistema de Notificaciones y Búsqueda Global (Session Actual)
+
+### Resumen
+Se han agregado dos módulos principales para mejorar la experiencia del usuario:
+1. **Sistema de Eventos y Notificaciones** - Seguimiento de hitos de carrera y eventos importantes
+2. **Motor de Búsqueda Global** - Búsqueda de jugadores con filtros por posición y equipo
+
+### 1. Sistema de Eventos y Notificaciones de Carrera
+
+**Archivos creados**:
+- `include/career/game_events_system.h` - Definiciones del sistema de eventos
+- `src/career/game_events_system.cpp` - Implementación del sistema
+
+**Componentes principales**:
+
+#### Enum EventType (8 tipos de eventos)
+```
+CriticalInjury        - Lesión grave de jugador
+PlayerOffered         - Oferta de transferencia recibida
+ManagerAlert          - Alerta de objetivos del gerente/junta directiva
+FormAlert             - Alerta de baja forma de equipo
+AchievementUnlocked   - Logro desbloqueado
+CareerMilestone       - Hito de carrera alcanzado
+FinancialWarning      - Advertencia financiera
+MoraleAlert           - Alerta de baja moral
+```
+
+#### Estructura GameEvent
+- `EventType type` - Tipo del evento
+- `std::string title` - Título corto del evento
+- `std::string message` - Mensaje detallado
+- `time_t timestamp` - Marca de tiempo
+- `bool isRead` - Estado de lectura
+
+#### Clase EventNotificationSystem (métodos estáticos)
+- `recordEvent()` - Registra un nuevo evento
+- `getUnreadEvents()` - Obtiene eventos no leídos
+- `getAllEvents()` - Obtiene todos los eventos
+- `markEventAsRead()` - Marca evento como leído
+- `clearOldEvents()` - Limpia eventos antiguos (>7 días y leídos)
+- `getUnreadCount()` - Retorna cantidad de eventos sin leer
+- `checkCareerMilestone()` - Detecta hitos en semanas 10, 50, 100, 200, 500
+- `GetMilestoneDescription()` - Retorna descripción narrativa del hito
+
+**Beneficios**:
+- Sistema centralizado de notificaciones en juego
+- Registro persistente de eventos importantes
+- Soporte para hitos de carrera (10, 50, 100, 200, 500 semanas)
+- Narrativa inmersiva con descripciones personalizadas
+
+### 2. Motor de Búsqueda Global de Jugadores
+
+**Archivos creados**:
+- `include/ui/global_search.h` - Definiciones del motor de búsqueda
+- `src/ui/global_search.cpp` - Implementación del motor
+
+**Componentes principales**:
+
+#### Estructura SearchResult
+- `std::string playerName` - Nombre del jugador
+- `std::string clubName` - Nombre del club
+- `std::string position` - Posición del jugador
+- `int age` - Edad
+- `int skill` - Habilidad(0-100)
+- `long long value` - Valor de mercado
+
+#### Clase PlayerSearchEngine 
+- `initialize(Career*)` - Inicializa con referencia a Career
+- `search(query)` - Búsqueda por nombre de jugador o equipo (fuzzy matching)
+- `searchByPosition(position)` - Filtrar por posición (arquero, defensor, lateral, etc.)
+- `searchByClub(clubName)` - Filtrar por nombre de club
+- `isInitialized()` - Verifica si el motor está inicializado
+- `toLower()` - Conversión a minúsculas (helper privado)
+- `matches()` - Búsqueda insensible a mayúsculas (helper privado)
+
+**Características**:
+- Búsqueda difusa (fuzzy matching) sin diferenciar mayúsculas/minúsculas
+- Limita resultados a 20 jugadores máximo
+- Integración con estructura Career existente
+- Soporte para múltiples criterios de filtrado
+
+**Beneficios**:
+- Acceso rápido a información de jugadores
+- Facilita identificación de objetivos de transferencia
+- Interfaz de búsqueda flexible
+- Preparado para integración con Ctrl+F en GUI
+
+### Archivos modificados en CMakeLists.txt
+
+| Sección | Cambios |
+|---------|---------|
+| **FM_CAREER_SOURCES** | Agregado `src/career/game_events_system.cpp` |
+| **FM_CONSOLE_UI_SOURCES** | Agregado `src/ui/global_search.cpp` |
+
+### Status de compilación
+✅ **BUILD SUCCESSFUL**: Ambos módulos compilados exitosamente con:
+- Ruta: CMake
+- Target: FootballManager
+- Executable: C:\Users\moise\OneDrive\Escritorio\Juego\build-cmake\bin\FootballManager.exe
+
+### Próximas etapas (Workflow planeado)
+- [ ] Integrar EventNotificationSystem en week_simulation.cpp (registrar eventos de transferencia)
+- [ ] Integrar EventNotificationSystem en gui_actions.cpp (registrar eventos críticos)
+- [ ] Crear atajos de teclado (Ctrl+F para búsqueda global, 'S' para scouting, 'V' para vender)
+- [ ] Implementar sistema de contexto de menú (clic derecho en lista de jugadores)
+- [ ] Mejorar dashboard con KPIs (edad promedio, forma promedio, presupuesto)
+- [ ] Crear sistema de economía justa (salary cap relativo a ingresos)
+- [ ] Implementar mini-juego de penales
+- [ ] Documentación completa y validación de compilación final
    - Facilitar testing unitario de operaciones complejas
 
 2. **Reemplazo de global state en season_service.cpp**:
