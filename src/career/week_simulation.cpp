@@ -12,6 +12,7 @@
 #include "career/staff_service.h"
 #include "career/team_management.h"
 #include "career/world_state_service.h"
+#include "career/game_events_system.h"
 #include "competition.h"
 #include "development/monthly_development.h"
 #include "simulation.h"
@@ -209,6 +210,11 @@ void applyClubEvent(Career& career) {
         career.myTeam->morale = clampInt(career.myTeam->morale - 5, 0, 100);
         career.addNews("La hinchada presiona a " + career.myTeam->name + " tras los ultimos resultados.");
         emitUiMessage("[Evento] Protesta de hinchas: moral -5.");
+        career_events::EventNotificationSystem::recordEvent(
+            career_events::EventType::MoraleAlert,
+            "Protesta de hinchas",
+            "Baja moral en el equipo. La hinchada presiona tras los ultimos resultados (-5 moral)."
+        );
         return;
     }
     if (event == 3) {
@@ -222,6 +228,11 @@ void applyClubEvent(Career& career) {
         career.addNews(player.name + " sufre una lesion leve en entrenamiento.");
         emitUiMessage("[Evento] Accidente en entrenamiento: " + player.name +
                       " fuera " + to_string(player.injuryWeeks) + " semanas.");
+        career_events::EventNotificationSystem::recordEvent(
+            career_events::EventType::CriticalInjury,
+            "Lesión en entrenamiento",
+            player.name + " sufre una lesión leve. Baja estimada: " + to_string(player.injuryWeeks) + " semanas."
+        );
         return;
     }
     if (event == 4) {
@@ -232,6 +243,11 @@ void applyClubEvent(Career& career) {
             player.socialGroup = "Frustrados";
             career.addNews("Vestuario: " + player.name + " pide una conversacion por falta de minutos.");
             emitUiMessage("[Evento] Vestuario tenso: " + player.name + " reclama mas protagonismo.");
+            career_events::EventNotificationSystem::recordEvent(
+                career_events::EventType::ManagerAlert,
+                "Jugador frustrado",
+                player.name + " reclama más minutos. ¡Atiende al vestuario!"
+            );
             return;
         }
     }
@@ -248,6 +264,11 @@ void applyClubEvent(Career& career) {
             player.happiness = clampInt(player.happiness - 3, 1, 99);
             career.addNews("Mercado: un club grande empieza a seguir a " + player.name + ".");
             emitUiMessage("[Evento] Mercado: aumenta el interes externo por " + player.name + ".");
+            career_events::EventNotificationSystem::recordEvent(
+                career_events::EventType::PlayerOffered,
+                "Interés de mercado",
+                "Un club grande sigue a " + player.name + ". ¡Prepárate para una posible oferta!"
+            );
             return;
         }
     }
@@ -1204,6 +1225,19 @@ void simulateCareerWeek(Career& career) {
     handleManagerStatus(career);
     career.currentWeek++;
     checkAchievements(career);
+    
+    // Check for career milestones
+    int milestoneWeek = -999;
+    if (career_events::checkCareerMilestone(career, milestoneWeek)) {
+        std::string description = career_events::GetMilestoneDescription(milestoneWeek, career);
+        career_events::EventNotificationSystem::recordEvent(
+            career_events::EventType::CareerMilestone,
+            "¡Hito alcanzado!",
+            description
+        );
+        emitUiMessage("[Hito] " + description);
+    }
+    
     if (career.currentWeek > static_cast<int>(career.schedule.size())) {
         emitSeasonTransitionSummary(endSeason(career));
     }
