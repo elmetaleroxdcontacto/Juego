@@ -296,6 +296,12 @@ void restoreTableState(Team& team, const TeamTableSnapshot& snapshot) {
     team.headToHead = snapshot.headToHead;
 }
 
+void maybeInvokeIdle() {
+    if (IdleCallback callback = idleCallback()) {
+        callback();
+    }
+}
+
 void storeMatchAnalysis(Career& career,
                         const Team& home,
                         const Team& away,
@@ -332,6 +338,7 @@ void simulateSeasonCupRound(Career& career) {
     }
 
     for (size_t i = 0; i < alive.size(); i += 2) {
+        maybeInvokeIdle();
         Team* home = alive[i];
         Team* away = alive[i + 1];
         TeamTableSnapshot homeSnap = captureTableState(*home);
@@ -880,6 +887,7 @@ void simulateBackgroundDivisionWeek(Career& career, const string& divisionId) {
     int headlineMargin = -1;
     string headline;
     for (const auto& match : schedule[static_cast<size_t>(round)]) {
+        maybeInvokeIdle();
         Team* home = teams[static_cast<size_t>(match.first)];
         Team* away = teams[static_cast<size_t>(match.second)];
         MatchResult result = playMatch(*home, *away, false, false);
@@ -974,19 +982,15 @@ void checkAchievements(Career& career) {
     }
 }
 
-void simulateCareerWeek(Career& career) {
-    if (career.activeTeams.empty() || career.schedule.empty()) {
-        emitUiMessage("No hay calendario disponible.");
-        return;
-    }
-    if (career.currentWeek > static_cast<int>(career.schedule.size())) {
-        emitSeasonTransitionSummary(endSeason(career));
-        return;
-    }
+// === PHASE 2: SEPARATION OF CONCERNS (Internal Helpers) ===
+// These functions extract logical sections of simulateCareerWeek to improve readability
+// and reduce cyclomatic complexity of the main function
 
-    emitUiMessage("");
-    emitUiMessage("Simulando semana " + to_string(career.currentWeek) + "...");
-    career.leagueTable.sortTable();
+namespace {
+
+// Process all matches scheduled for this week and return points delta for player team
+void processWeekMatches(Career& career, const vector<pair<int, int>>& matches,
+                       const vector<int>& pointsBefore, int& outMyTeamPointsDelta) {
     LeagueTable northTable;
     LeagueTable southTable;
     bool useGroups = career.usesGroupFormat();
@@ -995,22 +999,8 @@ void simulateCareerWeek(Career& career) {
         southTable = buildCompetitionGroupTable(career, false);
     }
 
-    const auto& matches = career.schedule[static_cast<size_t>(career.currentWeek - 1)];
-    vector<vector<int>> suspensionsBefore;
-    suspensionsBefore.reserve(career.activeTeams.size());
-    for (auto* team : career.activeTeams) {
-        vector<int> snapshot;
-        snapshot.reserve(team->players.size());
-        for (const auto& player : team->players) snapshot.push_back(player.matchesSuspended);
-        suspensionsBefore.push_back(snapshot);
-    }
-
-    vector<int> pointsBefore;
-    pointsBefore.reserve(career.activeTeams.size());
-    for (auto* team : career.activeTeams) pointsBefore.push_back(team->points);
-
-    int myTeamPointsDelta = 0;
     for (const auto& match : matches) {
+        maybeInvokeIdle();
         Team* home = career.activeTeams[static_cast<size_t>(match.first)];
         Team* away = career.activeTeams[static_cast<size_t>(match.second)];
         const bool userControlledMatch = (home == career.myTeam || away == career.myTeam);
@@ -1039,15 +1029,20 @@ void simulateCareerWeek(Career& career) {
         storeMatchAnalysis(career, *home, *away, result, false);
     }
 
-    for (const auto& division : career.divisions) {
-        simulateBackgroundDivisionWeek(career, division.id);
+    // Calculate points delta for player team
+    if (career.myTeam) {
+        for (size_t i = 0; i < career.activeTeams.size(); ++i) {
+            if (career.activeTeams[i] == career.myTeam) {
+                outMyTeamPointsDelta = career.myTeam->points - pointsBefore[i];
+                break;
+            }
+        }
     }
+}
 
-    bool cupWeek = career.cupActive &&
-                   (career.currentWeek == 1 || career.currentWeek % 4 == 0 ||
-                    career.currentWeek == static_cast<int>(career.schedule.size()));
-    if (cupWeek) simulateSeasonCupRound(career);
-
+// Update suspensions, injuries, fitness and training for all teams
+void updateTeamPhysicalStates(Career& career, const vector<vector<int>>& suspensionsBefore, bool cupWeek) {
+    maybeInvokeIdle();
     for (size_t i = 0; i < career.activeTeams.size(); ++i) {
         Team* team = career.activeTeams[i];
         const auto& snapshot = suspensionsBefore[i];
@@ -1057,33 +1052,44 @@ void simulateCareerWeek(Career& career) {
                 team->players[j].matchesSuspended--;
             }
         }
+        maybeInvokeIdle();
     }
 
     for (auto& team : career.allTeams) {
+        maybeInvokeIdle();
         healInjuries(team, false);
         recoverFitness(team, 7);
-        const bool congestedTraining = cupWeek ? team.division == career.activeDivision : (career.currentWeek % 5 == 0 && team.division != career.activeDivision);
+        const bool congestedTraining = cupWeek ? team.division == career.activeDivision 
+                                                : (career.currentWeek % 5 == 0 && team.division != career.activeDivision);
         player_dev::applyWeeklyTrainingPlan(team, congestedTraining);
     }
+}
 
+// Process finances, transfers and market operations
+void processFinancesAndTransfers(Career& career, const vector<int>& pointsBefore) {
+    maybeInvokeIdle();
     updateContracts(career);
+    maybeInvokeIdle();
     processIncomingOffers(career);
+    maybeInvokeIdle();
     transfer_market::processCpuTransfers(career);
+    maybeInvokeIdle();
     transfer_market::processLoanReturns(career);
+    maybeInvokeIdle();
     applyWeeklyFinances(career, pointsBefore);
+    maybeInvokeIdle();
     career.leagueTable.sortTable();
+}
 
+// Update manager-specific game state (reputation, objectives, etc.)
+void updateManagerGameState(Career& career, int myTeamPointsDelta) {
+    maybeInvokeIdle();
     if (career.myTeam) {
-        for (size_t i = 0; i < career.activeTeams.size(); ++i) {
-            if (career.activeTeams[i] == career.myTeam) {
-                myTeamPointsDelta = career.myTeam->points - pointsBefore[i];
-                break;
-            }
-        }
         if (career.boardMonthlyObjective.find("puntos") != string::npos) {
             career.boardMonthlyProgress += myTeamPointsDelta;
         }
         updateSquadDynamics(career, myTeamPointsDelta);
+        maybeInvokeIdle();
         WorldPulseSummary worldPulse = world_state_service::processWeeklyWorldState(career);
         for (size_t i = 0; i < worldPulse.headlines.size() && i < 2; ++i) {
             emitUiMessage("[Mundo] " + worldPulse.headlines[i]);
@@ -1091,16 +1097,20 @@ void simulateCareerWeek(Career& career) {
     }
 
     runMonthlyDevelopment(career);
+    maybeInvokeIdle();
     progressScoutingAssignments(career);
+    maybeInvokeIdle();
     updateShortlistAlerts(career);
+    maybeInvokeIdle();
     career.updateDynamicObjectiveStatus();
+    maybeInvokeIdle();
     career.updateBoardConfidence();
+    maybeInvokeIdle();
     updateManagerReputation(career);
-    if (career.myTeam) ensureTeamIdentity(*career.myTeam);
-    dispatchWeeklyStaffBriefing(career);
-    weeklyDashboard(career);
-    applyClubEvent(career);
+}
 
+// Generate game narrative, events and communications for the week
+void generateWeeklyNarrative(Career& career, int myTeamPointsDelta) {
     if (career.myTeam) {
         if (myTeamPointsDelta == 3) {
             career.addNews(career.myTeam->name + " gana en la fecha " + to_string(career.currentWeek) + ".");
@@ -1115,6 +1125,81 @@ void simulateCareerWeek(Career& career) {
         generateManagerCareerEvents(career);
         generateWeeklyNarratives(career, myTeamPointsDelta);
     }
+}
+
+}  // anonymous namespace
+// === END SEPARATION OF CONCERNS ===
+
+void simulateCareerWeek(Career& career) {
+    if (career.activeTeams.empty() || career.schedule.empty()) {
+        emitUiMessage("No hay calendario disponible.");
+        return;
+    }
+    if (career.currentWeek > static_cast<int>(career.schedule.size())) {
+        emitSeasonTransitionSummary(endSeason(career));
+        return;
+    }
+
+    emitUiMessage("");
+    emitUiMessage("Simulando semana " + to_string(career.currentWeek) + "...");
+    career.leagueTable.sortTable();
+
+    // Snapshot states before week processing
+    vector<vector<int>> suspensionsBefore;
+    suspensionsBefore.reserve(career.activeTeams.size());
+    for (auto* team : career.activeTeams) {
+        vector<int> snapshot;
+        snapshot.reserve(team->players.size());
+        for (const auto& player : team->players) snapshot.push_back(player.matchesSuspended);
+        suspensionsBefore.push_back(snapshot);
+    }
+
+    vector<int> pointsBefore;
+    pointsBefore.reserve(career.activeTeams.size());
+    for (auto* team : career.activeTeams) pointsBefore.push_back(team->points);
+
+    // Core week simulation steps
+    const auto& matches = career.schedule[static_cast<size_t>(career.currentWeek - 1)];
+    int myTeamPointsDelta = 0;
+    processWeekMatches(career, matches, pointsBefore, myTeamPointsDelta);
+    maybeInvokeIdle();
+
+    for (const auto& division : career.divisions) {
+        simulateBackgroundDivisionWeek(career, division.id);
+        maybeInvokeIdle();
+    }
+
+    bool cupWeek = career.cupActive &&
+                   (career.currentWeek == 1 || career.currentWeek % 4 == 0 ||
+                    career.currentWeek == static_cast<int>(career.schedule.size()));
+    if (cupWeek) {
+        simulateSeasonCupRound(career);
+        maybeInvokeIdle();
+    }
+
+    // Update player physical states
+    updateTeamPhysicalStates(career, suspensionsBefore, cupWeek);
+    maybeInvokeIdle();
+
+    // Financial and transfer operations
+    processFinancesAndTransfers(career, pointsBefore);
+    maybeInvokeIdle();
+
+    // Update manager state and world
+    updateManagerGameState(career, myTeamPointsDelta);
+    maybeInvokeIdle();
+
+    if (career.myTeam) ensureTeamIdentity(*career.myTeam);
+    dispatchWeeklyStaffBriefing(career);
+    maybeInvokeIdle();
+    weeklyDashboard(career);
+    maybeInvokeIdle();
+    applyClubEvent(career);
+    maybeInvokeIdle();
+
+    // Generate narrative and communications
+    generateWeeklyNarrative(career, myTeamPointsDelta);
+    maybeInvokeIdle();
 
     handleManagerStatus(career);
     career.currentWeek++;
@@ -1123,3 +1208,4 @@ void simulateCareerWeek(Career& career) {
         emitSeasonTransitionSummary(endSeason(career));
     }
 }
+

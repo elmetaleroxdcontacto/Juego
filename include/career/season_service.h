@@ -29,5 +29,6 @@ public:
     SeasonStepResult simulateWeek(Career& career,
                                   IncomingOfferDecisionCallback offerDecision = nullptr,
                                   ContractRenewalDecisionCallback renewDecision = nullptr,
-                                  ManagerJobSelectionCallback managerDecision = nullptr) const;
+                                  ManagerJobSelectionCallback managerDecision = nullptr,
+                                  IdleCallback idleCallback = nullptr) const;
 };

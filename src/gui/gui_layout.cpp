@@ -1120,8 +1120,8 @@ void layoutWindow(AppState& state) {
         if (state.currentPage == GuiPage::MainMenu) {
             const int secondaryTop = buttonTop + s(50);
             const int secondaryGap = s(12);
-            const int secondaryCount = 4;
-            const int secondaryWidth = std::max(s(132),
+            const int secondaryCount = 5;
+            const int secondaryWidth = std::max(s(100),
                                                 static_cast<int>((shellWidth - s(32) - secondaryGap * (secondaryCount - 1)) / secondaryCount));
             placeFixedWindow(state.menuContinueButton, shellLeft + s(16), buttonTop, primaryWidth, s(42));
             placeFixedWindow(state.menuPlayButton,
@@ -1131,13 +1131,14 @@ void layoutWindow(AppState& state) {
                         s(42));
             placeFixedWindow(state.menuSettingsButton, shellLeft + s(16), secondaryTop, secondaryWidth, s(40));
             placeFixedWindow(state.menuLoadButton, shellLeft + s(16) + (secondaryWidth + secondaryGap), secondaryTop, secondaryWidth, s(40));
+            placeFixedWindow(state.menuDeleteSaveButton, shellLeft + s(16) + (secondaryWidth + secondaryGap) * 2, secondaryTop, secondaryWidth, s(40));
             placeFixedWindow(state.menuCreditsButton,
-                        shellLeft + s(16) + (secondaryWidth + secondaryGap) * 2,
+                        shellLeft + s(16) + (secondaryWidth + secondaryGap) * 3,
                         secondaryTop,
                         secondaryWidth,
                         s(40));
             placeFixedWindow(state.menuExitButton,
-                        shellLeft + s(16) + (secondaryWidth + secondaryGap) * 3,
+                        shellLeft + s(16) + (secondaryWidth + secondaryGap) * 4,
                         secondaryTop,
                         secondaryWidth,
                         s(40));
@@ -1145,6 +1146,7 @@ void layoutWindow(AppState& state) {
             setControlVisibility(state, state.menuPlayButton, true);
             setControlVisibility(state, state.menuSettingsButton, true);
             setControlVisibility(state, state.menuLoadButton, true);
+            setControlVisibility(state, state.menuDeleteSaveButton, true);
             setControlVisibility(state, state.menuCreditsButton, true);
             setControlVisibility(state, state.menuExitButton, true);
             setControlVisibility(state, state.menuBackButton, false);
@@ -1262,7 +1264,7 @@ void layoutWindow(AppState& state) {
     const int blockGap = s(20);
     const int rowTwoTop = fieldTop + fieldHeight + s(kHeaderRowGap);
     const int rowThreeTop = rowTwoTop + fieldHeight + s(kHeaderRowGap);
-    const int headerAvailableWidth = std::max(s(520), headerRightLimit - s(20));
+    const int headerAvailableWidth = std::max(s(320), std::min(s(520), headerRightLimit - s(20)));
     int managerFieldLeft = s(20);
     int managerFieldTop = fieldTop;
     int managerFieldWidth = s(240);
@@ -1696,6 +1698,7 @@ void initializeInterface(AppState& state) {
     state.menuPlayButton = createControl(state, 0, L"BUTTON", L"Jugar", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_PLAY_BUTTON);
     state.menuSettingsButton = createControl(state, 0, L"BUTTON", L"Configuraciones", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_SETTINGS_BUTTON);
     state.menuLoadButton = createControl(state, 0, L"BUTTON", L"Cargar guardado", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_LOAD_BUTTON);
+    state.menuDeleteSaveButton = createControl(state, 0, L"BUTTON", L"Borrar guardado", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_DELETE_SAVE_BUTTON);
     state.menuCreditsButton = createControl(state, 0, L"BUTTON", L"Creditos", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_CREDITS_BUTTON);
     state.menuExitButton = createControl(state, 0, L"BUTTON", L"Salir", buttonStyle, 0, 0, 180, 36, state.window, IDC_MENU_EXIT_BUTTON);
     state.menuBackButton = createControl(state, 0, L"BUTTON", L"Volver", buttonStyle, 0, 0, 140, 34, state.window, IDC_MENU_BACK_BUTTON);

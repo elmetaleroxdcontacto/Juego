@@ -17,6 +17,7 @@ enum class WeekSimulationPresentation {
 
 using ManagerJobSelectionCallback = int (*)(const Career& career, const std::vector<Team*>& jobs);
 using UiMessageCallback = void (*)(const std::string& message);
+using IdleCallback = void (*)();
 using IncomingOfferDecisionCallback = IncomingOfferDecision (*)(const Career& career,
                                                                 const Player& player,
                                                                 long long offer,
@@ -30,12 +31,15 @@ using ContractRenewalDecisionCallback = bool (*)(const Career& career,
 
 void setManagerJobSelectionCallback(ManagerJobSelectionCallback callback);
 void setUiMessageCallback(UiMessageCallback callback);
+void setIdleCallback(IdleCallback callback);
 void setIncomingOfferDecisionCallback(IncomingOfferDecisionCallback callback);
 void setContractRenewalDecisionCallback(ContractRenewalDecisionCallback callback);
+void setIdleCallback(IdleCallback callback);
 void setWeekSimulationPresentation(WeekSimulationPresentation presentation);
 
 ManagerJobSelectionCallback managerJobSelectionCallback();
 UiMessageCallback uiMessageCallback();
+IdleCallback idleCallback();
 IncomingOfferDecisionCallback incomingOfferDecisionCallback();
 ContractRenewalDecisionCallback contractRenewalDecisionCallback();
 WeekSimulationPresentation weekSimulationPresentation();

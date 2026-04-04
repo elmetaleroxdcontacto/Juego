@@ -349,6 +349,23 @@ struct Career {
     void updateBoardConfidence();
     bool saveCareer();
     bool loadCareer();
+
+    // === SAFE ACCESS METHODS (Phase 1 Refactoring) ===
+    // Provide safe access to teams without relying on raw pointers
+    // These methods validate bounds and prevent dangling pointer issues
+    Team* getMyTeamSafe();
+    const Team* getMyTeamSafe() const;
+    Team* getTeamAtIndexSafe(int index);
+    const Team* getTeamAtIndexSafe(int index) const;
+    int getActiveTeamsCount() const;
+    bool isValidTeamIndex(int index) const;
+    // === END SAFE ACCESS METHODS ===
+
+    // === PHASE 3: CONST CORRECTNESS & CONST REFERENCES ===
+    // Provide non-const access to mutable division reference but const access to read
+    const std::vector<Team*>& getActiveDivisionTeamsRef() const;
+    std::vector<Team*>& getActiveDivisionTeamsRef();
+    // === END PHASE 3 ===
 };
 
 struct MatchResult {

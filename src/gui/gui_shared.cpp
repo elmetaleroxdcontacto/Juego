@@ -815,7 +815,7 @@ static bool isActivePageButton(const AppState& state, int id) {
 
 static bool usesButtonBadge(int id) {
     return isPageButtonId(id) || id == IDC_DISPLAY_MODE_BUTTON || id == IDC_FRONT_MENU_BUTTON || id == IDC_MENU_CONTINUE_BUTTON ||
-           id == IDC_MENU_PLAY_BUTTON || id == IDC_MENU_LOAD_BUTTON || id == IDC_MENU_SETTINGS_BUTTON ||
+           id == IDC_MENU_PLAY_BUTTON || id == IDC_MENU_LOAD_BUTTON || id == IDC_MENU_DELETE_SAVE_BUTTON || id == IDC_MENU_SETTINGS_BUTTON ||
            id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON || id == IDC_MENU_BACK_BUTTON;
 }
 
@@ -846,8 +846,8 @@ static wchar_t pageButtonGlyph(int id) {
 }
 
 static bool isFrontMenuButtonId(int id) {
-    return id == IDC_MENU_CONTINUE_BUTTON || id == IDC_MENU_PLAY_BUTTON || id == IDC_MENU_LOAD_BUTTON ||
-           id == IDC_MENU_SETTINGS_BUTTON || id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON ||
+    return id == IDC_MENU_CONTINUE_BUTTON || id == IDC_MENU_PLAY_BUTTON || id == IDC_MENU_LOAD_BUTTON || 
+           id == IDC_MENU_DELETE_SAVE_BUTTON ||  id == IDC_MENU_SETTINGS_BUTTON || id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON ||
            id == IDC_MENU_BACK_BUTTON || id == IDC_MENU_VOLUME_BUTTON || id == IDC_MENU_DIFFICULTY_BUTTON ||
            id == IDC_MENU_SPEED_BUTTON || id == IDC_MENU_SIMULATION_BUTTON || id == IDC_MENU_LANGUAGE_BUTTON ||
            id == IDC_MENU_TEXT_SPEED_BUTTON || id == IDC_MENU_VISUAL_BUTTON ||
@@ -863,13 +863,13 @@ static bool isFrontMenuSettingButtonId(int id) {
 
 static bool isFrontMenuMainActionButtonId(int id) {
     return id == IDC_MENU_CONTINUE_BUTTON || id == IDC_MENU_PLAY_BUTTON || id == IDC_MENU_LOAD_BUTTON ||
-           id == IDC_MENU_SETTINGS_BUTTON || id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON ||
+           id == IDC_MENU_DELETE_SAVE_BUTTON || id == IDC_MENU_SETTINGS_BUTTON || id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON ||
            id == IDC_MENU_BACK_BUTTON;
 }
 
 static bool shouldRenderButtonOnCurrentPage(const AppState& state, int id) {
     if (id == IDC_MENU_CONTINUE_BUTTON || id == IDC_MENU_PLAY_BUTTON || id == IDC_MENU_LOAD_BUTTON ||
-        id == IDC_MENU_SETTINGS_BUTTON || id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON) {
+        id == IDC_MENU_DELETE_SAVE_BUTTON || id == IDC_MENU_SETTINGS_BUTTON || id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON) {
         return state.currentPage == GuiPage::MainMenu;
     }
     if (isFrontMenuSettingButtonId(id)) {
@@ -895,6 +895,7 @@ static wchar_t buttonBadgeGlyph(int id, DisplayMode displayMode) {
     if (id == IDC_MENU_CONTINUE_BUTTON) return L'C';
     if (id == IDC_MENU_PLAY_BUTTON) return L'J';
     if (id == IDC_MENU_LOAD_BUTTON) return L'L';
+    if (id == IDC_MENU_DELETE_SAVE_BUTTON) return L'B';
     if (id == IDC_FRONT_MENU_BUTTON) return L'M';
     if (id == IDC_MENU_SETTINGS_BUTTON) return L'A';
     if (id == IDC_MENU_CREDITS_BUTTON) return L'R';

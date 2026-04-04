@@ -52,21 +52,25 @@ public:
     RuntimeCallbackScope(UiMessageCallback uiCallback,
                          IncomingOfferDecisionCallback offerCallback,
                          ContractRenewalDecisionCallback renewCallback,
-                         ManagerJobSelectionCallback managerCallback)
+                         ManagerJobSelectionCallback managerCallback,
+                         IdleCallback idleCb)
         : previousUi_(uiMessageCallback()),
           previousOffer_(incomingOfferDecisionCallback()),
           previousRenew_(contractRenewalDecisionCallback()),
-          previousManager_(managerJobSelectionCallback()) {
+          previousManager_(managerJobSelectionCallback()),
+          previousIdle_(idleCallback()) {
         setUiMessageCallback(uiCallback);
         setIncomingOfferDecisionCallback(offerCallback);
         setContractRenewalDecisionCallback(renewCallback);
         setManagerJobSelectionCallback(managerCallback);
+        setIdleCallback(idleCb);
     }
 
     ~RuntimeCallbackScope() {
         setManagerJobSelectionCallback(previousManager_);
         setContractRenewalDecisionCallback(previousRenew_);
         setIncomingOfferDecisionCallback(previousOffer_);
+        setIdleCallback(previousIdle_);
         setUiMessageCallback(previousUi_);
     }
 
@@ -75,6 +79,7 @@ private:
     IncomingOfferDecisionCallback previousOffer_;
     ContractRenewalDecisionCallback previousRenew_;
     ManagerJobSelectionCallback previousManager_;
+    IdleCallback previousIdle_;
 };
 
 }  // namespace
@@ -82,7 +87,8 @@ private:
 SeasonStepResult SeasonService::simulateWeek(Career& career,
                                              IncomingOfferDecisionCallback offerDecision,
                                              ContractRenewalDecisionCallback renewDecision,
-                                             ManagerJobSelectionCallback managerDecision) const {
+                                             ManagerJobSelectionCallback managerDecision,
+                                             IdleCallback idleCallback) const {
     SeasonStepResult result;
     WeekSimulationResult week;
     week.weekBefore = career.currentWeek;
@@ -93,7 +99,7 @@ SeasonStepResult SeasonService::simulateWeek(Career& career,
     g_seasonMessages = &messages;
     StdoutCapture stdoutCapture;
     {
-        RuntimeCallbackScope callbackScope(collectSeasonMessage, offerDecision, renewDecision, managerDecision);
+        RuntimeCallbackScope callbackScope(collectSeasonMessage, offerDecision, renewDecision, managerDecision, idleCallback);
         simulateCareerWeek(career);
     }
     g_seasonMessages = nullptr;

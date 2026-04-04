@@ -110,6 +110,7 @@ set(FM_FINANCE_SOURCES
 
 set(FM_SUPPORT_SOURCES
     src/utils/utils.cpp
+    src/utils/career_safety.cpp
 )
 
 set(FM_VALIDATOR_SOURCES

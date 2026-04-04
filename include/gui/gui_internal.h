@@ -70,6 +70,7 @@ enum ControlId {
     IDC_MENU_PLAY_BUTTON,
     IDC_MENU_SETTINGS_BUTTON,
     IDC_MENU_LOAD_BUTTON,
+    IDC_MENU_DELETE_SAVE_BUTTON,
     IDC_MENU_CREDITS_BUTTON,
     IDC_MENU_EXIT_BUTTON,
     IDC_MENU_BACK_BUTTON,
@@ -250,6 +251,7 @@ struct AppState {
     bool pageRefreshInProgress = false;
     bool pageChangeQueued = false;
     bool menuMusicOpened = false;
+    bool actionInProgress = false;
     bool menuMusicPlaying = false;
     bool menuMusicMissingReported = false;
     int menuMusicAppliedVolume = -1;
@@ -307,6 +309,7 @@ struct AppState {
     HWND menuPlayButton = nullptr;
     HWND menuSettingsButton = nullptr;
     HWND menuLoadButton = nullptr;
+    HWND menuDeleteSaveButton = nullptr;
     HWND menuCreditsButton = nullptr;
     HWND menuExitButton = nullptr;
     HWND menuBackButton = nullptr;
@@ -455,6 +458,7 @@ void startNewCareer(AppState& state);
 void continueCareer(AppState& state);
 void loadCareer(AppState& state);
 void saveCareer(AppState& state);
+void deleteCareerSave(AppState& state);
 void simulateWeek(AppState& state);
 void validateSystem(AppState& state);
 void runScoutingAction(AppState& state);

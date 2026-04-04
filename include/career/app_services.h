@@ -86,8 +86,8 @@ ServiceResult startCareerService(Career& career,
                                  const std::string& managerName);
 ServiceResult loadCareerService(Career& career);
 ServiceResult saveCareerService(Career& career);
-SeasonStepResult simulateSeasonStepService(Career& career);
-ServiceResult simulateCareerWeekService(Career& career);
+SeasonStepResult simulateSeasonStepService(Career& career, IdleCallback idleCallback = nullptr);
+ServiceResult simulateCareerWeekService(Career& career, IdleCallback idleCallback = nullptr);
 ScoutingSessionResult runScoutingSessionService(Career& career,
                                                 const std::string& region = "Todas",
                                                 const std::string& focusPos = "");

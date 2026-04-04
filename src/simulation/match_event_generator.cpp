@@ -1,5 +1,6 @@
 #include "simulation/match_event_generator.h"
 
+#include "career/career_runtime.h"
 #include "simulation/match_engine_internal.h"
 #include "simulation/match_event_resolver.h"
 #include "simulation/player_condition.h"
@@ -146,6 +147,11 @@ void playPhaseSequences(Team& attacking,
         0.06, 0.66);
 
     for (int i = 0; i < attackCount; ++i) {
+        if (i % 5 == 0) {
+            if (IdleCallback cb = idleCallback()) {
+                cb();
+            }
+        }
         const int minute = randInt(minuteStart, minuteEnd);
         const double sequenceChanceReachProbability =
             clampValue(baseChanceReachProbability + (i < chanceCount ? 0.10 : -0.04), 0.06, 0.76);

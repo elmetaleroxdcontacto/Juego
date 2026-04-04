@@ -1,5 +1,6 @@
 #include "simulation/match_engine.h"
 
+#include "career/career_runtime.h"
 #include "ai/ai_match_manager.h"
 #include "simulation/fatigue_engine.h"
 #include "simulation/match_context.h"
@@ -195,6 +196,9 @@ MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch, 
                                            data.awayInjuredPlayers);
         fatigue_engine::applyPhaseFatigue(homeState.team, homeState.xi, static_cast<int>(phaseIndex));
         fatigue_engine::applyPhaseFatigue(awayState.team, awayState.xi, static_cast<int>(phaseIndex));
+        if (IdleCallback cb = idleCallback()) {
+            cb();
+        }
     }
 
     stats.homePossession = clampInt(static_cast<int>(round(homePossAccumulator / static_cast<double>(kPhases.size()))), 30, 70);

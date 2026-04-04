@@ -16,8 +16,8 @@ public:
                                  const std::string& managerName);
     ServiceResult loadCareer();
     ServiceResult saveCareer();
-    SeasonStepResult simulateSeasonStep();
-    ServiceResult simulateWeek();
+    SeasonStepResult simulateSeasonStep(IdleCallback idleCallback = nullptr);
+    ServiceResult simulateWeek(IdleCallback idleCallback = nullptr);
 
 private:
     Career career_;

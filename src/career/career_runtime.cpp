@@ -8,6 +8,7 @@ namespace {
 
 ManagerJobSelectionCallback g_managerJobSelectionCallback = nullptr;
 UiMessageCallback g_uiMessageCallback = nullptr;
+IdleCallback g_idleCallback = nullptr;
 IncomingOfferDecisionCallback g_incomingOfferDecisionCallback = nullptr;
 ContractRenewalDecisionCallback g_contractRenewalDecisionCallback = nullptr;
 WeekSimulationPresentation g_weekSimulationPresentation = WeekSimulationPresentation::Detailed;
@@ -20,6 +21,10 @@ void setManagerJobSelectionCallback(ManagerJobSelectionCallback callback) {
 
 void setUiMessageCallback(UiMessageCallback callback) {
     g_uiMessageCallback = callback;
+}
+
+void setIdleCallback(IdleCallback callback) {
+    g_idleCallback = callback;
 }
 
 void setIncomingOfferDecisionCallback(IncomingOfferDecisionCallback callback) {
@@ -48,6 +53,10 @@ IncomingOfferDecisionCallback incomingOfferDecisionCallback() {
 
 ContractRenewalDecisionCallback contractRenewalDecisionCallback() {
     return g_contractRenewalDecisionCallback;
+}
+
+IdleCallback idleCallback() {
+    return g_idleCallback;
 }
 
 WeekSimulationPresentation weekSimulationPresentation() {

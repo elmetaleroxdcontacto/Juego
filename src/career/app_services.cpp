@@ -360,13 +360,13 @@ ServiceResult saveCareerService(Career& career) {
     return result;
 }
 
-SeasonStepResult simulateSeasonStepService(Career& career) {
+SeasonStepResult simulateSeasonStepService(Career& career, IdleCallback idleCallback) {
     SeasonFlowController controller(career);
-    return controller.simulateWeek(autoOfferDecision, autoRenewDecision, autoManagerJobDecision);
+    return controller.simulateWeek(autoOfferDecision, autoRenewDecision, autoManagerJobDecision, idleCallback);
 }
 
-ServiceResult simulateCareerWeekService(Career& career) {
-    return toServiceResult(simulateSeasonStepService(career));
+ServiceResult simulateCareerWeekService(Career& career, IdleCallback idleCallback) {
+    return toServiceResult(simulateSeasonStepService(career, idleCallback));
 }
 
 ScoutingSessionResult runScoutingSessionService(Career& career, const string& region, const string& focusPos) {

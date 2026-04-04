@@ -8,7 +8,8 @@ public:
 
     SeasonStepResult simulateWeek(IncomingOfferDecisionCallback offerDecision = nullptr,
                                   ContractRenewalDecisionCallback renewDecision = nullptr,
-                                  ManagerJobSelectionCallback managerDecision = nullptr);
+                                  ManagerJobSelectionCallback managerDecision = nullptr,
+                                  IdleCallback idleCallback = nullptr);
 
 private:
     Career& career_;

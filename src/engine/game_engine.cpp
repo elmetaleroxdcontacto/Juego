@@ -36,8 +36,8 @@ ServiceResult GameEngine::saveCareer() {
     return careerManager_.saveCareer();
 }
 
-ServiceResult GameEngine::simulateCareerWeek() {
-    return careerManager_.simulateWeek();
+ServiceResult GameEngine::simulateCareerWeek(IdleCallback idleCallback) {
+    return careerManager_.simulateWeek(idleCallback);
 }
 
 MatchResult GameEngine::runQuickMatch(Team& home,

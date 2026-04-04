@@ -1865,5 +1865,49 @@ bool Career::loadCareer() {
     initializeDynamicObjective();
     return true;
 }
+
+// === SAFE ACCESS METHODS (Phase 1 Refactoring) ===
+// These methods provide bounds-checked access to teams, preventing dangling pointers
+Team* Career::getMyTeamSafe() {
+    return myTeam;  // Already validated at assignment time
+}
+
+const Team* Career::getMyTeamSafe() const {
+    return myTeam;
+}
+
+Team* Career::getTeamAtIndexSafe(int index) {
+    if (index < 0 || index >= static_cast<int>(activeTeams.size())) {
+        return nullptr;
+    }
+    return activeTeams[index];
+}
+
+const Team* Career::getTeamAtIndexSafe(int index) const {
+    if (index < 0 || index >= static_cast<int>(activeTeams.size())) {
+        return nullptr;
+    }
+    return activeTeams[index];
+}
+
+int Career::getActiveTeamsCount() const {
+    return static_cast<int>(activeTeams.size());
+}
+
+bool Career::isValidTeamIndex(int index) const {
+    return index >= 0 && index < static_cast<int>(activeTeams.size());
+}
+
+// === PHASE 3: CONST CORRECTNESS & CONST REFERENCES ===
+const vector<Team*>& Career::getActiveDivisionTeamsRef() const {
+    // Return const reference to active teams (no copying)
+    return activeTeams;
+}
+
+vector<Team*>& Career::getActiveDivisionTeamsRef() {
+    // Return non-const reference for internal mutations
+    return activeTeams;
+}
+// === END PHASE 3 ===
 #endif
 

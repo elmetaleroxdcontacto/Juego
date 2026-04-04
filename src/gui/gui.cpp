@@ -623,6 +623,9 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
             break;
         case WM_COMMAND:
             if (!state) break;
+            if (state->actionInProgress) {
+                return 0;
+            }
             switch (LOWORD(wParam)) {
                 case IDC_DIVISION_COMBO:
                     if (HIWORD(wParam) == CBN_SELCHANGE && !state->suppressComboEvents) {
@@ -682,6 +685,9 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                     return 0;
                 case IDC_MENU_LOAD_BUTTON:
                     loadCareer(*state);
+                    return 0;
+                case IDC_MENU_DELETE_SAVE_BUTTON:
+                    deleteCareerSave(*state);
                     return 0;
                 case IDC_MENU_CREDITS_BUTTON:
                     openCreditsPage(*state);

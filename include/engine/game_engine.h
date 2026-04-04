@@ -18,7 +18,7 @@ public:
                               const std::string& managerName);
     ServiceResult loadCareer();
     ServiceResult saveCareer();
-    ServiceResult simulateCareerWeek();
+    ServiceResult simulateCareerWeek(IdleCallback idleCallback = nullptr);
     MatchResult runQuickMatch(Team& home,
                               Team& away,
                               bool verbose,

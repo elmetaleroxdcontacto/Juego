@@ -5,6 +5,7 @@
 
 #include "career/career_runtime.h"
 #include "engine/game_settings.h"
+#include "utils/utils.h"
 
 #include <sstream>
 
@@ -133,12 +134,59 @@ void finalizeAction(AppState& state,
 void pulseFrontendTiming(AppState& state) {
     const int delay = game_settings::pageTransitionDelayMs(state.settings);
     if (delay <= 0) return;
+
     UpdateWindow(state.window);
-    Sleep(static_cast<DWORD>(delay));
+    const DWORD stopTime = GetTickCount() + static_cast<DWORD>(delay);
+    MSG msg{};
+    while (GetTickCount() < stopTime) {
+        while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            if (msg.message == WM_QUIT) {
+                PostQuitMessage(static_cast<int>(msg.wParam));
+                return;
+            }
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+        Sleep(4);
+    }
 }
 
 void persistSettings(AppState& state) {
     game_settings::saveToDisk(state.settings);
+}
+
+AppState* g_pumpState = nullptr;
+
+std::string buildSimulationStatus(const AppState& state, int spinnerIndex) {
+    static const char spinner[] = "|/-\\";
+    std::ostringstream status;
+    status << "Simulando semana en modo "
+           << game_settings::simulationModeLabel(state.settings.simulationMode)
+           << " a velocidad "
+           << game_settings::simulationSpeedLabel(state.settings.simulationSpeed)
+           << " " << spinner[spinnerIndex % 4];
+    return status.str();
+}
+
+void pumpUiMessages() {
+    static int spinnerIndex = 0;
+    if (g_pumpState) {
+        if ((spinnerIndex % 10) == 0) {
+            setStatus(*g_pumpState, buildSimulationStatus(*g_pumpState, spinnerIndex));
+            UpdateWindow(g_pumpState->window);
+        }
+        spinnerIndex = (spinnerIndex + 1) % 4;
+    }
+
+    MSG msg{};
+    while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
+        if (msg.message == WM_QUIT) {
+            PostQuitMessage(static_cast<int>(msg.wParam));
+            return;
+        }
+        TranslateMessage(&msg);
+        DispatchMessageW(&msg);
+    }
 }
 
 }  // namespace
@@ -228,9 +276,53 @@ void saveCareer(AppState& state) {
     setStatus(state, result.messages.empty() ? "Carrera guardada." : result.messages.back());
 }
 
+void deleteCareerSave(AppState& state) {
+    if (state.career.myTeam) {
+        MessageBoxW(state.window, L"No se puede borrar un guardado mientras hay una carrera activa.", L"Football Manager", MB_OK | MB_ICONWARNING);
+        setStatus(state, "No se puede borrar un guardado con carrera activa.");
+        return;
+    }
+
+    std::string savePath = state.career.saveFile.empty() ? std::string("saves/career_save.txt") : state.career.saveFile;
+    
+    if (!pathExists(savePath) && savePath == "saves/career_save.txt" && pathExists("career_save.txt")) {
+        savePath = "career_save.txt";
+    }
+
+    if (!pathExists(savePath)) {
+        MessageBoxW(state.window, L"No hay un guardado para borrar.", L"Football Manager", MB_OK | MB_ICONINFORMATION);
+        setStatus(state, "No hay guardado disponible para borrar.");
+        return;
+    }
+
+    int result = MessageBoxW(state.window, 
+                            utf8ToWide("¿Estás seguro de que deseas borrar el guardado?\n\n" + savePath).c_str(), 
+                            L"Confirmar borrado", 
+                            MB_YESNO | MB_ICONQUESTION);
+    
+    if (result == IDYES) {
+        try {
+            std::remove(savePath.c_str());
+            if (pathExists(savePath + ".bak")) {
+                std::remove((savePath + ".bak").c_str());
+            }
+            state.career.myTeam = nullptr;
+            refreshAll(state);
+            setStatus(state, "Guardado eliminado correctamente.");
+            MessageBoxW(state.window, L"El guardado ha sido eliminado.", L"Football Manager", MB_OK | MB_ICONINFORMATION);
+        } catch (...) {
+            MessageBoxW(state.window, L"No se pudo eliminar el guardado.", L"Football Manager", MB_OK | MB_ICONERROR);
+            setStatus(state, "Error al eliminar el guardado.");
+        }
+    } else {
+        setStatus(state, "Borrado cancelado.");
+    }
+}
+
 void simulateWeek(AppState& state) {
     if (!state.career.myTeam) return;
     syncManagerNameFromUi(state);
+    state.actionInProgress = true;
     setStatus(state,
               "Simulando semana en modo " +
                   game_settings::simulationModeLabel(state.settings.simulationMode) +
@@ -240,10 +332,13 @@ void simulateWeek(AppState& state) {
     const WeekSimulationPresentation previousPresentation = weekSimulationPresentation();
     // La GUI no muestra el volcado crudo del partido; el detalle ya vive en el match center.
     setWeekSimulationPresentation(WeekSimulationPresentation::Compact);
-    ServiceResult result = simulateCareerWeekService(state.career);
+    g_pumpState = &state;
+    ServiceResult result = simulateCareerWeekService(state.career, pumpUiMessages);
+    g_pumpState = nullptr;
     setWeekSimulationPresentation(previousPresentation);
     syncCombosFromCareer(state);
     refreshAll(state);
+    state.actionInProgress = false;
     setStatus(state, result.messages.empty() ? "Semana simulada." : result.messages.back());
 }
 
