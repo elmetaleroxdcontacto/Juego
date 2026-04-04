@@ -138,6 +138,9 @@ set(FM_CONSOLE_UI_SOURCES
     src/ui/team_ui.cpp
     src/ui/ui.cpp
     src/ui/global_search.cpp
+    src/ui/keyboard_shortcuts.cpp
+    src/ui/context_menu.cpp
+    src/ui/economy_fairplay.cpp
 )
 
 set(FM_CONSOLE_ENTRY_SOURCES
