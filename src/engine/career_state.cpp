@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 using namespace std;
@@ -121,6 +122,7 @@ Career::Career()
       saveFile("saves/career_save.txt"),
       managerName("Manager"),
       managerReputation(50),
+      activeHumanManagerIndex(0),
       boardConfidence(60),
       boardExpectedFinish(0),
       boardBudgetTarget(0),
@@ -131,7 +133,16 @@ Career::Career()
       boardMonthlyDeadlineWeek(0),
       cupActive(false),
       cupRound(0),
-      initialized(false) {}
+      managerStress(initializeManagerStress()),
+      initialized(false) {
+    // Inicializar sistemas de gameplay
+    infrastructure.levels.trainingGround = 2;
+    infrastructure.levels.youthAcademy = 1;
+    infrastructure.levels.medical = 2;
+    infrastructure.levels.stadium = 2;
+    infrastructure.levels.facilities = 1;
+    infrastructure.totalUpgradeCapacity = 2000000;
+}
 
 bool Career::usesSegundaFormat() const {
     const CompetitionConfig& config = getCompetitionConfig(activeDivision);
@@ -331,6 +342,39 @@ const Team* Career::findTeamByName(const string& name) const {
         if (team.name == name) return &team;
     }
     return nullptr;
+}
+
+int Career::getActiveTeamCount() const {
+    return static_cast<int>(activeTeams.size());
+}
+
+Team* Career::getActiveTeamAt(int index) {
+    if (index < 0 || index >= static_cast<int>(activeTeams.size())) return nullptr;
+    return activeTeams[static_cast<size_t>(index)];
+}
+
+const Team* Career::getActiveTeamAt(int index) const {
+    if (index < 0 || index >= static_cast<int>(activeTeams.size())) return nullptr;
+    return activeTeams[static_cast<size_t>(index)];
+}
+
+int Career::getAllTeamCount() const {
+    return static_cast<int>(allTeams.size());
+}
+
+Team* Career::getTeamAt(int index) {
+    if (index < 0 || index >= static_cast<int>(allTeams.size())) return nullptr;
+    return &allTeams[static_cast<size_t>(index)];
+}
+
+const Team* Career::getTeamAt(int index) const {
+    if (index < 0 || index >= static_cast<int>(allTeams.size())) return nullptr;
+    return &allTeams[static_cast<size_t>(index)];
+}
+
+Team* Career::setMyTeamByName(const string& teamName) {
+    myTeam = findTeamByName(teamName);
+    return myTeam;
 }
 
 void Career::addInboxItem(const string& item, const string& channel) {
@@ -539,4 +583,129 @@ void Career::updateBoardConfidence() {
     boardConfidence = clampInt(boardConfidence + delta, 0, 100);
     if (boardConfidence < 35) boardWarningWeeks++;
     else boardWarningWeeks = 0;
+}
+
+void Career::clearHumanManagers() {
+    humanManagers.clear();
+    activeHumanManagerIndex = 0;
+}
+
+void Career::syncActiveHumanManager() {
+    if (!myTeam && humanManagers.empty()) return;
+
+    if (humanManagers.empty()) {
+        HumanManagerProfile profile;
+        profile.managerName = managerName.empty() ? "Manager" : managerName;
+        profile.teamName = myTeam ? myTeam->name : "";
+        profile.reputation = clampInt(managerReputation <= 0 ? 50 : managerReputation, 1, 100);
+        humanManagers.push_back(std::move(profile));
+        activeHumanManagerIndex = 0;
+    }
+
+    if (activeHumanManagerIndex < 0 || activeHumanManagerIndex >= static_cast<int>(humanManagers.size())) {
+        activeHumanManagerIndex = 0;
+    }
+
+    HumanManagerProfile& active = humanManagers[static_cast<size_t>(activeHumanManagerIndex)];
+    active.managerName = managerName.empty() ? (active.managerName.empty() ? "Manager" : active.managerName)
+                                             : managerName;
+    active.reputation = clampInt(managerReputation <= 0 ? active.reputation : managerReputation, 1, 100);
+    if (myTeam) active.teamName = myTeam->name;
+}
+
+void Career::applyActiveHumanManager() {
+    if (humanManagers.empty()) {
+        if (myTeam) {
+            managerName = managerName.empty() ? "Manager" : managerName;
+            managerReputation = clampInt(managerReputation <= 0 ? 50 : managerReputation, 1, 100);
+        }
+        return;
+    }
+
+    if (activeHumanManagerIndex < 0 || activeHumanManagerIndex >= static_cast<int>(humanManagers.size())) {
+        activeHumanManagerIndex = 0;
+    }
+
+    HumanManagerProfile& active = humanManagers[static_cast<size_t>(activeHumanManagerIndex)];
+    if (active.managerName.empty()) active.managerName = "Manager";
+    if (active.reputation <= 0) active.reputation = 50;
+
+    managerName = active.managerName;
+    managerReputation = clampInt(active.reputation, 1, 100);
+    myTeam = active.teamName.empty() ? nullptr : findTeamByName(active.teamName);
+
+    if (!myTeam && !active.teamName.empty()) {
+        for (size_t i = 0; i < humanManagers.size(); ++i) {
+            if (humanManagers[i].teamName.empty()) continue;
+            Team* fallback = findTeamByName(humanManagers[i].teamName);
+            if (!fallback) continue;
+            activeHumanManagerIndex = static_cast<int>(i);
+            HumanManagerProfile& fallbackProfile = humanManagers[i];
+            managerName = fallbackProfile.managerName.empty() ? "Manager" : fallbackProfile.managerName;
+            managerReputation = clampInt(fallbackProfile.reputation <= 0 ? 50 : fallbackProfile.reputation, 1, 100);
+            myTeam = fallback;
+            break;
+        }
+    }
+
+    if (myTeam) {
+        activeDivision = canonicalDivisionId(myTeam->division);
+        humanManagers[static_cast<size_t>(activeHumanManagerIndex)].teamName = myTeam->name;
+    }
+}
+
+bool Career::addHumanManager(const string& manager, const string& teamName, int reputation, bool makeActive) {
+    if (teamName.empty() || !findTeamByName(teamName)) return false;
+
+    syncActiveHumanManager();
+    const string resolvedManager = manager.empty() ? "Manager" : manager;
+    const int resolvedReputation = clampInt(reputation <= 0 ? 50 : reputation, 1, 100);
+    for (size_t i = 0; i < humanManagers.size(); ++i) {
+        if (humanManagers[i].teamName != teamName) continue;
+        humanManagers[i].managerName = resolvedManager;
+        humanManagers[i].reputation = resolvedReputation;
+        if (makeActive) {
+            activeHumanManagerIndex = static_cast<int>(i);
+            applyActiveHumanManager();
+        }
+        return true;
+    }
+
+    humanManagers.push_back({resolvedManager, teamName, resolvedReputation});
+    if (makeActive) {
+        activeHumanManagerIndex = static_cast<int>(humanManagers.size() - 1);
+        applyActiveHumanManager();
+    }
+    return true;
+}
+
+bool Career::switchActiveHumanManager(int index) {
+    syncActiveHumanManager();
+    if (index < 0 || index >= static_cast<int>(humanManagers.size())) return false;
+    activeHumanManagerIndex = index;
+    applyActiveHumanManager();
+    if (myTeam) setActiveDivision(myTeam->division);
+    return myTeam != nullptr;
+}
+
+int Career::humanManagerCount() const {
+    if (!humanManagers.empty()) return static_cast<int>(humanManagers.size());
+    return myTeam ? 1 : 0;
+}
+
+vector<string> Career::humanControlledTeamNames() const {
+    vector<string> names;
+    const auto pushUniqueName = [&names](const string& name) {
+        if (name.empty()) return;
+        if (find(names.begin(), names.end(), name) == names.end()) names.push_back(name);
+    };
+
+    for (const auto& profile : humanManagers) pushUniqueName(profile.teamName);
+    if (names.empty() && myTeam) pushUniqueName(myTeam->name);
+    return names;
+}
+
+bool Career::isHumanControlledTeam(const Team& team) const {
+    const vector<string> names = humanControlledTeamNames();
+    return find(names.begin(), names.end(), team.name) != names.end();
 }

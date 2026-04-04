@@ -11,13 +11,14 @@ set "BUILD_DIR=%ROOT_DIR%\build"
 set "CMAKE_BUILD_DIR=%ROOT_DIR%\build-cmake"
 set "SRC_DIR=%ROOT_DIR%\src"
 set "CXX=g++"
-set "FALLBACK_CXXFLAGS=-std=c++17 -static -Iinclude -Isrc"
+set "FALLBACK_CXXFLAGS=-std=c++17 -static -I\"%ROOT_DIR%\include\" -I\"%ROOT_DIR%\src\""
 
 set "CMAKE_TARGETS=FootballManager"
 set "PRIMARY_TARGET=FootballManager"
 set "RUN_MODE=gui"
 set "RUN_VALIDATE=0"
 set "RUN_TESTS=0"
+set "CMAKE_BUILD_TESTING=OFF"
 set "BUILD_ROUTE=Sin definir"
 set "FORWARD_ARGS="
 set "OUTPUT=%ROOT_DIR%\FootballManager.exe"
@@ -29,10 +30,17 @@ set "TEST_OUTPUT=%CMAKE_TEST_OUTPUT%"
 set "ROOT_GUI_OUTPUT=%ROOT_DIR%\FootballManager.exe"
 set "ROOT_CLI_OUTPUT=%ROOT_DIR%\FootballManagerCLI.exe"
 set "ROOT_TEST_OUTPUT=%ROOT_DIR%\FootballManagerTests.exe"
+set "CMAKE_CONFIG_LOG=%CMAKE_BUILD_DIR%\cmake-config.log"
+set "CMAKE_BUILD_LOG=%CMAKE_BUILD_DIR%\cmake-build.log"
+set "SHOW_HELP=0"
 
 :parse_args
 if "%~1"=="" goto :after_parse
-if /i "%~1"=="--gui" (
+if /i "%~1"=="--help" (
+    set "SHOW_HELP=1"
+) else if /i "%~1"=="-h" (
+    set "SHOW_HELP=1"
+) else if /i "%~1"=="--gui" (
     set "CMAKE_TARGETS=FootballManager"
     set "PRIMARY_TARGET=FootballManager"
     set "RUN_MODE=gui"
@@ -51,13 +59,16 @@ if /i "%~1"=="--gui" (
     set "PRIMARY_TARGET=FootballManagerTests"
     set "RUN_MODE=tests"
     set "RUN_TESTS=1"
+    set "CMAKE_BUILD_TESTING=ON"
 ) else if /i "%~1"=="--all" (
     set "CMAKE_TARGETS=FootballManager FootballManagerCLI FootballManagerTests"
     set "PRIMARY_TARGET=FootballManager"
     set "RUN_MODE=gui"
     set "RUN_TESTS=1"
+    set "CMAKE_BUILD_TESTING=ON"
 ) else if /i "%~1"=="--run-tests" (
     set "RUN_TESTS=1"
+    set "CMAKE_BUILD_TESTING=ON"
     if /i "!CMAKE_TARGETS!"=="FootballManager" set "CMAKE_TARGETS=FootballManager FootballManagerTests"
     if /i "!CMAKE_TARGETS!"=="FootballManagerCLI" set "CMAKE_TARGETS=FootballManagerCLI FootballManagerTests"
 ) else (
@@ -67,6 +78,7 @@ shift
 goto :parse_args
 
 :after_parse
+if "%SHOW_HELP%"=="1" goto :show_help
 if /i "%PRIMARY_TARGET%"=="FootballManagerCLI" set "OUTPUT=%ROOT_DIR%\FootballManagerCLI.exe"
 if /i "%PRIMARY_TARGET%"=="FootballManagerTests" set "OUTPUT=%ROOT_DIR%\FootballManagerTests.exe"
 if /i "%PRIMARY_TARGET%"=="FootballManager" (
@@ -85,10 +97,10 @@ if errorlevel 1 goto :legacy_build
 
 echo Usando CMake como sistema principal de compilacion...
 if not exist "%CMAKE_BUILD_DIR%" mkdir "%CMAKE_BUILD_DIR%"
-cmake -S "%ROOT_DIR%" -B "%CMAKE_BUILD_DIR%" -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=%CXX% > "%CMAKE_BUILD_DIR%\cmake-config.log" 2>&1
+cmake -S "%ROOT_DIR%" -B "%CMAKE_BUILD_DIR%" -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=%CXX% -DBUILD_TESTING=%CMAKE_BUILD_TESTING% > "%CMAKE_CONFIG_LOG%" 2>&1
 if errorlevel 1 goto :legacy_build_after_cmake_config
 
-cmake --build "%CMAKE_BUILD_DIR%" --config Release --target %CMAKE_TARGETS% > "%CMAKE_BUILD_DIR%\cmake-build.log" 2>&1
+cmake --build "%CMAKE_BUILD_DIR%" --config Release --target %CMAKE_TARGETS% > "%CMAKE_BUILD_LOG%" 2>&1
 if errorlevel 1 goto :legacy_build_after_cmake_build
 
 set "BUILD_ROUTE=CMake"
@@ -99,12 +111,12 @@ goto :post_build
 
 :legacy_build_after_cmake_config
 echo CMake no pudo configurarse correctamente en este entorno.
-echo Revisa "%CMAKE_BUILD_DIR%\cmake-config.log" para mas detalle.
+echo Revisa "%CMAKE_CONFIG_LOG%" para mas detalle.
 goto :legacy_build
 
 :legacy_build_after_cmake_build
 echo CMake se configuro, pero la compilacion fallo en este entorno.
-echo Revisa "%CMAKE_BUILD_DIR%\cmake-build.log" para mas detalle.
+echo Revisa "%CMAKE_BUILD_LOG%" para mas detalle.
 
 :legacy_build
 set "BUILD_ROUTE=Fallback directo g++"
@@ -122,10 +134,14 @@ for /R "%SRC_DIR%" %%F in (*.cpp) do (
     if /i "%PRIMARY_TARGET%"=="FootballManagerTests" if /i "%%~nxF"=="winmain.cpp" set "SKIP_FILE=1"
 
     if not defined SKIP_FILE (
+        set "OBJ_NAME=%%~pnF"
+        set "OBJ_NAME=!OBJ_NAME:\=_!"
+        set "OBJ_NAME=!OBJ_NAME:/=_!"
+        set "OBJ_NAME=!OBJ_NAME::=_!"
         echo Compilando %%~nxF...
-        %CXX% -c "%%~fF" -o "%BUILD_DIR%\%%~nF.o" %FALLBACK_CXXFLAGS%
+        %CXX% -c "%%~fF" -o "%BUILD_DIR%\!OBJ_NAME!.o" %FALLBACK_CXXFLAGS%
         if errorlevel 1 goto :compile_error
-        set "OBJECTS=!OBJECTS! "%BUILD_DIR%\%%~nF.o""
+        set "OBJECTS=!OBJECTS! "%BUILD_DIR%\!OBJ_NAME!.o""
     )
 )
 
@@ -171,21 +187,8 @@ if /i "%FM_SKIP_RUN%"=="1" (
 )
 
 if "%RUN_TESTS%"=="1" (
-    if exist "%TEST_OUTPUT%" (
-        echo Ejecutando FootballManagerTests...
-        pushd "%ROOT_DIR%"
-        "%TEST_OUTPUT%"
-        set "TEST_EXIT=%ERRORLEVEL%"
-        popd
-        if not "%TEST_EXIT%"=="0" exit /b %TEST_EXIT%
-    ) else if /i "%PRIMARY_TARGET%"=="FootballManagerTests" (
-        echo Ejecutando FootballManagerTests...
-        pushd "%ROOT_DIR%"
-        "%OUTPUT%"
-        set "TEST_EXIT=%ERRORLEVEL%"
-        popd
-        if not "%TEST_EXIT%"=="0" exit /b %TEST_EXIT%
-    )
+    call :run_requested_tests
+    if errorlevel 1 exit /b %ERRORLEVEL%
 )
 
 if /i "%RUN_MODE%"=="tests" exit /b 0
@@ -247,6 +250,41 @@ if "%RUN_TESTS%"=="1" if /i not "%PRIMARY_TARGET%"=="FootballManagerTests" (
 )
 goto :eof
 
+:run_requested_tests
+if /i "%BUILD_ROUTE%"=="CMake" if exist "%CMAKE_BUILD_DIR%\CTestTestfile.cmake" (
+    where ctest >nul 2>nul
+    if not errorlevel 1 (
+        echo Ejecutando FootballManagerTests con CTest...
+        pushd "%ROOT_DIR%"
+        ctest --test-dir "%CMAKE_BUILD_DIR%" --output-on-failure -C Release
+        set "TEST_EXIT=%ERRORLEVEL%"
+        popd
+        exit /b %TEST_EXIT%
+    )
+)
+
+if exist "%TEST_OUTPUT%" (
+    echo Ejecutando FootballManagerTests...
+    pushd "%ROOT_DIR%"
+    "%TEST_OUTPUT%"
+    set "TEST_EXIT=%ERRORLEVEL%"
+    popd
+    exit /b %TEST_EXIT%
+)
+
+if /i "%PRIMARY_TARGET%"=="FootballManagerTests" if exist "%OUTPUT%" (
+    echo Ejecutando FootballManagerTests...
+    pushd "%ROOT_DIR%"
+    "%OUTPUT%"
+    set "TEST_EXIT=%ERRORLEVEL%"
+    popd
+    exit /b %TEST_EXIT%
+)
+
+echo.
+echo [ERROR] Se pidio ejecutar tests, pero no se encontro FootballManagerTests.
+exit /b 1
+
 :compile_error
 echo.
 echo [ERROR] Error en la compilacion.
@@ -261,3 +299,19 @@ exit /b 1
 echo.
 echo [ERROR] Error en el linking.
 exit /b 1
+
+:show_help
+echo Uso: build.bat [opciones]
+echo.
+echo   --gui         Compila y abre FootballManager.
+echo   --cli         Compila y ejecuta FootballManagerCLI en consola.
+echo   --validate    Compila FootballManagerCLI y lo ejecuta con --validate.
+echo   --tests       Compila FootballManagerTests y ejecuta la suite.
+echo   --run-tests   Agrega FootballManagerTests al build actual y ejecuta la suite.
+echo   --all         Compila GUI, CLI y Tests; luego ejecuta la suite.
+echo   --help, -h    Muestra esta ayuda.
+echo.
+echo Variables utiles:
+echo   FM_SKIP_RUN=1       Compila pero no ejecuta nada despues.
+echo   FM_FORCE_FALLBACK=1 Fuerza el build directo con g++.
+exit /b 0

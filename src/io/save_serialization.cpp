@@ -6,12 +6,13 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include <utility>
 
 using namespace std;
 
 namespace {
 
-static constexpr int kCareerSaveVersion = 12;
+static constexpr int kCareerSaveVersion = 14;
 
 string canonicalizeDivisionValue(const string& raw) {
     return canonicalDivisionId(raw);
@@ -396,6 +397,34 @@ vector<ScoutingAssignment> decodeScoutingAssignments(const string& encoded) {
     return assignments;
 }
 
+string encodeHumanManagers(const vector<HumanManagerProfile>& managers) {
+    vector<string> encodedEntries;
+    encodedEntries.reserve(managers.size());
+    for (const auto& manager : managers) {
+        encodedEntries.push_back(joinEscapedFields({
+            manager.managerName,
+            manager.teamName,
+            to_string(manager.reputation)
+        }, '^'));
+    }
+    return joinEscapedFields(encodedEntries, '~');
+}
+
+vector<HumanManagerProfile> decodeHumanManagers(const string& encoded) {
+    vector<HumanManagerProfile> managers;
+    if (encoded.empty()) return managers;
+    for (const string& token : splitEscapedFields(encoded, '~')) {
+        const auto parts = splitEscapedFields(token, '^');
+        if (parts.size() < 2) continue;
+        HumanManagerProfile manager;
+        manager.managerName = parts[0].empty() ? "Manager" : parts[0];
+        manager.teamName = parts[1];
+        manager.reputation = clampInt(parts.size() > 2 ? parseIntField(parts[2], 50) : 50, 1, 100);
+        managers.push_back(std::move(manager));
+    }
+    return managers;
+}
+
 string encodePlayerFields(const Player& player) {
     return joinEscapedFields({
         player.name,
@@ -557,6 +586,15 @@ bool serializeCareer(ostream& file, const Career& career) {
     Team* const& myTeam = career.myTeam;
     const string& managerName = career.managerName;
     const int& managerReputation = career.managerReputation;
+    vector<HumanManagerProfile> humanManagers = career.humanManagers;
+    if (humanManagers.empty() && myTeam) {
+        humanManagers.push_back({managerName.empty() ? "Manager" : managerName, myTeam->name,
+                                 clampInt(managerReputation <= 0 ? 50 : managerReputation, 1, 100)});
+    }
+    const int activeHumanManagerIndex = humanManagers.empty()
+                                            ? 0
+                                            : clampInt(career.activeHumanManagerIndex, 0,
+                                                       static_cast<int>(humanManagers.size()) - 1);
     const string& boardMonthlyObjective = career.boardMonthlyObjective;
     const int& boardMonthlyTarget = career.boardMonthlyTarget;
     const int& boardMonthlyProgress = career.boardMonthlyProgress;
@@ -592,6 +630,8 @@ bool serializeCareer(ostream& file, const Career& career) {
     file << "DIVISION " << escapeSaveField(activeDivision) << "\n";
     file << "MYTEAM " << escapeSaveField(myTeam ? myTeam->name : "") << "\n";
     file << "MANAGER " << joinEscapedFields({managerName, to_string(managerReputation)}, '|') << "\n";
+    file << "HUMANS " << encodeHumanManagers(humanManagers) << "\n";
+    file << "ACTIVE_MANAGER " << activeHumanManagerIndex << "\n";
     file << "DYNOBJ "
          << joinEscapedFields({boardMonthlyObjective,
                                to_string(boardMonthlyTarget),
@@ -628,6 +668,83 @@ bool serializeCareer(ostream& file, const Career& career) {
     file << "LASTMATCH_POTM " << escapeSaveField(lastMatchPlayerOfTheMatch) << "\n";
     file << "LASTMATCH_CENTER " << encodeMatchCenterSnapshot(lastMatchCenter) << "\n";
     file << "LASTMATCH_PHASES " << encodeStringList(lastMatchCenter.phaseSummaries) << "\n";
+    
+    // Serialize new gameplay systems
+    file << "GAMEPLAY_SYSTEMS " 
+         << joinEscapedFields({
+             to_string(career.managerStress.stressLevel),
+             to_string(career.managerStress.energy),
+             to_string(career.managerStress.mentalFortitude),
+             to_string(career.infrastructure.levels.trainingGround),
+             to_string(career.infrastructure.levels.youthAcademy),
+             to_string(career.infrastructure.levels.medical),
+             to_string(career.infrastructure.levels.stadium),
+             to_string(career.infrastructure.levels.facilities),
+             to_string(career.debtStatus.totalDebt),
+             to_string(career.debtStatus.debtSeverity),
+             to_string(career.debtStatus.weeksUntilSeizure)
+         }, '|') << "\n";
+    
+    // Serialize dressing room dynamics
+    file << "DRESSING_ROOM " << career.dressingRoomDynamics.cliques.size() << "\n";
+    for (const auto& clique : career.dressingRoomDynamics.cliques) {
+        file << "CLIQUE " << joinEscapedFields({
+            clique.name,
+            to_string(clique.cohesion),
+            to_string(clique.moralBoost),
+            encodeStringList(clique.memberNames)
+        }, '|') << "\n";
+    }
+    
+    // Serialize rival AI map
+    file << "RIVAL_AI " << career.rivalAIMap.size() << "\n";
+    for (const auto& rivalPair : career.rivalAIMap) {
+        const std::string& teamName = rivalPair.first;
+        const RivalAI& rivalAI = rivalPair.second;
+        file << "RIVAL " << joinEscapedFields({
+            teamName,
+            rivalAI.personality.teamName,
+            rivalAI.personality.playstyle,
+            to_string(rivalAI.personality.adaptability),
+            to_string(rivalAI.personality.tactical_awareness),
+            to_string(rivalAI.personality.unpredictability),
+            to_string(rivalAI.memoryBank.size())
+        }, '|') << "\n";
+        for (const auto& memory : rivalAI.memoryBank) {
+            file << "MEMORY " << joinEscapedFields({
+                memory.opponentName,
+                to_string(memory.matchesPlayed),
+                to_string(memory.wins),
+                to_string(memory.draws),
+                to_string(memory.losses),
+                encodeStringList(memory.favoredFormations),
+                encodeStringList(memory.favoredTactics),
+                escapeSaveField(memory.commonPlayPattern),
+                encodeStringList(memory.identifiedWeaknesses),
+                encodeStringList(memory.identifiedStrengths),
+                to_string(memory.lastMatchOutcome),
+                to_string(memory.consecutiveVsThisTeam)
+            }, '|') << "\n";
+        }
+    }
+    
+    // Serialize rivalry dynamics
+    file << "RIVALRY_DYNAMICS " << career.rivalryDynamics.rivalries.size() << "\n";
+    for (const auto& record : career.rivalryDynamics.rivalries) {
+        file << "RIVALRY " << joinEscapedFields({
+            record.team1,
+            record.team2,
+            to_string(record.encounters),
+            to_string(record.team1Wins),
+            to_string(record.team1Draws),
+            to_string(record.team1Losses),
+            to_string(record.lastMeetingWeek),
+            to_string(record.intensity),
+            to_string(record.isLocalRivalry ? 1 : 0),
+            to_string(record.isHistoricRivalry ? 1 : 0)
+        }, '|') << "\n";
+    }
+    
     file << "TEAMS " << allTeams.size() << "\n";
 
     for (const auto& team : allTeams) {
@@ -717,6 +834,8 @@ bool deserializeCareer(istream& file, Career& career) {
     auto& myTeam = career.myTeam;
     auto& managerName = career.managerName;
     auto& managerReputation = career.managerReputation;
+    auto& humanManagers = career.humanManagers;
+    auto& activeHumanManagerIndex = career.activeHumanManagerIndex;
     auto& boardMonthlyObjective = career.boardMonthlyObjective;
     auto& boardMonthlyTarget = career.boardMonthlyTarget;
     auto& boardMonthlyProgress = career.boardMonthlyProgress;
@@ -782,10 +901,20 @@ bool deserializeCareer(istream& file, Career& career) {
         if (!getline(file, teamsLine)) return false;
         managerName = "Manager";
         managerReputation = 50;
+        humanManagers.clear();
+        activeHumanManagerIndex = 0;
         if (teamsLine.rfind("MANAGER ", 0) == 0) {
             auto managerFields = splitEscapedFields(teamsLine.substr(8), '|');
             if (!managerFields.empty()) managerName = managerFields[0];
             if (managerFields.size() > 1) managerReputation = parseIntField(managerFields[1], 50);
+            if (!getline(file, teamsLine)) return false;
+        }
+        if (teamsLine.rfind("HUMANS ", 0) == 0) {
+            humanManagers = decodeHumanManagers(teamsLine.substr(7));
+            if (!getline(file, teamsLine)) return false;
+        }
+        if (teamsLine.rfind("ACTIVE_MANAGER ", 0) == 0) {
+            activeHumanManagerIndex = parseIntField(trim(teamsLine.substr(15)), 0);
             if (!getline(file, teamsLine)) return false;
         }
         boardMonthlyObjective.clear();
@@ -909,6 +1038,128 @@ bool deserializeCareer(istream& file, Career& career) {
             lastMatchCenter.phaseSummaries = decodeStringList(teamsLine.substr(16));
             if (!getline(file, teamsLine)) return false;
         }
+        
+        // Deserialize new gameplay systems
+        career.managerStress = initializeManagerStress();
+        career.infrastructure = InfrastructureSystem{};
+        career.debtStatus = DebtStatus{};
+        if (teamsLine.rfind("GAMEPLAY_SYSTEMS ", 0) == 0) {
+            auto systemFields = splitEscapedFields(teamsLine.substr(16), '|');
+            if (systemFields.size() >= 3) {
+                career.managerStress.stressLevel = parseIntField(systemFields[0], 0);
+                career.managerStress.energy = parseIntField(systemFields[1], 100);
+                career.managerStress.mentalFortitude = parseIntField(systemFields[2], 50);
+            }
+            if (systemFields.size() >= 8) {
+                career.infrastructure.levels.trainingGround = parseIntField(systemFields[3], 1);
+                career.infrastructure.levels.youthAcademy = parseIntField(systemFields[4], 1);
+                career.infrastructure.levels.medical = parseIntField(systemFields[5], 1);
+                career.infrastructure.levels.stadium = parseIntField(systemFields[6], 1);
+                career.infrastructure.levels.facilities = parseIntField(systemFields[7], 1);
+            }
+            if (systemFields.size() >= 11) {
+                career.debtStatus.totalDebt = parseLongField(systemFields[8], 0);
+                career.debtStatus.debtSeverity = parseIntField(systemFields[9], 0);
+                career.debtStatus.weeksUntilSeizure = parseIntField(systemFields[10], 0);
+            }
+            if (!getline(file, teamsLine)) return false;
+        }
+        
+        // Deserialize dressing room dynamics
+        career.dressingRoomDynamics = DressingRoomDynamics{};
+        if (teamsLine.rfind("DRESSING_ROOM ", 0) == 0) {
+            int cliqueCount = parseIntField(trim(teamsLine.substr(14)));
+            for (int i = 0; i < cliqueCount; ++i) {
+                if (!getline(file, line) || line.rfind("CLIQUE ", 0) != 0) return false;
+                auto cliqueFields = splitEscapedFields(line.substr(7), '|');
+                if (cliqueFields.size() >= 4) {
+                    SocialGroup clique;
+                    clique.name = cliqueFields[0];
+                    clique.cohesion = parseIntField(cliqueFields[1], 50);
+                    clique.moralBoost = parseIntField(cliqueFields[2], 0);
+                    clique.memberNames = decodeStringList(cliqueFields[3]);
+                    career.dressingRoomDynamics.cliques.push_back(clique);
+                }
+            }
+            if (!getline(file, teamsLine)) return false;
+        }
+        
+        // Deserialize rival AI map
+        career.rivalAIMap.clear();
+        if (teamsLine.rfind("RIVAL_AI ", 0) == 0) {
+            int rivalCount = parseIntField(trim(teamsLine.substr(9)));
+            for (int i = 0; i < rivalCount; ++i) {
+                if (!getline(file, line) || line.rfind("RIVAL ", 0) != 0) return false;
+                auto rivalFields = splitEscapedFields(line.substr(6), '|');
+                if (rivalFields.size() >= 7) {
+                    std::string teamName = rivalFields[0];
+                    RivalAI rivalAI;
+                    rivalAI.personality.teamName = rivalFields[1];
+                    rivalAI.personality.playstyle = rivalFields[2];
+                    rivalAI.personality.adaptability = parseIntField(rivalFields[3], 50);
+                    rivalAI.personality.tactical_awareness = parseIntField(rivalFields[4], 70);
+                    rivalAI.personality.unpredictability = parseIntField(rivalFields[5], 50);
+                    int memoryCount = parseIntField(rivalFields[6], 0);
+                    
+                    for (int j = 0; j < memoryCount; ++j) {
+                        if (!getline(file, line) || line.rfind("MEMORY ", 0) != 0) return false;
+                        auto memoryFields = splitEscapedFields(line.substr(7), '|');
+                        if (memoryFields.size() >= 5) {
+                            RivalMemory memory;
+                            memory.opponentName = memoryFields[0];
+                            memory.matchesPlayed = parseIntField(memoryFields[1], 0);
+                            memory.wins = parseIntField(memoryFields[2], 0);
+                            memory.draws = parseIntField(memoryFields[3], 0);
+                            memory.losses = parseIntField(memoryFields[4], 0);
+
+                            if (memoryFields.size() == 6) {
+                                memory.lastMatchOutcome = parseIntField(memoryFields[5], 0);
+                            } else if (memoryFields.size() == 7) {
+                                memory.lastMatchOutcome = parseIntField(memoryFields[5], 0);
+                                memory.consecutiveVsThisTeam = parseIntField(memoryFields[6], 0);
+                            } else if (memoryFields.size() >= 11) {
+                                memory.favoredFormations = decodeStringList(memoryFields[5]);
+                                memory.favoredTactics = decodeStringList(memoryFields[6]);
+                                memory.commonPlayPattern = memoryFields[7];
+                                memory.identifiedWeaknesses = decodeStringList(memoryFields[8]);
+                                memory.identifiedStrengths = decodeStringList(memoryFields[9]);
+                                memory.lastMatchOutcome = parseIntField(memoryFields[10], 0);
+                                memory.consecutiveVsThisTeam = parseIntField(memoryFields[11], 0);
+                            }
+                            rivalAI.memoryBank.push_back(memory);
+                        }
+                    }
+                    career.rivalAIMap[teamName] = rivalAI;
+                }
+            }
+            if (!getline(file, teamsLine)) return false;
+        }
+        
+        // Deserialize rivalry dynamics
+        career.rivalryDynamics = RivalryDynamics{};
+        if (teamsLine.rfind("RIVALRY_DYNAMICS ", 0) == 0) {
+            int rivalryCount = parseIntField(trim(teamsLine.substr(16)));
+            for (int i = 0; i < rivalryCount; ++i) {
+                if (!getline(file, line) || line.rfind("RIVALRY ", 0) != 0) return false;
+                auto rivalryFields = splitEscapedFields(line.substr(8), '|');
+                if (rivalryFields.size() >= 10) {
+                    RivalryRecord record;
+                    record.team1 = rivalryFields[0];
+                    record.team2 = rivalryFields[1];
+                    record.encounters = parseIntField(rivalryFields[2], 0);
+                    record.team1Wins = parseIntField(rivalryFields[3], 0);
+                    record.team1Draws = parseIntField(rivalryFields[4], 0);
+                    record.team1Losses = parseIntField(rivalryFields[5], 0);
+                    record.lastMeetingWeek = parseIntField(rivalryFields[6], 0);
+                    record.intensity = parseIntField(rivalryFields[7], 0);
+                    record.isLocalRivalry = parseBoolField(rivalryFields[8]);
+                    record.isHistoricRivalry = parseBoolField(rivalryFields[9]);
+                    career.rivalryDynamics.rivalries.push_back(record);
+                }
+            }
+            if (!getline(file, teamsLine)) return false;
+        }
+        
         if (teamsLine.rfind("TEAMS ", 0) != 0) return false;
         int teamCount = parseIntField(trim(teamsLine.substr(6)));
 
@@ -1043,15 +1294,25 @@ bool deserializeCareer(istream& file, Career& career) {
             career.setActiveDivision(activeDivision);
         }
 
-        myTeam = nullptr;
-        for (auto& team : allTeams) {
-            if (team.name == myTeamName) {
-                myTeam = &team;
-                break;
+        if (humanManagers.empty() && !myTeamName.empty()) {
+            humanManagers.push_back({managerName.empty() ? "Manager" : managerName,
+                                     myTeamName,
+                                     clampInt(managerReputation <= 0 ? 50 : managerReputation, 1, 100)});
+            activeHumanManagerIndex = 0;
+        }
+
+        career.applyActiveHumanManager();
+        if (!myTeam) {
+            for (auto& team : allTeams) {
+                if (team.name == myTeamName) {
+                    myTeam = &team;
+                    break;
+                }
             }
         }
         if (myTeam) activeDivision = canonicalizeDivisionValue(myTeam->division);
         if (!activeDivision.empty()) career.setActiveDivision(activeDivision);
+        career.syncActiveHumanManager();
         if (boardExpectedFinish <= 0) career.initializeBoardObjectives();
         if (boardMonthlyObjective.empty()) career.initializeDynamicObjective();
         if (!cupActive && !career.activeTeams.empty()) career.initializeSeasonCup();
@@ -1067,6 +1328,8 @@ bool deserializeCareer(istream& file, Career& career) {
     currentWeek = week;
     managerName = "Manager";
     managerReputation = 50;
+    humanManagers.clear();
+    activeHumanManagerIndex = 0;
     newsFeed.clear();
     managerInbox.clear();
     scoutInbox.clear();
@@ -1164,6 +1427,7 @@ bool deserializeCareer(istream& file, Career& career) {
     if (myTeam) activeDivision = canonicalizeDivisionValue(myTeam->division);
     else if (!divisions.empty()) activeDivision = canonicalizeDivisionValue(divisions.front().id);
     if (!activeDivision.empty()) career.setActiveDivision(activeDivision);
+    career.syncActiveHumanManager();
     career.initializeBoardObjectives();
     career.initializeSeasonCup();
     career.initializeDynamicObjective();

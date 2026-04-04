@@ -25,6 +25,7 @@ set(FM_CAREER_SOURCES
     src/career/medical_service.cpp
     src/career/staff_service.cpp
     src/career/career_runtime.cpp
+    src/career/career_state.cpp
     src/career/career_reports.cpp
     src/career/transfer_briefing.cpp
     src/career/career_manager.cpp
@@ -40,6 +41,7 @@ set(FM_CAREER_SOURCES
     src/career/week_simulation.cpp
     src/career/world_state_service.cpp
     src/career/game_events_system.cpp
+    src/career/gameplay_reports.cpp
 )
 
 set(FM_AI_SOURCES
@@ -62,6 +64,12 @@ set(FM_ENGINE_SOURCES
     src/engine/league_table.cpp
     src/engine/models.cpp
     src/engine/team_selection.cpp
+    src/engine/social_system.cpp
+    src/engine/manager_stress.cpp
+    src/engine/rival_ai.cpp
+    src/engine/rivalry_system.cpp
+    src/engine/facilities_system.cpp
+    src/engine/debt_system.cpp
 )
 
 set(FM_APP_SOURCES
@@ -112,6 +120,8 @@ set(FM_FINANCE_SOURCES
 set(FM_SUPPORT_SOURCES
     src/utils/utils.cpp
     src/utils/career_safety.cpp
+    src/utils/localization.cpp
+    src/utils/logger.cpp
 )
 
 set(FM_VALIDATOR_SOURCES

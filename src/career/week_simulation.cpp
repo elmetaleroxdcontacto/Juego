@@ -1,6 +1,7 @@
 #include "career/week_simulation.h"
 
 #include "career/app_services.h"
+#include "career/gameplay_reports.h"
 #include "ai/team_ai.h"
 #include "career/match_analysis_store.h"
 #include "career/dressing_room_service.h"
@@ -18,6 +19,11 @@
 #include "simulation.h"
 #include "transfers/negotiation_system.h"
 #include "transfers/transfer_market.h"
+#include "engine/social_system.h"
+#include "engine/rival_ai.h"
+#include "engine/rivalry_system.h"
+#include "engine/manager_stress.h"
+#include "engine/debt_system.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -140,59 +146,55 @@ void generateManagerCareerEvents(Career& career) {
 
 void weeklyDashboard(const Career& career) {
     if (!career.myTeam) return;
-    LeagueTable table = buildRelevantCompetitionTable(career);
-    int rank = teamRank(table, career.myTeam);
-    int injured = 0;
-    int suspended = 0;
-    int expiring = 0;
-    for (const auto& player : career.myTeam->players) {
-        if (player.injured) injured++;
-        if (player.matchesSuspended > 0) suspended++;
-        if (player.contractWeeks > 0 && player.contractWeeks <= 4) expiring++;
-    }
-
     emitUiMessage("");
-    emitUiMessage("--- Resumen Semanal ---");
-    {
-        ostringstream out;
-        out << "Posicion: " << rank << " | Pts: " << career.myTeam->points
-            << " | Moral: " << career.myTeam->morale
-            << " | Presupuesto: $" << career.myTeam->budget
-            << " | Directiva: " << career.boardConfidence << "/100";
-        emitUiMessage(out.str());
+    for (const string& line : formatCareerReportLines(buildWeeklyDashboardReport(career))) {
+        emitUiMessage(line);
     }
-    {
-        ostringstream out;
-        out << "Sponsor: $" << career.myTeam->sponsorWeekly << " | Deuda: $" << career.myTeam->debt
-            << " | Infraestructura E/C/T: " << career.myTeam->stadiumLevel << "/"
-            << career.myTeam->youthFacilityLevel << "/" << career.myTeam->trainingFacilityLevel;
-        emitUiMessage(out.str());
+    
+    // === Mostrar Sistemas de Gameplay ===
+    emitUiMessage("");
+    emitUiMessage("--- SISTEMAS DE JUGABILIDAD ---");
+    
+    // Reportes de vestuario
+    auto dressingRoomBrief = gameplay_reports::getDressingRoomBrief(career.dressingRoomDynamics);
+    for (const auto& line : dressingRoomBrief) {
+        emitUiMessage(line);
     }
-    {
-        ostringstream out;
-        out << "Lesionados: " << injured
-            << " | Suspendidos: " << suspended
-            << " | Contratos por vencer (<=4 sem): " << expiring
-            << " | Shortlist: " << career.scoutingShortlist.size()
-            << " | Promesas: " << career.activePromises.size();
-        emitUiMessage(out.str());
+    
+    // Alertas del manager
+    auto managerAlerts = gameplay_reports::getManagerCriticalAlerts(career.managerStress);
+    if (!managerAlerts.empty()) {
+        emitUiMessage("");
+        for (const auto& alert : managerAlerts) {
+            emitUiMessage(alert);
+        }
     }
-    emitUiMessage("Identidad: " + career.myTeam->clubStyle +
-                  " | Cantera: " + career.myTeam->youthIdentity +
-                  " | Rival: " +
-                  (career.myTeam->primaryRival.empty() ? string("-") : career.myTeam->primaryRival));
-    emitUiMessage("Estado por lineas: " + lineMap(*career.myTeam));
-    emitUiMessage("Rival proximo: " + buildOpponentReport(career));
-    if (!career.boardMonthlyObjective.empty()) {
-        emitUiMessage("Objetivo mensual: " + career.boardMonthlyObjective +
-                      " | " + to_string(career.boardMonthlyProgress) + "/" +
-                      to_string(career.boardMonthlyTarget));
+    
+    // Alertas de deuda
+    auto debtAlerts = gameplay_reports::getDebtAlerts(career.debtStatus);
+    if (!debtAlerts.empty()) {
+        emitUiMessage("");
+        for (const auto& alert : debtAlerts) {
+            emitUiMessage(alert);
+        }
     }
-    if (!career.cupChampion.empty()) {
-        emitUiMessage("Copa: campeon " + career.cupChampion);
-    } else if (career.cupActive) {
-        emitUiMessage("Copa: ronda " + to_string(career.cupRound + 1) +
-                      " | vivos " + to_string(career.cupRemainingTeams.size()));
+    
+    // Rivalidades destacadas
+    auto rivalryHighlights = gameplay_reports::getRivalryHighlights(career.rivalryDynamics, career.myTeam->name);
+    if (!rivalryHighlights.empty()) {
+        emitUiMessage("");
+        for (const auto& highlight : rivalryHighlights) {
+            emitUiMessage(highlight);
+        }
+    }
+    
+    // Sugerencias de instalaciones
+    auto facilitySuggestions = gameplay_reports::getFacilitySuggestions(career.infrastructure, career.myTeam->budget);
+    if (!facilitySuggestions.empty()) {
+        emitUiMessage("");
+        for (const auto& suggestion : facilitySuggestions) {
+            emitUiMessage(suggestion);
+        }
     }
 }
 
@@ -1210,6 +1212,61 @@ void simulateCareerWeek(Career& career) {
     updateManagerGameState(career, myTeamPointsDelta);
     maybeInvokeIdle();
 
+    // === Actualizar Sistemas de Gameplay ===
+    if (career.myTeam) {
+        // Actualizar estrés del manager basado en resultado
+        StressEvent stressEvent;
+        if (myTeamPointsDelta >= 3) {
+            stressEvent.type = "win";
+            stressEvent.stressImpact = -10;
+            stressEvent.description = "Victoria conseguida";
+        } else if (myTeamPointsDelta == 1) {
+            stressEvent.type = "draw";
+            stressEvent.stressImpact = -3;
+            stressEvent.description = "Empate";
+        } else {
+            stressEvent.type = "loss";
+            stressEvent.stressImpact = +15;
+            stressEvent.description = "Derrota sufrida";
+        }
+        updateManagerStress(career.managerStress, stressEvent);
+        
+        // Actualizar dinámicas de vestuario
+        bool hadWin = (myTeamPointsDelta >= 3);
+        bool isKeyMatch = career.currentWeek % 4 == 0;  // Simplificado
+        updateCliqueDynamics(career.dressingRoomDynamics, hadWin, isKeyMatch);
+        
+        // Actualizar deuda
+        long long weeklyIncome = career.myTeam->budget / 10;  // Aproximación
+        updateDebtStatus(career.debtStatus, weeklyIncome);
+        
+        // Actualizar rivalidades basado en resultado contra rival
+        if (!matches.empty()) {
+            for (const auto& match : matches) {
+                Team* home = career.activeTeams[static_cast<size_t>(match.first)];
+                Team* away = career.activeTeams[static_cast<size_t>(match.second)];
+                
+                if (home == career.myTeam && away) {
+                    RivalryRecord* rivalryRec = getRivalryRecord(career.rivalryDynamics, home->name, away->name);
+                    if (rivalryRec) {
+                        updateRivalryRecord(*rivalryRec, home->goalsFor - home->goalsAgainst, away->goalsFor - away->goalsAgainst);
+                    }
+                    // Aumentar presión mediática
+                    int matchesVsThisRival = getRivalryIntensity(career.rivalryDynamics, home->name, away->name);
+                    if (matchesVsThisRival > 70) {
+                        career.managerStress.pressureIntensity = std::min(100, career.managerStress.pressureIntensity + 3);
+                    }
+                } else if (away == career.myTeam && home) {
+                    RivalryRecord* rivalryRec = getRivalryRecord(career.rivalryDynamics, away->name, home->name);
+                    if (rivalryRec) {
+                        updateRivalryRecord(*rivalryRec, away->goalsFor - away->goalsAgainst, home->goalsFor - home->goalsAgainst);
+                    }
+                }
+            }
+        }
+    }
+    // === Fin Actualización Sistemas ===
+
     if (career.myTeam) ensureTeamIdentity(*career.myTeam);
     dispatchWeeklyStaffBriefing(career);
     maybeInvokeIdle();
@@ -1225,6 +1282,7 @@ void simulateCareerWeek(Career& career) {
     handleManagerStatus(career);
     career.currentWeek++;
     checkAchievements(career);
+    career.syncActiveHumanManager();
     
     // Check for career milestones
     int milestoneWeek = -999;

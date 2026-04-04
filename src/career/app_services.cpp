@@ -16,6 +16,10 @@
 #include "development/training_impact_system.h"
 #include "simulation/player_condition.h"
 #include "transfers/negotiation_system.h"
+#include "engine/social_system.h"
+#include "engine/rival_ai.h"
+#include "engine/rivalry_system.h"
+#include "engine/debt_system.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -319,6 +323,8 @@ ServiceResult startCareerService(Career& career,
     career.myTeam = selectedTeam;
     career.managerName = managerName.empty() ? "Manager" : managerName;
     career.managerReputation = 50;
+    career.clearHumanManagers();
+    career.addHumanManager(career.managerName, career.myTeam ? career.myTeam->name : string(), career.managerReputation, true);
     career.newsFeed.clear();
     career.managerInbox.clear();
     career.scoutInbox.clear();
@@ -332,6 +338,37 @@ ServiceResult startCareerService(Career& career,
     career.currentSeason = 1;
     career.currentWeek = 1;
     career.resetSeason();
+    
+    // === Inicializar Nuevos Sistemas de Gameplay ===
+    vector<string> playerNames;
+    for (const auto& player : career.myTeam->players) {
+        playerNames.push_back(player.name);
+    }
+    career.dressingRoomDynamics = initializeDressingRoom(playerNames);
+    
+    // Inicializar IA rival para todos los equipos
+    for (auto team : career.activeTeams) {
+        if (team != career.myTeam && team) {
+            int prestigeLevel = teamPrestigeScore(*team);
+            career.rivalAIMap[team->name] = createRivalAI(team->name, prestigeLevel);
+        }
+    }
+    
+    // Inicializar rivalidades
+    vector<string> teamNames;
+    for (auto team : career.activeTeams) {
+        if (team) teamNames.push_back(team->name);
+    }
+    initializeRivalries(teamNames, career.rivalryDynamics);
+    
+    // Deuda inicial
+    career.debtStatus = calculateDebtStatus(
+        career.myTeam->budget,
+        0,  // Sin deuda inicial
+        career.myTeam->budget / 10  // Ingresos aproximados semanales
+    );
+    // === Fin Inicialización Sistemas ===
+    
     world_state_service::seedSeasonPromises(career);
     result.ok = true;
     result.messages.push_back("Nueva carrera iniciada con " + career.myTeam->name + ".");

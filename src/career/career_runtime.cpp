@@ -1,71 +1,96 @@
 #include "career/career_runtime.h"
 
 #include <iostream>
+#include <utility>
 
 using namespace std;
 
 namespace {
 
-ManagerJobSelectionCallback g_managerJobSelectionCallback = nullptr;
-UiMessageCallback g_uiMessageCallback = nullptr;
-IdleCallback g_idleCallback = nullptr;
-IncomingOfferDecisionCallback g_incomingOfferDecisionCallback = nullptr;
-ContractRenewalDecisionCallback g_contractRenewalDecisionCallback = nullptr;
-WeekSimulationPresentation g_weekSimulationPresentation = WeekSimulationPresentation::Detailed;
+thread_local CareerRuntimeContext g_defaultRuntimeContext;
+thread_local CareerRuntimeContext* g_currentRuntimeContext = &g_defaultRuntimeContext;
+
+CareerRuntimeContext& mutableCurrentContext() {
+    return *g_currentRuntimeContext;
+}
+
+const CareerRuntimeContext& currentContext() {
+    return *g_currentRuntimeContext;
+}
 
 }  // namespace
 
+ScopedCareerRuntimeContext::ScopedCareerRuntimeContext(CareerRuntimeContext context)
+    : context_(std::move(context)),
+      previous_(g_currentRuntimeContext),
+      active_(true) {
+    if (context_.presentation != WeekSimulationPresentation::Compact &&
+        context_.presentation != WeekSimulationPresentation::Detailed) {
+        context_.presentation = WeekSimulationPresentation::Detailed;
+    }
+    g_currentRuntimeContext = &context_;
+}
+
+ScopedCareerRuntimeContext::~ScopedCareerRuntimeContext() {
+    if (!active_) return;
+    g_currentRuntimeContext = previous_ ? previous_ : &g_defaultRuntimeContext;
+}
+
 void setManagerJobSelectionCallback(ManagerJobSelectionCallback callback) {
-    g_managerJobSelectionCallback = callback;
+    mutableCurrentContext().managerJobSelection = callback;
 }
 
 void setUiMessageCallback(UiMessageCallback callback) {
-    g_uiMessageCallback = callback;
+    mutableCurrentContext().uiMessage = callback;
 }
 
 void setIdleCallback(IdleCallback callback) {
-    g_idleCallback = callback;
+    mutableCurrentContext().idle = callback;
 }
 
 void setIncomingOfferDecisionCallback(IncomingOfferDecisionCallback callback) {
-    g_incomingOfferDecisionCallback = callback;
+    mutableCurrentContext().incomingOfferDecision = callback;
 }
 
 void setContractRenewalDecisionCallback(ContractRenewalDecisionCallback callback) {
-    g_contractRenewalDecisionCallback = callback;
+    mutableCurrentContext().contractRenewalDecision = callback;
 }
 
 void setWeekSimulationPresentation(WeekSimulationPresentation presentation) {
-    g_weekSimulationPresentation = presentation;
+    mutableCurrentContext().presentation = presentation;
+}
+
+CareerRuntimeContext currentCareerRuntimeContext() {
+    return currentContext();
 }
 
 ManagerJobSelectionCallback managerJobSelectionCallback() {
-    return g_managerJobSelectionCallback;
+    return currentContext().managerJobSelection;
 }
 
 UiMessageCallback uiMessageCallback() {
-    return g_uiMessageCallback;
+    return currentContext().uiMessage;
 }
 
 IncomingOfferDecisionCallback incomingOfferDecisionCallback() {
-    return g_incomingOfferDecisionCallback;
+    return currentContext().incomingOfferDecision;
 }
 
 ContractRenewalDecisionCallback contractRenewalDecisionCallback() {
-    return g_contractRenewalDecisionCallback;
+    return currentContext().contractRenewalDecision;
 }
 
 IdleCallback idleCallback() {
-    return g_idleCallback;
+    return currentContext().idle;
 }
 
 WeekSimulationPresentation weekSimulationPresentation() {
-    return g_weekSimulationPresentation;
+    return currentContext().presentation;
 }
 
 void emitUiMessage(const string& message) {
-    if (g_uiMessageCallback) {
-        g_uiMessageCallback(message);
+    if (UiMessageCallback callback = uiMessageCallback()) {
+        callback(message);
     } else {
         cout << message << endl;
     }

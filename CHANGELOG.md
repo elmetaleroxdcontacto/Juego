@@ -1,5 +1,68 @@
 # Changelog
 
+## 2026-04-04
+
+### Mejoras Gameplay Mayores - Nuevos Sistemas
+
+#### Sistema Social de Vestuario
+- **Cliques de Jugadores**: Los jugadores se agrupan en cliques sociales con personalidades distintas ("Líderes", "Profesionales", "Revoltosos")
+- **Dinámicas de Grupo**: Las cliques tienen cohesión variable que afecta la moral colectiva
+- **Química entre Jugadores**: Relaciones interpersonales entre jugadores con impacto en rendimiento de cancha
+- **Resolución de Conflictos**: Sistema para manejar tensiones internas y conflictos entre jugadores
+
+#### Estrés del Manager
+- **Nivel de Estrés**: Afecta directamente la calidad de decisiones en fichajes, tácticas y scouting
+- **Energía y Fortaleza Mental**: Recursos que se recuperan con descanso
+- **Efectos en Decisiones**: Mayor estrés = decisiones más erráticas (ej: pagar más en transferencias, mal scouting)
+- **Eventos de Colapso**: Si estrés supera 90, riesgo de crisis mental del manager
+
+#### IA Rival Adaptativa
+- **Personalidades de Equipos**: Cada rival tiene estilo único (agresivo, defensivo, balanced, contra-ataque, posesión)
+- **Memoria de Encuentros**: La IA recuerda sus enfrentamientos previos contra ti y se adapta
+- **Cambios Tácticos Reactivos**: Los rivales ajustan su táctica según cómo va el partido (si van perdiendo, atacan más)
+- **Tasa de Error**: Equipos con menor prestigio cometen más errores por "presión"
+
+#### Sistema de Rivalidades Dinámicas
+- **Historial de Enfrentamientos**: Registro de todos los encuentros entre equipos
+- **Intensidad de Rivalidad**: Se incrementa con encuentros frecuentes y rachas significativas
+- **Rivalidades Locales e Históricas**: Se detectan automáticamente (ej: Colo-Colo vs U. de Chile = 85 de intensidad)
+- **Narrativa Generada**: Se crean reportes sobre el estado de cada rivalidad
+
+#### Cambios Tácticos en Tiempo Real
+- **3 Cambios por Partido**: El jugador puede cambiar táctica/formación hasta 3 veces por partido
+- **Restricciones Tácticas**: No permite cambios en primeros 10 minutos o últimos 5 minutos
+- **Costo Energético**: Cada cambio cuesta energía del manager
+- **Espaciado Mínimo**: No dos cambios en menos de 15 minutos
+
+#### Sistema de Patrocinio Dinámico
+- **Patrocinadores con Objetivos**: Pagan según cumples metas (posición final, victorias, puntos)
+- **Bonificaciones/Penalizaciones**: Ingresos extras si cumples, castigos económicos si no
+- **Conflictos Potenciales**: Algunos sponsors no quieren jugar contra rivales específicos
+
+#### Infraestructura con Impacto Real
+- **5 Niveles de Mejora** para cada instalación:
+  - Centro de Entrenamiento (efectividad de entrenamientos)  
+  - Academia de Cantera (probabilidad de talento joven)
+  - Departamento Médico (velocidad de recuperación de lesiones)
+  - Estadio (ingresos por taquilla y ambiente local)
+  - Comodidades (felicidad de jugadores)
+- **Modificadores Multiplicativos**: Cada nivel aplica bonificadores reales al rendimiento
+- **Presupuesto de Mejoras**: Capacity limitado basado en finanzas
+
+#### Sistema de Deuda y Consecuencias
+- **Cálculo Automático de Severidad**: Deuda/Ingresos determina severidad (0-100)
+- **Restricciones Progresivas**:
+  - Severidad >30: Salarios limitados
+  - Severidad >70: No puedes comprar jugadores
+  - Severidad >85: Riesgo de embargo en 6 meses
+  - En default: Puntos descontados en liga
+- **Sanciones Financieras**: Baneos de transferencia, caps salariales, restricciones de cantera
+
+### Integración de Sistemas
+- Todos los sistemas están integrados en la estructura Career
+- Los datos persisten en saves (listos para implementación en sistema de guardado)
+- Compilación exitosa: FootballManager.exe, CLI y Tests
+
 ## 2026-03-26
 
 ### Frontend y portada

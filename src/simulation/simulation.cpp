@@ -176,3 +176,49 @@ MatchResult playMatch(Team& home, Team& away, bool verbose, bool keyMatch, bool 
     }
     return result;
 }
+
+// Overload with Career context for rival AI integration
+MatchResult simulateMatch(Career* career, Team& home, Team& away, bool keyMatch, bool neutralVenue) {
+    ensureMinimumSquad(home, 11);
+    ensureMinimumSquad(away, 11);
+    ensureTeamIdentity(home);
+    ensureTeamIdentity(away);
+
+    const vector<int> homeStartXI = home.getStartingXIIndices();
+    const vector<int> awayStartXI = away.getStartingXIIndices();
+    for (int idx : homeStartXI) {
+        if (idx >= 0 && idx < static_cast<int>(home.players.size())) {
+            home.players[static_cast<size_t>(idx)].startsThisSeason++;
+        }
+    }
+    for (int idx : awayStartXI) {
+        if (idx >= 0 && idx < static_cast<int>(away.players.size())) {
+            away.players[static_cast<size_t>(idx)].startsThisSeason++;
+        }
+    }
+
+    const match_engine::MatchSimulationData simulation = match_engine::simulate(home, away, career, keyMatch, neutralVenue);
+    match_postprocess::applySimulationOutcome(home, away, simulation, homeStartXI, awayStartXI, keyMatch);
+    return simulation.result;
+}
+
+// Overload with Career context for rival AI integration
+MatchResult playMatch(Career* career, Team& home, Team& away, bool verbose, bool keyMatch, bool neutralVenue) {
+    MatchResult result = simulateMatch(career, home, away, keyMatch, neutralVenue);
+    if (!verbose) return result;
+
+    cout << endl;
+    for (const auto& warning : result.warnings) {
+        cout << "[AVISO] " << warning << endl;
+    }
+    for (const auto& line : result.reportLines) {
+        cout << line << endl;
+    }
+    if (!result.events.empty()) {
+        cout << "\nEventos:" << endl;
+        for (const auto& event : result.events) {
+            cout << "- " << event << endl;
+        }
+    }
+    return result;
+}

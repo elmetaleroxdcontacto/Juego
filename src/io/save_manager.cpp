@@ -109,6 +109,7 @@ bool copyExistingFile(const string& sourcePath, const string& targetPath) {
 }
 
 bool saveCareer(Career& career) {
+    career.syncActiveHumanManager();
     career.saveFile = normalizeSavePath(career.saveFile);
     const string savePath = resolveSavePath(career.saveFile);
     const string saveFolder = parentDirectory(savePath);
@@ -165,10 +166,12 @@ bool loadCareer(Career& career) {
     if (career.activeDivision.empty() && !career.allTeams.empty()) {
         career.activeDivision = career.allTeams.front().division;
     }
+    career.applyActiveHumanManager();
     if (!career.activeDivision.empty()) {
         career.setActiveDivision(career.activeDivision);
     }
     career.myTeam = controlledTeam.empty() ? nullptr : career.findTeamByName(controlledTeam);
+    career.syncActiveHumanManager();
     return true;
 }
 

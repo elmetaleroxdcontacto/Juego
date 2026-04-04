@@ -48,6 +48,7 @@ void takeManagerJob(Career& career, Team* newClub, const string& reason) {
     string oldClub = career.myTeam ? career.myTeam->name : "Sin club";
     career.myTeam = newClub;
     career.setActiveDivision(newClub->division);
+    career.syncActiveHumanManager();
     career.initializeBoardObjectives();
     career.boardConfidence = clampInt(career.boardConfidence + 10, 35, 80);
     career.addNews(career.managerName + " deja " + oldClub + " y asume en " + newClub->name + ". " + reason);

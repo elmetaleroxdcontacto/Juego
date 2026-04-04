@@ -1,6 +1,12 @@
 ﻿#pragma once
 
 #include "simulation/match_types.h"
+#include "engine/social_system.h"
+#include "engine/manager_stress.h"
+#include "engine/rival_ai.h"
+#include "engine/rivalry_system.h"
+#include "engine/facilities_system.h"
+#include "engine/debt_system.h"
 
 #include <deque>
 #include <string>
@@ -80,6 +86,12 @@ struct SeasonHistoryEntry {
     std::string promoted;
     std::string relegated;
     std::string note;
+};
+
+struct HumanManagerProfile {
+    std::string managerName;
+    std::string teamName;
+    int reputation = 50;
 };
 
 struct PendingTransfer {
@@ -293,6 +305,8 @@ struct Career {
     std::vector<std::string> achievements;
     std::string managerName;
     int managerReputation;
+    std::vector<HumanManagerProfile> humanManagers;
+    int activeHumanManagerIndex;
     int boardConfidence;
     int boardExpectedFinish;
     long long boardBudgetTarget;
@@ -320,6 +334,27 @@ struct Career {
     std::vector<std::string> lastMatchEvents;
     std::string lastMatchPlayerOfTheMatch;
     MatchCenterSnapshot lastMatchCenter;
+    
+    // === NUEVOS SISTEMAS DE GAMEPLAY ===
+    // Dinámicas Sociales
+    DressingRoomDynamics dressingRoomDynamics;
+    
+    // Estrés del Manager
+    ManagerStressState managerStress;
+    
+    // IA Rival
+    std::unordered_map<std::string, RivalAI> rivalAIMap;
+    
+    // Rivalidades entre equipos
+    RivalryDynamics rivalryDynamics;
+    
+    // Infraestructura
+    InfrastructureSystem infrastructure;
+    
+    // Sistema de Deuda
+    DebtStatus debtStatus;
+    
+    // === FIN NUEVOS SISTEMAS ===
     bool initialized;
 
     Career();
@@ -347,6 +382,24 @@ struct Career {
     int currentCompetitiveFieldSize() const;
     void initializeBoardObjectives();
     void updateBoardConfidence();
+    void clearHumanManagers();
+    void syncActiveHumanManager();
+    void applyActiveHumanManager();
+    bool addHumanManager(const std::string& managerName,
+                         const std::string& teamName,
+                         int reputation = 50,
+                         bool makeActive = true);
+    bool switchActiveHumanManager(int index);
+    int humanManagerCount() const;
+    std::vector<std::string> humanControlledTeamNames() const;
+    bool isHumanControlledTeam(const Team& team) const;
+    int getActiveTeamCount() const;
+    Team* getActiveTeamAt(int index);
+    const Team* getActiveTeamAt(int index) const;
+    int getAllTeamCount() const;
+    Team* getTeamAt(int index);
+    const Team* getTeamAt(int index) const;
+    Team* setMyTeamByName(const std::string& teamName);
     bool saveCareer();
     bool loadCareer();
 

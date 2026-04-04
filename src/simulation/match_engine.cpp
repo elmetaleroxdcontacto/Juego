@@ -2,6 +2,8 @@
 
 #include "career/career_runtime.h"
 #include "ai/ai_match_manager.h"
+#include "engine/rival_ai.h"
+#include "engine/rivalry_system.h"
 #include "simulation/fatigue_engine.h"
 #include "simulation/match_context.h"
 #include "simulation/match_event_generator.h"
@@ -247,6 +249,61 @@ MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch, 
                                                          : "Empate";
     data.result = std::move(result);
     return data;
+}
+
+// Overload that integrates rival AI tactics
+MatchSimulationData simulate(const Team& home, const Team& away, const Career* career, bool keyMatch, bool neutralVenue) {
+    // If no career context, use basic simulation
+    if (!career) {
+        return simulate(home, away, keyMatch, neutralVenue);
+    }
+    
+    // Adjust away team tactics based on rival AI personality
+    Team awayModified = away;
+    bool isAwayOpponent = (awayModified.name != career->myTeam->name && !career->myTeam->name.empty());
+    
+    if (isAwayOpponent) {
+        const auto it = career->rivalAIMap.find(awayModified.name);
+        if (it != career->rivalAIMap.end()) {
+            const RivalAI& rivalAI = it->second;
+            const string playerFormation = career->myTeam->formation.empty() ? "4-3-3" : career->myTeam->formation;
+            const string playerTactics = career->myTeam->tactics.empty() ? "Balanced" : career->myTeam->tactics;
+            
+            // Decide rival tactics based on player's team
+            const string rivalTactics = rivalAI.decideTactics(playerFormation, playerTactics);
+            
+            // Apply tempo shift based on rival tactics
+            if (rivalTactics.find("Aggressive") != string::npos) {
+                awayModified.tempo = min(5, awayModified.tempo + 1);
+                awayModified.pressingIntensity = min(5, awayModified.pressingIntensity + 1);
+            } else if (rivalTactics.find("Defensive") != string::npos) {
+                awayModified.tempo = max(1, awayModified.tempo - 1);
+                awayModified.defensiveLine = max(1, awayModified.defensiveLine - 1);
+            }
+            
+            // Apply unpredictability
+            if (rivalAI.personality.unpredictability > 65) {
+                awayModified.width = clampInt(awayModified.width + randInt(-1, 1), 1, 5);
+                awayModified.defensiveLine = clampInt(awayModified.defensiveLine + randInt(-1, 1), 1, 5);
+            }
+        }
+    }
+    
+    // Adjust home team tactics if it's the player's team and we have player manager stress
+    Team homeModified = home;
+    if (homeModified.name == career->myTeam->name) {
+        // High stress manager becomes more conservative
+        if (career->managerStress.stressLevel > 75) {
+            homeModified.defensiveLine = max(1, homeModified.defensiveLine - 1);
+            homeModified.pressingIntensity = max(1, homeModified.pressingIntensity - 1);
+        } else if (career->managerStress.stressLevel < 30) {
+            // Very calm manager plays more boldly
+            homeModified.pressingIntensity = min(5, homeModified.pressingIntensity + 1);
+        }
+    }
+    
+    // Run the modified match simulation
+    return simulate(homeModified, awayModified, keyMatch, neutralVenue);
 }
 
 }  // namespace match_engine

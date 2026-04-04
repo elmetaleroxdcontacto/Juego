@@ -19,5 +19,6 @@ struct MatchSimulationData {
 };
 
 MatchSimulationData simulate(const Team& home, const Team& away, bool keyMatch = false, bool neutralVenue = false);
+MatchSimulationData simulate(const Team& home, const Team& away, const Career* career, bool keyMatch = false, bool neutralVenue = false);
 
 }  // namespace match_engine

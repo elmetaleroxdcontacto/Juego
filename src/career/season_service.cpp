@@ -13,7 +13,7 @@ using namespace std;
 
 namespace {
 
-vector<string>* g_seasonMessages = nullptr;
+thread_local vector<string>* g_seasonMessages = nullptr;
 
 void collectSeasonMessage(const string& message) {
     if (g_seasonMessages && !message.empty()) g_seasonMessages->push_back(message);
@@ -47,41 +47,6 @@ private:
     ostringstream buffer_;
 };
 
-class RuntimeCallbackScope {
-public:
-    RuntimeCallbackScope(UiMessageCallback uiCallback,
-                         IncomingOfferDecisionCallback offerCallback,
-                         ContractRenewalDecisionCallback renewCallback,
-                         ManagerJobSelectionCallback managerCallback,
-                         IdleCallback idleCb)
-        : previousUi_(uiMessageCallback()),
-          previousOffer_(incomingOfferDecisionCallback()),
-          previousRenew_(contractRenewalDecisionCallback()),
-          previousManager_(managerJobSelectionCallback()),
-          previousIdle_(idleCallback()) {
-        setUiMessageCallback(uiCallback);
-        setIncomingOfferDecisionCallback(offerCallback);
-        setContractRenewalDecisionCallback(renewCallback);
-        setManagerJobSelectionCallback(managerCallback);
-        setIdleCallback(idleCb);
-    }
-
-    ~RuntimeCallbackScope() {
-        setManagerJobSelectionCallback(previousManager_);
-        setContractRenewalDecisionCallback(previousRenew_);
-        setIncomingOfferDecisionCallback(previousOffer_);
-        setIdleCallback(previousIdle_);
-        setUiMessageCallback(previousUi_);
-    }
-
-private:
-    UiMessageCallback previousUi_;
-    IncomingOfferDecisionCallback previousOffer_;
-    ContractRenewalDecisionCallback previousRenew_;
-    ManagerJobSelectionCallback previousManager_;
-    IdleCallback previousIdle_;
-};
-
 }  // namespace
 
 SeasonStepResult SeasonService::simulateWeek(Career& career,
@@ -98,8 +63,14 @@ SeasonStepResult SeasonService::simulateWeek(Career& career,
     vector<string> messages;
     g_seasonMessages = &messages;
     StdoutCapture stdoutCapture;
+    CareerRuntimeContext runtimeContext = currentCareerRuntimeContext();
+    runtimeContext.uiMessage = collectSeasonMessage;
+    runtimeContext.incomingOfferDecision = offerDecision;
+    runtimeContext.contractRenewalDecision = renewDecision;
+    runtimeContext.managerJobSelection = managerDecision;
+    runtimeContext.idle = idleCallback;
     {
-        RuntimeCallbackScope callbackScope(collectSeasonMessage, offerDecision, renewDecision, managerDecision, idleCallback);
+        ScopedCareerRuntimeContext callbackScope(runtimeContext);
         simulateCareerWeek(career);
     }
     g_seasonMessages = nullptr;

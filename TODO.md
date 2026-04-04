@@ -248,6 +248,36 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
   - Solicita confirmación mediante un diálogo
   - Borra el archivo de guardado y su backup (.bak)
   - Actualiza la UI después de la eliminación
+
+  - [x] Iniciado refactorización del "God Object" Career: Creada clase CareerState en include/career/career_state.h y src/career/career_state.cpp con métodos básicos (usesSegundaFormat, etc.).
+  - [x] Actualizado CMakeLists.txt para incluir src/career/career_state.cpp en la compilación.
+  - [x] Verificada compilación exitosa después de los cambios.
+  - [ ] Eliminar funciones gigantes: Romper simulateCareerWeek en métodos más pequeños con patrones Command/Strategy.
+  - [ ] Reemplazar global state y callbacks: Implementar sistema de eventos/inyección de dependencias.
+  - [ ] Mejorar const correctness: Intentado agregar const a getDivisionTeams, pero requiere cambios en tipos de retorno para evitar const Team* vs Team*.
+- **Nuevas Funcionalidades de Gameplay**:
+  - [ ] Modo Multijugador Local/Online: Agregar soporte para carreras compartidas.
+  - [ ] Expansión de Ligas: Integrar ligas internacionales con scraping automático.
+  - [ ] Sistema de IA Avanzado: Aprendizaje adaptativo y personalidades de managers.
+  - [ ] Modo Copa Internacional: Torneos como Libertadores con reglas específicas.
+  - [ ] Desarrollo Juvenil Profundo: Scouting global y academias personalizables.
+  - [ ] Eventos Dinámicos: Eventos ramificados con decisiones.
+- **Mejoras en UI y Experiencia de Usuario**:
+  - [ ] Migrar a Framework Moderno: Reemplazar Win32 por Qt/ImGui.
+  - [ ] Dashboard Interactivo: Gráficos en tiempo real.
+  - [x] Soporte Multiidioma Completo: Creada clase Localization en include/utils/localization.h y src/utils/localization.cpp con soporte para español, inglés, portugués y francés.
+  - [x] Actualizado CMakeLists.txt para incluir src/utils/localization.cpp.
+  - [ ] Modo Tutorial y Ayuda: Guías integradas.
+- **Correcciones Técnicas y Optimizaciones**:
+  - [x] Agregar Pruebas Unitarias: Agregada prueba para Localization en tests/project_tests.cpp (requiere BUILD_TESTING=ON para ejecutar).
+  - [ ] Optimización de Rendimiento: Perfilado y optimización de bucles.
+  - [x] Manejo de Errores Robusto: Implementado sistema de logging básico en include/utils/logger.h y src/utils/logger.cpp, integrado en main.cpp.
+  - [ ] Seguridad y Validación: Sanitización de inputs y checksums.
+  - [ ] Compatibilidad Cruzada: Portar a Linux/macOS.
+- **Mejoras en Contenido y Balanceo**:
+  - [ ] Balanceo de Dificultad: Ajustar curvas de progresión.
+  - [ ] Contenido Adicional: Más audio y personalización.
+  - [ ] Integración con Datos Reales: APIs para actualizaciones automáticas.
 - Cambios en archivos:
   - `include/gui/gui_internal.h`: agregado ID `IDC_MENU_DELETE_SAVE_BUTTON` y campo `menuDeleteSaveButton`
   - `src/gui/gui_actions.cpp`: implementación de `deleteCareerSave()` con manejo de rutas y confirmación
@@ -4634,3 +4664,121 @@ MoraleAlert           - Alerta de baja moral
 ## Cambios aplicados (2026-03-11)
 - Ajustado el layout de la interfaz para usar mejor el ancho disponible en cabeceras, reduciendo el riesgo de controles sobrepuestos en ventanas estrechas.
 - Actualizado el temporizador de transición de frontend para procesar mensajes de Windows mientras espera, de modo que la UI no quede inmovilizada durante la simulación de una semana.
+
+## === AI ARCHITECTURE + GAMEPLAY IMPROVEMENT LOG ===
+Fecha: 2026-04-04
+
+### Objetivo del trabajo
+- Reducir acoplamiento restante entre simulación, runtime y UI sin reescribir el proyecto.
+- Preparar la base de carrera para múltiples managers humanos con compatibilidad hacia atrás en saves.
+- Reforzar la sostenibilidad con un dashboard semanal estructurado y tests de regresión sobre runtime y persistencia.
+
+### Diagnóstico inicial
+- `src/career/career_runtime.cpp` seguía usando callbacks globales planos, lo que dejaba scopes frágiles y aumentaba riesgo de estados cruzados entre simulación, GUI y tests.
+- El modelo `Career` continuaba centrado en un único manager humano (`myTeam`, `managerName`, `managerReputation`), limitando expansión futura a hotseat/local multiplayer.
+- `weeklyDashboard` en `src/career/week_simulation.cpp` mezclaba armado de UI con reglas de negocio, duplicando composición textual dentro de la simulación semanal.
+
+### Cambios arquitectónicos aplicados
+- Se introdujo `CareerRuntimeContext` y `ScopedCareerRuntimeContext` en `include/career/career_runtime.h` para encapsular callbacks y presentación en un contexto explícito con alcance controlado.
+- Se migró `SeasonService` a scopes de runtime basados en contexto en vez de reescribir callbacks globales ad hoc, reduciendo acoplamiento directo con `simulateCareerWeek`.
+- Se amplió `Career` con `HumanManagerProfile`, `humanManagers` y `activeHumanManagerIndex` para separar la base multijugador del view-model legacy de manager activo.
+
+### Refactors aplicados
+- `src/career/season_service.cpp` dejó de usar un scope local manual de callbacks y ahora reutiliza el runtime contextual compartido.
+- `src/career/week_simulation.cpp` dejó de construir el resumen semanal línea por línea y consume `buildWeeklyDashboardReport` + `formatCareerReportLines`.
+- `src/career/career_reports.cpp` pasó a exponer reportes estructurados reutilizables para UI/UX, añadiendo un dashboard semanal con bloques y facts en vez de cadenas dispersas.
+
+### Mejoras técnicas aplicadas
+- `src/io/save_manager.cpp` sincroniza el manager humano activo antes de guardar y después de cargar para mantener consistencia entre modelo legacy y slots humanos.
+- `src/io/save_serialization.cpp` subió la versión de save a `13` y agregó persistencia explícita de `HUMANS` + `ACTIVE_MANAGER`, con fallback automático a saves antiguos sin esos campos.
+- El runtime contextual se simplificó para evitar destrucción thread-local compleja al salir de la suite de tests, corrigiendo un cierre anómalo del proceso tras ejecutar todos los casos.
+
+### Mejoras de gameplay aplicadas
+- La carrera puede registrar más de un manager humano y alternar el manager activo con sincronización del club controlado, reputación y división activa.
+- El dashboard semanal ahora prioriza acciones sugeridas e inbox de manager dentro del resumen, mejorando la lectura táctica/operativa de cada semana de carrera.
+
+### Mejoras de UI/UX aplicadas
+- Se creó `buildWeeklyDashboardReport` para ofrecer un resumen semanal más claro, con facts de club, salud del plantel, contexto competitivo, copa, agenda y centro del manager.
+- El dashboard semanal muestra explícitamente cuando existen varios managers humanos y cuál de ellos está activo, preparando la interfaz para hotseat sin romper la UX actual.
+
+### Tests o validaciones agregadas
+- `career_runtime_scope`: valida que el scope de runtime restaure callbacks, idle y presentación al salir del contexto temporal.
+- `human_manager_persistence`: valida roundtrip de serialización/deserialización para múltiples managers humanos y cambio correcto de manager activo tras cargar.
+- `weekly_dashboard_report`: valida que el dashboard estructurado incluya managers humanos, acciones sugeridas y centro del manager.
+
+### Archivos modificados
+- `include/career/career_runtime.h` -> se agregó el contexto de runtime y el scope RAII para callbacks/presentación.
+- `src/career/career_runtime.cpp` -> se reemplazó el manejo global frágil por un contexto activo con encadenamiento seguro de scopes.
+- `src/career/season_service.cpp` -> se conectó la simulación semanal al nuevo contexto de runtime.
+- `include/engine/models.h` -> se añadieron `HumanManagerProfile`, slots humanos y helpers públicos de sincronización/cambio de manager.
+- `src/engine/career_state.cpp` -> se implementó la lógica real de alta, cambio y sincronización de managers humanos.
+- `src/career/app_services.cpp` -> se inicializa la nueva carrera registrando el primer manager humano en la estructura nueva.
+- `src/career/career_support.cpp` -> los cambios de club del manager actual actualizan también el slot humano activo.
+- `src/io/save_manager.cpp` -> se sincroniza el manager humano activo alrededor de save/load.
+- `src/io/save_serialization.cpp` -> se serializan/deserializan managers humanos y el índice activo con compatibilidad retroactiva.
+- `include/career/career_reports.h` -> se declararon el dashboard semanal estructurado y el formateo en líneas reutilizable.
+- `src/career/career_reports.cpp` -> se implementó el dashboard semanal reutilizable y la salida en líneas para UI/CLI.
+- `src/career/week_simulation.cpp` -> el resumen semanal pasó a emitirse desde el reporte estructurado y sincroniza el manager activo al cerrar la semana.
+- `tests/project_tests.cpp` -> se agregaron regresiones de runtime, persistencia multihumana y dashboard semanal.
+
+### Problemas detectados pero no resueltos todavía
+- La base multijugador quedó preparada a nivel de modelo/save, pero todavía no existe flujo completo de turnos simultáneos o interfaz dedicada para gestionar varios managers humanos desde GUI/CLI.
+- `src/career/week_simulation.cpp` sigue siendo un archivo grande; este cambio desacopla parte de la presentación, pero aún quedan responsabilidades extensas dentro de la progresión semanal.
+
+### Mejoras futuras sugeridas
+- Añadir servicios/UI para alta, selección y rotación explícita de managers humanos desde menús reales del juego.
+- Separar más fases de `simulateCareerWeek` en coordinadores de dominio (`progression`, `events`, `finances`, `communications`) para seguir reduciendo tamaño y complejidad.
+- Extender la persistencia con validación de integridad/checksum de save para detectar corrupción antes de iniciar la carga.
+
+## === AI ARCHITECTURE + GAMEPLAY IMPROVEMENT LOG ===
+Fecha: 2026-04-04
+
+### Objetivo del trabajo
+- Alinear `build.bat` con el flujo real de compilación del proyecto basado en `CMake`.
+- Mejorar la ejecución de tests desde el script de build.
+- Corregir fragilidades del fallback directo con `g++`.
+
+### Diagnóstico inicial
+- `build.bat` no forzaba `BUILD_TESTING=ON` cuando se pedían tests, por lo que dependía del estado previo de la caché de CMake.
+- La ejecución de tests desde el batch llamaba el binario directamente y no aprovechaba `CTest`, pese a que el proyecto ya registra `FootballManagerTests`.
+- El fallback con `g++` generaba objetos con `%%~nF.o`, lo que podía colisionar con archivos homónimos en carpetas distintas como `src/career/career_state.cpp` y `src/engine/career_state.cpp`.
+
+### Cambios arquitectónicos aplicados
+- Se reforzó `build.bat` como punto de entrada coherente para GUI, CLI y tests sobre la arquitectura actual basada en `CMake`.
+- Se integró la noción de `BUILD_TESTING` en el script para que el target de tests deje de depender del estado accidental de configuración.
+- Se separó la ejecución de tests en una rutina reusable `:run_requested_tests` con prioridad a `CTest`.
+
+### Refactors aplicados
+- Se centralizaron rutas de logs (`cmake-config.log`, `cmake-build.log`) en variables explícitas reutilizadas por el script.
+- Se añadió ayuda integrada (`--help`, `-h`) para documentar modos de build y variables relevantes.
+- Se unificó la lógica de test execution para `--tests`, `--run-tests` y `--all`.
+
+### Mejoras técnicas aplicadas
+- `build.bat` ahora pasa `-DBUILD_TESTING=ON` cuando corresponde compilar o ejecutar `FootballManagerTests`.
+- Cuando la ruta de build es `CMake`, el script usa `ctest --output-on-failure` antes de caer al ejecutable directo, mejorando trazabilidad de fallos.
+- El fallback directo con `g++` ahora usa includes absolutos (`%ROOT_DIR%\include`, `%ROOT_DIR%\src`) y nombres de objetos únicos derivados de la ruta para evitar colisiones.
+
+### Mejoras de gameplay aplicadas
+- No se aplicaron cambios directos de gameplay en esta intervención; fue una mejora de tooling y estabilidad del pipeline de build/test.
+- La mejora impacta indirectamente el desarrollo de gameplay al hacer más confiable la compilación y validación automatizada del proyecto.
+
+### Mejoras de UI/UX aplicadas
+- Se mejoró la experiencia de uso de `build.bat` con una ayuda clara y una salida más consistente al ejecutar tests.
+- El flujo `--tests` y `--all` ahora devuelve feedback más alineado con el sistema de pruebas del proyecto.
+
+### Tests o validaciones agregadas
+- Validación manual de `.\build.bat --tests` con compilación correcta y ejecución mediante `CTest`.
+- Confirmación de salida exitosa del script con `100% tests passed`.
+
+### Archivos modificados
+- `build.bat` -> se alineó con `CMake`/`CTest`, se agregó ayuda, se forzó `BUILD_TESTING` cuando corresponde y se corrigió el fallback de objetos duplicados.
+- `TODO.md` -> se agregó trazabilidad del ajuste de build al final del archivo.
+
+### Problemas detectados pero no resueltos todavía
+- El fallback directo con `g++` sigue siendo una ruta de contingencia y no reproduce con la misma fidelidad todas las ventajas del grafo de targets de `CMake`.
+- El script todavía asume toolchain MinGW para la ruta principal de `CMake` y no abstrae otros generadores/toolchains Windows.
+
+### Mejoras futuras sugeridas
+- Añadir un modo `--clean` seguro para limpiar caché de `CMake` cuando cambien opciones importantes del proyecto.
+- Agregar una opción explícita para ejecutar `FootballManagerCLI --validate` más tests en una sola pasada de verificación.
+- Considerar una ruta de autodetección de generador/toolchain para no depender únicamente de `MinGW Makefiles`.

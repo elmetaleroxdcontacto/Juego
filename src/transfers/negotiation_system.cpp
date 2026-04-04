@@ -2,6 +2,7 @@
 
 #include "career/dressing_room_service.h"
 #include "career/career_reports.h"
+#include "engine/manager_stress.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -259,6 +260,18 @@ bool renewalNeedsStrongerPromise(const Player& player, NegotiationPromise promis
 
 namespace {
 
+// Apply manager stress modifier to negotiation calculations
+// High stress: manager makes poor decisions (accepts worse deals)
+// Low stress: manager drives harder bargains
+double getStressNegotiationModifier(const ManagerStressState& stress) {
+    if (stress.stressLevel > 80) return 1.08;  // Very stressed: accepts 8% worse deals
+    if (stress.stressLevel > 65) return 1.05;  // Stressed: accepts 5% worse deals
+    if (stress.stressLevel > 50) return 1.02;  // Moderately stressed: slightly worse
+    if (stress.stressLevel < 25) return 0.97;  // Very calm: negotiates better (-3%)
+    if (stress.stressLevel < 40) return 0.99;  // Calm: negotiates slightly better
+    return 1.00;  // Normal range
+}
+
 long long moveTowards(long long from, long long to, double ratio) {
     if (from >= to) return from;
     return from + static_cast<long long>((to - from) * ratio + 0.5);
@@ -281,12 +294,18 @@ int competitionPressureScore(const Career& career, const Team& buyer, const Team
 long long transferExpectation(const Team& buyer,
                               const Team& seller,
                               const Player& player,
-                              bool competingClubPresent) {
+                              bool competingClubPresent,
+                              const ManagerStressState& stress) {
     long long expectation = max(player.value, player.releaseClause * 65 / 100);
     if (player.contractWeeks <= 20) expectation = expectation * 92 / 100;
     if (player.wantsToLeave) expectation = expectation * 90 / 100;
     expectation += rivalrySurcharge(buyer, seller, expectation);
     if (competingClubPresent) expectation += max(15000LL, expectation / 10);
+    
+    // Apply manager stress: stressed managers willing to pay more
+    double stressModifier = getStressNegotiationModifier(stress);
+    expectation = static_cast<long long>(expectation * stressModifier);
+    
     return expectation;
 }
 
@@ -307,6 +326,11 @@ long long negotiatedWageDemand(const Career& career,
     long long wage = max(player.wage, static_cast<long long>(wageDemandFor(player) *
                                                              negotiationWageFactor(profile) *
                                                              promiseWageFactor(promise)));
+    
+    // Apply manager stress: stressed managers accept higher wages
+    double stressModifier = getStressNegotiationModifier(career.managerStress);
+    wage = static_cast<long long>(wage * stressModifier);
+    
     const int projectAdjustment = projectAppealAdjustment(career, buyer, player);
     wage = wage * (100 + agentDifficulty(player) / 14) / 100;
     if (competingClubPresent) wage = wage * 106 / 100;
@@ -416,7 +440,7 @@ NegotiationState runTransferNegotiation(const Career& career,
                                         NegotiationPromise promise) {
     NegotiationState state;
     state.competingClubPresent = competitionPressureScore(career, buyer, seller, player) >= 16;
-    state.sellerExpectation = transferExpectation(buyer, seller, player, state.competingClubPresent);
+    state.sellerExpectation = transferExpectation(buyer, seller, player, state.competingClubPresent, career.managerStress);
 
     long long openingFee = state.sellerExpectation * (profile == NegotiationProfile::Safe ? 97 : 90) / 100;
     if (profile == NegotiationProfile::Aggressive) openingFee = state.sellerExpectation * 83 / 100;

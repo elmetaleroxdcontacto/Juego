@@ -557,18 +557,108 @@ CareerReport buildScoutingReport(const Career& career) {
     return report;
 }
 
-string formatCareerReport(const CareerReport& report) {
-    ostringstream out;
-    out << "=== " << report.title << " ===\r\n";
+CareerReport buildWeeklyDashboardReport(const Career& career) {
+    CareerReport report;
+    report.title = "Dashboard Semanal";
+
+    if (!career.myTeam) {
+        addBlock(report, "Estado", {"No hay una carrera activa para resumir."});
+        return report;
+    }
+
+    const Team& team = *career.myTeam;
+    const LeagueTable table = buildRelevantCompetitionTable(career);
+    int rank = -1;
+    for (size_t i = 0; i < table.teams.size(); ++i) {
+        if (table.teams[i] == career.myTeam) {
+            rank = static_cast<int>(i) + 1;
+            break;
+        }
+    }
+
+    int injured = 0;
+    int suspended = 0;
+    int expiring = 0;
+    for (const auto& player : team.players) {
+        if (player.injured) ++injured;
+        if (player.matchesSuspended > 0) ++suspended;
+        if (player.contractWeeks > 0 && player.contractWeeks <= 4) ++expiring;
+    }
+
+    addFact(report, "Club", team.name);
+    addFact(report, "Semana", "T" + to_string(career.currentSeason) + " | F" + to_string(career.currentWeek));
+    addFact(report, "Posicion", rank > 0 ? to_string(rank) : "N/D");
+    addFact(report, "Puntos", to_string(team.points));
+    addFact(report, "Moral", to_string(team.morale));
+    addFact(report, "Presupuesto", formatMoneyValue(team.budget));
+    addFact(report, "Directiva", to_string(career.boardConfidence) + "/100");
+    if (career.humanManagerCount() > 1) {
+        addFact(report, "Managers humanos", to_string(career.humanManagerCount()) + " | activo " + career.managerName);
+    }
+
+    addBlock(report,
+             "Salud del plantel",
+             {
+                 "Lesionados: " + to_string(injured) + " | Suspendidos: " + to_string(suspended),
+                 "Contratos por vencer (<=4 sem): " + to_string(expiring),
+                 "Promesas activas: " + to_string(career.activePromises.size()) +
+                     " | Shortlist: " + to_string(career.scoutingShortlist.size())
+             });
+
+    addBlock(report,
+             "Club y contexto",
+             {
+                 "Identidad: " + team.clubStyle + " | Cantera: " + team.youthIdentity,
+                 "Sponsor: " + formatMoneyValue(team.sponsorWeekly) + " | Deuda: " + formatMoneyValue(team.debt),
+                 "Infraestructura E/C/T: " + to_string(team.stadiumLevel) + "/" +
+                     to_string(team.youthFacilityLevel) + "/" + to_string(team.trainingFacilityLevel),
+                 "Estado por lineas: " + lineMap(team),
+                 "Rival proximo: " + buildOpponentReport(career)
+             });
+
+    if (!career.boardMonthlyObjective.empty()) {
+        addBlock(report,
+                 "Directiva",
+                 {"Objetivo mensual: " + career.boardMonthlyObjective + " | " +
+                      to_string(career.boardMonthlyProgress) + "/" + to_string(career.boardMonthlyTarget)});
+    }
+
+    if (!career.cupChampion.empty()) {
+        addBlock(report, "Copa", {"Campeon actual: " + career.cupChampion});
+    } else if (career.cupActive) {
+        addBlock(report,
+                 "Copa",
+                 {"Ronda " + to_string(career.cupRound + 1) +
+                  " | equipos vivos " + to_string(career.cupRemainingTeams.size())});
+    }
+
+    addBlock(report, "Acciones sugeridas", manager_advice::buildManagerActionLines(career, 3));
+    addBlock(report, "Centro del manager", inbox_service::buildPriorityInboxLines(career, 4));
+    return report;
+}
+
+vector<string> formatCareerReportLines(const CareerReport& report) {
+    vector<string> lines;
+    lines.push_back("=== " + report.title + " ===");
     for (const auto& fact : report.facts) {
-        out << fact.label << ": " << fact.value << "\r\n";
+        lines.push_back(fact.label + ": " + fact.value);
     }
     for (const auto& block : report.blocks) {
         if (block.lines.empty()) continue;
-        out << "\r\n" << block.title << ":\r\n";
+        lines.push_back("");
+        lines.push_back(block.title + ":");
         for (const auto& line : block.lines) {
-            out << "- " << line << "\r\n";
+            lines.push_back("- " + line);
         }
+    }
+    return lines;
+}
+
+string formatCareerReport(const CareerReport& report) {
+    ostringstream out;
+    const auto lines = formatCareerReportLines(report);
+    for (const auto& line : lines) {
+        out << line << "\r\n";
     }
     return out.str();
 }

@@ -3,6 +3,7 @@
 #include "career/analytics_service.h"
 #include "career/app_services.h"
 #include "career/career_reports.h"
+#include "career/career_runtime.h"
 #include "career/inbox_service.h"
 #include "career/manager_advice.h"
 #include "career/transfer_briefing.h"
@@ -37,6 +38,7 @@
 #include "transfers/transfer_market.h"
 #include "utils/utils.h"
 #include "validators/validators.h"
+#include "utils/localization.h"
 
 #include <algorithm>
 #include <cstddef>
@@ -217,6 +219,19 @@ struct ScopedCurrentDirectory {
         if (!previous.empty()) changeCurrentDirectoryForTest(previous);
     }
 };
+
+vector<string> g_runtimeMessagesA;
+vector<string> g_runtimeMessagesB;
+
+void collectRuntimeMessageA(const string& message) {
+    g_runtimeMessagesA.push_back(message);
+}
+
+void collectRuntimeMessageB(const string& message) {
+    g_runtimeMessagesB.push_back(message);
+}
+
+void idleRuntimeProbe() {}
 
 void testValidationSuiteReflectsRosterAudit() {
     const DataValidationReport report = buildRosterDataValidationReport();
@@ -935,6 +950,48 @@ void testSaveLoadRoundTripPreservesCareerState() {
     original.historicalRecords.push_back({"Primera Division - Mas puntos", "Club Persistencia", "Club Persistencia", 7, 71, "Puntos en una temporada"});
     original.pendingTransfers.push_back({"Jugador| Pendiente", "Club Persistencia", "Club Destino", 9, 0, 120000, 9000, 104, false, false, "Titular^"});
 
+    original.managerStress = initializeManagerStress();
+    original.managerStress.stressLevel = 82;
+    original.managerStress.energy = 64;
+    original.managerStress.mentalFortitude = 73;
+    original.infrastructure.levels.trainingGround = 4;
+    original.infrastructure.levels.youthAcademy = 3;
+    original.infrastructure.levels.medical = 4;
+    original.infrastructure.levels.stadium = 3;
+    original.infrastructure.levels.facilities = 2;
+    original.debtStatus.totalDebt = 420000;
+    original.debtStatus.debtSeverity = 38;
+    original.debtStatus.weeksUntilSeizure = 5;
+    SocialGroup clique;
+    clique.id = "lideres";
+    clique.name = "Lideres";
+    clique.memberNames = {"Jugador Persistente", "Jugador Recluta"};
+    clique.cohesion = 68;
+    clique.moralBoost = 6;
+    clique.personality = "leadership";
+    original.dressingRoomDynamics.cliques.push_back(clique);
+    RivalAI rival;
+    rival.personality.teamName = "Club Destino";
+    rival.personality.playstyle = "aggressive";
+    rival.personality.adaptability = 80;
+    rival.personality.tactical_awareness = 72;
+    rival.personality.unpredictability = 28;
+    RivalMemory rivalMemory;
+    rivalMemory.opponentName = "Club Persistencia";
+    rivalMemory.matchesPlayed = 2;
+    rivalMemory.wins = 1;
+    rivalMemory.draws = 0;
+    rivalMemory.losses = 1;
+    rivalMemory.favoredFormations = {"4-3-3"};
+    rivalMemory.favoredTactics = {"aggressive"};
+    rivalMemory.commonPlayPattern = "pressing_high";
+    rivalMemory.identifiedWeaknesses = {"weak_defense"};
+    rivalMemory.identifiedStrengths = {"fast_attack"};
+    rivalMemory.lastMatchOutcome = -1;
+    rivalMemory.consecutiveVsThisTeam = 1;
+    rival.memoryBank.push_back(rivalMemory);
+    original.rivalAIMap["Club Destino"] = rival;
+
     original.allTeams.push_back(makeTeam("Club Persistencia", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
     original.allTeams.push_back(makeTeam("Club Destino", "primera division", 68, 3, 3, "Balanced", "Equilibrado", 650000));
     original.setActiveDivision("primera division");
@@ -1012,6 +1069,30 @@ void testSaveLoadRoundTripPreservesCareerState() {
            "La carga debe preservar fichajes pendientes.");
     expect(!loaded.scoutingAssignments.empty() && loaded.scoutingAssignments.front().region == "Sur",
            "La carga debe preservar asignaciones activas de scouting.");
+    expect(loaded.managerStress.stressLevel == original.managerStress.stressLevel &&
+               loaded.managerStress.energy == original.managerStress.energy &&
+               loaded.managerStress.mentalFortitude == original.managerStress.mentalFortitude,
+           "La carga debe preservar el estado de estres del manager.");
+    expect(loaded.infrastructure.levels.trainingGround == original.infrastructure.levels.trainingGround &&
+               loaded.infrastructure.levels.youthAcademy == original.infrastructure.levels.youthAcademy &&
+               loaded.infrastructure.levels.medical == original.infrastructure.levels.medical &&
+               loaded.infrastructure.levels.stadium == original.infrastructure.levels.stadium &&
+               loaded.infrastructure.levels.facilities == original.infrastructure.levels.facilities,
+           "La carga debe preservar el estado de infraestructura.");
+    expect(loaded.debtStatus.totalDebt == original.debtStatus.totalDebt &&
+               loaded.debtStatus.debtSeverity == original.debtStatus.debtSeverity &&
+               loaded.debtStatus.weeksUntilSeizure == original.debtStatus.weeksUntilSeizure,
+           "La carga debe preservar el estado de la deuda.");
+    expect(loaded.dressingRoomDynamics.cliques.size() == original.dressingRoomDynamics.cliques.size() &&
+               !loaded.dressingRoomDynamics.cliques.empty() &&
+               loaded.dressingRoomDynamics.cliques.front().name == original.dressingRoomDynamics.cliques.front().name &&
+               loaded.dressingRoomDynamics.cliques.front().cohesion == original.dressingRoomDynamics.cliques.front().cohesion,
+           "La carga debe preservar el dinamismo del vestuario.");
+    expect(loaded.rivalAIMap.size() == original.rivalAIMap.size() &&
+               loaded.rivalAIMap.begin()->second.personality.teamName == original.rivalAIMap.begin()->second.personality.teamName &&
+               loaded.rivalAIMap.begin()->second.memoryBank.size() == original.rivalAIMap.begin()->second.memoryBank.size() &&
+               loaded.rivalAIMap.begin()->second.memoryBank.front().commonPlayPattern == original.rivalAIMap.begin()->second.memoryBank.front().commonPlayPattern,
+           "La carga debe preservar la memoria y configuracion de la IA rival.");
 
     std::remove(savePath.c_str());
 }
@@ -2056,6 +2137,154 @@ void testProjectPathsResolveFromNestedWorkingDirectory() {
     std::remove(resolvedProbeSettingsPath.c_str());
 }
 
+void testCareerRuntimeScopeRestoresContext() {
+    g_runtimeMessagesA.clear();
+    g_runtimeMessagesB.clear();
+
+    const CareerRuntimeContext previous = currentCareerRuntimeContext();
+    setUiMessageCallback(collectRuntimeMessageA);
+    setIdleCallback(idleRuntimeProbe);
+    setWeekSimulationPresentation(WeekSimulationPresentation::Compact);
+
+    CareerRuntimeContext scoped = currentCareerRuntimeContext();
+    scoped.uiMessage = collectRuntimeMessageB;
+    scoped.idle = nullptr;
+    scoped.presentation = WeekSimulationPresentation::Detailed;
+
+    {
+        ScopedCareerRuntimeContext runtimeScope(scoped);
+        expect(uiMessageCallback() == collectRuntimeMessageB,
+               "El contexto de runtime activo debe exponer el callback de UI scoped.");
+        expect(idleCallback() == nullptr,
+               "El scope debe poder anular callbacks temporales sin tocar el default externo.");
+        expect(weekSimulationPresentation() == WeekSimulationPresentation::Detailed,
+               "La presentacion scoped debe sobreescribir la del runtime base.");
+        emitUiMessage("scope");
+    }
+
+    expect(uiMessageCallback() == collectRuntimeMessageA,
+           "Al salir del scope debe restaurarse el callback de UI previo.");
+    expect(idleCallback() == idleRuntimeProbe,
+           "Al salir del scope debe restaurarse el idle callback previo.");
+    expect(weekSimulationPresentation() == WeekSimulationPresentation::Compact,
+           "La presentacion previa debe restaurarse tras destruir el scope.");
+
+    emitUiMessage("default");
+    expect(g_runtimeMessagesB.size() == 1 && g_runtimeMessagesB[0] == "scope",
+           "El mensaje scoped debe ir solo al colector temporal.");
+    expect(g_runtimeMessagesA.size() == 1 && g_runtimeMessagesA[0] == "default",
+           "El callback base debe volver a recibir mensajes tras cerrar el scope.");
+
+    setUiMessageCallback(previous.uiMessage);
+    setIdleCallback(previous.idle);
+    setIncomingOfferDecisionCallback(previous.incomingOfferDecision);
+    setContractRenewalDecisionCallback(previous.contractRenewalDecision);
+    setManagerJobSelectionCallback(previous.managerJobSelection);
+    setWeekSimulationPresentation(previous.presentation);
+}
+
+void testHumanManagerProfilesPersistAcrossSaveSerialization() {
+    Career career;
+    career.allTeams.push_back(makeTeam("Control Uno", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 800000));
+    career.allTeams.push_back(makeTeam("Control Dos", "primera division", 68, 2, 3, "Balanced", "Equilibrado", 720000));
+    career.allTeams.push_back(makeTeam("CPU Club", "primera division", 66, 2, 2, "Defensive", "Bloque bajo", 640000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Control Uno");
+    expect(career.myTeam != nullptr, "La prueba multijugador necesita un club inicial.");
+
+    career.managerName = "Manager Uno";
+    career.managerReputation = 67;
+    career.clearHumanManagers();
+    expect(career.addHumanManager("Manager Uno", "Control Uno", 67, true),
+           "Debe poder registrarse el primer manager humano.");
+    expect(career.addHumanManager("Manager Dos", "Control Dos", 59, false),
+           "Debe poder registrarse un segundo manager humano sin desplazar al primero.");
+    expect(career.humanManagerCount() == 2,
+           "El estado de carrera debe conservar los dos perfiles humanos registrados.");
+    expect(career.switchActiveHumanManager(1),
+           "Debe poder activarse el segundo manager humano.");
+    expect(career.myTeam != nullptr && career.myTeam->name == "Control Dos" &&
+               career.managerName == "Manager Dos",
+           "Cambiar de manager activo debe sincronizar el club controlado y la vista legacy.");
+
+    stringstream saved;
+    expect(save_serialization::serializeCareer(saved, career),
+           "La serializacion debe aceptar carreras con multiples managers humanos.");
+
+    Career loaded;
+    stringstream input(saved.str());
+    expect(save_serialization::deserializeCareer(input, loaded),
+           "La deserializacion debe restaurar carreras con multiples managers humanos.");
+    expect(loaded.humanManagerCount() == 2,
+           "Los perfiles humanos deben persistir a traves del save.");
+    expect(loaded.switchActiveHumanManager(0),
+           "Tras cargar, debe poder volver a activarse el primer manager.");
+    expect(loaded.myTeam != nullptr && loaded.myTeam->name == "Control Uno" &&
+               loaded.managerName == "Manager Uno",
+           "La carga debe restaurar el primer manager y su club.");
+    expect(loaded.switchActiveHumanManager(1),
+           "Tras cargar, debe poder activarse el segundo manager.");
+    expect(loaded.myTeam != nullptr && loaded.myTeam->name == "Control Dos" &&
+               loaded.managerName == "Manager Dos",
+           "La carga debe restaurar correctamente el segundo manager humano.");
+    expect(loaded.findTeamByName("Control Uno") != nullptr &&
+               loaded.isHumanControlledTeam(*loaded.findTeamByName("Control Uno")),
+           "La carrera cargada debe reconocer clubes humanos aunque no sean el slot activo.");
+}
+
+void testWeeklyDashboardReportHighlightsHumanManagersAndAgenda() {
+    Career career;
+    career.allTeams.push_back(makeTeam("Dashboard FC", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 820000));
+    career.allTeams.push_back(makeTeam("Dashboard B", "primera division", 67, 2, 2, "Defensive", "Bloque bajo", 690000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Dashboard FC");
+    expect(career.myTeam != nullptr, "La prueba de dashboard necesita un club controlado.");
+
+    career.managerName = "Manager Principal";
+    career.managerReputation = 64;
+    career.clearHumanManagers();
+    expect(career.addHumanManager("Manager Principal", "Dashboard FC", 64, true),
+           "El dashboard necesita un manager principal.");
+    expect(career.addHumanManager("Manager Secundario", "Dashboard B", 58, false),
+           "El dashboard debe reflejar tambien managers humanos secundarios.");
+
+    career.currentSeason = 2;
+    career.currentWeek = 6;
+    career.boardConfidence = 48;
+    career.boardMonthlyObjective = "Entrar al top 3";
+    career.boardMonthlyTarget = 3;
+    career.boardMonthlyProgress = 2;
+    career.managerInbox.push_back("[Directiva] Necesitas una reaccion competitiva.");
+    career.scoutInbox.push_back("Seguimiento activo sobre un volante mixto.");
+    career.myTeam->players[0].injured = true;
+
+    const CareerReport report = buildWeeklyDashboardReport(career);
+    const vector<string> lines = formatCareerReportLines(report);
+    const string dump = joinLines(lines);
+
+    expect(report.title == "Dashboard Semanal",
+           "El nuevo dashboard semanal debe exponerse como reporte estructurado.");
+    expect(dump.find("Managers humanos: 2 | activo Manager Principal") != string::npos,
+           "El dashboard debe informar cuando la carrera tiene mas de un manager humano.");
+    expect(dump.find("Acciones sugeridas:") != string::npos,
+           "El dashboard debe incluir recomendaciones accionables.");
+    expect(dump.find("Centro del manager:") != string::npos,
+           "El dashboard debe integrar el centro del manager en la misma vista.");
+}
+
+void testLocalizationSupportsMultipleLanguages() {
+    Localization& loc = Localization::getInstance();
+    loc.setLanguage(Localization::Language::Spanish);
+    expect(loc.getText("menu_continue") == "Continuar", "Debe retornar texto en español.");
+    loc.setLanguage(Localization::Language::English);
+    expect(loc.getText("menu_continue") == "Continue", "Debe retornar texto en inglés.");
+    loc.setLanguage(Localization::Language::Portuguese);
+    expect(loc.getText("menu_continue") == "Continuar", "Debe retornar texto en portugués.");
+    loc.setLanguage(Localization::Language::French);
+    expect(loc.getText("menu_continue") == "Continuer", "Debe retornar texto en francés.");
+    expect(loc.getText("unknown_key") == "unknown_key", "Debe retornar la clave si no existe traducción.");
+}
+
 }  // namespace
 
 int main() {
@@ -2098,11 +2327,15 @@ int main() {
         {"club_prestige_divisions", testClubPrestigeUsesCanonicalTerceraDivisionIds},
         {"manager_inbox", testManagerInboxTracksNewsAndScouting},
         {"configured_world_data", testConfiguredWorldDataLoads},
+        {"localization_support", testLocalizationSupportsMultipleLanguages},
         {"league_registry_data", testLeagueRegistryLoadsConfiguredData},
         {"analytics_inbox_blocks", testAnalyticsAndInboxServicesProduceUsefulBlocks},
         {"manager_hub_digest", testManagerHubDigestCombinesStaffAndAgenda},
         {"manager_advice", testManagerAdviceHighlightsUrgentActions},
         {"transfer_briefing", testTransferBriefingBuildsActionableMarketView},
+        {"career_runtime_scope", testCareerRuntimeScopeRestoresContext},
+        {"human_manager_persistence", testHumanManagerProfilesPersistAcrossSaveSerialization},
+        {"weekly_dashboard_report", testWeeklyDashboardReportHighlightsHumanManagersAndAgenda},
         {"late_match_urgency", testLateDeficitRaisesUrgencyInMatchPhase},
         {"instruction_chance_profiles", testMatchInstructionsShapeChanceProfiles},
         {"injury_replacement", testMatchInjuryTriggersRealReplacement},

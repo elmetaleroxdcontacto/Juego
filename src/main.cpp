@@ -1,4 +1,5 @@
 #include "engine/game_controller.h"
+#include "utils/logger.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -10,6 +11,9 @@ int main(int argc, char* argv[]) {
     SetConsoleCP(CP_UTF8);
     SetConsoleTitleA("Chilean Footballito");
 #endif
+
+    Logger::getInstance().setLogFile("football_manager.log");
+    LOG_INFO("Iniciando Chilean Footballito");
 
     GameController controller;
     return controller.run(argc, argv);

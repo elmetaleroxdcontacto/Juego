@@ -32,5 +32,7 @@ CareerReport buildBoardReport(const Career& career);
 CareerReport buildClubReport(const Career& career);
 CareerReport buildScoutingReport(const Career& career);
 CareerReport buildMatchCenterReport(const Career& career);
+CareerReport buildWeeklyDashboardReport(const Career& career);
 
+std::vector<std::string> formatCareerReportLines(const CareerReport& report);
 std::string formatCareerReport(const CareerReport& report);
