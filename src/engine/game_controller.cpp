@@ -296,7 +296,25 @@ void GameController::runCareerLoop() {
                 setWeekSimulationPresentation(game_settings::isDetailedSimulation(settings_)
                                                   ? WeekSimulationPresentation::Detailed
                                                   : WeekSimulationPresentation::Compact);
-                ServiceResult simResult = engine_.simulateCareerWeek();
+                
+                // Create idle callback to prevent UI freezing during week simulation
+                // Processes Windows messages periodically to keep UI responsive
+                auto idleFunc = []() {
+                    #ifdef _WIN32
+                    // Process every Nth call to avoid excessive function call overhead
+                    static int counter = 0;
+                    if (++counter > 10) {
+                        counter = 0;
+                        MSG msg;
+                        while (::PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+                            ::TranslateMessage(&msg);
+                            ::DispatchMessage(&msg);
+                        }
+                    }
+                    #endif
+                };
+                
+                ServiceResult simResult = engine_.simulateCareerWeek(idleFunc);
                 setWeekSimulationPresentation(previousPresentation);
                 for (const auto& message : simResult.messages) cout << message << endl;
                 break;

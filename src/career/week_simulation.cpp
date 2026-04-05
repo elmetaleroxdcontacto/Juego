@@ -1078,13 +1078,16 @@ void updateTeamPhysicalStates(Career& career, const vector<vector<int>>& suspens
         maybeInvokeIdle();
     }
 
+    maybeInvokeIdle();
     for (auto& team : career.allTeams) {
         maybeInvokeIdle();
         healInjuries(team, false);
         recoverFitness(team, 7);
+        maybeInvokeIdle();
         const bool congestedTraining = cupWeek ? team.division == career.activeDivision 
                                                 : (career.currentWeek % 5 == 0 && team.division != career.activeDivision);
         player_dev::applyWeeklyTrainingPlan(team, congestedTraining);
+        maybeInvokeIdle();
     }
 }
 
@@ -1102,6 +1105,7 @@ void processFinancesAndTransfers(Career& career, const vector<int>& pointsBefore
     applyWeeklyFinances(career, pointsBefore);
     maybeInvokeIdle();
     career.leagueTable.sortTable();
+    maybeInvokeIdle();
 }
 
 // Update manager-specific game state (reputation, objectives, etc.)
