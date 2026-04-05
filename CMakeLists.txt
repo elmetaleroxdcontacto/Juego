@@ -42,6 +42,8 @@ set(FM_CAREER_SOURCES
     src/career/world_state_service.cpp
     src/career/game_events_system.cpp
     src/career/gameplay_reports.cpp
+    src/career/career_service.cpp
+    src/career/sub_services.cpp
 )
 
 set(FM_AI_SOURCES
@@ -122,6 +124,7 @@ set(FM_SUPPORT_SOURCES
     src/utils/career_safety.cpp
     src/utils/localization.cpp
     src/utils/logger.cpp
+    src/utils/event_system.cpp
 )
 
 set(FM_VALIDATOR_SOURCES
