@@ -239,6 +239,31 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - Se mejoró la capacidad de respuesta del UI añadiendo un spinner de estado y puntos de liberación periódicos en la simulación semanal.
 - Se agregó despacho de mensajes Win32 durante la simulación de semana y se extendió la invocación de `maybeInvokeIdle()` en finanzas, estado de manager y eventos de la semana.
 
+## UI Responsiveness Fix (2026-04-04 - Commit 89c9499)
+- **Problema**: Simulación de semana congelaba la interfaz completamente (UI se quedaba pegada).
+- **Causa Raíz**: El mecanismo de `idleCallback` existe pero no estaba siendo invocado desde el controlador del juego.
+- **Solución Implementada**:
+  1. **game_controller.cpp (case 4 - Simulate Week)**:
+     - Creada lambda que ejecuta `PeekMessage` / `TranslateMessage` / `DispatchMessage` de Win32
+     - Counter-based throttling (cada 10+ llamadas) para evitar overhead de procesamiento
+     - Compilación condicional para plataforma Windows (#ifdef _WIN32)
+  2. **week_simulation.cpp (múltiples ubicaciones)**:
+     - Llamadas adicionales a `maybeInvokeIdle()` en:
+       - `processWeekMatches()`: dentro del loop de partidos
+       - `updateTeamPhysicalStates()`: en loops anidados de entrenamiento para todos los equipos
+       - `processFinancesAndTransfers()`: después de ordenamiento de tabla
+       - `simulateBackgroundDivisionWeek()`: dentro del loop de partidos
+     - `simulateCareerWeek()`: ya tenía puntos de idle, ahora más robustos
+- **Impacto**:
+  - UI ahora responde periódicamente durante simulación (cada ~50ms con throttling)
+  - Mejor UX: usuario puede ver progreso y no percibe congelamiento
+  - Performance: throttling evita overhead excesivo del message pump
+- **Cambios de Archivos**:
+  - `src/career/week_simulation.cpp`: +15 líneas (maybeInvokeIdle calls)
+  - `src/engine/game_controller.cpp`: +8 líneas (idle callback lambda)
+- **Compilación**: ✅ Exitosa - FootballManager.exe y FootballManagerCLI.exe compilados
+- **GitHub**: ✅ Push exitoso a main (commit 89c9499)
+
 ## Nuevos cambios (2026-04-04) - Función para borrar archivos guardados
 - Agregada funcionalidad para borrar archivos guardados desde el menú principal.
 - Nuevo botón "Borrar guardado" en el menú principal con acceso directo 'B'.
