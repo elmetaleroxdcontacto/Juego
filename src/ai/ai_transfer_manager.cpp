@@ -1,5 +1,6 @@
 #include "ai/ai_transfer_manager.h"
 
+#include "engine/team_personality.h"
 #include "finance/finance_system.h"
 #include "simulation/player_condition.h"
 #include "transfers/negotiation_system.h"
@@ -28,14 +29,17 @@ int assignmentKnowledgeBoost(const Career& career, const Team& seller, const Pla
 }
 
 int projectStyleFit(const Team& buyer, const Player& player) {
+    const TeamPersonalityProfile profile = buildTeamPersonalityProfile(buyer);
+    const string normalizedPos = normalizePosition(player.position);
     int fit = 0;
-    if (buyer.headCoachStyle == "Intensidad" && playerHasTrait(player, "Presiona")) fit += 8;
-    if (buyer.headCoachStyle == "Transicion" && normalizePosition(player.position) == "DEL") fit += 5;
-    if (buyer.clubStyle == "Ataque por bandas" && (normalizePosition(player.position) == "DEF" || normalizePosition(player.position) == "DEL")) fit += 4;
-    if (buyer.clubStyle == "Bloque ordenado" && normalizePosition(player.position) == "DEF") fit += 5;
-    if (buyer.youthIdentity == "Cantera estructurada" && player.age <= 21) fit += 8;
-    if (buyer.transferPolicy == "Cantera y valor futuro" && player.age <= 22) fit += 6;
-    if (buyer.transferPolicy == "Competir por titulares hechos" && player.skill >= buyer.getAverageSkill()) fit += 5;
+    if (profile.pressBias >= 72 && playerHasTrait(player, "Presiona")) fit += 8;
+    if (profile.transitionBias >= 72 && normalizedPos == "DEL") fit += 6;
+    if (profile.widthBias >= 72 && (normalizedPos == "DEF" || normalizedPos == "DEL")) fit += 5;
+    if (profile.blockBias >= 72 && normalizedPos == "DEF") fit += 6;
+    if (profile.controlBias >= 72 && normalizedPos == "MED") fit += 5;
+    if (profile.youthTrust >= 70 && player.age <= 21) fit += 8;
+    if (profile.starterBias >= 70 && player.skill >= buyer.getAverageSkill()) fit += 6;
+    if (profile.saleBias >= 70 && player.age >= 27) fit -= 4;
     return fit;
 }
 
@@ -46,20 +50,32 @@ namespace ai_transfer_manager {
 ClubTransferStrategy buildClubTransferStrategy(const Career& career, const Team& team) {
     ClubTransferStrategy strategy;
     const SquadNeedReport squad = ai_squad_planner::analyzeSquad(team);
+    const TeamPersonalityProfile profile = buildTeamPersonalityProfile(team);
     strategy.weakestPosition = squad.weakestPosition;
     strategy.surplusPosition = squad.surplusPosition;
     strategy.needsLiquidity = team.budget < 120000 || team.debt > team.sponsorWeekly * 18;
-    strategy.youthFocus = team.youthFacilityLevel >= 3 || team.youthCoach >= 75 || team.youthIdentity == "Cantera estructurada" ||
-                         team.transferPolicy == "Cantera y valor futuro";
-    strategy.promotionPush = teamPrestigeScore(team) >= 58 || career.currentSeason <= 2 || team.headCoachStyle == "Presion";
-    strategy.needsStarter = squad.rotationRisk >= 5 || !squad.thinPositions.empty();
-    strategy.trustYouthCover = strategy.youthFocus && !squad.youthCoverPositions.empty();
+    strategy.youthFocus = team.youthFacilityLevel >= 3 || team.youthCoach >= 75 || profile.youthTrust >= 68;
+    strategy.promotionPush = teamPrestigeScore(team) >= 58 || career.currentSeason <= 2 ||
+                             profile.riskAppetite >= 72 || profile.starterBias >= 70;
+    strategy.needsStarter = squad.rotationRisk >= 5 || !squad.thinPositions.empty() || profile.starterBias >= 78;
+    strategy.trustYouthCover = strategy.youthFocus &&
+                               (!squad.youthCoverPositions.empty() || profile.youthTrust >= 75);
     strategy.rotationRisk = squad.rotationRisk;
     strategy.salePressure = squad.salePressure;
     strategy.maxTargets = strategy.promotionPush ? 6 : 4;
-    if (team.transferPolicy == "Vender antes de comprar") strategy.maxTargets = min(strategy.maxTargets, 3);
+    if (profile.riskAppetite >= 76 || profile.starterBias >= 76) {
+        strategy.maxTargets = max(strategy.maxTargets, 7);
+    }
+    if (profile.saleBias >= 72) strategy.maxTargets = min(strategy.maxTargets, 3);
     strategy.maxTransferBudget = finance_system::calculateTransferBuffer(team);
     strategy.maxWageBudget = max(20000LL, finance_system::calculateWeeklyPayroll(team) / 4);
+    if (profile.saleBias >= 72) {
+        strategy.maxTransferBudget = strategy.maxTransferBudget * 7 / 10;
+        strategy.maxWageBudget = strategy.maxWageBudget * 3 / 4;
+    } else if (profile.starterBias >= 72 && !strategy.needsLiquidity) {
+        strategy.maxTransferBudget = strategy.maxTransferBudget * 23 / 20;
+        strategy.maxWageBudget = strategy.maxWageBudget * 11 / 10;
+    }
     strategy.averageStarterSkill = team.getAverageSkill();
     strategy.prestigeScore = teamPrestigeScore(team);
     strategy.priorityPositions = squad.priorityPositions;
@@ -95,6 +111,7 @@ TransferTarget evaluateTarget(const Career& career,
     target.upsideScore = max(0, player.potential - player.skill) +
                          player_condition::developmentStability(player, seller, false) / 5;
     target.fitScore = player.skill * 3 + player.potential * 2 - player.age * 2 + target.squadNeedScore;
+    const TeamPersonalityProfile profile = buildTeamPersonalityProfile(buyer);
     const int assignmentBoost = assignmentKnowledgeBoost(career, seller, player);
     const int styleFit = projectStyleFit(buyer, player);
     if (strategy.youthFocus) target.fitScore += max(0, 24 - player.age) * 3 + max(0, player.potential - player.skill) * 2;
@@ -104,6 +121,19 @@ TransferTarget evaluateTarget(const Career& career,
     if (target.contractRunningOut) target.fitScore += 8;
     if (target.urgentNeed) target.fitScore += 10;
     if (target.onShortlist) target.fitScore += 6;
+    if (profile.youthTrust >= 72 && player.age <= 21) target.fitScore += 10;
+    if (profile.youthTrust >= 72 && player.age >= 28) target.fitScore -= 6;
+    if (profile.starterBias >= 72 && target.readinessScore >= 66 && player.skill >= strategy.averageStarterSkill) {
+        target.fitScore += 10;
+    }
+    if (profile.starterBias >= 72 && player.age >= 24 && target.readinessScore >= 68) {
+        target.fitScore += 12;
+    }
+    if (profile.starterBias >= 72 && player.age <= 21 && player.skill < strategy.averageStarterSkill + 4) {
+        target.fitScore -= 14;
+    }
+    if (profile.marketPatience >= 68 && player.potential >= player.skill + 10) target.fitScore += 5;
+    if (profile.saleBias >= 72 && player.age >= 28 && !target.contractRunningOut) target.fitScore -= 8;
     target.fitScore += styleFit;
     target.fitScore += target.readinessScore / 6;
     target.fitScore += target.upsideScore / 7;
@@ -115,6 +145,8 @@ TransferTarget evaluateTarget(const Career& career,
     else if (target.availableForLoan && target.expectedWage <= strategy.maxWageBudget) target.affordabilityScore = 16;
     else if (target.expectedFee + target.expectedAgentFee <= strategy.maxTransferBudget * 12 / 10) target.affordabilityScore = 8;
     else target.affordabilityScore = -12;
+    if (profile.saleBias >= 72 && totalCost > strategy.maxTransferBudget) target.affordabilityScore -= 6;
+    if (profile.starterBias >= 72 && target.readinessScore >= 68) target.affordabilityScore += 2;
     if (target.medicalRisk >= 72) target.affordabilityScore -= 8;
     else if (target.medicalRisk >= 56) target.affordabilityScore -= 3;
 
@@ -144,6 +176,15 @@ TransferTarget evaluateTarget(const Career& career,
     } else if (buyer.transferPolicy == "Vender antes de comprar") {
         target.scoutingNote += " | el club vigila mucho el coste total";
     }
+    if (profile.youthTrust >= 72 && player.age <= 21) {
+        target.scoutingNote += " | proyecto de cantera";
+    }
+    if (profile.starterBias >= 72 && target.readinessScore >= 68) {
+        target.scoutingNote += " | impacto inmediato";
+    }
+    if (profile.saleBias >= 72) {
+        target.scoutingNote += " | club especialmente sensible al costo total";
+    }
     if (styleFit >= 8) {
         target.scoutingNote += " | encaje fuerte con el proyecto";
     } else if (styleFit >= 4) {
@@ -166,12 +207,26 @@ TransferTarget evaluateTarget(const Career& career,
         target.affordabilityScore -= 18;
     }
 
+    double personalityScoreBias = 0.0;
+    if (profile.youthTrust >= 72) {
+        personalityScoreBias += max(0, 22 - player.age) * 1.3;
+        personalityScoreBias += max(0, player.potential - player.skill) * 0.35;
+    }
+    if (profile.starterBias >= 72) {
+        personalityScoreBias += (target.readinessScore >= 68 ? 8.0 : -6.0);
+        personalityScoreBias += max(0, player.skill - strategy.averageStarterSkill) * 0.6;
+        personalityScoreBias -= max(0, 22 - player.age) * 1.4;
+    }
+    if (profile.saleBias >= 72) {
+        personalityScoreBias -= max(0LL, totalCost - strategy.maxTransferBudget) / 60000.0;
+    }
+
     target.totalScore = target.fitScore * 0.55 + target.potentialScore * 0.18 +
                         target.affordabilityScore * 2.1 + target.scoutingConfidence * 0.08 +
                         target.readinessScore * 0.10 - target.medicalRisk * 0.09 + target.upsideScore * 0.12 -
                         target.competitionScore * 0.22 + (target.availableForLoan ? 6.0 : 0.0) +
                         (target.contractRunningOut ? 4.0 : 0.0) + (target.onShortlist ? 5.0 : 0.0) + styleFit * 0.35 +
-                        assignmentBoost * 0.18;
+                        assignmentBoost * 0.18 + personalityScoreBias;
     return target;
 }
 

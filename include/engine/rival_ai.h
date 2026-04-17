@@ -4,6 +4,8 @@
 #include <vector>
 #include <unordered_map>
 
+class Team;
+
 // Sistema de IA Rival Adaptativa - Personalidad, Memoria, Ajustes Tácticos
 
 struct RivalAIPersonality {
@@ -65,6 +67,7 @@ public:
 
 // Crea IA rival con personalidad basada en características del equipo
 RivalAI createRivalAI(const std::string& teamName, int prestigeLevel);
+RivalAI createRivalAI(const Team& team);
 
 // Aplica ajustes tácticos durante partido
 void applyRivalAIAdjustments(std::string& rivalTactics, const std::vector<TacticalAdjustment>& adjustments);

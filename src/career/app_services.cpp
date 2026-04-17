@@ -20,6 +20,7 @@
 #include "engine/rival_ai.h"
 #include "engine/rivalry_system.h"
 #include "engine/debt_system.h"
+#include "engine/facilities_system.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -143,6 +144,104 @@ string nextTrainingFocus(const string& current) {
     return focuses.front();
 }
 
+string weeklyDecisionLabel(WeeklyDecision decision) {
+    switch (decision) {
+        case WeeklyDecision::Auto: return "Decision automatica del staff";
+        case WeeklyDecision::Recovery: return "Recuperar plantel";
+        case WeeklyDecision::HighIntensityTraining: return "Entrenar fuerte";
+        case WeeklyDecision::DressingRoom: return "Ordenar vestuario";
+        case WeeklyDecision::MatchPreparation: return "Preparar rival";
+        case WeeklyDecision::FinancialControl: return "Control financiero";
+        case WeeklyDecision::YouthPathway: return "Impulsar juveniles";
+        case WeeklyDecision::ManagerRest: return "Descanso del manager";
+    }
+    return "Decision semanal";
+}
+
+int countFatiguedPlayers(const Team& team) {
+    int total = 0;
+    for (const auto& player : team.players) {
+        if (player.fitness < 62 || player.fatigueLoad >= 58 || player.injured) ++total;
+    }
+    return total;
+}
+
+int countLowMoralePlayers(const Team& team) {
+    int total = 0;
+    for (const auto& player : team.players) {
+        if (player.happiness < 48 || player.wantsToLeave || player.unhappinessWeeks >= 2) ++total;
+    }
+    return total;
+}
+
+int countYouthCandidates(const Team& team) {
+    int total = 0;
+    for (const auto& player : team.players) {
+        if (player.age <= 21 && player.potential >= player.skill + 6) ++total;
+    }
+    return total;
+}
+
+void syncInfrastructureFromTeam(Career& career, const Team& team) {
+    career.infrastructure.levels.trainingGround = clampInt(team.trainingFacilityLevel, 1, 5);
+    career.infrastructure.levels.youthAcademy = clampInt(team.youthFacilityLevel, 1, 5);
+    career.infrastructure.levels.medical = clampInt(1 + team.medicalTeam / 25, 1, 5);
+    career.infrastructure.levels.stadium = clampInt(team.stadiumLevel, 1, 5);
+    career.infrastructure.levels.facilities = clampInt(1 + team.assistantCoach / 30, 1, 5);
+}
+
+void syncTeamFromInfrastructure(const Career& career, Team& team) {
+    team.trainingFacilityLevel = max(team.trainingFacilityLevel, career.infrastructure.levels.trainingGround);
+    team.youthFacilityLevel = max(team.youthFacilityLevel, career.infrastructure.levels.youthAcademy);
+    team.stadiumLevel = max(team.stadiumLevel, career.infrastructure.levels.stadium);
+    team.medicalTeam = max(team.medicalTeam, 45 + career.infrastructure.levels.medical * 8);
+    team.assistantCoach = max(team.assistantCoach, 42 + career.infrastructure.levels.facilities * 7);
+}
+
+WeeklyDecision chooseAutomaticWeeklyDecision(const Career& career) {
+    if (!career.myTeam) return WeeklyDecision::Auto;
+    const Team& team = *career.myTeam;
+    const int fatigued = countFatiguedPlayers(team);
+    const int lowMorale = countLowMoralePlayers(team);
+    const int youth = countYouthCandidates(team);
+    const bool objectiveYouth =
+        career.boardMonthlyObjective.find("titularidades") != string::npos &&
+        career.boardMonthlyProgress < career.boardMonthlyTarget;
+    const bool objectiveBudget =
+        career.boardMonthlyObjective.find("presupuesto") != string::npos &&
+        career.boardMonthlyProgress < career.boardMonthlyTarget;
+
+    if (career.debtStatus.debtSeverity >= 55 || objectiveBudget ||
+        team.debt > team.sponsorWeekly * 16 || team.budget < max(120000LL, team.sponsorWeekly * 3)) {
+        return WeeklyDecision::FinancialControl;
+    }
+    if (career.managerStress.stressLevel >= 78 || career.managerStress.energy <= 28) {
+        return WeeklyDecision::ManagerRest;
+    }
+    if (fatigued >= 4) return WeeklyDecision::Recovery;
+    if (lowMorale >= 3 || team.morale < 48) return WeeklyDecision::DressingRoom;
+    if ((objectiveYouth || career.boardYouthTarget > 0) && youth >= 2) return WeeklyDecision::YouthPathway;
+    if (!career.lastMatchCenter.opponentName.empty() || nextOpponent(career) != nullptr) {
+        return WeeklyDecision::MatchPreparation;
+    }
+    return WeeklyDecision::HighIntensityTraining;
+}
+
+string debtRestrictionMessage(const Career& career, long long transferCost, long long playerWage) {
+    if (!career.myTeam) return "No hay una carrera activa.";
+    if (!career.debtStatus.canBuyPlayers) {
+        return "La deuda bloquea fichajes: la directiva exige control financiero antes de comprar.";
+    }
+    if (!canAffordTransfer(career.debtStatus, transferCost, playerWage)) {
+        return "La deuda restringe esta operacion: costo y salario superan el margen permitido.";
+    }
+    if (!career.debtStatus.canOfferHighSalaries &&
+        playerWage > max(12000LL, career.myTeam->sponsorWeekly / 2)) {
+        return "La deuda activa un techo salarial: no puedes ofrecer ese salario semanal.";
+    }
+    return "";
+}
+
 bool hasScoutingCoverage(const Team& team, const string& region) {
     if (region.empty() || region == "Todas") return true;
     return find(team.scoutingRegions.begin(), team.scoutingRegions.end(), region) != team.scoutingRegions.end();
@@ -262,6 +361,13 @@ string upgradeLabel(ClubUpgrade upgrade) {
     return "club";
 }
 
+bool isFacilityUpgrade(ClubUpgrade upgrade) {
+    return upgrade == ClubUpgrade::Stadium ||
+           upgrade == ClubUpgrade::Youth ||
+           upgrade == ClubUpgrade::Training ||
+           upgrade == ClubUpgrade::Medical;
+}
+
 ServiceResult failure(const string& message) {
     ServiceResult result;
     result.ok = false;
@@ -349,8 +455,7 @@ ServiceResult startCareerService(Career& career,
     // Inicializar IA rival para todos los equipos
     for (auto team : career.activeTeams) {
         if (team != career.myTeam && team) {
-            int prestigeLevel = teamPrestigeScore(*team);
-            career.rivalAIMap[team->name] = createRivalAI(team->name, prestigeLevel);
+            career.rivalAIMap[team->name] = createRivalAI(*team);
         }
     }
     
@@ -367,6 +472,7 @@ ServiceResult startCareerService(Career& career,
         0,  // Sin deuda inicial
         career.myTeam->budget / 10  // Ingresos aproximados semanales
     );
+    syncInfrastructureFromTeam(career, *career.myTeam);
     // === Fin Inicialización Sistemas ===
     
     world_state_service::seedSeasonPromises(career);
@@ -381,6 +487,14 @@ ServiceResult loadCareerService(Career& career) {
     result.ok = career.loadCareer();
     if (result.ok && career.activePromises.empty()) {
         world_state_service::seedSeasonPromises(career);
+    }
+    if (result.ok && career.myTeam) {
+        syncTeamFromInfrastructure(career, *career.myTeam);
+        career.debtStatus = calculateDebtStatus(
+            career.myTeam->budget,
+            career.myTeam->debt,
+            max(1LL, career.myTeam->sponsorWeekly + static_cast<long long>(career.myTeam->fanBase) * 2500LL));
+        applyFinancialSanctions(career.debtStatus);
     }
     result.messages.push_back(result.ok
                                   ? "Carrera cargada: " + (career.myTeam ? career.myTeam->name : string("Sin club")) + "."
@@ -620,6 +734,9 @@ ServiceResult upgradeClubService(Career& career, ClubUpgrade upgrade) {
     if (!career.myTeam) return failure("No hay una carrera activa.");
     Team& team = *career.myTeam;
     ensureTeamIdentity(team);
+    if (isFacilityUpgrade(upgrade) && career.debtStatus.debtSeverity >= 70) {
+        return failure("La deuda bloquea inversiones de infraestructura hasta recuperar estabilidad financiera.");
+    }
     long long cost = upgradeCost(team, upgrade);
     if (team.budget < cost) return failure("Presupuesto insuficiente para mejorar " + upgradeLabel(upgrade) + ".");
     team.budget -= cost;
@@ -686,6 +803,8 @@ ServiceResult upgradeClubService(Career& career, ClubUpgrade upgrade) {
             break;
     }
     ensureTeamIdentity(team);
+    syncInfrastructureFromTeam(career, team);
+    career.infrastructure.upgradesThisSeason++;
     career.addNews(message);
     ServiceResult result;
     result.ok = true;
@@ -764,6 +883,10 @@ ServiceResult buyTransferTargetService(Career& career,
         return failureFromNegotiation(negotiation, "La negociacion no pudo cerrarse.");
     }
     const long long totalCost = totalNegotiationCommitment(negotiation);
+    const string debtRestriction = debtRestrictionMessage(career, totalCost, negotiation.agreedWage);
+    if (!debtRestriction.empty()) {
+        return failureFromNegotiation(negotiation, debtRestriction);
+    }
     if (career.myTeam->budget < totalCost) {
         return failureFromNegotiation(negotiation, "Presupuesto insuficiente para cerrar la operacion.");
     }
@@ -827,6 +950,10 @@ ServiceResult triggerReleaseClauseService(Career& career,
         return failureFromNegotiation(negotiation, "No se pudo cerrar la clausula.");
     }
     const long long totalCost = totalNegotiationCommitment(negotiation);
+    const string debtRestriction = debtRestrictionMessage(career, totalCost, negotiation.agreedWage);
+    if (!debtRestriction.empty()) {
+        return failureFromNegotiation(negotiation, debtRestriction);
+    }
     if (career.myTeam->budget < totalCost) {
         return failureFromNegotiation(negotiation, "Presupuesto insuficiente para ejecutar la clausula.");
     }
@@ -892,6 +1019,10 @@ ServiceResult signPreContractService(Career& career,
         return failureFromNegotiation(negotiation, "El precontrato no pudo cerrarse.");
     }
     const long long upfrontCost = negotiation.agreedBonus + negotiation.agreedAgentFee + negotiation.agreedLoyaltyBonus;
+    const string debtRestriction = debtRestrictionMessage(career, upfrontCost, negotiation.agreedWage);
+    if (!debtRestriction.empty()) {
+        return failureFromNegotiation(negotiation, debtRestriction);
+    }
     if (career.myTeam->budget < upfrontCost) {
         return failureFromNegotiation(negotiation, "Presupuesto insuficiente para el paquete de firma.");
     }
@@ -937,6 +1068,10 @@ ServiceResult renewPlayerContractService(Career& career,
         return failureFromNegotiation(negotiation, "La renovacion no pudo cerrarse.");
     }
     const long long upfrontCost = negotiation.agreedBonus + negotiation.agreedAgentFee + negotiation.agreedLoyaltyBonus;
+    const string debtRestriction = debtRestrictionMessage(career, upfrontCost, negotiation.agreedWage);
+    if (!debtRestriction.empty()) {
+        return failureFromNegotiation(negotiation, debtRestriction);
+    }
     if (team.budget < negotiation.agreedWage * 6 + upfrontCost) {
         return failureFromNegotiation(negotiation, "Presupuesto insuficiente para renovar al jugador.");
     }
@@ -1007,6 +1142,8 @@ ServiceResult loanInPlayerService(Career& career,
     loanWeeks = clampInt(loanWeeks, 8, 26);
     long long fee = max(15000LL, player.value / 10);
     long long wageShare = max(player.wage / 2, wageDemandFor(player) * 55 / 100);
+    const string debtRestriction = debtRestrictionMessage(career, fee, wageShare);
+    if (!debtRestriction.empty()) return failure(debtRestriction);
     if (career.myTeam->budget < fee) return failure("Presupuesto insuficiente para el cargo de prestamo.");
 
     player.onLoan = true;
@@ -1201,6 +1338,151 @@ ServiceResult cycleMatchInstructionService(Career& career) {
     result.ok = true;
     result.messages.push_back("Instruccion de partido actual: " + team.matchInstruction + ".");
     return result;
+}
+
+ServiceResult applyWeeklyDecisionService(Career& career, WeeklyDecision decision) {
+    if (!career.myTeam) return failure("No hay una carrera activa.");
+    Team& team = *career.myTeam;
+    ensureTeamIdentity(team);
+    syncTeamFromInfrastructure(career, team);
+    if (decision == WeeklyDecision::Auto) {
+        decision = chooseAutomaticWeeklyDecision(career);
+    }
+
+    ServiceResult result;
+    result.ok = true;
+    result.messages.push_back("Decision semanal aplicada: " + weeklyDecisionLabel(decision) + ".");
+
+    switch (decision) {
+        case WeeklyDecision::Auto:
+            break;
+        case WeeklyDecision::Recovery: {
+            team.trainingFocus = "Recuperacion";
+            int protectedPlayers = 0;
+            for (auto& player : team.players) {
+                if (player.fitness >= 66 && player.fatigueLoad < 55 && !player.injured) continue;
+                player.individualInstruction = "Descanso medico";
+                player.fatigueLoad = clampInt(player.fatigueLoad - 10, 0, 100);
+                player.fitness = clampInt(player.fitness + 4 + max(0, team.medicalTeam - 60) / 18, 15, player.stamina);
+                if (player.injured && team.medicalTeam >= 68) {
+                    player.injuryWeeks = max(0, player.injuryWeeks - 1);
+                    if (player.injuryWeeks == 0) {
+                        player.injured = false;
+                        player.injuryType.clear();
+                    }
+                }
+                if (++protectedPlayers >= 4) break;
+            }
+            reduceStressWithRest(career.managerStress, 1);
+            result.messages.push_back("Plan semanal: Recuperacion. Protegidos " + to_string(protectedPlayers) + " jugador(es).");
+            break;
+        }
+        case WeeklyDecision::HighIntensityTraining: {
+            const bool needsGoals = career.lastMatchCenter.myGoals <= career.lastMatchCenter.oppGoals &&
+                                    career.lastMatchCenter.myExpectedGoalsTenths <= 11;
+            const bool concededChances = career.lastMatchCenter.oppExpectedGoalsTenths >= 14;
+            team.trainingFocus = needsGoals ? "Ataque" : (concededChances ? "Defensa" : "Tactico");
+            career.managerStress.energy = clampInt(career.managerStress.energy - 5, 0, 100);
+            career.managerStress.stressLevel = clampInt(career.managerStress.stressLevel + 2, 0, 100);
+            team.morale = clampInt(team.morale + 1, 0, 100);
+            result.messages.push_back("Plan semanal: " + team.trainingFocus + ". Suben automatismos, pero baja energia del manager.");
+            break;
+        }
+        case WeeklyDecision::DressingRoom: {
+            ServiceResult meeting = holdTeamMeetingService(career);
+            result.messages.insert(result.messages.end(), meeting.messages.begin(), meeting.messages.end());
+            career.managerStress.stressLevel = clampInt(career.managerStress.stressLevel - 3, 0, 100);
+            break;
+        }
+        case WeeklyDecision::MatchPreparation: {
+            const Team* opponent = nextOpponent(career);
+            team.trainingFocus = "Preparacion partido";
+            if (opponent) {
+                if (opponent->defensiveLine >= 4) team.matchInstruction = "Juego directo";
+                else if (opponent->width <= 2) team.matchInstruction = "Por bandas";
+                else if (opponent->pressingIntensity >= 4) team.matchInstruction = "Pausar juego";
+                else team.matchInstruction = "Contra-presion";
+            } else {
+                team.matchInstruction = "Equilibrado";
+            }
+            int tunedPlayers = 0;
+            for (auto& player : team.players) {
+                if (player.injured || player.matchesSuspended > 0) continue;
+                player.tacticalDiscipline = clampInt(player.tacticalDiscipline + 1 + max(0, team.performanceAnalyst - 60) / 20, 1, 99);
+                if (++tunedPlayers >= 11) break;
+            }
+            career.managerStress.energy = clampInt(career.managerStress.energy - 4, 0, 100);
+            result.messages.push_back("Preparacion rival: " +
+                                      string(opponent ? opponent->name : "sin rival confirmado") +
+                                      " | instruccion " + team.matchInstruction + ".");
+            break;
+        }
+        case WeeklyDecision::FinancialControl: {
+            team.transferPolicy = "Vender antes de comprar";
+            long long payment = 0;
+            if (team.debt > 0 && team.budget > team.sponsorWeekly * 2) {
+                payment = min(team.debt, max(0LL, team.budget / 12));
+                team.budget -= payment;
+                team.debt -= payment;
+            }
+            career.debtStatus = calculateDebtStatus(
+                team.budget,
+                team.debt,
+                max(1LL, team.sponsorWeekly + static_cast<long long>(team.fanBase) * 2500LL));
+            applyFinancialSanctions(career.debtStatus);
+            career.boardConfidence = clampInt(career.boardConfidence + (payment > 0 ? 1 : 0), 0, 100);
+            result.messages.push_back("Politica de mercado: Vender antes de comprar" +
+                                      string(payment > 0 ? " | amortizacion " + formatMoneyValue(payment) : " | sin amortizacion posible") + ".");
+            break;
+        }
+        case WeeklyDecision::YouthPathway: {
+            team.trainingFocus = "Tecnico";
+            int promotedFocus = 0;
+            for (auto& player : team.players) {
+                if (player.age > 21 || player.potential < player.skill + 6) continue;
+                player.developmentPlan = normalizePosition(player.position) == "DEL" ? "Finalizacion"
+                                      : normalizePosition(player.position) == "DEF" ? "Defensa"
+                                      : "Creatividad";
+                player.happiness = clampInt(player.happiness + 4, 1, 99);
+                player.moraleMomentum = clampInt(player.moraleMomentum + 2, -25, 25);
+                ++promotedFocus;
+                if (promotedFocus >= 3) break;
+            }
+            if (career.boardMonthlyObjective.find("titularidades") != string::npos && promotedFocus > 0) {
+                career.addInboxItem("Plan juvenil listo: alinea un sub-20 para avanzar el objetivo mensual.", "Directiva");
+            }
+            result.messages.push_back("Cantera priorizada: " + to_string(promotedFocus) + " proyecto(s) reciben foco individual.");
+            break;
+        }
+        case WeeklyDecision::ManagerRest: {
+            const int previousStress = career.managerStress.stressLevel;
+            reduceStressWithRest(career.managerStress, 2);
+            team.trainingFocus = "Recuperacion";
+            team.morale = clampInt(team.morale + 1, 0, 100);
+            result.messages.push_back("Descanso del manager: estres " + to_string(previousStress) + " -> " +
+                                      to_string(career.managerStress.stressLevel) +
+                                      " | energia " + to_string(career.managerStress.energy) + ".");
+            break;
+        }
+    }
+
+    syncInfrastructureFromTeam(career, team);
+    career.addNews("Centro semanal: " + weeklyDecisionLabel(decision) + " en " + team.name + ".");
+    return result;
+}
+
+vector<string> buildWeeklyDecisionOptions(const Career& career) {
+    vector<string> lines;
+    const WeeklyDecision autoDecision = chooseAutomaticWeeklyDecision(career);
+    lines.push_back("Auto | El staff recomienda: " + weeklyDecisionLabel(autoDecision));
+    lines.push_back("Recuperar plantel | Baja fatiga, protege lesionados y orienta el microciclo a recuperacion.");
+    lines.push_back("Entrenar fuerte | Sube foco tecnico/tactico segun el ultimo partido, con coste de energia.");
+    lines.push_back("Ordenar vestuario | Reunion de plantel para mejorar moral, quimica y promesas en riesgo.");
+    lines.push_back("Preparar rival | Ajusta instruccion de partido y disciplina tactica para el proximo rival.");
+    lines.push_back("Control financiero | Reduce deuda cuando hay caja y activa politica vender antes de comprar.");
+    lines.push_back("Impulsar juveniles | Enfoca proyectos sub-21 y prepara el objetivo de minutos juveniles.");
+    lines.push_back("Descanso manager | Reduce estres y recupera energia antes de decisiones importantes.");
+    return lines;
 }
 
 ServiceResult resolveInboxDecisionService(Career& career) {

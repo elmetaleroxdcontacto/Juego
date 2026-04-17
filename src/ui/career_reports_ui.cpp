@@ -7,6 +7,7 @@
 #include "career/manager_advice.h"
 #include "career/match_center_service.h"
 #include "career/transfer_briefing.h"
+#include "career/weekly_focus_service.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -100,6 +101,10 @@ void displayBoardStatus(Career& career) {
 
 void displayNewsFeed(Career& career) {
     cout << "\n=== Centro del Manager ===" << endl;
+    const weekly_focus_service::WeeklyFocusSnapshot weeklyFocus =
+        weekly_focus_service::buildWeeklyFocusSnapshot(career, 3, 4, 3);
+
+    cout << weeklyFocus.headline << endl;
 
     const auto inboxEntries = inbox_service::buildCombinedInbox(career, 10);
     if (inboxEntries.empty()) {
@@ -121,7 +126,11 @@ void displayNewsFeed(Career& career) {
         }
     }
 
+    printSection("Cockpit semanal", weeklyFocus.priorityLines);
+    printSection("Decisiones semanales", buildWeeklyDecisionOptions(career));
+    printSection("KPIs accionables", weeklyFocus.kpiLines);
     printSection("Acciones sugeridas", manager_advice::buildManagerActionLines(career, 4));
+    printSection("Ayuda contextual", weeklyFocus.tutorialLines);
     printSection("Narrativa de la semana", manager_advice::buildCareerStorylines(career, 3));
     printSection("Pulso de mercado", transfer_briefing::buildMarketPulseLines(career, 3));
     printSection("Lectura del ultimo partido", latestMatchDigest(career));
@@ -131,13 +140,34 @@ void displayNewsFeed(Career& career) {
     cout << "\n";
     printActiveScoutingAssignments(career);
 
-    cout << "\n1. Resolver decision prioritaria" << endl;
-    cout << "2. Crear asignacion de scouting" << endl;
-    cout << "3. Volver" << endl;
-    int action = readInt("Elige opcion: ", 1, 3);
-    if (action == 3) return;
+    cout << "\n1. Aplicar decision semanal" << endl;
+    cout << "2. Resolver decision prioritaria" << endl;
+    cout << "3. Crear asignacion de scouting" << endl;
+    cout << "4. Volver" << endl;
+    int action = readInt("Elige opcion: ", 1, 4);
+    if (action == 4) return;
 
     if (action == 1) {
+        const vector<pair<string, WeeklyDecision>> decisions = {
+            {"Auto: que el staff elija", WeeklyDecision::Auto},
+            {"Recuperar plantel", WeeklyDecision::Recovery},
+            {"Entrenar fuerte", WeeklyDecision::HighIntensityTraining},
+            {"Ordenar vestuario", WeeklyDecision::DressingRoom},
+            {"Preparar rival", WeeklyDecision::MatchPreparation},
+            {"Control financiero", WeeklyDecision::FinancialControl},
+            {"Impulsar juveniles", WeeklyDecision::YouthPathway},
+            {"Descanso del manager", WeeklyDecision::ManagerRest},
+        };
+        cout << "\nDecisiones disponibles:" << endl;
+        for (size_t i = 0; i < decisions.size(); ++i) {
+            cout << i + 1 << ". " << decisions[i].first << endl;
+        }
+        int decisionChoice = readInt("Decision: ", 1, static_cast<int>(decisions.size()));
+        printMessages(applyWeeklyDecisionService(career, decisions[static_cast<size_t>(decisionChoice - 1)].second));
+        return;
+    }
+
+    if (action == 2) {
         printMessages(resolveInboxDecisionService(career));
         return;
     }

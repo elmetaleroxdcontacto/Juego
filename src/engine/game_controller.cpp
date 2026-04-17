@@ -3,7 +3,7 @@
 #include "career/career_runtime.h"
 #include "engine/front_menu.h"
 #include "gui.h"
-#include "io.h"
+#include "io/io.h"
 #include "ui.h"
 #include "utils.h"
 #include "validators.h"
@@ -33,6 +33,30 @@ size_t warningSignature(const vector<string>& warnings) {
 
 bool startsWith(const string& value, const string& prefix) {
     return value.rfind(prefix, 0) == 0;
+}
+
+bool loadTeamFromInputPath(const string& filename, Team& team) {
+    if (isDirectory(filename)) {
+        const string csv = joinPath(filename, "players.csv");
+        if (pathExists(csv) && loadTeamFromCsv(csv, team)) return true;
+
+        const string txt = joinPath(filename, "players.txt");
+        if (pathExists(txt) && loadTeamFromPlayersTxt(txt, team)) return true;
+        if (pathExists(txt) && loadTeamFromLegacyTxt(txt, team)) return true;
+
+        const string json = joinPath(filename, "players.json");
+        if (pathExists(json) && loadTeamFromJson(json, team)) return true;
+        return false;
+    }
+
+    const string ext = toLower(pathExtension(filename));
+    if (ext == ".csv") return loadTeamFromCsv(filename, team);
+    if (ext == ".json") return loadTeamFromJson(filename, team);
+    if (ext == ".txt") {
+        if (loadTeamFromPlayersTxt(filename, team)) return true;
+        return loadTeamFromLegacyTxt(filename, team);
+    }
+    return false;
 }
 
 void configureConsoleEncoding() {
@@ -399,7 +423,7 @@ void GameController::runQuickGame() {
                 break;
             case 6: {
                 string fname = readLine("Ingresa ruta de archivo o carpeta del equipo: ");
-                if (!loadTeamFromFile(fname, myTeam)) {
+                if (!loadTeamFromInputPath(fname, myTeam)) {
                     cout << "No se pudo cargar el equipo." << endl;
                 } else {
                     cout << "Equipo cargado correctamente." << endl;

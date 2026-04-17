@@ -1,5 +1,6 @@
 #include "ai/ai_squad_planner.h"
 #include "ai/ai_transfer_manager.h"
+#include "ai/team_ai.h"
 #include "career/analytics_service.h"
 #include "career/app_services.h"
 #include "career/career_reports.h"
@@ -12,6 +13,7 @@
 #include "career/staff_service.h"
 #include "career/match_analysis_store.h"
 #include "career/match_center_service.h"
+#include "career/weekly_focus_service.h"
 #include "career/career_support.h"
 #include "career/season_service.h"
 #include "career/season_transition.h"
@@ -21,6 +23,8 @@
 #include "development/monthly_development.h"
 #include "development/training_impact_system.h"
 #include "engine/models.h"
+#include "engine/team_personality.h"
+#include "engine/debt_system.h"
 #include "engine/game_settings.h"
 #ifdef _WIN32
 #include "gui/gui_view_builders.h"
@@ -1821,6 +1825,123 @@ void testTransferEvaluationPenalizesMedicalRisk() {
            "El mercado debe penalizar perfiles con mayor riesgo fisico.");
 }
 
+void testTeamPersonalityProfileShapesCpuTactics() {
+    Team intense = makeTeam("Presion Identitaria", "primera division", 71, 3, 3, "Balanced", "Equilibrado", 760000);
+    intense.headCoachStyle = "Intensidad";
+    intense.clubStyle = "Presion vertical";
+    intense.transferPolicy = "Mercado de oportunidades";
+    intense.youthIdentity = "Desarrollo mixto";
+    intense.morale = 74;
+    for (auto& player : intense.players) {
+        player.fitness = 78;
+        player.injured = false;
+    }
+
+    Team ordered = makeTeam("Bloque Identitario", "primera division", 71, 3, 3, "Balanced", "Equilibrado", 760000);
+    ordered.headCoachStyle = "Orden";
+    ordered.clubStyle = "Bloque ordenado";
+    ordered.transferPolicy = "Vender antes de comprar";
+    ordered.youthIdentity = "Talento local";
+    ordered.morale = 66;
+    for (auto& player : ordered.players) {
+        player.fitness = 78;
+        player.injured = false;
+    }
+
+    Team opponent = makeTeam("Rival Referencia", "primera division", 69, 4, 4, "Pressing", "Contra-presion", 740000);
+    for (auto& player : opponent.players) {
+        player.fitness = 76;
+        player.injured = false;
+    }
+
+    team_ai::adjustCpuTactics(intense, opponent);
+    team_ai::adjustCpuTactics(ordered, opponent);
+
+    expect(intense.tactics == "Pressing" || intense.pressingIntensity >= 4,
+           "Un proyecto de intensidad debe traducirse en una IA mas agresiva.");
+    expect(ordered.tactics == "Defensive" || ordered.defensiveLine <= 2,
+           "Un proyecto de orden debe tender a un bloque mas conservador.");
+}
+
+void testTransferEvaluationReflectsClubPersonality() {
+    Career career;
+    career.currentSeason = 3;
+
+    Team academy = makeTeam("Academia Azul", "primera division", 69, 3, 3, "Balanced", "Equilibrado", 1600000);
+    academy.headCoachStyle = "Control";
+    academy.clubStyle = "Control de posesion";
+    academy.youthIdentity = "Cantera estructurada";
+    academy.transferPolicy = "Cantera y valor futuro";
+    academy.youthFacilityLevel = 4;
+    academy.youthCoach = 82;
+    ensureTeamIdentity(academy);
+
+    Team contender = makeTeam("Contendiente Rojo", "primera division", 73, 4, 4, "Pressing", "Contra-presion", 2000000);
+    contender.headCoachStyle = "Ofensivo";
+    contender.clubStyle = "Ataque por bandas";
+    contender.youthIdentity = "Plantel de mercado";
+    contender.transferPolicy = "Competir por titulares hechos";
+    contender.clubPrestige = 78;
+    ensureTeamIdentity(contender);
+
+    Team seller = makeTeam("Mercado Gris", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 900000);
+    ensureTeamIdentity(seller);
+
+    Player prospect = makePlayer("Proyecto Fino", "MED", 68, 87, 19, 76, 78);
+    prospect.value = 380000;
+    prospect.releaseClause = 760000;
+    prospect.wage = 12000;
+    prospect.contractWeeks = 96;
+    prospect.currentForm = 58;
+
+    Player ready = makePlayer("Titular Hecho", "DEL", 82, 83, 27, 77, 80);
+    ready.value = 420000;
+    ready.releaseClause = 840000;
+    ready.wage = 18000;
+    ready.contractWeeks = 88;
+    ready.currentForm = 79;
+
+    const ClubTransferStrategy academyStrategy = ai_transfer_manager::buildClubTransferStrategy(career, academy);
+    const ClubTransferStrategy contenderStrategy = ai_transfer_manager::buildClubTransferStrategy(career, contender);
+
+    const TransferTarget academyProspect =
+        ai_transfer_manager::evaluateTarget(career, academy, seller, prospect, academyStrategy);
+    const TransferTarget academyReady =
+        ai_transfer_manager::evaluateTarget(career, academy, seller, ready, academyStrategy);
+    const TransferTarget contenderProspect =
+        ai_transfer_manager::evaluateTarget(career, contender, seller, prospect, contenderStrategy);
+    const TransferTarget contenderReady =
+        ai_transfer_manager::evaluateTarget(career, contender, seller, ready, contenderStrategy);
+
+    expect(academyProspect.totalScore > academyReady.totalScore,
+           "Un club formador debe priorizar el talento joven sobre el impacto corto.");
+    expect(contenderReady.totalScore > contenderProspect.totalScore,
+           "Un club hecho para competir ya debe valorar mas al titular listo.");
+}
+
+void testOpponentReportIncludesCompetitivePersonality() {
+    Career career;
+    career.allTeams.push_back(makeTeam("Mi Club", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 820000));
+    career.allTeams.push_back(makeTeam("Rival con Sello", "primera division", 72, 4, 3, "Balanced", "Equilibrado", 840000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Mi Club");
+    Team* rival = career.findTeamByName("Rival con Sello");
+    expect(career.myTeam != nullptr && rival != nullptr, "La prueba de informe rival necesita dos clubes.");
+
+    rival->headCoachStyle = "Intensidad";
+    rival->transferPolicy = "Rearme competitivo";
+    rival->clubStyle = "Ataque por bandas";
+    rival->morale = 67;
+    career.schedule = {{{0, 1}}};
+    career.currentWeek = 1;
+
+    const string report = buildOpponentReport(career);
+    expect(report.find("DT Intensidad") != string::npos,
+           "El informe rival debe exponer la personalidad del entrenador.");
+    expect(report.find("mercado Competir por titulares hechos") != string::npos,
+           "El informe rival debe traducir la politica de mercado a una lectura usable.");
+}
+
 void testMonthlyDevelopmentCycleImprovesStableProspects() {
     Team team = makeTeam("Cantera Pro", "primera division", 67, 3, 3, "Balanced", "Equilibrado", 860000);
     team.youthCoach = 82;
@@ -2266,10 +2387,158 @@ void testWeeklyDashboardReportHighlightsHumanManagersAndAgenda() {
            "El nuevo dashboard semanal debe exponerse como reporte estructurado.");
     expect(dump.find("Managers humanos: 2 | activo Manager Principal") != string::npos,
            "El dashboard debe informar cuando la carrera tiene mas de un manager humano.");
+    expect(dump.find("Cockpit: Cockpit semanal:") != string::npos,
+           "El dashboard debe exponer un headline de cockpit semanal reutilizable por UI.");
+    expect(dump.find("Cockpit semanal:") != string::npos,
+           "El dashboard debe incluir prioridades semanales agrupadas.");
+    expect(dump.find("KPIs accionables:") != string::npos,
+           "El dashboard debe resumir KPIs accionables para la semana.");
     expect(dump.find("Acciones sugeridas:") != string::npos,
            "El dashboard debe incluir recomendaciones accionables.");
     expect(dump.find("Centro del manager:") != string::npos,
            "El dashboard debe integrar el centro del manager en la misma vista.");
+    expect(dump.find("Ayuda contextual:") != string::npos,
+           "El dashboard debe incluir guias contextuales para la siguiente decision.");
+}
+
+void testWeeklyFocusSnapshotPrioritizesUrgentClubState() {
+    Career career;
+    career.allTeams.push_back(makeTeam("Focus FC", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 90000));
+    career.allTeams.push_back(makeTeam("Rival Focus", "primera division", 71, 3, 3, "Pressing", "Presion alta", 620000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Focus FC");
+    expect(career.myTeam != nullptr, "La prueba de cockpit semanal necesita un club controlado.");
+
+    career.currentSeason = 1;
+    career.currentWeek = 2;
+    career.boardConfidence = 34;
+    career.boardMonthlyObjective = "Entrar al top 3";
+    career.boardMonthlyTarget = 3;
+    career.boardMonthlyProgress = 5;
+    career.boardYouthTarget = 2;
+    career.schedule = {{{0, 1}}};
+
+    career.myTeam->debt = 550000;
+    career.myTeam->sponsorWeekly = 25000;
+    career.myTeam->budget = 70000;
+    career.myTeam->morale = 44;
+    career.myTeam->players[0].injured = true;
+    career.myTeam->players[1].contractWeeks = 6;
+    career.myTeam->players[2].fatigueLoad = 72;
+    career.myTeam->players[2].fitness = 58;
+    career.myTeam->players[3].fatigueLoad = 68;
+    career.myTeam->players[3].fitness = 59;
+    career.myTeam->players[4].happiness = 35;
+    career.myTeam->players[5].age = 19;
+    career.myTeam->players[5].potential = career.myTeam->players[5].skill + 10;
+
+    const auto snapshot = weekly_focus_service::buildWeeklyFocusSnapshot(career, 4, 5, 4);
+    const string priorities = joinLines(snapshot.priorityLines);
+    const string tips = joinLines(snapshot.tutorialLines);
+
+    expect(snapshot.headline.find("Cockpit semanal:") != string::npos,
+           "El servicio de cockpit debe producir un headline reusable por CLI y GUI.");
+    expect(priorities.find("Directiva |") != string::npos,
+           "Cuando la confianza cae, la directiva debe aparecer como foco prioritario.");
+    expect(priorities.find("Fisico |") != string::npos || priorities.find("Vestuario |") != string::npos,
+           "El cockpit debe detectar urgencias fisicas o de clima interno.");
+    expect(priorities.find("Caja |") != string::npos,
+           "La caja comprometida debe emerger como prioridad semanal.");
+    expect(tips.find("scouting activo") != string::npos || tips.find("mercado") != string::npos,
+           "La ayuda contextual debe ensenar el siguiente paso, no solo describir el estado.");
+}
+
+void testWeeklyDecisionServiceAppliesActionableConsequences() {
+    Career career;
+    career.allTeams.push_back(makeTeam("Decision FC", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 900000));
+    career.allTeams.push_back(makeTeam("Decision Rival", "primera division", 68, 4, 3, "Pressing", "Contra-presion", 700000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Decision FC");
+    expect(career.myTeam != nullptr, "La decision semanal necesita un club controlado.");
+
+    career.currentWeek = 3;
+    career.schedule = {{{0, 1}}};
+    career.managerStress = initializeManagerStress();
+    career.managerStress.stressLevel = 84;
+    career.managerStress.energy = 24;
+    career.infrastructure.levels.trainingGround = 3;
+    career.infrastructure.levels.youthAcademy = 3;
+    career.infrastructure.levels.medical = 4;
+    career.infrastructure.levels.stadium = 3;
+    career.infrastructure.levels.facilities = 3;
+    career.myTeam->players[0].fatigueLoad = 75;
+    career.myTeam->players[0].fitness = 52;
+    career.myTeam->players[1].age = 19;
+    career.myTeam->players[1].potential = career.myTeam->players[1].skill + 10;
+
+    const vector<string> options = buildWeeklyDecisionOptions(career);
+    expect(!options.empty() && options.front().find("Auto") != string::npos,
+           "El centro semanal debe exponer una recomendacion automatica.");
+
+    const int stressBefore = career.managerStress.stressLevel;
+    ServiceResult rest = applyWeeklyDecisionService(career, WeeklyDecision::ManagerRest);
+    expect(rest.ok, "El descanso del manager debe aplicarse como decision semanal.");
+    expect(career.managerStress.stressLevel < stressBefore,
+           "El descanso del manager debe reducir el estres.");
+    expect(career.myTeam->trainingFocus == "Recuperacion",
+           "El descanso del manager debe dejar un microciclo conservador.");
+
+    const int fatigueBefore = career.myTeam->players[0].fatigueLoad;
+    ServiceResult recovery = applyWeeklyDecisionService(career, WeeklyDecision::Recovery);
+    expect(recovery.ok, "La recuperacion debe aplicarse como decision semanal.");
+    expect(career.myTeam->players[0].fatigueLoad < fatigueBefore,
+           "La decision de recuperacion debe bajar carga de fatiga.");
+
+    ServiceResult youth = applyWeeklyDecisionService(career, WeeklyDecision::YouthPathway);
+    expect(youth.ok, "El impulso juvenil debe aplicarse como decision semanal.");
+    expect(!career.myTeam->players[1].developmentPlan.empty(),
+           "El impulso juvenil debe asignar un plan individual al proyecto joven.");
+}
+
+void testDebtAndInfrastructureConsequencesAreEnforced() {
+    Career career;
+    career.allTeams.push_back(makeTeam("Debt FC", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 900000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Debt FC");
+    expect(career.myTeam != nullptr, "La prueba de deuda necesita un club controlado.");
+
+    career.myTeam->debt = 9000000;
+    career.myTeam->budget = 700000;
+    career.myTeam->sponsorWeekly = 15000;
+    career.debtStatus = calculateDebtStatus(career.myTeam->budget, career.myTeam->debt, career.myTeam->sponsorWeekly);
+    applyFinancialSanctions(career.debtStatus);
+
+    ServiceResult blockedUpgrade = upgradeClubService(career, ClubUpgrade::Stadium);
+    expect(!blockedUpgrade.ok,
+           "La deuda grave debe bloquear inversiones de infraestructura.");
+
+    ServiceResult control = applyWeeklyDecisionService(career, WeeklyDecision::FinancialControl);
+    expect(control.ok, "El control financiero debe poder aplicarse aun con deuda alta.");
+    expect(career.myTeam->transferPolicy == "Vender antes de comprar",
+           "El control financiero debe cambiar la politica de mercado.");
+}
+
+void testMatchCenterRecommendationsFeedWeeklyDecisionLoop() {
+    Career career;
+    career.lastMatchAnalysis = "Liga: derrota de prueba.";
+    career.lastMatchCenter.opponentName = "Rival Claro";
+    career.lastMatchCenter.competitionLabel = "Liga";
+    career.lastMatchCenter.venueLabel = "Visita";
+    career.lastMatchCenter.myGoals = 0;
+    career.lastMatchCenter.oppGoals = 2;
+    career.lastMatchCenter.myShots = 5;
+    career.lastMatchCenter.oppShots = 14;
+    career.lastMatchCenter.myShotsOnTarget = 1;
+    career.lastMatchCenter.oppShotsOnTarget = 6;
+    career.lastMatchCenter.myExpectedGoalsTenths = 6;
+    career.lastMatchCenter.oppExpectedGoalsTenths = 18;
+    career.lastMatchCenter.myPossession = 42;
+    career.lastMatchCenter.oppPossession = 58;
+
+    const MatchCenterView view = match_center_service::buildLastMatchCenter(career, 2, 2);
+    const string recommendations = joinLines(view.recommendationLines);
+    expect(recommendations.find("Decision semanal sugerida") != string::npos,
+           "El match center debe cerrar el feedback post-partido con una decision semanal sugerida.");
 }
 
 void testLocalizationSupportsMultipleLanguages() {
@@ -2336,6 +2605,13 @@ int main() {
         {"career_runtime_scope", testCareerRuntimeScopeRestoresContext},
         {"human_manager_persistence", testHumanManagerProfilesPersistAcrossSaveSerialization},
         {"weekly_dashboard_report", testWeeklyDashboardReportHighlightsHumanManagersAndAgenda},
+        {"weekly_focus_snapshot", testWeeklyFocusSnapshotPrioritizesUrgentClubState},
+        {"weekly_decision_service", testWeeklyDecisionServiceAppliesActionableConsequences},
+        {"debt_infrastructure_consequences", testDebtAndInfrastructureConsequencesAreEnforced},
+        {"match_center_weekly_decision_loop", testMatchCenterRecommendationsFeedWeeklyDecisionLoop},
+        {"personality_cpu_tactics", testTeamPersonalityProfileShapesCpuTactics},
+        {"personality_transfer_eval", testTransferEvaluationReflectsClubPersonality},
+        {"opponent_personality_report", testOpponentReportIncludesCompetitivePersonality},
         {"late_match_urgency", testLateDeficitRaisesUrgencyInMatchPhase},
         {"instruction_chance_profiles", testMatchInstructionsShapeChanceProfiles},
         {"injury_replacement", testMatchInjuryTriggersRealReplacement},

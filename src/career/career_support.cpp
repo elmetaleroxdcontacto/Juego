@@ -1,5 +1,6 @@
 #include "career/career_support.h"
 
+#include "engine/team_personality.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -102,6 +103,7 @@ string lineMap(const Team& team) {
 string buildOpponentReport(const Career& career) {
     const Team* opponent = nextOpponent(career);
     if (!career.myTeam || !opponent) return "Sin informe rival disponible.";
+    const TeamPersonalityProfile profile = buildTeamPersonalityProfile(*opponent);
     int midfieldFitness = averageFitnessForLine(*opponent, "MED");
     int defenseThreat = lineThreatScore(*opponent, "DEF");
     int midfieldThreat = lineThreatScore(*opponent, "MED");
@@ -118,6 +120,8 @@ string buildOpponentReport(const Career& career) {
                         : midfieldThreat >= defenseThreat + 4 ? "mediocampo"
                                                               : "estructura equilibrada";
     return opponent->name + " | estilo " + (opponent->clubStyle.empty() ? string("equilibrado") : opponent->clubStyle) +
+           " | DT " + profile.coachLabel +
+           " | mercado " + profile.marketLabel +
            " | formacion " + opponent->formation +
            " | moral " + to_string(opponent->morale) +
            " | prestigio " + to_string(teamPrestigeScore(*opponent)) +

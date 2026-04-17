@@ -426,6 +426,14 @@ void runInstructionAction(AppState& state) {
         finalizeAction(state, holdTeamMeetingService(state.career), "Reunion");
         return;
     }
+    if (state.currentPage == GuiPage::News) {
+        finalizeAction(state, applyWeeklyDecisionService(state.career, WeeklyDecision::Auto), "Decision semanal", true);
+        return;
+    }
+    if (state.currentPage == GuiPage::Board) {
+        finalizeAction(state, reviewStaffStructureService(state.career), "Staff", true);
+        return;
+    }
     if (state.currentPage == GuiPage::Squad || state.currentPage == GuiPage::Youth) {
         int row = selectedListViewRow(state.squadList);
         if (row < 0) {

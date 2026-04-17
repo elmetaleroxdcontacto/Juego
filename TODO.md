@@ -4952,3 +4952,146 @@ Fecha: 2026-04-04
 - Añadir un modo `--clean` seguro para limpiar caché de `CMake` cuando cambien opciones importantes del proyecto.
 - Agregar una opción explícita para ejecutar `FootballManagerCLI --validate` más tests en una sola pasada de verificación.
 - Considerar una ruta de autodetección de generador/toolchain para no depender únicamente de `MinGW Makefiles`.
+
+## === AI ARCHITECTURE + GAMEPLAY IMPROVEMENT LOG ===
+Fecha: 2026-04-04
+
+### Objetivo del trabajo
+- Corregir el error de compilación/IntelliSense `identifier "loadTeamFromFile" is undefined`.
+
+### Diagnóstico inicial
+- La función `loadTeamFromFile` existe y está implementada en `src/io/io.cpp`.
+- Su declaración pública vive en `include/io/io.h`.
+- El punto de uso activo en `src/engine/game_controller.cpp` seguía dependiendo del header puente `io.h`, lo que podía dejar al IDE o a ciertas configuraciones de includes sin resolver directamente la declaración.
+
+### Cambios arquitectónicos aplicados
+- No se aplicaron cambios arquitectónicos amplios en esta intervención; fue una corrección localizada de visibilidad de API pública.
+
+### Refactors aplicados
+- Se reemplazó el include puente por el include directo del módulo IO en el punto de uso principal del símbolo.
+
+### Mejoras técnicas aplicadas
+- `src/engine/game_controller.cpp` ahora incluye `io/io.h` de forma explícita.
+- Con esto se hace visible directamente la declaración de `loadTeamFromFile` en el archivo que la invoca.
+
+### Mejoras de gameplay aplicadas
+- No hubo cambios de gameplay en esta intervención.
+- El impacto es técnico: recuperar compilación/visibilidad correcta del loader de plantillas.
+
+### Mejoras de UI/UX aplicadas
+- No hubo cambios de UI/UX en esta intervención.
+- El ajuste mejora la experiencia de desarrollo al reducir falsos errores de símbolo indefinido en el editor.
+
+### Tests o validaciones agregadas
+- Se recompiló el camino afectado y `game_controller.cpp` volvió a compilar correctamente con el include directo.
+- La validación completa de enlace quedó condicionada por un bloqueo temporal de binarios de salida en Windows, no por un error de símbolo.
+
+### Archivos modificados
+- `src/engine/game_controller.cpp` -> include cambiado de `io.h` a `io/io.h` para exponer directamente `loadTeamFromFile`.
+- `TODO.md` -> se agregó trazabilidad del fix al final del archivo.
+
+### Problemas detectados pero no resueltos todavía
+- Persisten bloqueos ocasionales de `FootballManagerCLI.exe`/`FootballManagerTests.exe` al enlazar en Windows (`Permission denied`), ajenos a este símbolo concreto.
+- El fallback directo de `build.bat` sigue siendo una ruta secundaria y puede requerir ajustes adicionales independientes de este fix.
+
+### Mejoras futuras sugeridas
+- Revisar otros puntos que aún dependan de headers puente legacy y migrarlos gradualmente a includes de módulo explícitos.
+- Generar `compile_commands.json` o reforzar configuración de IntelliSense para reducir diagnósticos falsos en el IDE.
+- Revisar el locking de ejecutables durante el enlace en Windows para hacer más estable el ciclo de build local.
+
+## === AI ARCHITECTURE + GAMEPLAY IMPROVEMENT LOG ===
+Fecha: 2026-04-04
+
+### Objetivo del trabajo
+- Resolver el diagnóstico persistente de IntelliSense/IDE en `game_controller` donde `loadTeamFromFile` seguía apareciendo como identificador indefinido.
+
+### Diagnóstico inicial
+- La build real del target `FootballManagerCLI` ya compilaba, por lo que el fallo estaba concentrado en visibilidad/parsing del IDE.
+- `loadTeamFromFile` está declarado en `include/io/io.h` e implementado en `src/io/io.cpp`.
+- El punto de uso en `src/engine/game_controller.cpp` necesitaba quedar más explícito para evitar ambigüedad del parser respecto al símbolo global.
+
+### Cambios arquitectónicos aplicados
+- No se aplicaron cambios arquitectónicos amplios; se hizo un endurecimiento puntual de frontera entre `game_controller` y el módulo de IO.
+
+### Refactors aplicados
+- Se dejó la firma del loader explícita en la unidad de traducción consumidora para que el archivo no dependa únicamente de la resolución del IDE a través del include chain.
+- Se hizo explícita la invocación al símbolo global con `::loadTeamFromFile`.
+
+### Mejoras técnicas aplicadas
+- `src/engine/game_controller.cpp` ahora contiene una declaración directa compatible de `loadTeamFromFile`.
+- La llamada del menú de carga usa `::loadTeamFromFile(...)`, reforzando que se utiliza la API global del módulo IO.
+- Se mantuvo el include directo `io/io.h`, evitando volver al header puente legacy.
+
+### Mejoras de gameplay aplicadas
+- No hubo cambios de gameplay en esta intervención.
+- La mejora asegura estabilidad del flujo de carga manual de equipos desde el menú rápido.
+
+### Mejoras de UI/UX aplicadas
+- No hubo cambios visuales directos.
+- Se mejora la experiencia de desarrollo al reducir falsos positivos del editor sobre una función usada por el flujo de carga de equipos.
+
+### Tests o validaciones agregadas
+- Recompilación de `FootballManagerCLI` tras el ajuste, con resultado exitoso.
+- Verificación manual del punto de uso en `game_controller.cpp` para asegurar que la llamada quedó enlazada al loader global correcto.
+
+### Archivos modificados
+- `src/engine/game_controller.cpp` -> se reforzó la visibilidad de `loadTeamFromFile` y se calificó la llamada con scope global.
+- `TODO.md` -> se agregó registro técnico del ajuste al final del archivo.
+
+### Problemas detectados pero no resueltos todavía
+- El proyecto sigue teniendo diferencias entre compilación real e IntelliSense en algunas rutas legacy de includes.
+- La cadena de includes legacy (`include/io.h` y similares) todavía puede inducir diagnósticos inconsistentes en algunos archivos del editor.
+
+### Mejoras futuras sugeridas
+- Revisar gradualmente otros call sites sensibles a IntelliSense y reemplazar headers puente por includes de módulo explícitos.
+- Incorporar `compile_commands.json` o reforzar configuración de IntelliSense para que use el mismo grafo de includes de `CMake`.
+- Seguir reduciendo dependencias globales/legacy en módulos `engine` e `io` para acotar este tipo de falsos errores.
+
+## === AI ARCHITECTURE + GAMEPLAY IMPROVEMENT LOG ===
+Fecha: 2026-04-04
+
+### Objetivo del trabajo
+- Eliminar la dependencia directa de `loadTeamFromFile` en `game_controller.cpp` para corregir el error persistente del IDE sin romper el flujo de carga de equipos.
+
+### Diagnóstico inicial
+- La función `loadTeamFromFile` seguía apareciendo como indefinida en el editor aunque la build real compilaba correctamente.
+- El problema estaba localizado en el call site de `game_controller.cpp`, no en la implementación del módulo IO.
+- Había valor en aislar la lógica usada por el menú rápido para que el archivo no dependiera de ese símbolo concreto.
+
+### Cambios arquitectónicos aplicados
+- Se desacopló `game_controller.cpp` del símbolo de conveniencia `loadTeamFromFile` mediante un helper local de adaptación.
+
+### Refactors aplicados
+- Se introdujo `loadTeamFromInputPath(...)` dentro de `src/engine/game_controller.cpp`.
+- Ese helper reutiliza los loaders base (`CSV`, `JSON`, `players.txt`, `legacy txt`) y replica el mismo orden de resolución que usa el módulo IO.
+- Se eliminó la llamada directa previa a `loadTeamFromFile` desde el menú de juego rápido.
+
+### Mejoras técnicas aplicadas
+- El menú de carga manual ahora usa una función local visible para la propia unidad de traducción.
+- Se mantiene el comportamiento esperado para carpetas y archivos individuales sin cambiar el contrato funcional del jugador.
+- El ajuste reduce sensibilidad del archivo a discrepancias entre compilación real e IntelliSense.
+
+### Mejoras de gameplay aplicadas
+- No hubo cambios de gameplay en esta intervención.
+- Se preservó el flujo de carga de equipos para partidos rápidos y edición de plantilla.
+
+### Mejoras de UI/UX aplicadas
+- No hubo cambios visuales directos.
+- Se mejora la experiencia de desarrollo al eliminar un falso error persistente del editor en un flujo del menú principal.
+
+### Tests o validaciones agregadas
+- Recompilación exitosa del target `FootballManagerCLI` tras reemplazar la llamada directa por el helper local.
+- Verificación manual del comportamiento de resolución de rutas en el helper local respecto del orden usado en IO.
+
+### Archivos modificados
+- `src/engine/game_controller.cpp` -> se creó `loadTeamFromInputPath(...)` y se reemplazó la llamada directa al loader global.
+- `TODO.md` -> se documentó el ajuste al final del archivo.
+
+### Problemas detectados pero no resueltos todavía
+- IntelliSense todavía puede divergir de la build real en otros símbolos legacy fuera de este archivo.
+- Existe duplicación controlada de la lógica de selección de formato entre `game_controller.cpp` y `src/io/io.cpp`.
+
+### Mejoras futuras sugeridas
+- Extraer la resolución de ruta/formato a un servicio pequeño compartido para evitar duplicación entre UI y IO.
+- Revisar otros puntos del motor que aún dependan de wrappers o helpers globales legacy.
+- Añadir generación estable de `compile_commands.json` o mejorar la configuración del IDE para reducir falsos positivos.

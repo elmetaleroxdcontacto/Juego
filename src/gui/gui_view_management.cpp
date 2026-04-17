@@ -3,6 +3,7 @@
 #ifdef _WIN32
 
 #include "ai/ai_transfer_manager.h"
+#include "engine/team_personality.h"
 #include "career/inbox_service.h"
 #include "career/manager_advice.h"
 #include "finance/finance_system.h"
@@ -330,6 +331,7 @@ GuiPageModel buildBoardModel(AppState& state) {
         profileRows.push_back({"Antiguedad DT", std::to_string(team.headCoachTenureWeeks) + " sem", "Tiempo del proyecto actual"});
         profileRows.push_back({"Seguridad", std::to_string(team.jobSecurity), "Estabilidad del banquillo"});
         profileRows.push_back({"Politica", team.transferPolicy, "Mercado del club"});
+        profileRows.push_back({"Perfil competitivo", teamPersonalityHeadline(team), "Como se refleja la identidad en decisiones CPU"});
         profileRows.push_back({"Red scouting", team.scoutingRegions.empty() ? std::string("-") : joinStringValues(team.scoutingRegions, ", "), "Cobertura activa"});
         profileRows.push_back({"Identidad cantera", team.youthIdentity, "Condiciona objetivos"});
         profileRows.push_back({"Estilo", team.clubStyle, "Contexto institucional"});
@@ -384,6 +386,7 @@ GuiPageModel buildNewsModel(AppState& state) {
     std::vector<std::string> alerts = buildAlertLines(state.career);
     const auto storyLines = manager_advice::buildCareerStorylines(state.career, 4);
     const auto hubLines = inbox_service::buildPriorityInboxLines(state.career, 12);
+    const auto weeklyDecisionOptions = buildWeeklyDecisionOptions(state.career);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state, alerts);
@@ -429,6 +432,10 @@ GuiPageModel buildNewsModel(AppState& state) {
                             "\r\nScouting: " + std::to_string(state.career.scoutInbox.size()) +
                             "\r\nAsignaciones: " + std::to_string(state.career.scoutingAssignments.size()) +
                             "\r\nFiltro actual: " + state.currentFilter;
+    if (!weeklyDecisionOptions.empty()) {
+        model.summary.content += "\r\nDecision semanal: " + weeklyDecisionOptions.front();
+        model.summary.content += "\r\nBoton Decidir: aplica la recomendacion del staff.";
+    }
     if (!hubLines.empty()) {
         model.summary.content += "\r\nPrioridad: " + hubLines.front();
     }
@@ -437,6 +444,12 @@ GuiPageModel buildNewsModel(AppState& state) {
     }
     model.detail.content = inbox_service::buildManagerHubDigest(state.career, 8) + "\r\n" +
                            lastMatchPanelText(state.career, 5, 8) + "\r\n" + dressingRoomPanelText(state.career, 4);
+    if (!weeklyDecisionOptions.empty()) {
+        model.detail.content += "\r\n\r\nCentro semanal";
+        for (size_t i = 0; i < weeklyDecisionOptions.size() && i < 6; ++i) {
+            model.detail.content += "\r\n- " + weeklyDecisionOptions[i];
+        }
+    }
     if (!storyLines.empty()) {
         model.detail.content += "\r\n\r\nNarrativa de la semana";
         for (const auto& line : storyLines) model.detail.content += "\r\n- " + line;

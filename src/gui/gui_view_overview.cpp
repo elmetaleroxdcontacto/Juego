@@ -8,6 +8,7 @@
 #include "career/inbox_service.h"
 #include "career/manager_advice.h"
 #include "career/staff_service.h"
+#include "career/weekly_focus_service.h"
 #include "career/career_support.h"
 #include "utils/utils.h"
 
@@ -44,11 +45,13 @@ GuiPageModel buildDashboardModel(AppState& state) {
     std::vector<std::string> alerts = buildAlertLines(state.career);
     const auto actionLines = manager_advice::buildManagerActionLines(state.career, 4);
     const auto storyLines = manager_advice::buildCareerStorylines(state.career, 3);
+    const auto weeklyFocus = weekly_focus_service::buildWeeklyFocusSnapshot(state.career, 3, 4, 3);
+    const auto weeklyDecisionOptions = buildWeeklyDecisionOptions(state.career);
     model.title = pageTitleFor(state.currentPage);
     model.breadcrumb = breadcrumbFor(state.currentPage);
     model.metrics = buildMetrics(state, alerts);
     model.infoLine = state.career.myTeam
-        ? "Panorama inmediato del club: proximo rival, forma del plantel, clasificacion y focos de gestion."
+        ? weeklyFocus.headline
         : state.gameSetup.inlineMessage;
     model.summary.title = "UpcomingMatchWidget";
     model.primary = buildLeagueTableModel(state.career, "Grupo actual");
@@ -139,10 +142,25 @@ GuiPageModel buildDashboardModel(AppState& state) {
     out << "Moral " << team.morale << " | Lesionados " << injured << " | Tension " << dressing.socialTension << "\r\n";
     out << "Plan semanal: " << team.trainingFocus << (congestedWeek ? " | semana congestionada" : " | semana regular") << "\r\n";
     out << "Objetivo: " << (state.career.boardMonthlyObjective.empty() ? "Sin objetivo mensual activo" : state.career.boardMonthlyObjective) << "\r\n\r\n";
+    if (!weeklyFocus.priorityLines.empty()) {
+        out << "Cockpit semanal\r\n";
+        for (const auto& line : weeklyFocus.priorityLines) out << "- " << line << "\r\n";
+        out << "\r\n";
+    }
+    if (!weeklyFocus.kpiLines.empty()) {
+        out << "KPIs accionables\r\n";
+        for (const auto& line : weeklyFocus.kpiLines) out << "- " << line << "\r\n";
+        out << "\r\n";
+    }
     if (!actionLines.empty()) {
         out << "Decisiones sugeridas\r\n";
         for (const auto& line : actionLines) out << "- " << line << "\r\n";
         out << "\r\n";
+    }
+    if (!weeklyDecisionOptions.empty()) {
+        out << "Centro semanal\r\n";
+        for (size_t i = 0; i < weeklyDecisionOptions.size() && i < 4; ++i) out << "- " << weeklyDecisionOptions[i] << "\r\n";
+        out << "Usa Noticias > Decidir para aplicar la recomendacion automatica.\r\n\r\n";
     }
     if (!storyLines.empty()) {
         out << "Clima de la semana\r\n";
@@ -178,9 +196,17 @@ GuiPageModel buildDashboardModel(AppState& state) {
         if (analyticsLines.size() > 1) detail << analyticsLines[1] << "\r\n";
         if (analyticsLines.size() > 2) detail << analyticsLines[2] << "\r\n";
     }
+    if (!weeklyFocus.kpiLines.empty()) {
+        detail << "\r\nKPIs accionables\r\n";
+        for (const auto& line : weeklyFocus.kpiLines) detail << "- " << line << "\r\n";
+    }
     if (!actionLines.empty()) {
         detail << "\r\nAcciones sugeridas\r\n";
         for (const auto& line : actionLines) detail << "- " << line << "\r\n";
+    }
+    if (!weeklyFocus.tutorialLines.empty()) {
+        detail << "\r\nAyuda contextual\r\n";
+        for (const auto& line : weeklyFocus.tutorialLines) detail << "- " << line << "\r\n";
     }
     if (!storyLines.empty()) {
         detail << "\r\nNarrativa de la semana\r\n";

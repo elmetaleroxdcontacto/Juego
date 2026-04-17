@@ -24,6 +24,7 @@
 #include "engine/rivalry_system.h"
 #include "engine/manager_stress.h"
 #include "engine/debt_system.h"
+#include "engine/facilities_system.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -34,6 +35,95 @@
 using namespace std;
 
 namespace {
+
+void pushUniqueLimited(vector<string>& lines, const string& line, size_t limit = 3) {
+    if (line.empty()) return;
+    if (find(lines.begin(), lines.end(), line) != lines.end()) return;
+    if (lines.size() >= limit) return;
+    lines.push_back(line);
+}
+
+Team* scheduledTeam(Career& career, int index) {
+    if (index < 0 || index >= static_cast<int>(career.activeTeams.size())) return nullptr;
+    return career.activeTeams[static_cast<size_t>(index)];
+}
+
+FacilityLevel facilityLevelsForTeam(const Team& team) {
+    FacilityLevel levels;
+    levels.trainingGround = clampInt(team.trainingFacilityLevel, 1, 5);
+    levels.youthAcademy = clampInt(team.youthFacilityLevel, 1, 5);
+    levels.medical = clampInt(1 + team.medicalTeam / 25, 1, 5);
+    levels.stadium = clampInt(team.stadiumLevel, 1, 5);
+    levels.facilities = clampInt(1 + team.assistantCoach / 30, 1, 5);
+    return levels;
+}
+
+void updateRivalMemoryForUserMatch(Career& career, const Team& home, const Team& away, const MatchResult& result) {
+    if (!career.myTeam) return;
+    const bool playerHome = (&home == career.myTeam);
+    const bool playerAway = (&away == career.myTeam);
+    if (!playerHome && !playerAway) return;
+
+    const Team& rivalTeam = playerHome ? away : home;
+    const Team& userTeam = playerHome ? home : away;
+    const int rivalGoals = playerHome ? result.awayGoals : result.homeGoals;
+    const int userGoals = playerHome ? result.homeGoals : result.awayGoals;
+
+    RivalAI& rivalAI = career.rivalAIMap[rivalTeam.name];
+    if (rivalAI.personality.teamName.empty()) {
+        rivalAI = createRivalAI(rivalTeam);
+    }
+
+    auto memoryIt = find_if(rivalAI.memoryBank.begin(), rivalAI.memoryBank.end(), [&](const RivalMemory& memory) {
+        return memory.opponentName == userTeam.name;
+    });
+    if (memoryIt == rivalAI.memoryBank.end()) {
+        rivalAI.memoryBank.push_back(RivalMemory{});
+        memoryIt = rivalAI.memoryBank.end() - 1;
+        memoryIt->opponentName = userTeam.name;
+    }
+
+    RivalMemory& memory = *memoryIt;
+    const int previousOutcome = memory.lastMatchOutcome;
+    const int newOutcome = rivalGoals > userGoals ? 1 : (rivalGoals < userGoals ? -1 : 0);
+    memory.matchesPlayed++;
+    if (newOutcome > 0) memory.wins++;
+    else if (newOutcome < 0) memory.losses++;
+    else memory.draws++;
+    memory.lastMatchOutcome = newOutcome;
+    if (newOutcome != 0 && previousOutcome == newOutcome) {
+        memory.consecutiveVsThisTeam = clampInt(memory.consecutiveVsThisTeam + 1, 1, 12);
+    } else if (newOutcome != 0) {
+        memory.consecutiveVsThisTeam = 1;
+    } else {
+        memory.consecutiveVsThisTeam = 0;
+    }
+
+    if (newOutcome >= 0) {
+        pushUniqueLimited(memory.favoredFormations, rivalTeam.formation);
+        pushUniqueLimited(memory.favoredTactics, rivalTeam.tactics);
+    }
+
+    if (rivalTeam.matchInstruction == "Juego directo") {
+        memory.commonPlayPattern = "vertical";
+    } else if (rivalTeam.matchInstruction == "Por bandas") {
+        memory.commonPlayPattern = "bandas";
+    } else if (rivalTeam.tactics == "Pressing") {
+        memory.commonPlayPattern = "presion";
+    } else {
+        memory.commonPlayPattern = "equilibrado";
+    }
+
+    if (userGoals >= 2 || (playerHome ? result.stats.homeExpectedGoals : result.stats.awayExpectedGoals) >= 1.5) {
+        pushUniqueLimited(memory.identifiedWeaknesses, "defensive_fragility");
+    }
+    if (rivalGoals >= 2 || (playerHome ? result.stats.awayExpectedGoals : result.stats.homeExpectedGoals) >= 1.5) {
+        pushUniqueLimited(memory.identifiedStrengths, "sharp_attack");
+    }
+    if ((playerHome ? result.homePossession : result.awayPossession) >= 57) {
+        pushUniqueLimited(memory.identifiedWeaknesses, "midfield_control");
+    }
+}
 
 int teamRank(const LeagueTable& table, const Team* team) {
     for (size_t i = 0; i < table.teams.size(); ++i) {
@@ -68,12 +158,19 @@ void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore) {
     unordered_map<Team*, int> homeGames;
     if (career.currentWeek >= 1 && career.currentWeek <= static_cast<int>(career.schedule.size())) {
         for (const auto& match : career.schedule[static_cast<size_t>(career.currentWeek - 1)]) {
-            homeGames[career.activeTeams[static_cast<size_t>(match.first)]]++;
+            if (Team* home = scheduledTeam(career, match.first)) {
+                homeGames[home]++;
+            }
         }
     }
 
     for (size_t i = 0; i < career.activeTeams.size(); ++i) {
         Team* team = career.activeTeams[i];
+        if (!team || i >= pointsBefore.size()) continue;
+        const FacilityLevel levels = (team == career.myTeam)
+                                         ? career.infrastructure.levels
+                                         : facilityLevelsForTeam(*team);
+        const InfrastructureModifiers infraMods = getModifiersFromFacilities(levels);
         int pointsDelta = team->points - pointsBefore[i];
         if (pointsDelta >= 3) {
             team->fanBase = clampInt(team->fanBase + 1, 10, 99);
@@ -81,13 +178,18 @@ void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore) {
             team->fanBase--;
         }
 
-        long long ticketIncome =
+        long long baseTicketIncome =
             static_cast<long long>(homeGames[team]) * (team->fanBase * 2500LL + team->stadiumLevel * 7000LL);
+        long long ticketIncome = static_cast<long long>(baseTicketIncome * infraMods.ticketRevenue);
         long long seasonTickets = (career.currentWeek % 4 == 1) ? team->fanBase * 900LL : 0LL;
         long long merchandising = static_cast<long long>(team->fanBase) * 350LL +
                                   static_cast<long long>(teamPrestigeScore(*team)) * 180LL +
                                   static_cast<long long>(max(0, team->goalsFor - team->goalsAgainst)) * 120LL;
         long long sponsorActivation = (pointsDelta >= 3 ? 3500LL : 0LL) + (team->fanBase >= 60 ? 2000LL : 0LL);
+        if (team == career.myTeam && career.boardMonthlyTarget > 0 &&
+            career.boardMonthlyProgress >= career.boardMonthlyTarget) {
+            sponsorActivation += 4500LL;
+        }
         long long sponsor = team->sponsorWeekly + max(0, pointsDelta) * 800LL + sponsorActivation;
         long long performanceBonus = pointsDelta * 4000LL;
         long long solidarity = randInt(0, 3000);
@@ -98,15 +200,23 @@ void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore) {
         team->debt -= debtPayment;
         long long debtInterest = max(0LL, team->debt / 250);
         long long infrastructure =
-            (team->trainingFacilityLevel + team->youthFacilityLevel + team->stadiumLevel - 3) * 1500LL;
+            (levels.trainingGround + levels.youthAcademy + levels.medical + levels.stadium + levels.facilities - 5) * 1250LL;
         long long net = income - wages - debtPayment - debtInterest - infrastructure;
-        team->budget = max(0LL, team->budget + net);
+        const long long budgetAfter = team->budget + net;
+        if (budgetAfter < 0) {
+            team->debt += -budgetAfter;
+            team->budget = 0;
+        } else {
+            team->budget = budgetAfter;
+        }
 
         if (career.currentWeek % 8 == 0 && pointsDelta >= 3) {
             team->sponsorWeekly += max(500LL, team->fanBase * 30LL);
         }
 
         if (career.myTeam == team) {
+            career.debtStatus = calculateDebtStatus(team->budget, team->debt, max(1LL, income));
+            applyFinancialSanctions(career.debtStatus);
             ostringstream out;
             out << "Finanzas semanales: +" << income << " (entradas " << ticketIncome << ", abonos "
                 << seasonTickets << ", merch " << merchandising << ", sponsor " << sponsor << ")"
@@ -114,8 +224,15 @@ void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore) {
                 << " / -" << debtPayment << " deuda"
                 << " / -" << debtInterest << " interes"
                 << " / -" << infrastructure << " infraestructura"
-                << " = " << net;
+                << " = " << net
+                << " | deuda " << team->debt
+                << " | severidad " << career.debtStatus.debtSeverity << "/100";
             emitUiMessage(out.str());
+            if (career.debtStatus.inDefaultRisk && career.currentWeek % 4 == 0 && team->points > 0) {
+                team->points = max(0, team->points - 1);
+                career.addNews("Sancion financiera: la crisis de deuda descuenta 1 punto a " + team->name + ".");
+                emitUiMessage("[Deuda] Riesgo de embargo: se descuenta 1 punto por incumplimiento financiero.");
+            }
         }
     }
 }
@@ -148,6 +265,11 @@ void weeklyDashboard(const Career& career) {
     if (!career.myTeam) return;
     emitUiMessage("");
     for (const string& line : formatCareerReportLines(buildWeeklyDashboardReport(career))) {
+        emitUiMessage(line);
+    }
+    emitUiMessage("");
+    emitUiMessage("--- CENTRO SEMANAL DE DECISIONES ---");
+    for (const string& line : buildWeeklyDecisionOptions(career)) {
         emitUiMessage(line);
     }
     
@@ -368,10 +490,12 @@ void simulateSeasonCupRound(Career& career) {
         TeamTableSnapshot awaySnap = captureTableState(*away);
         bool verbose = (home == career.myTeam || away == career.myTeam);
         emitUiMessage(home->name + " vs " + away->name);
-        MatchResult result = playMatch(*home, *away, verbose, true, true);
+        MatchResult result = verbose ? playMatch(&career, *home, *away, true, true, true)
+                                     : playMatch(*home, *away, false, true, true);
         restoreTableState(*home, homeSnap);
         restoreTableState(*away, awaySnap);
         storeMatchAnalysis(career, *home, *away, result, true);
+        updateRivalMemoryForUserMatch(career, *home, *away, result);
 
         Team* winner = home;
         if (result.awayGoals > result.homeGoals) {
@@ -1024,8 +1148,12 @@ void processWeekMatches(Career& career, const vector<pair<int, int>>& matches,
 
     for (const auto& match : matches) {
         maybeInvokeIdle();
-        Team* home = career.activeTeams[static_cast<size_t>(match.first)];
-        Team* away = career.activeTeams[static_cast<size_t>(match.second)];
+        Team* home = scheduledTeam(career, match.first);
+        Team* away = scheduledTeam(career, match.second);
+        if (!home || !away) {
+            emitUiMessage("[Calendario] Partido omitido por indice de equipo invalido.");
+            continue;
+        }
         const bool userControlledMatch = (home == career.myTeam || away == career.myTeam);
         const bool verbose =
             userControlledMatch && weekSimulationPresentation() == WeekSimulationPresentation::Detailed;
@@ -1048,8 +1176,20 @@ void processWeekMatches(Career& career, const vector<pair<int, int>>& matches,
         }
         if (verbose && key) emitUiMessage("[Aviso] Partido clave de la semana.");
 
-        MatchResult result = playMatch(*home, *away, verbose, key);
+        MatchResult result = userControlledMatch ? playMatch(&career, *home, *away, verbose, key)
+                                                 : playMatch(*home, *away, verbose, key);
         storeMatchAnalysis(career, *home, *away, result, false);
+        updateRivalMemoryForUserMatch(career, *home, *away, result);
+        if (userControlledMatch) {
+            if (RivalryRecord* rivalryRec = getRivalryRecord(career.rivalryDynamics, home->name, away->name)) {
+                updateRivalryRecord(*rivalryRec, result.homeGoals, result.awayGoals);
+                rivalryRec->lastMeetingWeek = career.currentWeek;
+                if (rivalryRec->intensity >= 70) {
+                    career.managerStress.pressureIntensity =
+                        min(100, career.managerStress.pressureIntensity + 3);
+                }
+            }
+        }
     }
 
     // Calculate points delta for player team
@@ -1083,6 +1223,24 @@ void updateTeamPhysicalStates(Career& career, const vector<vector<int>>& suspens
         maybeInvokeIdle();
         healInjuries(team, false);
         recoverFitness(team, 7);
+        if (career.myTeam == &team) {
+            const InfrastructureModifiers mods = getModifiersFromFacilities(career.infrastructure.levels);
+            for (auto& player : team.players) {
+                if (player.injured && mods.injuryRecoverySpeed >= 1.2f && randInt(1, 100) <= 35) {
+                    player.injuryWeeks = max(0, player.injuryWeeks - 1);
+                    if (player.injuryWeeks == 0) {
+                        player.injured = false;
+                        player.injuryType.clear();
+                    }
+                }
+                if (mods.playerHappiness > 0) {
+                    player.happiness = clampInt(player.happiness + static_cast<int>(mods.playerHappiness) / 3, 1, 99);
+                }
+            }
+            team.trainingFacilityLevel = max(team.trainingFacilityLevel, career.infrastructure.levels.trainingGround);
+            team.youthFacilityLevel = max(team.youthFacilityLevel, career.infrastructure.levels.youthAcademy);
+            team.stadiumLevel = max(team.stadiumLevel, career.infrastructure.levels.stadium);
+        }
         maybeInvokeIdle();
         const bool congestedTraining = cupWeek ? team.division == career.activeDivision 
                                                 : (career.currentWeek % 5 == 0 && team.division != career.activeDivision);
@@ -1241,19 +1399,23 @@ void simulateCareerWeek(Career& career) {
         updateCliqueDynamics(career.dressingRoomDynamics, hadWin, isKeyMatch);
         
         // Actualizar deuda
-        long long weeklyIncome = career.myTeam->budget / 10;  // Aproximación
-        updateDebtStatus(career.debtStatus, weeklyIncome);
+        career.debtStatus = calculateDebtStatus(
+            career.myTeam->budget,
+            career.myTeam->debt,
+            max(1LL, career.myTeam->sponsorWeekly + static_cast<long long>(career.myTeam->fanBase) * 2500LL));
+        applyFinancialSanctions(career.debtStatus);
         
         // Actualizar rivalidades basado en resultado contra rival
         if (!matches.empty()) {
             for (const auto& match : matches) {
-                Team* home = career.activeTeams[static_cast<size_t>(match.first)];
-                Team* away = career.activeTeams[static_cast<size_t>(match.second)];
+                Team* home = scheduledTeam(career, match.first);
+                Team* away = scheduledTeam(career, match.second);
+                if (!home || !away) continue;
                 
                 if (home == career.myTeam && away) {
                     RivalryRecord* rivalryRec = getRivalryRecord(career.rivalryDynamics, home->name, away->name);
                     if (rivalryRec) {
-                        updateRivalryRecord(*rivalryRec, home->goalsFor - home->goalsAgainst, away->goalsFor - away->goalsAgainst);
+                        rivalryRec->lastMeetingWeek = career.currentWeek;
                     }
                     // Aumentar presión mediática
                     int matchesVsThisRival = getRivalryIntensity(career.rivalryDynamics, home->name, away->name);
@@ -1263,7 +1425,7 @@ void simulateCareerWeek(Career& career) {
                 } else if (away == career.myTeam && home) {
                     RivalryRecord* rivalryRec = getRivalryRecord(career.rivalryDynamics, away->name, home->name);
                     if (rivalryRec) {
-                        updateRivalryRecord(*rivalryRec, away->goalsFor - away->goalsAgainst, home->goalsFor - home->goalsAgainst);
+                        rivalryRec->lastMeetingWeek = career.currentWeek;
                     }
                 }
             }

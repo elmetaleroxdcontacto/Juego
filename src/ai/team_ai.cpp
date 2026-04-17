@@ -1,5 +1,6 @@
 #include "ai/team_ai.h"
 
+#include "engine/team_personality.h"
 #include "simulation/match_engine_internal.h"
 #include "utils/utils.h"
 
@@ -61,6 +62,7 @@ void adjustCpuTactics(Team& team, const Team& opponent, const Team* myTeam) {
 
     ensureTeamIdentity(team);
     ensureTeamIdentity(const_cast<Team&>(opponent));
+    const TeamPersonalityProfile profile = buildTeamPersonalityProfile(team);
 
     int diff = team.getAverageSkill() - opponent.getAverageSkill();
     int avgFitness = averageAvailableFitness(team);
@@ -79,6 +81,14 @@ void adjustCpuTactics(Team& team, const Team& opponent, const Team* myTeam) {
 
     if (avgFitness < 60 || team.morale <= 35) {
         team.tactics = "Defensive";
+    } else if (profile.pressBias >= 74 && avgFitness >= 68 && unavailable <= 3) {
+        team.tactics = "Pressing";
+    } else if (profile.blockBias >= 76 && (diff <= 3 || unavailable >= 3)) {
+        team.tactics = "Defensive";
+    } else if (profile.transitionBias >= 74 && (chaseBackSpace || opponentAggressive)) {
+        team.tactics = diff >= 4 ? "Offensive" : "Counter";
+    } else if (profile.widthBias >= 74 && diff >= 2 && avgFitness >= 66) {
+        team.tactics = "Offensive";
     } else if (diff >= 7 && avgFitness >= 70) {
         team.tactics = "Offensive";
     } else if (opponentAggressive && chaseBackSpace) {
@@ -134,6 +144,29 @@ void adjustCpuTactics(Team& team, const Team& opponent, const Team* myTeam) {
     } else {
         team.matchInstruction = "Equilibrado";
     }
+
+    if (profile.pressBias >= 72 && team.tactics == "Pressing") {
+        team.pressingIntensity = max(team.pressingIntensity, 4);
+        team.defensiveLine = max(team.defensiveLine, 4);
+        if (avgFitness >= 68) team.matchInstruction = "Contra-presion";
+    }
+    if (profile.transitionBias >= 72 && team.tactics != "Defensive" && chaseBackSpace) {
+        team.matchInstruction = "Juego directo";
+        team.tempo = max(team.tempo, 4);
+    }
+    if (profile.widthBias >= 72 && team.tactics != "Defensive" && team.matchInstruction != "Juego directo") {
+        team.width = max(team.width, 4);
+        if (team.tactics != "Counter") team.matchInstruction = "Por bandas";
+    }
+    if (profile.blockBias >= 72 && team.tactics == "Defensive") {
+        team.defensiveLine = min(team.defensiveLine, 2);
+        team.markingStyle = "Zonal";
+    }
+    if (profile.controlBias >= 72 && team.tactics == "Balanced") {
+        team.tempo = clampInt(team.tempo, 2, 3);
+        team.width = clampInt(team.width, 2, 4);
+        if (team.matchInstruction == "Equilibrado") team.markingStyle = "Zonal";
+    }
 }
 
 bool applyInMatchCpuAdjustment(Team& team,
@@ -148,35 +181,63 @@ bool applyInMatchCpuAdjustment(Team& team,
     bool changed = false;
     int scoreDiff = goalsFor - goalsAgainst;
     int avgFitness = averageAvailableFitness(team);
+    const TeamPersonalityProfile profile = buildTeamPersonalityProfile(team);
     string note;
 
     if (scoreDiff <= -2 && minute >= 55) {
-        changed |= applySetting(team.tactics, "Offensive");
-        changed |= applySetting(team.matchInstruction, "Presion final");
-        changed |= applySetting(team.pressingIntensity, team.pressingIntensity + 1, 1, 5);
-        changed |= applySetting(team.defensiveLine, team.defensiveLine + 1, 1, 5);
-        changed |= applySetting(team.tempo, team.tempo + 1, 1, 5);
-        changed |= applySetting(team.width, 4, 1, 5);
-        note = team.name + " cambia a un plan de urgencia para remontar";
+        if (profile.transitionBias >= profile.pressBias && profile.transitionBias >= 72) {
+            changed |= applySetting(team.tactics, "Counter");
+            changed |= applySetting(team.matchInstruction, "Juego directo");
+            changed |= applySetting(team.tempo, team.tempo + 2, 1, 5);
+            changed |= applySetting(team.width, 4, 1, 5);
+            note = team.name + " acelera un plan vertical para remontar";
+        } else {
+            changed |= applySetting(team.tactics, profile.pressBias >= 72 ? "Pressing" : "Offensive");
+            changed |= applySetting(team.matchInstruction, "Presion final");
+            changed |= applySetting(team.pressingIntensity, team.pressingIntensity + 1, 1, 5);
+            changed |= applySetting(team.defensiveLine, team.defensiveLine + 1, 1, 5);
+            changed |= applySetting(team.tempo, team.tempo + 1, 1, 5);
+            changed |= applySetting(team.width, 4, 1, 5);
+            note = team.name + " cambia a un plan de urgencia para remontar";
+        }
     } else if (scoreDiff == -1 && minute >= 65) {
-        changed |= applySetting(team.tactics, opponent.tactics == "Defensive" ? "Offensive" : "Pressing");
-        changed |= applySetting(team.matchInstruction, opponent.defensiveLine >= 4 ? "Juego directo" : "Por bandas");
-        changed |= applySetting(team.pressingIntensity, team.pressingIntensity + 1, 1, 5);
-        changed |= applySetting(team.tempo, team.tempo + 1, 1, 5);
-        changed |= applySetting(team.defensiveLine, team.defensiveLine + 1, 1, 5);
-        note = team.name + " adelanta lineas y asume mas riesgo";
-    } else if (scoreDiff >= 1 && minute >= 75) {
+        if (profile.transitionBias >= 72 && opponent.defensiveLine >= 4) {
+            changed |= applySetting(team.tactics, "Counter");
+            changed |= applySetting(team.matchInstruction, "Juego directo");
+            changed |= applySetting(team.tempo, team.tempo + 1, 1, 5);
+            changed |= applySetting(team.width, 4, 1, 5);
+            note = team.name + " busca la espalda de la ultima linea rival";
+        } else if (profile.widthBias >= 72) {
+            changed |= applySetting(team.tactics, "Offensive");
+            changed |= applySetting(team.matchInstruction, "Por bandas");
+            changed |= applySetting(team.width, 5, 1, 5);
+            changed |= applySetting(team.tempo, team.tempo + 1, 1, 5);
+            note = team.name + " carga amplitud y centros para romper el partido";
+        } else {
+            changed |= applySetting(team.tactics, opponent.tactics == "Defensive" ? "Offensive" : "Pressing");
+            changed |= applySetting(team.matchInstruction, opponent.defensiveLine >= 4 ? "Juego directo" : "Por bandas");
+            changed |= applySetting(team.pressingIntensity, team.pressingIntensity + 1, 1, 5);
+            changed |= applySetting(team.tempo, team.tempo + 1, 1, 5);
+            changed |= applySetting(team.defensiveLine, team.defensiveLine + 1, 1, 5);
+            note = team.name + " adelanta lineas y asume mas riesgo";
+        }
+    } else if (scoreDiff >= 1 && minute >= (profile.blockBias >= 72 ? 68 : 75)) {
         changed |= applySetting(team.tactics, "Defensive");
         changed |= applySetting(team.matchInstruction, avgFitness < 60 ? "Pausar juego" : "Bloque bajo");
         changed |= applySetting(team.pressingIntensity, team.pressingIntensity - 1, 1, 5);
         changed |= applySetting(team.tempo, team.tempo - 1, 1, 5);
         changed |= applySetting(team.defensiveLine, team.defensiveLine - 1, 1, 5);
-        note = team.name + " protege la ventaja con un bloque mas conservador";
+        note = profile.blockBias >= 72
+                   ? team.name + " protege la ventaja antes de tiempo con su sello conservador"
+                   : team.name + " protege la ventaja con un bloque mas conservador";
     } else if (scoreDiff == 0 && minute >= 70 && team.getAverageSkill() >= opponent.getAverageSkill() + 4) {
-        changed |= applySetting(team.matchInstruction, "Por bandas");
+        changed |= applySetting(team.matchInstruction, profile.transitionBias >= 72 ? "Juego directo" : "Por bandas");
         changed |= applySetting(team.tempo, team.tempo + 1, 1, 5);
-        changed |= applySetting(team.width, 4, 1, 5);
-        note = team.name + " busca romper el empate con mas amplitud";
+        changed |= applySetting(team.width, profile.widthBias >= 72 ? 5 : 4, 1, 5);
+        if (profile.pressBias >= 72 && avgFitness >= 62) {
+            changed |= applySetting(team.tactics, "Pressing");
+        }
+        note = team.name + " busca romper el empate con un plan alineado a su identidad";
     }
 
     if (scoreDiff == 0 && minute >= 60 && opponentAvailablePlayers <= 10) {
@@ -249,8 +310,8 @@ bool applyInMatchCpuAdjustment(Team& team,
 
     if (minute >= 80 && scoreDiff <= -1 && avgFitness >= 58) {
         bool finalPush = false;
-        finalPush |= applySetting(team.tactics, "Offensive");
-        finalPush |= applySetting(team.matchInstruction, "Presion final");
+        finalPush |= applySetting(team.tactics, profile.transitionBias >= 74 ? "Counter" : "Offensive");
+        finalPush |= applySetting(team.matchInstruction, profile.transitionBias >= 74 ? "Juego directo" : "Presion final");
         finalPush |= applySetting(team.pressingIntensity, 5, 1, 5);
         finalPush |= applySetting(team.tempo, 5, 1, 5);
         finalPush |= applySetting(team.width, 5, 1, 5);

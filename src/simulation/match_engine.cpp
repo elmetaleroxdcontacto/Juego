@@ -258,47 +258,65 @@ MatchSimulationData simulate(const Team& home, const Team& away, const Career* c
         return simulate(home, away, keyMatch, neutralVenue);
     }
     
-    // Adjust away team tactics based on rival AI personality
+    Team homeModified = home;
     Team awayModified = away;
-    bool isAwayOpponent = (awayModified.name != career->myTeam->name && !career->myTeam->name.empty());
-    
-    if (isAwayOpponent) {
-        const auto it = career->rivalAIMap.find(awayModified.name);
+    const bool playerInHome = career->myTeam && homeModified.name == career->myTeam->name;
+    const bool playerInAway = career->myTeam && awayModified.name == career->myTeam->name;
+
+    if (playerInHome || playerInAway) {
+        Team& opponentModified = playerInHome ? awayModified : homeModified;
+        const auto it = career->rivalAIMap.find(opponentModified.name);
         if (it != career->rivalAIMap.end()) {
             const RivalAI& rivalAI = it->second;
             const string playerFormation = career->myTeam->formation.empty() ? "4-3-3" : career->myTeam->formation;
             const string playerTactics = career->myTeam->tactics.empty() ? "Balanced" : career->myTeam->tactics;
             
             // Decide rival tactics based on player's team
-            const string rivalTactics = rivalAI.decideTactics(playerFormation, playerTactics);
+            const string rivalTactics = toLower(rivalAI.decideTactics(playerFormation, playerTactics));
             
-            // Apply tempo shift based on rival tactics
-            if (rivalTactics.find("Aggressive") != string::npos) {
-                awayModified.tempo = min(5, awayModified.tempo + 1);
-                awayModified.pressingIntensity = min(5, awayModified.pressingIntensity + 1);
-            } else if (rivalTactics.find("Defensive") != string::npos) {
-                awayModified.tempo = max(1, awayModified.tempo - 1);
-                awayModified.defensiveLine = max(1, awayModified.defensiveLine - 1);
+            if (rivalTactics.find("aggressive") != string::npos) {
+                opponentModified.tactics = "Pressing";
+                opponentModified.matchInstruction = "Contra-presion";
+                opponentModified.tempo = min(5, opponentModified.tempo + 1);
+                opponentModified.pressingIntensity = min(5, opponentModified.pressingIntensity + 1);
+                opponentModified.defensiveLine = min(5, opponentModified.defensiveLine + 1);
+            } else if (rivalTactics.find("defensive") != string::npos) {
+                opponentModified.tactics = "Defensive";
+                opponentModified.matchInstruction = "Bloque bajo";
+                opponentModified.tempo = max(1, opponentModified.tempo - 1);
+                opponentModified.defensiveLine = max(1, opponentModified.defensiveLine - 1);
+            } else if (rivalTactics.find("counter") != string::npos) {
+                opponentModified.tactics = "Counter";
+                opponentModified.matchInstruction = "Juego directo";
+                opponentModified.tempo = min(5, opponentModified.tempo + 1);
+                opponentModified.defensiveLine = max(1, opponentModified.defensiveLine - 1);
+            } else if (rivalTactics.find("possession") != string::npos) {
+                opponentModified.tactics = "Balanced";
+                opponentModified.matchInstruction = "Equilibrado";
+                opponentModified.tempo = clampInt(opponentModified.tempo, 2, 3);
+                opponentModified.width = clampInt(opponentModified.width, 2, 4);
+                opponentModified.markingStyle = "Zonal";
             }
             
             // Apply unpredictability
             if (rivalAI.personality.unpredictability > 65) {
-                awayModified.width = clampInt(awayModified.width + randInt(-1, 1), 1, 5);
-                awayModified.defensiveLine = clampInt(awayModified.defensiveLine + randInt(-1, 1), 1, 5);
+                opponentModified.width = clampInt(opponentModified.width + randInt(-1, 1), 1, 5);
+                opponentModified.defensiveLine = clampInt(opponentModified.defensiveLine + randInt(-1, 1), 1, 5);
             }
         }
     }
     
-    // Adjust home team tactics if it's the player's team and we have player manager stress
-    Team homeModified = home;
-    if (homeModified.name == career->myTeam->name) {
-        // High stress manager becomes more conservative
+    // Adjust the player's team tactics if we have manager stress context
+    Team* playerTeamModified = nullptr;
+    if (career->myTeam && homeModified.name == career->myTeam->name) playerTeamModified = &homeModified;
+    else if (career->myTeam && awayModified.name == career->myTeam->name) playerTeamModified = &awayModified;
+
+    if (playerTeamModified) {
         if (career->managerStress.stressLevel > 75) {
-            homeModified.defensiveLine = max(1, homeModified.defensiveLine - 1);
-            homeModified.pressingIntensity = max(1, homeModified.pressingIntensity - 1);
+            playerTeamModified->defensiveLine = max(1, playerTeamModified->defensiveLine - 1);
+            playerTeamModified->pressingIntensity = max(1, playerTeamModified->pressingIntensity - 1);
         } else if (career->managerStress.stressLevel < 30) {
-            // Very calm manager plays more boldly
-            homeModified.pressingIntensity = min(5, homeModified.pressingIntensity + 1);
+            playerTeamModified->pressingIntensity = min(5, playerTeamModified->pressingIntensity + 1);
         }
     }
     

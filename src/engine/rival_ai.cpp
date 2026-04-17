@@ -1,13 +1,19 @@
 #include "engine/rival_ai.h"
+
+#include "engine/models.h"
+#include "engine/team_personality.h"
+#include "utils/utils.h"
+
 #include <algorithm>
-#include <sstream>
 #include <cmath>
+#include <sstream>
+
+using namespace std;
 
 RivalAI createRivalAI(const std::string& teamName, int prestigeLevel) {
     RivalAI ai;
     ai.personality.teamName = teamName;
-    
-    // Asignar estilo basado en prestigio
+
     if (prestigeLevel < 40) {
         ai.personality.playstyle = "defensive";
         ai.personality.adaptability = 40;
@@ -25,50 +31,75 @@ RivalAI createRivalAI(const std::string& teamName, int prestigeLevel) {
         ai.personality.adaptability = 75;
         ai.personality.tactical_awareness = 80;
     }
-    
-    // Impredibilidad - equipos peores cometen más errores
+
     ai.personality.unpredictability = 100 - prestigeLevel;
-    
+    return ai;
+}
+
+RivalAI createRivalAI(const Team& team) {
+    RivalAI ai;
+    ai.personality.teamName = team.name;
+    const TeamPersonalityProfile profile = buildTeamPersonalityProfile(team);
+
+    if (profile.pressBias >= std::max(profile.transitionBias, std::max(profile.blockBias, profile.controlBias))) {
+        ai.personality.playstyle = "aggressive";
+    } else if (profile.blockBias >= std::max(profile.transitionBias, profile.controlBias)) {
+        ai.personality.playstyle = "defensive";
+    } else if (profile.transitionBias >= std::max(profile.widthBias, profile.controlBias)) {
+        ai.personality.playstyle = "counter-attack";
+    } else if (profile.controlBias >= profile.widthBias) {
+        ai.personality.playstyle = "possession";
+    } else {
+        ai.personality.playstyle = "balanced";
+    }
+
+    ai.personality.adaptability = clampInt(profile.adaptability, 35, 90);
+    ai.personality.tactical_awareness =
+        clampInt(42 + team.headCoachReputation / 2 + team.performanceAnalyst / 4, 35, 92);
+    ai.personality.unpredictability =
+        clampInt(72 - team.headCoachReputation / 3 - team.performanceAnalyst / 5 +
+                     std::abs(50 - profile.riskAppetite) / 3 + std::max(0, 45 - team.jobSecurity) / 2,
+                 12, 78);
     return ai;
 }
 
 std::string RivalAI::decideTactics(const std::string& playerTeamFormation, const std::string& playerTactics) const {
-    std::string decidedTactics = personality.playstyle;
-    
-    // Buscar memorias contra este oponente
+    std::string decidedTactics = toLower(personality.playstyle.empty() ? std::string("balanced") : personality.playstyle);
+    const std::string playerTacticsLower = toLower(playerTactics);
+    const std::string playerFormationLower = toLower(playerTeamFormation);
+
     if (!memoryBank.empty()) {
-        auto lastMemory = memoryBank.back();
-        
-        // Si ganó recientemente, mantiene táctica
+        const auto lastMemory = memoryBank.back();
         if (lastMemory.lastMatchOutcome == 1 && lastMemory.consecutiveVsThisTeam > 0) {
-            return lastMemory.favoredTactics.empty() ? personality.playstyle : lastMemory.favoredTactics.front();
+            return lastMemory.favoredTactics.empty() ? decidedTactics : toLower(lastMemory.favoredTactics.front());
         }
-        
-        // Si perdió, intenta cambiar táctica (adaptación)
         if (lastMemory.lastMatchOutcome == -1 && personality.adaptability > 60) {
-            // Cambiar a táctica contraria
-            if (playerTactics == "aggressive") {
+            if (playerTacticsLower == "pressing" || playerTacticsLower == "offensive" ||
+                playerTacticsLower == "aggressive") {
                 decidedTactics = "defensive";
-            } else if (playerTactics == "defensive") {
+            } else if (playerTacticsLower == "defensive") {
                 decidedTactics = "counter-attack";
             } else {
-                decidedTactics = "attacking";
+                decidedTactics = "aggressive";
             }
         }
     }
-    
+
+    if (personality.tactical_awareness >= 72 && playerFormationLower.find("4-3-3") != std::string::npos &&
+        decidedTactics == "balanced") {
+        decidedTactics = "counter-attack";
+    }
+
     return decidedTactics;
 }
 
 std::vector<TacticalAdjustment> RivalAI::generateInMatchAdjustments(
-    int currentMinute, int myScore, int oppScore, 
+    int currentMinute, int myScore, int oppScore,
     const std::string& myTactics, const std::string& oppTactics) const {
-    
+
     std::vector<TacticalAdjustment> adjustments;
-    
-    // Lógica de reacción simple del rival
+
     if (myScore > oppScore) {
-        // Si va ganando, presiona más (si es agresivo)
         if (personality.playstyle == "aggressive") {
             TacticalAdjustment adj;
             adj.adjustmentType = "intensity_boost";
@@ -77,7 +108,6 @@ std::vector<TacticalAdjustment> RivalAI::generateInMatchAdjustments(
             adj.reactive = true;
             adjustments.push_back(adj);
         } else if (personality.playstyle == "defensive") {
-            // Si va ganando y es defensivo, se cierra más
             TacticalAdjustment adj;
             adj.adjustmentType = "defensive_focus";
             adj.intensity = 10;
@@ -86,7 +116,6 @@ std::vector<TacticalAdjustment> RivalAI::generateInMatchAdjustments(
             adjustments.push_back(adj);
         }
     } else if (oppScore > myScore && personality.adaptability > 50) {
-        // Si va perdiendo y es adaptable, intenta atacar más
         TacticalAdjustment adj;
         adj.adjustmentType = "formation_change";
         adj.intensity = 20;
@@ -94,8 +123,7 @@ std::vector<TacticalAdjustment> RivalAI::generateInMatchAdjustments(
         adj.reactive = true;
         adjustments.push_back(adj);
     }
-    
-    // Ajustes en minutos críticos (45', 80'+)
+
     if (currentMinute == 45 || currentMinute == 80) {
         if (myScore == oppScore && personality.playstyle != "balanced") {
             TacticalAdjustment adj;
@@ -106,15 +134,14 @@ std::vector<TacticalAdjustment> RivalAI::generateInMatchAdjustments(
             adjustments.push_back(adj);
         }
     }
-    
+
     return adjustments;
 }
 
 void RivalAI::analyzeOpponentPattern(const std::string& opponentTeam, int goalsScoredByOpp, int goalsConceded) {
-    // Buscar o crear memoria
     auto memIt = std::find_if(memoryBank.begin(), memoryBank.end(),
         [&opponentTeam](const RivalMemory& m) { return m.opponentName == opponentTeam; });
-    
+
     RivalMemory* memory;
     if (memIt != memoryBank.end()) {
         memory = &(*memIt);
@@ -123,39 +150,37 @@ void RivalAI::analyzeOpponentPattern(const std::string& opponentTeam, int goalsS
         memory = &memoryBank.back();
         memory->opponentName = opponentTeam;
     }
-    
+
+    const int previousOutcome = memory->lastMatchOutcome;
+    const int newOutcome = goalsScoredByOpp > goalsConceded ? 1 : (goalsScoredByOpp < goalsConceded ? -1 : 0);
     memory->matchesPlayed++;
-    if (goalsScoredByOpp > goalsConceded) {
+    if (newOutcome > 0) {
         memory->wins++;
-    } else if (goalsScoredByOpp == goalsConceded) {
+    } else if (newOutcome == 0) {
         memory->draws++;
     } else {
         memory->losses++;
     }
-    
-    // Identificar patrones
-    if (goalsScoredByOpp > 2) {
+    memory->lastMatchOutcome = newOutcome;
+    memory->consecutiveVsThisTeam =
+        (newOutcome != 0 && previousOutcome == newOutcome) ? memory->consecutiveVsThisTeam + 1 : (newOutcome == 0 ? 0 : 1);
+
+    if (goalsConceded > 2) {
         memory->identifiedWeaknesses.push_back("defensive_fragility");
     }
-    if (goalsConceded < 1) {
-        memory->identifiedStrengths.push_back("strong_defense");
+    if (goalsScoredByOpp >= 2) {
+        memory->identifiedStrengths.push_back("sharp_attack");
     }
 }
 
 int RivalAI::getErrorProbability(int minuteOfMatch) {
-    // Probabilidad base según unpredictability
     int baseErrorChance = personality.unpredictability / 2;
-    
-    // Aumenta con fatiga (minutos finales)
     if (minuteOfMatch > 75) {
         baseErrorChance += 10;
     }
-    
-    // Disminuye si está ganando
     if (minuteOfMatch < 45) {
         baseErrorChance -= 5;
     }
-    
     return std::max(0, std::min(100, baseErrorChance));
 }
 
@@ -170,6 +195,5 @@ void applyRivalAIAdjustments(std::string& rivalTactics, const std::vector<Tactic
         } else if (adj.adjustmentType == "counter_setup") {
             rivalTactics = "counter-attack";
         }
-        // formation_change se manejaría en otro lado
     }
 }

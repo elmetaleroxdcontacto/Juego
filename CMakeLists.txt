@@ -39,6 +39,7 @@ set(FM_CAREER_SOURCES
     src/career/player_development.cpp
     src/career/team_management.cpp
     src/career/week_simulation.cpp
+    src/career/weekly_focus_service.cpp
     src/career/world_state_service.cpp
     src/career/game_events_system.cpp
     src/career/gameplay_reports.cpp
@@ -70,6 +71,7 @@ set(FM_ENGINE_SOURCES
     src/engine/manager_stress.cpp
     src/engine/rival_ai.cpp
     src/engine/rivalry_system.cpp
+    src/engine/team_personality.cpp
     src/engine/facilities_system.cpp
     src/engine/debt_system.cpp
 )
@@ -183,23 +185,59 @@ if(WIN32)
     )
 endif()
 
+foreach(source_list
+        FM_CAREER_SOURCES
+        FM_AI_SOURCES
+        FM_COMPETITION_SOURCES
+        FM_ENGINE_SOURCES
+        FM_APP_SOURCES
+        FM_IO_SOURCES
+        FM_SIMULATION_SOURCES
+        FM_TRANSFER_SOURCES
+        FM_DEVELOPMENT_SOURCES
+        FM_FINANCE_SOURCES
+        FM_SUPPORT_SOURCES
+        FM_VALIDATOR_SOURCES
+        FM_CORE_SOURCES
+        FM_CONSOLE_UI_SOURCES
+        FM_CONSOLE_ENTRY_SOURCES
+        FM_GUI_SOURCES
+        FM_GUI_ENTRY_SOURCES)
+    list(REMOVE_DUPLICATES ${source_list})
+endforeach()
+
+set(FM_FOOTBALLMANAGER_SOURCES
+    ${FM_CORE_SOURCES}
+    ${FM_APP_SOURCES}
+    ${FM_GUI_ENTRY_SOURCES}
+    ${FM_CONSOLE_UI_SOURCES}
+    ${FM_VALIDATOR_SOURCES}
+    ${FM_GUI_SOURCES}
+)
+set(FM_FOOTBALLMANAGER_CLI_SOURCES
+    ${FM_CORE_SOURCES}
+    ${FM_APP_SOURCES}
+    ${FM_CONSOLE_ENTRY_SOURCES}
+    ${FM_CONSOLE_UI_SOURCES}
+    ${FM_VALIDATOR_SOURCES}
+)
+set(FM_FOOTBALLMANAGER_TEST_SOURCES
+    tests/project_tests.cpp
+    ${FM_CORE_SOURCES}
+    ${FM_VALIDATOR_SOURCES}
+    ${FM_GUI_SOURCES}
+)
+list(REMOVE_DUPLICATES FM_FOOTBALLMANAGER_SOURCES)
+list(REMOVE_DUPLICATES FM_FOOTBALLMANAGER_CLI_SOURCES)
+list(REMOVE_DUPLICATES FM_FOOTBALLMANAGER_TEST_SOURCES)
+
 if(WIN32)
     add_executable(FootballManager WIN32
-        ${FM_CORE_SOURCES}
-        ${FM_APP_SOURCES}
-        ${FM_GUI_ENTRY_SOURCES}
-        ${FM_CONSOLE_UI_SOURCES}
-        ${FM_VALIDATOR_SOURCES}
-        ${FM_GUI_SOURCES}
+        ${FM_FOOTBALLMANAGER_SOURCES}
     )
 else()
     add_executable(FootballManager
-        ${FM_CORE_SOURCES}
-        ${FM_APP_SOURCES}
-        ${FM_GUI_ENTRY_SOURCES}
-        ${FM_CONSOLE_UI_SOURCES}
-        ${FM_VALIDATOR_SOURCES}
-        ${FM_GUI_SOURCES}
+        ${FM_FOOTBALLMANAGER_SOURCES}
     )
 endif()
 
@@ -237,11 +275,7 @@ endif()
 
 if(WIN32)
     add_executable(FootballManagerCLI
-        ${FM_CORE_SOURCES}
-        ${FM_APP_SOURCES}
-        ${FM_CONSOLE_ENTRY_SOURCES}
-        ${FM_CONSOLE_UI_SOURCES}
-        ${FM_VALIDATOR_SOURCES}
+        ${FM_FOOTBALLMANAGER_CLI_SOURCES}
     )
     target_compile_definitions(FootballManagerCLI PRIVATE FM_CONSOLE_DEFAULT=1)
     fm_configure_target(FootballManagerCLI)
@@ -249,10 +283,7 @@ endif()
 
 if(BUILD_TESTING)
     add_executable(FootballManagerTests
-        tests/project_tests.cpp
-        ${FM_CORE_SOURCES}
-        ${FM_VALIDATOR_SOURCES}
-        ${FM_GUI_SOURCES}
+        ${FM_FOOTBALLMANAGER_TEST_SOURCES}
     )
     fm_configure_target(FootballManagerTests)
     add_test(NAME FootballManagerTests COMMAND FootballManagerTests)

@@ -47,6 +47,13 @@ vector<string> buildRecommendationLines(const MatchCenterSnapshot& snapshot) {
     if (!snapshot.fatigueSummary.empty()) {
         lines.push_back("Revisar carga postpartido: la lectura fisica sugiere gestionar mejor la semana.");
     }
+    if (snapshot.myGoals < snapshot.oppGoals && snapshot.oppExpectedGoalsTenths >= 14) {
+        lines.push_back("Decision semanal sugerida: Preparar rival o Defensa antes de volver a simular.");
+    } else if (snapshot.myGoals < snapshot.oppGoals && snapshot.myExpectedGoalsTenths <= 10) {
+        lines.push_back("Decision semanal sugerida: Entrenar fuerte con foco Ataque.");
+    } else if (snapshot.myGoals >= snapshot.oppGoals && snapshot.myExpectedGoalsTenths >= snapshot.oppExpectedGoalsTenths + 4) {
+        lines.push_back("Decision semanal sugerida: sostener plan y rotar cargas para proteger la ventaja.");
+    }
     if (lines.empty()) {
         lines.push_back("Partido equilibrado: el siguiente ajuste fino deberia salir de tu lectura del rival.");
     }

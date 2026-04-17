@@ -80,6 +80,17 @@ enum class NegotiationPromise {
     Prospect
 };
 
+enum class WeeklyDecision {
+    Auto,
+    Recovery,
+    HighIntensityTraining,
+    DressingRoom,
+    MatchPreparation,
+    FinancialControl,
+    YouthPathway,
+    ManagerRest
+};
+
 ServiceResult startCareerService(Career& career,
                                  const std::string& divisionId,
                                  const std::string& teamName,
@@ -133,6 +144,8 @@ ServiceResult holdTeamMeetingService(Career& career);
 ServiceResult talkToPlayerService(Career& career, const std::string& playerName);
 ServiceResult cycleTrainingFocusService(Career& career);
 ServiceResult cycleMatchInstructionService(Career& career);
+ServiceResult applyWeeklyDecisionService(Career& career, WeeklyDecision decision = WeeklyDecision::Auto);
+std::vector<std::string> buildWeeklyDecisionOptions(const Career& career);
 ServiceResult createScoutingAssignmentService(Career& career,
                                               const std::string& region = "",
                                               const std::string& focusPos = "",

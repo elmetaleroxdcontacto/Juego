@@ -8,11 +8,13 @@
 #include "career/medical_service.h"
 #include "career/staff_service.h"
 #include "career/match_center_service.h"
+#include "career/weekly_focus_service.h"
 #include "career/match_analysis_store.h"
 #include "career/career_support.h"
 #include "career/team_management.h"
 #include "career/transfer_briefing.h"
 #include "career/world_state_service.h"
+#include "engine/team_personality.h"
 #include "competition/competition.h"
 #include "development/training_impact_system.h"
 #include "finance/finance_system.h"
@@ -416,6 +418,7 @@ CareerReport buildClubReport(const Career& career) {
     addFact(report, "Proyectos juveniles", to_string(youthProjects));
     addFact(report, "Carga acumulada", to_string(avgFatigueLoad) + "/100");
     addFact(report, "Plan semanal", team.trainingFocus);
+    addFact(report, "Perfil competitivo", teamPersonalityHeadline(team));
 
     if (!leaders.empty()) {
         vector<string> leaderNames;
@@ -428,6 +431,7 @@ CareerReport buildClubReport(const Career& career) {
     addBlock(report, "Grupos sociales", dressing.groups);
     addBlock(report, "Promesas activas", activePromiseLines(career));
     addBlock(report, "Planner de plantilla", plannerLines(team));
+    addBlock(report, "Perfil del proyecto", teamPersonalitySummaryLines(team));
     addBlock(report, "Centro medico", medicalDigestLines(team));
     addBlock(report, "Acciones sugeridas", manager_advice::buildManagerActionLines(career, 5));
     addBlock(report, "Narrativa de la semana", manager_advice::buildCareerStorylines(career, 4));
@@ -595,6 +599,9 @@ CareerReport buildWeeklyDashboardReport(const Career& career) {
     if (career.humanManagerCount() > 1) {
         addFact(report, "Managers humanos", to_string(career.humanManagerCount()) + " | activo " + career.managerName);
     }
+    const weekly_focus_service::WeeklyFocusSnapshot weeklyFocus =
+        weekly_focus_service::buildWeeklyFocusSnapshot(career, 3, 4, 3);
+    addFact(report, "Cockpit", weeklyFocus.headline);
 
     addBlock(report,
              "Salud del plantel",
@@ -622,6 +629,10 @@ CareerReport buildWeeklyDashboardReport(const Career& career) {
                  {"Objetivo mensual: " + career.boardMonthlyObjective + " | " +
                       to_string(career.boardMonthlyProgress) + "/" + to_string(career.boardMonthlyTarget)});
     }
+
+    addBlock(report, "Cockpit semanal", weeklyFocus.priorityLines);
+    addBlock(report, "KPIs accionables", weeklyFocus.kpiLines);
+    addBlock(report, "Ayuda contextual", weeklyFocus.tutorialLines);
 
     if (!career.cupChampion.empty()) {
         addBlock(report, "Copa", {"Campeon actual: " + career.cupChampion});
