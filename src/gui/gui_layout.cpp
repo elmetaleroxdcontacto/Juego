@@ -1264,7 +1264,10 @@ void layoutWindow(AppState& state) {
     const int blockGap = s(20);
     const int rowTwoTop = fieldTop + fieldHeight + s(kHeaderRowGap);
     const int rowThreeTop = rowTwoTop + fieldHeight + s(kHeaderRowGap);
-    const int headerAvailableWidth = std::max(s(320), std::min(s(520), headerRightLimit - s(20)));
+    const int controlsLeft = s(20);
+    const int controlsAvailableWidth = std::max(s(320), headerRightLimit - controlsLeft);
+    const int maxControlRowWidth = header.stackedControls ? s(520) : (header.splitControls ? s(820) : s(1120));
+    const int headerAvailableWidth = std::max(s(320), std::min(maxControlRowWidth, controlsAvailableWidth));
     int managerFieldLeft = s(20);
     int managerFieldTop = fieldTop;
     int managerFieldWidth = s(240);
