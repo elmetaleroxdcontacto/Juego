@@ -272,6 +272,7 @@ CareerReport buildCompetitionReport(const Career& career) {
         }
         addBlock(report, "Proxima fecha", std::move(fixtures));
         addBlock(report, "Informe rival", {buildOpponentReport(career)});
+        addBlock(report, "Plan de partido", buildNextOpponentPlanLines(career, 5));
     }
 
     if (!career.newsFeed.empty()) {

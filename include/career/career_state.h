@@ -1,14 +1,9 @@
 #pragma once
 
+#include "engine/models.h"
+
 #include <string>
 #include <vector>
-#include <deque>
-
-struct DivisionInfo {
-    std::string id;
-    std::string folder;
-    std::string display;
-};
 
 class CareerState {
 public:
@@ -20,6 +15,8 @@ public:
     bool initialized;
 
     CareerState();
+    static CareerState fromCareer(const Career& career);
+    void captureFrom(const Career& career);
     bool usesSegundaFormat() const;
     bool usesTerceraBFormat() const;
     bool usesGroupFormat() const;

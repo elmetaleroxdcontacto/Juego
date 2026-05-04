@@ -5095,3 +5095,100 @@ Fecha: 2026-04-04
 - Extraer la resolución de ruta/formato a un servicio pequeño compartido para evitar duplicación entre UI y IO.
 - Revisar otros puntos del motor que aún dependan de wrappers o helpers globales legacy.
 - Añadir generación estable de `compile_commands.json` o mejorar la configuración del IDE para reducir falsos positivos.
+
+## 🔧 Refactor Arquitectura y Limpieza (AUTO-GENERADO)
+
+### ✔ Cambios realizados
+- `include/engine/models.h`: se agregó `using TeamId = int`, `kInvalidTeamId` y accesores seguros `getTeamById`, `getTeamIdFor`, `getTeamIdByName` y `getActiveTeamIdAt`.
+- `src/engine/career_state.cpp`: se implementaron los nuevos accesos por `TeamId` sobre `allTeams`, manteniendo compatibilidad con `Team*`.
+- `include/career/career_modules.h` y `src/career/career_modules.cpp`: se creó la capa progresiva `TeamRepository`, `SeasonManager`, `FinanceManager`, `TransferManager`, `InboxManager` y `NewsManager`.
+- `include/career/career_manager.h` y `src/career/career_manager.cpp`: `CareerManager` ahora compone los managers nuevos y expone accesores para usarlos sin acceder siempre al agregado completo.
+- `include/career/career_state.h` y `src/career/career_state.cpp`: `CareerState` quedó como snapshot liviano de `Career`, sin duplicar `DivisionInfo`.
+- `src/career/week_simulation.cpp`: la simulación semanal quedó dividida en `simulateMatchesPhase`, `updateFitnessPhase`, `processTransfersPhase`, `applyFinancesPhase`, `generateNewsPhase` y `advanceCalendarPhase`.
+- `src/career/career_service.cpp`, `src/career/game_events_system.cpp`, `src/engine/social_system.cpp`, `src/engine/rival_ai.cpp`, `src/engine/debt_system.cpp`, `src/ui/context_menu.cpp`, `src/ui/economy_fairplay.cpp` y `src/ui/keyboard_shortcuts.cpp`: se corrigieron warnings claros de variables/parámetros sin uso y una comparación signed/unsigned.
+- `CMakeLists.txt`: se agregó `career_modules.cpp`, se reordenó el grupo `FM_CAREER_SOURCES`, se comentaron módulos y se agregó `source_group` para mejorar organización en IDEs.
+- `README.md`: se documentó compilación con CMake y VS Code, ejecución de GUI/CLI/tests, estructura, estado actual y próximos pasos.
+- `.gitignore`: se agregaron `tmp_cli_input.txt` y `tmp_cli_output.txt`.
+- `tmp_cli_input.txt` y `tmp_cli_output.txt`: se eliminaron del árbol como temporales de ejecución.
+- `tests/project_tests.cpp`: se agregó el test `team_id_repository` para validar `TeamId`, `TeamRepository` y snapshot de `CareerState`.
+
+### ⚙ Cambios técnicos
+- Uso de `TeamId` como identificador seguro progresivo para equipos, con resolución centralizada en `Career` y `TeamRepository`.
+- Separación intermedia de `Career`: el estado serializado sigue en `Career`, pero la coordinación pasa por managers dedicados para temporada, finanzas, transferencias, inbox, noticias y repositorio de equipos.
+- Modularización de simulación semanal en fases con responsabilidad única: partidos, estado físico, transferencias, finanzas, noticias/sistemas y avance de calendario.
+- `scheduledTeam(...)` ahora pasa por `TeamRepository` para validar el índice de calendario contra IDs derivados de `allTeams`, reduciendo riesgo de punteros colgantes.
+- `CareerState` ahora puede capturar estado desde `Career` sin duplicar estructuras globales.
+- CMake mantiene los targets `FootballManager`, `FootballManagerCLI` y `FootballManagerTests`, con el nuevo módulo incluido en todos los builds necesarios.
+
+### ⚠ Pendiente
+- No se reemplazaron todos los `Team*` del proyecto: UI, reportes, tablas, validadores y varios servicios todavía usan punteros por compatibilidad.
+- `Career` sigue siendo el contenedor principal de persistencia; la extracción completa requeriría migrar guardado/carga y contratos entre módulos.
+- `FinanceManager` y `TransferManager` son capas iniciales; la lógica semanal pesada aún vive parcialmente en `week_simulation.cpp`.
+- `LeagueTable` todavía mantiene `std::vector<Team*>`, por lo que la migración completa a `TeamId` debe hacerse con cuidado.
+- Algunos servicios antiguos (`sub_services`, `CareerService`) conservan lógica placeholder y podrían fusionarse o reemplazarse por los managers nuevos.
+
+### 🚀 Próximos pasos sugeridos
+- Migrar `LeagueTable`, reportes y GUI hacia `TeamId` o vistas inmutables de equipo.
+- Mover `applyWeeklyFinances`, contratos/ofertas y mercado CPU desde `week_simulation.cpp` hacia `FinanceManager` y `TransferManager`.
+- Crear tests específicos para fases de simulación con fixtures pequeños y deterministas.
+- Separar persistencia de `Career` en DTOs/versionadores para que los módulos no dependan del agregado completo.
+- Revisar `sub_services` y consolidar servicios duplicados bajo una API única de carrera.
+- Añadir métricas de simulación por fase para perf/debug y para detectar regresiones de calendario, finanzas o mercado.
+
+### ✅ Validación final
+- `cmake -S . -B build-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DBUILD_TESTING=ON`
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests`
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
+
+## 🚀 Expansión de Features (AUTO-GENERADO)
+
+### ✔ Funcionalidades implementadas
+- `include/engine/models.h` y `src/engine/models.cpp`: se agregaron atributos avanzados de jugador (`personality`, `discipline`, `injuryProneness`, `adaptation`) con inicializacion, inferencia de personalidad y rasgos derivados.
+- `src/simulation/player_condition.cpp`, `src/simulation/match_tactics.cpp` y `src/simulation/morale_engine.cpp`: los nuevos atributos ahora afectan riesgo medico, recaidas, readiness, estabilidad de desarrollo, rendimiento tactico y moral colectiva.
+- `src/ai/ai_transfer_manager.cpp`, `src/transfers/negotiation_system.cpp` y `src/transfers/transfer_market.cpp`: la IA de mercado considera adaptacion, disciplina, personalidad y propension a lesiones; tambien ajusta tacticas CPU, vende por liquidez, ficha/cede, promueve juveniles y usa agentes libres si no alcanza el presupuesto.
+- `src/io/save_serialization.cpp`: se subio el formato principal a `VERSION 15`, se agrego `save_version = 1`, linea `INTEGRITY`, validacion de estructura al cargar y persistencia compatible de los atributos nuevos.
+- `include/io/io.h` y `src/io/io.cpp`: se agrego loader JSON externo tolerante a campos faltantes para `data/leagues.json`, `data/teams.json`, `data/players.json` y overlays `mods/*.json`.
+- `data/leagues.json`, `data/teams.json` y `data/players.json`: se agregaron datos JSON base de ejemplo/mod con liga experimental, equipos y jugadores con atributos avanzados.
+- `src/engine/career_state.cpp`: `initializeLeague()` ahora incorpora contenido JSON/mods y agrega divisiones externas al runtime sin romper las divisiones chilenas existentes.
+- `src/career/world_state_service.cpp`: se expandieron objetivos de carrera con categorias tipo salir campeon, clasificar a copas, evitar descenso, mejorar finanzas y vender jugadores.
+- `src/career/season_transition.cpp`: el historial global ahora agrega campeones por temporada y tabla historica del club controlado.
+- `src/transfers/transfer_market.cpp`: los fichajes IA relevantes se registran como records/hitos historicos.
+- `src/gui/gui_view_common.cpp` y `src/ui/team_ui.cpp`: las fichas GUI/CLI muestran personalidad, disciplina, adaptacion y propension a lesiones.
+- `src/validators/validators.cpp`: la auditoria valida rangos de los nuevos atributos derivados.
+- `tests/project_tests.cpp`: se agregaron tests de versionado/integridad de saves y loader JSON/mods, y se amplio el roundtrip para atributos avanzados.
+- `README.md`: se documento guardado robusto, atributos avanzados, JSON/mods y estado actualizado del proyecto.
+
+### ⚙ Cambios técnicos
+- JSON integration: `loadExternalJsonData(...)` carga ligas/equipos/jugadores desde `data/*.json` y `mods/*.json`, aplica defaults seguros, evita duplicados de jugadores generados y no falla si faltan campos opcionales.
+- Guardado/carga: los saves nuevos escriben `save_version = 1` e `INTEGRITY schema|teams|players|history|records|pending`; los saves legacy siguen cargando si no traen esas lineas.
+- Nuevos sistemas integrados: atributos avanzados impactan simulacion, moral, mercado, negociacion y evaluacion medica.
+- IA rival/CPU: decision simple de tactica segun fitness, disciplina, necesidades de plantilla y liquidez; mercado con ventas, compras, cesiones, juveniles y agentes libres.
+- Historial global: se conserva informacion de campeones, tabla historica, goleadores/records ya existentes y fichajes importantes.
+- Objetivos de carrera: se reutiliza `SquadPromise` como estructura incremental para no romper persistencia ni UI actual.
+- GUI/CLI: se mejora la ficha de plantilla sin reescribir pantallas ni cambiar el flujo principal.
+- Tests automatizados: cobertura nueva para guardado corrupto/integridad y soporte basico de mods JSON.
+
+### ⚠ Pendiente
+- La migracion completa de todos los datos oficiales a `data/teams.json`, `data/players.json` y `data/leagues.json` no se hizo; se dejo una capa externa incremental y compatible con la estructura actual `data/LigaChilena`.
+- No se creo un editor visual de mods; por ahora los mods son archivos JSON planos.
+- La IA de mercado sigue siendo heuristica simple; no usa todavia memoria profunda por club ni objetivos multi-temporada.
+- Los objetivos de carrera usan la estructura existente de promesas; un sistema dedicado de objetivos con IDs, recompensas y UI propia queda pendiente.
+- La GUI fue enriquecida con informacion nueva, pero no se rediseñaron por completo las pantallas de plantilla, calendario, mercado, finanzas o noticias.
+- El historial global guarda hitos principales, pero no tiene aun una base consultable por jugador/club con filtros avanzados.
+- La integridad de saves valida conteos y estructura; no se agrego checksum criptografico del archivo completo.
+
+### 🚀 Próximos pasos
+- Migrar gradualmente los datos oficiales de equipos/jugadores a JSON raiz o generar JSON consolidado desde la base actual.
+- Crear un `ModManager` con reporte de errores por archivo, version de mod y vista de mods activos en GUI/CLI.
+- Separar objetivos de carrera en un modulo propio con tipos, progreso, recompensas, sanciones y resumen de fin de temporada.
+- Ampliar IA CPU con presupuestos por ventana, perfiles de entrenador, renovaciones, clausulas y memoria de necesidades historicas.
+- Agregar historial consultable por club/jugador: campeonatos, ventas record, goleadores historicos, lesiones largas y mejores temporadas.
+- Incorporar checksum o hash del payload del save para detectar corrupcion silenciosa mas alla de conteos estructurales.
+- Sumar tests de simulacion estadistica para balance de goles, lesiones, economia y progresion a varias temporadas.
+
+### ✅ Validación final
+- `cmake --build build-cmake --config Release --target FootballManagerCLI FootballManagerTests` -> compilado correctamente fuera del sandbox tras bloqueo temporal de MinGW con `objects.a`.
+- `cmake --build build-cmake --config Release --target FootballManager` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.

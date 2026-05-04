@@ -165,15 +165,22 @@ long long wageDemandFor(const Player& player) {
     long long performancePremium = static_cast<long long>(player.currentForm) * 60 +
                                    static_cast<long long>(player.bigMatches) * 40 +
                                    static_cast<long long>(player.consistency) * 30;
+    performancePremium += static_cast<long long>(player.leadership) * 20;
+    performancePremium += static_cast<long long>(max(0, player.potential - player.skill)) * 55;
+    performancePremium -= static_cast<long long>(player.injuryProneness) * 18;
     return max(player.wage, static_cast<long long>(player.skill) * 170 + player.potential * 25 + performancePremium);
 }
 
 int agentDifficulty(const Player& player) {
     int difficulty = 38 + player.ambition / 2 + max(0, 60 - player.professionalism) / 2;
+    difficulty += max(0, 55 - player.discipline) / 3;
+    difficulty -= max(0, player.adaptation - 65) / 8;
     if (player.wantsToLeave) difficulty -= 6;
     if (playerHasTrait(player, "Caliente")) difficulty += 8;
     if (playerHasTrait(player, "Lider")) difficulty += 3;
     if (playerHasTrait(player, "Competidor")) difficulty += 4;
+    if (player.personality == "Temperamental") difficulty += 5;
+    if (player.personality == "Profesional") difficulty -= 3;
     return clampInt(difficulty, 20, 90);
 }
 
@@ -211,6 +218,9 @@ int projectAppealAdjustment(const Career& career, const Team& buyer, const Playe
     if (dressing.promiseRiskCount >= 2) adjustment -= 4;
     if (buyer.youthIdentity == "Cantera estructurada" && player.age <= 21) adjustment += 7;
     if (buyer.transferPolicy == "Cantera y valor futuro" && player.age <= 22) adjustment += 5;
+    if (player.adaptation >= 72) adjustment += 3;
+    if (player.personality == "Profesional") adjustment += 2;
+    if (player.personality == "Temperamental" && dressing.climate != "Fuerte") adjustment -= 4;
     if (buyer.headCoachStyle == "Intensidad" && playerHasTrait(player, "Presiona")) adjustment += 4;
     if (buyer.clubStyle == "Ataque por bandas" &&
         (normalizePosition(player.position) == "DEF" || normalizePosition(player.position) == "DEL")) {

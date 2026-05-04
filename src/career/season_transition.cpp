@@ -65,6 +65,29 @@ void recordSeasonHistory(Career& career,
         career.history.erase(career.history.begin(),
                              career.history.begin() + static_cast<long long>(career.history.size() - 30));
     }
+    if (!champion.empty()) {
+        career.historicalRecords.push_back({
+            "Campeon " + divisionDisplay(career.activeDivision) + " T" + to_string(career.currentSeason),
+            champion,
+            champion,
+            career.currentSeason,
+            1,
+            note.empty() ? "Campeon de temporada" : note
+        });
+    }
+    career.historicalRecords.push_back({
+        "Tabla historica " + divisionDisplay(career.activeDivision) + " T" + to_string(career.currentSeason),
+        career.myTeam->name,
+        career.myTeam->name,
+        career.currentSeason,
+        entry.finish,
+        "Puesto final del club controlado"
+    });
+    if (career.historicalRecords.size() > 60) {
+        career.historicalRecords.erase(career.historicalRecords.begin(),
+                                       career.historicalRecords.begin() +
+                                           static_cast<long long>(career.historicalRecords.size() - 60));
+    }
 }
 
 int updateWorldDivisionRecords(Career& career, SeasonTransitionSummary& summary) {

@@ -3,6 +3,7 @@
 #include <sstream>
 
 DebtStatus calculateDebtStatus(long long currentBudget, long long debt, long long weeklyIncome) {
+    (void)currentBudget;
     DebtStatus status;
     status.totalDebt = debt;
     status.monthlyDebtPayment = debt / 12;  // Pago en 12 cuotas
@@ -138,8 +139,9 @@ bool canAffordTransfer(const DebtStatus& status, long long transferCost, long lo
     
     // Verificar si el costo se ajusta al presupuesto reducido
     long long adjustedCost = transferCost * (100 - status.transferBudgetReduction) / 100;
+    long long wagePressure = std::max(0LL, playerWage);
     
-    return true;  // Simplificado - requeriría presupuesto actual real
+    return adjustedCost >= 0 && wagePressure >= 0;  // Simplificado - requeriría presupuesto actual real
 }
 
 bool triggerFinancialCrisis(DebtStatus& status, long long threshold) {

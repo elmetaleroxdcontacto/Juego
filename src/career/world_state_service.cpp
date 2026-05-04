@@ -216,6 +216,26 @@ string promiseLabel(const SquadPromise& promise) {
     return out.str();
 }
 
+bool isTableObjective(const string& category) {
+    return category == "Competicion" || category == "Evitar descenso" ||
+           category == "Clasificar a copas" || category == "Salir campeon";
+}
+
+long long parseMoneyTarget(const string& target, long long fallback) {
+    try {
+        return stoll(target);
+    } catch (...) {
+        return fallback;
+    }
+}
+
+string tableObjectiveCategory(int targetRank, int fieldSize) {
+    if (targetRank <= 1) return "Salir campeon";
+    if (targetRank <= max(2, fieldSize / 3)) return "Clasificar a copas";
+    if (targetRank >= max(1, fieldSize - 2)) return "Evitar descenso";
+    return "Competicion";
+}
+
 }  // namespace
 
 namespace world_state_service {
@@ -228,9 +248,11 @@ void seedSeasonPromises(Career& career) {
     const int competitionTarget =
         max(1, career.boardExpectedFinish > 0 ? career.boardExpectedFinish
                                               : max(1, career.currentCompetitiveFieldSize() / 3));
+    const int fieldSize = max(1, career.currentCompetitiveFieldSize());
+    const string competitionCategory = tableObjectiveCategory(competitionTarget, fieldSize);
     career.activePromises.push_back({
         career.myTeam->name,
-        "Competicion",
+        competitionCategory,
         to_string(competitionTarget),
         career.currentWeek,
         seasonDeadline,
@@ -263,6 +285,31 @@ void seedSeasonPromises(Career& career) {
             career.currentWeek,
             min(seasonDeadline, career.currentWeek + 8),
             0,
+            false,
+            false,
+        });
+    }
+
+    if (career.boardBudgetTarget > 0 && career.myTeam->budget < career.boardBudgetTarget) {
+        career.activePromises.push_back({
+            career.myTeam->name,
+            "Mejorar finanzas",
+            to_string(career.boardBudgetTarget),
+            career.currentWeek,
+            seasonDeadline,
+            static_cast<int>(min<long long>(career.myTeam->budget, 2000000000LL)),
+            false,
+            false,
+        });
+    } else if (career.myTeam->debt > career.myTeam->sponsorWeekly * 18) {
+        const long long target = max(50000LL, career.myTeam->budget + career.myTeam->debt / 10);
+        career.activePromises.push_back({
+            career.myTeam->name,
+            "Vender jugadores",
+            to_string(target),
+            career.currentWeek,
+            min(seasonDeadline, career.currentWeek + 10),
+            static_cast<int>(min<long long>(career.myTeam->budget, 2000000000LL)),
             false,
             false,
         });
@@ -325,7 +372,7 @@ WorldPulseSummary processWeeklyWorldState(Career& career) {
                 summary.brokenPromises++;
                 resolved = true;
             }
-        } else if (promise.category == "Competicion") {
+        } else if (isTableObjective(promise.category)) {
             int targetRank = 1;
             try {
                 targetRank = max(1, stoi(promise.target));
@@ -351,6 +398,28 @@ WorldPulseSummary processWeeklyWorldState(Career& career) {
                     pushHeadline(summary, "Directiva: aumenta la presion tras incumplir la meta de tabla.");
                     summary.brokenPromises++;
                 }
+                resolved = true;
+            }
+        } else if (promise.category == "Mejorar finanzas" || promise.category == "Vender jugadores") {
+            const long long targetMoney = parseMoneyTarget(promise.target, team.budget);
+            promise.progress = static_cast<int>(min<long long>(team.budget, 2000000000LL));
+            const bool debtUnderControl = team.debt <= max(1LL, team.sponsorWeekly * 14);
+            const bool fulfilled = team.budget >= targetMoney || debtUnderControl;
+            if (fulfilled) {
+                promise.fulfilled = true;
+                career.boardConfidence = clampInt(career.boardConfidence + 2, 0, 100);
+                team.morale = clampInt(team.morale + 1, 0, 100);
+                career.addNews("Objetivo cumplido: " + team.name + " estabiliza su hoja financiera.");
+                pushHeadline(summary, "Finanzas: el club cumple la meta economica del curso.");
+                summary.resolvedPromises++;
+                resolved = true;
+            } else if (career.currentWeek >= promise.deadlineWeek) {
+                promise.failed = true;
+                career.boardConfidence = clampInt(career.boardConfidence - 4, 0, 100);
+                team.morale = clampInt(team.morale - 2, 0, 100);
+                career.addNews("Objetivo incumplido: la situacion financiera sigue por debajo de lo esperado.");
+                pushHeadline(summary, "Finanzas: la directiva queda preocupada por la caja del club.");
+                summary.brokenPromises++;
                 resolved = true;
             }
         }
@@ -569,7 +638,7 @@ int resolveSeasonCarryover(Career& career, vector<string>* summaryLines) {
             continue;
         }
 
-        if (promise.category == "Competicion") {
+        if (isTableObjective(promise.category)) {
             int targetRank = 1;
             try {
                 targetRank = max(1, stoi(promise.target));
@@ -591,6 +660,27 @@ int resolveSeasonCarryover(Career& career, vector<string>* summaryLines) {
                 team.morale = clampInt(team.morale - 3, 0, 100);
                 career.addNews("Cierre de temporada: " + team.name + " termina el curso por debajo del objetivo comprometido.");
                 pushSeasonSummary(summaryLines, "Promesa rota: " + team.name + " no alcanza la meta de tabla al final del ano.");
+            }
+            resolved++;
+            continue;
+        }
+
+        if (promise.category == "Mejorar finanzas" || promise.category == "Vender jugadores") {
+            const long long targetMoney = parseMoneyTarget(promise.target, team.budget);
+            promise.progress = static_cast<int>(min<long long>(team.budget, 2000000000LL));
+            const bool fulfilled = team.budget >= targetMoney || team.debt <= max(1LL, team.sponsorWeekly * 14);
+            if (fulfilled) {
+                promise.fulfilled = true;
+                career.boardConfidence = clampInt(career.boardConfidence + 2, 0, 100);
+                team.morale = clampInt(team.morale + 1, 0, 100);
+                career.addNews("Cierre de temporada: el objetivo financiero queda cumplido.");
+                pushSeasonSummary(summaryLines, "Objetivo cerrado: la caja queda dentro del rango pedido.");
+            } else {
+                promise.failed = true;
+                career.boardConfidence = clampInt(career.boardConfidence - 4, 0, 100);
+                team.morale = clampInt(team.morale - 2, 0, 100);
+                career.addNews("Cierre de temporada: el objetivo financiero queda pendiente.");
+                pushSeasonSummary(summaryLines, "Objetivo roto: la meta financiera no se alcanzo.");
             }
             resolved++;
         }

@@ -8,6 +8,21 @@ CareerState::CareerState()
       saveFile(""),
       initialized(false) {}
 
+CareerState CareerState::fromCareer(const Career& career) {
+    CareerState state;
+    state.captureFrom(career);
+    return state;
+}
+
+void CareerState::captureFrom(const Career& career) {
+    currentSeason = career.currentSeason;
+    currentWeek = career.currentWeek;
+    activeDivision = career.activeDivision;
+    saveFile = career.saveFile;
+    divisions = career.divisions;
+    initialized = career.initialized;
+}
+
 bool CareerState::usesSegundaFormat() const {
     const CompetitionConfig& config = getCompetitionConfig(activeDivision);
     // Note: This method now assumes team count is not available here; may need adjustment

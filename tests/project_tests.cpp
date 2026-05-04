@@ -3,8 +3,10 @@
 #include "ai/team_ai.h"
 #include "career/analytics_service.h"
 #include "career/app_services.h"
+#include "career/career_modules.h"
 #include "career/career_reports.h"
 #include "career/career_runtime.h"
+#include "career/career_state.h"
 #include "career/inbox_service.h"
 #include "career/manager_advice.h"
 #include "career/transfer_briefing.h"
@@ -434,6 +436,38 @@ void testCompetitionGroupTableScopesActiveGroup() {
     const LeagueTable relevant = buildRelevantCompetitionTable(career);
     expect(relevant.teams.size() == 7 && relevant.teams[0]->name == "Norte Azul",
            "La tabla relevante debe quedarse con el grupo del club usuario.");
+}
+
+void testTeamRepositoryResolvesStableIds() {
+    Career career;
+    career.allTeams.clear();
+    career.activeTeams.clear();
+
+    career.allTeams.emplace_back("Repo Norte");
+    career.allTeams.back().division = "primera division";
+    career.allTeams.emplace_back("Repo Sur");
+    career.allTeams.back().division = "primera division";
+    career.activeTeams.push_back(&career.allTeams[0]);
+    career.activeTeams.push_back(&career.allTeams[1]);
+    career.myTeam = &career.allTeams[1];
+    career.activeDivision = "primera division";
+    career.currentSeason = 2;
+    career.currentWeek = 7;
+
+    TeamRepository repository(career);
+    const TeamId firstId = repository.getTeamIdByName("Repo Norte");
+    const TeamId managedId = repository.getTeamIdFor(career.myTeam);
+
+    expect(firstId != kInvalidTeamId, "TeamRepository debe resolver IDs por nombre.");
+    expect(repository.getTeamById(firstId) == &career.allTeams[0], "TeamId debe apuntar al equipo correcto.");
+    expect(repository.getActiveTeamByScheduleIndex(1) == career.myTeam,
+           "El acceso por indice de calendario debe validar y devolver el equipo activo.");
+    expect(managedId == career.getActiveTeamIdAt(1), "Career debe exponer IDs seguros para equipos activos.");
+
+    CareerState snapshot = CareerState::fromCareer(career);
+    expect(snapshot.currentSeason == 2 && snapshot.currentWeek == 7,
+           "CareerState debe capturar temporada y semana desde Career.");
+    expect(snapshot.activeDivision == "primera division", "CareerState debe capturar la division activa.");
 }
 
 void testTransferEvaluationPenalizesUnaffordableDeals() {
@@ -1008,6 +1042,10 @@ void testSaveLoadRoundTripPreservesCareerState() {
     original.myTeam->players[0].socialGroup = "Lideres";
     original.myTeam->players[0].roleDuty = "Ataque";
     original.myTeam->players[0].individualInstruction = "Marcar fuerte";
+    original.myTeam->players[0].personality = "Adaptable";
+    original.myTeam->players[0].discipline = 81;
+    original.myTeam->players[0].injuryProneness = 22;
+    original.myTeam->players[0].adaptation = 77;
     original.myTeam->headCoachName = "DT Persistente";
     original.myTeam->headCoachStyle = "Presion";
     original.myTeam->headCoachTenureWeeks = 28;
@@ -1061,6 +1099,11 @@ void testSaveLoadRoundTripPreservesCareerState() {
                loaded.myTeam->players[0].roleDuty == "Ataque" &&
                loaded.myTeam->players[0].individualInstruction == "Marcar fuerte",
            "La carga debe preservar momento, carga, duty, instruccion y promesa de posicion del jugador.");
+    expect(loaded.myTeam->players[0].personality == "Adaptable" &&
+               loaded.myTeam->players[0].discipline == 81 &&
+               loaded.myTeam->players[0].injuryProneness == 22 &&
+               loaded.myTeam->players[0].adaptation == 77,
+           "La carga debe preservar atributos avanzados del jugador.");
     expect(loaded.myTeam->headCoachName == "DT Persistente" &&
                loaded.myTeam->transferPolicy == "Cantera y valor futuro" &&
                loaded.myTeam->scoutingRegions.size() == 3 &&
@@ -1099,6 +1142,88 @@ void testSaveLoadRoundTripPreservesCareerState() {
            "La carga debe preservar la memoria y configuracion de la IA rival.");
 
     std::remove(savePath.c_str());
+}
+
+void testSaveSchemaAndIntegrityRejectCorruptPayload() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 4;
+    career.allTeams.push_back(makeTeam("Schema FC", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
+    career.allTeams.push_back(makeTeam("Schema Rival", "primera division", 67, 3, 3, "Balanced", "Equilibrado", 620000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Schema FC");
+    expect(career.myTeam != nullptr, "La prueba de integridad necesita club usuario.");
+
+    ostringstream encoded;
+    expect(save_serialization::serializeCareer(encoded, career),
+           "La carrera debe serializarse para validar versionado e integridad.");
+    const string saveText = encoded.str();
+    expect(saveText.find("save_version = 1") != string::npos,
+           "El save debe declarar save_version = 1 para compatibilidad futura.");
+    expect(saveText.find("INTEGRITY ") != string::npos,
+           "El save debe incluir una linea de integridad.");
+
+    string corrupt = saveText;
+    const size_t marker = corrupt.find("INTEGRITY 1|2|");
+    expect(marker != string::npos, "El fixture debe contener un snapshot de integridad esperado.");
+    corrupt.replace(marker, string("INTEGRITY 1|2|").size(), "INTEGRITY 1|3|");
+
+    istringstream input(corrupt);
+    Career loaded;
+    expect(!save_serialization::deserializeCareer(input, loaded),
+           "La carga debe rechazar un save cuya integridad declarada no coincide con el contenido.");
+}
+
+void testExternalJsonLoaderAddsModLeagueAndAdvancedPlayers() {
+    expect(ensureDirectory("mods"), "La prueba de mods necesita crear la carpeta mods.");
+    const string leaguesPath = "mods/leagues.json";
+    const string teamsPath = "mods/teams.json";
+    const string playersPath = "mods/players.json";
+    std::remove(leaguesPath.c_str());
+    std::remove(teamsPath.c_str());
+    std::remove(playersPath.c_str());
+
+    {
+        ofstream leagues(leaguesPath);
+        expect(leagues.is_open(), "No se pudo crear mods/leagues.json.");
+        leagues << "[{\"id\":\"liga mod test\",\"display\":\"Liga Mod Test\",\"folder\":\"mods\"}]\n";
+    }
+    {
+        ofstream teams(teamsPath);
+        expect(teams.is_open(), "No se pudo crear mods/teams.json.");
+        teams << "[{\"name\":\"Mod Probador\",\"division\":\"liga mod test\",\"budget\":310000,\"tactics\":\"Pressing\"}]\n";
+    }
+    {
+        ofstream players(playersPath);
+        expect(players.is_open(), "No se pudo crear mods/players.json.");
+        players << "[{\"team\":\"Mod Probador\",\"name\":\"Canterano JSON\",\"position\":\"MED\",\"age\":18,"
+                   "\"market_value\":150000,\"potential\":82,\"personality\":\"Adaptable\","
+                   "\"discipline\":74,\"injury_proneness\":16,\"adaptation\":86,\"current_form\":63}]\n";
+    }
+
+    deque<Team> teams;
+    ExternalJsonLoadResult result = loadExternalJsonData(teams);
+    Team* modTeam = nullptr;
+    for (auto& team : teams) {
+        if (team.name == "Mod Probador") modTeam = &team;
+    }
+    expect(modTeam != nullptr, "El loader JSON debe agregar equipos desde mods/teams.json.");
+    expect(any_of(result.divisions.begin(), result.divisions.end(), [](const DivisionInfo& division) {
+               return division.id == "liga mod test";
+           }),
+           "El loader JSON debe exponer ligas nuevas desde mods/leagues.json.");
+    const Player* prospect = nullptr;
+    for (const auto& player : modTeam->players) {
+        if (player.name == "Canterano JSON") prospect = &player;
+    }
+    expect(prospect != nullptr, "El loader JSON debe agregar jugadores desde mods/players.json.");
+    expect(prospect->potential >= 82 && prospect->personality == "Adaptable" &&
+               prospect->discipline == 74 && prospect->injuryProneness == 16 && prospect->adaptation == 86,
+           "El loader JSON debe respetar atributos avanzados y tolerar campos faltantes.");
+
+    std::remove(leaguesPath.c_str());
+    std::remove(teamsPath.c_str());
+    std::remove(playersPath.c_str());
 }
 
 void testLoadTeamFromDirectoryFallsBackAndResolvesRawPositions() {
@@ -1715,6 +1840,55 @@ void testTransferBriefingBuildsActionableMarketView() {
            "Las oportunidades resumidas deben incluir el paquete economico recomendado.");
 }
 
+void testTransferWindowBlocksImmediateDeals() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 8;
+    career.managerReputation = 72;
+
+    career.allTeams.push_back(makeTeam("Ventana Local", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 950000));
+    career.allTeams.push_back(makeTeam("Ventana Norte", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 850000));
+    career.setActiveDivision("primera division");
+    career.schedule.assign(20, vector<pair<int, int>>{{0, 1}});
+    career.myTeam = career.findTeamByName("Ventana Local");
+    expect(career.myTeam != nullptr, "La prueba de ventana necesita club usuario.");
+
+    expect(!transfer_market::isTransferWindowOpen(career),
+           "La semana 8 debe quedar fuera de la ventana inicial y media.");
+    const string label = transfer_market::transferWindowLabel(career);
+    expect(label.find("Mercado cerrado") != string::npos,
+           "La etiqueta de mercado debe declarar cierre de ventana.");
+
+    ServiceResult buyResult =
+        buyTransferTargetService(career, "Ventana Norte", "Ventana Norte_P1", NegotiationProfile::Balanced);
+    expect(!buyResult.ok, "El servicio debe bloquear fichajes inmediatos fuera de ventana.");
+    expect(joinLines(buyResult.messages).find("Mercado cerrado") != string::npos,
+           "El bloqueo debe explicar que el mercado esta cerrado.");
+
+    career.currentWeek = 10;
+    expect(transfer_market::isTransferWindowOpen(career),
+           "La semana media debe abrir una segunda ventana de mercado.");
+}
+
+void testMarketPulseReflectsClosedWindow() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 8;
+    career.allTeams.push_back(makeTeam("Pulso Cerrado", "primera division", 69, 3, 3, "Balanced", "Equilibrado", 650000));
+    career.allTeams.push_back(makeTeam("Pulso Rival", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 650000));
+    career.setActiveDivision("primera division");
+    career.schedule.assign(20, vector<pair<int, int>>{{0, 1}});
+    career.myTeam = career.findTeamByName("Pulso Cerrado");
+    expect(career.myTeam != nullptr, "La prueba de pulso de mercado necesita club usuario.");
+
+    const auto pulse = transfer_briefing::buildMarketPulseLines(career, 5);
+    const string text = joinLines(pulse);
+    expect(text.find("Mercado cerrado") != string::npos,
+           "El pulso de mercado debe avisar cuando la ventana esta cerrada.");
+    expect(text.find("shortlist") != string::npos || text.find("precontratos") != string::npos,
+           "El pulso cerrado debe orientar hacia preparacion y no cierre inmediato.");
+}
+
 void testLateDeficitRaisesUrgencyInMatchPhase() {
     Team home = makeTeam("Urgencia Local", "primera division", 71, 3, 3, "Balanced", "Equilibrado", 780000);
     Team away = makeTeam("Urgencia Visitante", "primera division", 71, 3, 3, "Balanced", "Equilibrado", 780000);
@@ -1940,6 +2114,30 @@ void testOpponentReportIncludesCompetitivePersonality() {
            "El informe rival debe exponer la personalidad del entrenador.");
     expect(report.find("mercado Competir por titulares hechos") != string::npos,
            "El informe rival debe traducir la politica de mercado a una lectura usable.");
+}
+
+void testNextOpponentPlanBuildsActionableLines() {
+    Career career;
+    career.allTeams.push_back(makeTeam("Plan Local", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 820000));
+    career.allTeams.push_back(makeTeam("Plan Rival", "primera division", 72, 5, 4, "Pressing", "Contra-presion", 840000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Plan Local");
+    Team* rival = career.findTeamByName("Plan Rival");
+    expect(career.myTeam != nullptr && rival != nullptr, "La prueba de plan rival necesita dos clubes.");
+
+    rival->defensiveLine = 5;
+    rival->width = 4;
+    rival->morale = 74;
+    career.schedule = {{{0, 1}}};
+    career.currentWeek = 1;
+
+    const vector<string> plan = buildNextOpponentPlanLines(career, 5);
+    const string text = joinLines(plan);
+    expect(plan.size() >= 4, "El plan rival debe entregar varias lineas accionables.");
+    expect(text.find("Plan Rival") != string::npos, "El plan rival debe nombrar al oponente.");
+    expect(text.find("Amenaza") != string::npos, "El plan rival debe exponer la amenaza principal.");
+    expect(text.find("Vulnerabilidad") != string::npos, "El plan rival debe sugerir donde atacar.");
+    expect(text.find("Plan sugerido") != string::npos, "El plan rival debe recomendar una instruccion o microciclo.");
 }
 
 void testMonthlyDevelopmentCycleImprovesStableProspects() {
@@ -2567,6 +2765,7 @@ int main() {
         {"runtime_load_validation", testRuntimeValidationFlagsBrokenLoadedSquad},
         {"startup_data_validation", testStartupValidationSummaryExposesExternalAudit},
         {"competition_group_table", testCompetitionGroupTableScopesActiveGroup},
+        {"team_id_repository", testTeamRepositoryResolvesStableIds},
         {"game_settings_cycle", testGameSettingsCycleAndDifficultyImpact},
         {"game_settings_persistence", testGameSettingsPersistenceAndFrontendScope},
         {"transfer_affordability", testTransferEvaluationPenalizesUnaffordableDeals},
@@ -2602,6 +2801,8 @@ int main() {
         {"manager_hub_digest", testManagerHubDigestCombinesStaffAndAgenda},
         {"manager_advice", testManagerAdviceHighlightsUrgentActions},
         {"transfer_briefing", testTransferBriefingBuildsActionableMarketView},
+        {"transfer_window_rules", testTransferWindowBlocksImmediateDeals},
+        {"market_pulse_window", testMarketPulseReflectsClosedWindow},
         {"career_runtime_scope", testCareerRuntimeScopeRestoresContext},
         {"human_manager_persistence", testHumanManagerProfilesPersistAcrossSaveSerialization},
         {"weekly_dashboard_report", testWeeklyDashboardReportHighlightsHumanManagersAndAgenda},
@@ -2612,6 +2813,7 @@ int main() {
         {"personality_cpu_tactics", testTeamPersonalityProfileShapesCpuTactics},
         {"personality_transfer_eval", testTransferEvaluationReflectsClubPersonality},
         {"opponent_personality_report", testOpponentReportIncludesCompetitivePersonality},
+        {"next_opponent_plan", testNextOpponentPlanBuildsActionableLines},
         {"late_match_urgency", testLateDeficitRaisesUrgencyInMatchPhase},
         {"instruction_chance_profiles", testMatchInstructionsShapeChanceProfiles},
         {"injury_replacement", testMatchInjuryTriggersRealReplacement},
@@ -2627,6 +2829,8 @@ int main() {
         {"project_root_paths", testProjectPathsResolveFromNestedWorkingDirectory},
         {"simulate_match_state", testSimulateMatchAppliesPostProcessState},
         {"save_load_roundtrip", testSaveLoadRoundTripPreservesCareerState},
+        {"save_schema_integrity", testSaveSchemaAndIntegrityRejectCorruptPayload},
+        {"external_json_mod_loader", testExternalJsonLoaderAddsModLeagueAndAdvancedPlayers},
         {"legacy_division_ids", testLegacyDivisionIdentifiersCanonicalizeOnLoad},
         {"loader_fallback", testLoadTeamFromDirectoryFallsBackAndResolvesRawPositions},
 #ifdef _WIN32

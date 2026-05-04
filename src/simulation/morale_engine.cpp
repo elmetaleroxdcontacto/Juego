@@ -19,8 +19,11 @@ double collectiveMoraleFactor(const Team& team, const vector<int>& xi, bool keyM
         if (idx < 0 || idx >= static_cast<int>(team.players.size())) continue;
         const Player& player = team.players[idx];
         total += player.happiness + player.currentForm / 2 + player.chemistry / 2;
+        total += player.leadership / 8 + player.discipline / 10 + player.adaptation / 12;
         total += player.moraleMomentum / 2;
         if (playerHasTrait(player, "Lider")) total += 6;
+        if (player.personality == "Temperamental" && player.happiness < 48) total -= 5;
+        if (player.personality == "Profesional" && player.currentForm < 45) total += 2;
         if (playerHasTrait(player, "Cita grande") && keyMatch) total += 8;
         if (playerHasTrait(player, "Caliente") && keyMatch) total -= 3;
         if (player.wantsToLeave) wantsOut++;

@@ -13,6 +13,7 @@ int ContextMenuSystem::g_rightClickX = 0;
 int ContextMenuSystem::g_rightClickY = 0;
 
 void ContextMenuSystem::showPlayerMenu(AppState& state, Team& team, int playerIndex) {
+    (void)state;
     if (playerIndex < 0 || playerIndex >= static_cast<int>(team.players.size())) {
         return;
     }
@@ -33,12 +34,15 @@ bool ContextMenuSystem::isMenuOpen() {
 }
 
 void ContextMenuSystem::onSellClick(AppState& state, Player& player, Team& team) {
+    (void)state;
+    (void)team;
     // Trigger transfer market logic for selling this player
     player.wantsToLeave = true;
     g_menuOpen = false;
 }
 
 void ContextMenuSystem::onRenewClick(AppState& state, Player& player) {
+    (void)state;
     // Extend player contract
     if (player.contractWeeks > 0) {
         player.contractWeeks = std::max(player.contractWeeks, 52);  // At least 1 more year
@@ -47,6 +51,7 @@ void ContextMenuSystem::onRenewClick(AppState& state, Player& player) {
 }
 
 void ContextMenuSystem::onTrainClick(AppState& state, Player& player) {
+    (void)state;
     // Improve player skill through training focus
     player.skill = std::min(99, player.skill + 1);
     player.leadership = std::min(99, player.leadership + 1);
@@ -54,6 +59,7 @@ void ContextMenuSystem::onTrainClick(AppState& state, Player& player) {
 }
 
 void ContextMenuSystem::onRestClick(AppState& state, Player& player) {
+    (void)state;
     // Give player rest to recover physical condition
     player.fitness = std::min(100, player.fitness + 10);
     player.fatigueLoad = std::max(0, player.fatigueLoad - 5);
@@ -61,6 +67,7 @@ void ContextMenuSystem::onRestClick(AppState& state, Player& player) {
 }
 
 void ContextMenuSystem::onCaptainClick(AppState& state, Team& team, int playerIndex) {
+    (void)state;
     // Toggle captain status
     if (playerIndex >= 0 && playerIndex < static_cast<int>(team.players.size())) {
         Player& player = team.players[static_cast<size_t>(playerIndex)];

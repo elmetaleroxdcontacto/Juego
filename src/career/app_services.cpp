@@ -16,6 +16,7 @@
 #include "development/training_impact_system.h"
 #include "simulation/player_condition.h"
 #include "transfers/negotiation_system.h"
+#include "transfers/transfer_market.h"
 #include "engine/social_system.h"
 #include "engine/rival_ai.h"
 #include "engine/rivalry_system.h"
@@ -380,6 +381,16 @@ ServiceResult failureFromNegotiation(const NegotiationState& state, const string
     result.ok = false;
     result.messages.push_back(state.status.empty() ? fallback : state.status);
     result.messages.insert(result.messages.end(), state.roundSummaries.begin(), state.roundSummaries.end());
+    return result;
+}
+
+ServiceResult transferWindowClosedFailure(const Career& career, const string& operation) {
+    ServiceResult result;
+    result.ok = false;
+    result.messages.push_back("Mercado cerrado: no puedes cerrar " + operation + " en la semana " +
+                              to_string(career.currentWeek) + ".");
+    result.messages.push_back(transfer_market::transferWindowLabel(career));
+    result.messages.push_back("Puedes avanzar scouting, renovar contratos o firmar precontratos elegibles.");
     return result;
 }
 
@@ -864,6 +875,9 @@ ServiceResult buyTransferTargetService(Career& career,
                                        NegotiationProfile profile,
                                        NegotiationPromise promise) {
     if (!career.myTeam) return failure("No hay una carrera activa.");
+    if (!transfer_market::isTransferWindowOpen(career)) {
+        return transferWindowClosedFailure(career, "fichajes inmediatos");
+    }
     Team* seller = career.findTeamByName(sellerTeamName);
     if (!seller || seller == career.myTeam) return failure("No se encontro el club vendedor.");
     int sellerIdx = team_mgmt::playerIndexByName(*seller, playerName);
@@ -930,6 +944,9 @@ ServiceResult triggerReleaseClauseService(Career& career,
                                           NegotiationProfile profile,
                                           NegotiationPromise promise) {
     if (!career.myTeam) return failure("No hay una carrera activa.");
+    if (!transfer_market::isTransferWindowOpen(career)) {
+        return transferWindowClosedFailure(career, "clausulas de salida");
+    }
     Team* seller = career.findTeamByName(sellerTeamName);
     if (!seller || seller == career.myTeam) return failure("No se encontro el club vendedor.");
     int sellerIdx = team_mgmt::playerIndexByName(*seller, playerName);
@@ -1101,6 +1118,9 @@ ServiceResult renewPlayerContractService(Career& career,
 
 ServiceResult sellPlayerService(Career& career, const string& playerName) {
     if (!career.myTeam) return failure("No hay una carrera activa.");
+    if (!transfer_market::isTransferWindowOpen(career)) {
+        return transferWindowClosedFailure(career, "ventas inmediatas");
+    }
     Team& team = *career.myTeam;
     ensureTeamIdentity(team);
     if (team.players.size() <= 18) return failure("Debes mantener al menos 18 jugadores en plantel.");
@@ -1126,6 +1146,9 @@ ServiceResult loanInPlayerService(Career& career,
                                   const string& playerName,
                                   int loanWeeks) {
     if (!career.myTeam) return failure("No hay una carrera activa.");
+    if (!transfer_market::isTransferWindowOpen(career)) {
+        return transferWindowClosedFailure(career, "prestamos entrantes");
+    }
     Team* seller = career.findTeamByName(sellerTeamName);
     if (!seller || seller == career.myTeam) return failure("No se encontro el club de origen.");
     int sellerIdx = team_mgmt::playerIndexByName(*seller, playerName);
@@ -1170,6 +1193,9 @@ ServiceResult loanOutPlayerService(Career& career,
                                    const string& destinationTeamName,
                                    int loanWeeks) {
     if (!career.myTeam) return failure("No hay una carrera activa.");
+    if (!transfer_market::isTransferWindowOpen(career)) {
+        return transferWindowClosedFailure(career, "prestamos salientes");
+    }
     Team* receiver = career.findTeamByName(destinationTeamName);
     if (!receiver || receiver == career.myTeam) return failure("No se encontro el club destino.");
     Team& team = *career.myTeam;

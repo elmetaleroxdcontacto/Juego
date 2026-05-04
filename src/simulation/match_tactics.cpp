@@ -139,6 +139,13 @@ void applyPlayerStateModifier(const Player& p, const Team& team, int& attack, in
     defense += p.moraleMomentum / 5;
     attack -= p.fatigueLoad / 12;
     defense -= p.fatigueLoad / 14;
+    attack += max(0, p.adaptation - 70) / 12;
+    defense += max(0, p.discipline - 68) / 12;
+    if (p.discipline <= 38) defense -= 1;
+    if (p.injuryProneness >= 72 && p.fitness <= 70) {
+        attack -= 1;
+        defense -= 1;
+    }
     if (p.preferredFoot == "Ambos") {
         if (normalizePosition(p.position) == "MED" || normalizePosition(p.position) == "DEL") attack += 2;
         else defense += 1;

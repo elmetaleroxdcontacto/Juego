@@ -127,6 +127,7 @@ void displayNewsFeed(Career& career) {
     }
 
     printSection("Cockpit semanal", weeklyFocus.priorityLines);
+    printSection("Plan de proximo rival", buildNextOpponentPlanLines(career, 5));
     printSection("Decisiones semanales", buildWeeklyDecisionOptions(career));
     printSection("KPIs accionables", weeklyFocus.kpiLines);
     printSection("Acciones sugeridas", manager_advice::buildManagerActionLines(career, 4));

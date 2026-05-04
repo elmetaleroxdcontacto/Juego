@@ -2,6 +2,7 @@
 
 #include "engine/models.h"
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -16,3 +17,4 @@ int averageFitnessForLine(const Team& team, const std::string& line);
 int lineThreatScore(const Team& team, const std::string& line);
 std::string lineMap(const Team& team);
 std::string buildOpponentReport(const Career& career);
+std::vector<std::string> buildNextOpponentPlanLines(const Career& career, std::size_t limit = 5);

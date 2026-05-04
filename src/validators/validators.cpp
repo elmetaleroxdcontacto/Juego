@@ -1058,6 +1058,9 @@ DataValidationReport buildRosterDataValidationReport() {
             checkRange(player.bigMatches, "Partidos grandes", 1, 100);
             checkRange(player.currentForm, "Forma actual", 1, 100);
             checkRange(player.tacticalDiscipline, "Disciplina tactica", 1, 100);
+            checkRange(player.discipline, "Disciplina", 1, 100);
+            checkRange(player.injuryProneness, "Propension a lesiones", 1, 100);
+            checkRange(player.adaptation, "Adaptacion", 1, 100);
             checkRange(player.versatility, "Versatilidad", 1, 100);
             checkRange(player.moraleMomentum, "Impulso moral", -25, 25);
             checkRange(player.fatigueLoad, "Carga de fatiga", 0, 100);

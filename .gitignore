@@ -23,6 +23,8 @@ saves/*
 !saves/.gitkeep
 career_save.txt
 validation_career_save.txt
+tmp_cli_input.txt
+tmp_cli_output.txt
 
 # IDE files
 .vscode/

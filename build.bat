@@ -11,13 +11,14 @@ set "BUILD_DIR=%ROOT_DIR%\build"
 set "CMAKE_BUILD_DIR=%ROOT_DIR%\build-cmake"
 set "SRC_DIR=%ROOT_DIR%\src"
 set "CXX=g++"
-set "FALLBACK_CXXFLAGS=-std=c++17 -static -I\"%ROOT_DIR%\include\" -I\"%ROOT_DIR%\src\""
+set "FALLBACK_CXXFLAGS=-std=c++17 -static -I"%ROOT_DIR%\include" -I"%ROOT_DIR%\src""
 
 set "CMAKE_TARGETS=FootballManager"
 set "PRIMARY_TARGET=FootballManager"
 set "RUN_MODE=gui"
 set "RUN_VALIDATE=0"
 set "RUN_TESTS=0"
+set "RUN_VERIFY=0"
 set "CMAKE_BUILD_TESTING=OFF"
 set "BUILD_ROUTE=Sin definir"
 set "FORWARD_ARGS="
@@ -27,6 +28,7 @@ set "CMAKE_GUI_OUTPUT=%CMAKE_BIN_DIR%\FootballManager.exe"
 set "CMAKE_CLI_OUTPUT=%CMAKE_BIN_DIR%\FootballManagerCLI.exe"
 set "CMAKE_TEST_OUTPUT=%CMAKE_BIN_DIR%\FootballManagerTests.exe"
 set "TEST_OUTPUT=%CMAKE_TEST_OUTPUT%"
+set "LINK_RSP=%BUILD_DIR%\objects.rsp"
 set "ROOT_GUI_OUTPUT=%ROOT_DIR%\FootballManager.exe"
 set "ROOT_CLI_OUTPUT=%ROOT_DIR%\FootballManagerCLI.exe"
 set "ROOT_TEST_OUTPUT=%ROOT_DIR%\FootballManagerTests.exe"
@@ -65,6 +67,14 @@ if /i "%~1"=="--help" (
     set "PRIMARY_TARGET=FootballManager"
     set "RUN_MODE=gui"
     set "RUN_TESTS=1"
+    set "CMAKE_BUILD_TESTING=ON"
+) else if /i "%~1"=="--verify" (
+    set "CMAKE_TARGETS=FootballManager FootballManagerCLI FootballManagerTests"
+    set "PRIMARY_TARGET=FootballManager"
+    set "RUN_MODE=verify"
+    set "RUN_TESTS=1"
+    set "RUN_VALIDATE=1"
+    set "RUN_VERIFY=1"
     set "CMAKE_BUILD_TESTING=ON"
 ) else if /i "%~1"=="--run-tests" (
     set "RUN_TESTS=1"
@@ -124,6 +134,7 @@ echo CMake no esta disponible o no pudo completarse. Se usa fallback directo con
 if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"
 
 del /q "%BUILD_DIR%\*.o" 2>nul
+del /q "%LINK_RSP%" 2>nul
 set "OBJECTS="
 
 for /R "%SRC_DIR%" %%F in (*.cpp) do (
@@ -138,18 +149,24 @@ for /R "%SRC_DIR%" %%F in (*.cpp) do (
         set "OBJ_NAME=!OBJ_NAME:\=_!"
         set "OBJ_NAME=!OBJ_NAME:/=_!"
         set "OBJ_NAME=!OBJ_NAME::=_!"
+        set "OBJ_PATH=%BUILD_DIR%\!OBJ_NAME!.o"
         echo Compilando %%~nxF...
-        %CXX% -c "%%~fF" -o "%BUILD_DIR%\!OBJ_NAME!.o" %FALLBACK_CXXFLAGS%
+        %CXX% -c "%%~fF" -o "!OBJ_PATH!" %FALLBACK_CXXFLAGS%
         if errorlevel 1 goto :compile_error
-        set "OBJECTS=!OBJECTS! "%BUILD_DIR%\!OBJ_NAME!.o""
+        set "OBJ_RSP=!OBJ_PATH:\=/!"
+        >> "%LINK_RSP%" echo "!OBJ_RSP!"
+        set "OBJECTS=1"
     )
 )
 
 if /i "%PRIMARY_TARGET%"=="FootballManagerTests" (
+    set "TEST_OBJ=%BUILD_DIR%\project_tests.o"
     echo Compilando project_tests.cpp...
-    %CXX% -c "%ROOT_DIR%\tests\project_tests.cpp" -o "%BUILD_DIR%\project_tests.o" %FALLBACK_CXXFLAGS%
+    %CXX% -c "%ROOT_DIR%\tests\project_tests.cpp" -o "!TEST_OBJ!" %FALLBACK_CXXFLAGS%
     if errorlevel 1 goto :compile_error
-    set "OBJECTS=!OBJECTS! "%BUILD_DIR%\project_tests.o""
+    set "TEST_OBJ_RSP=!TEST_OBJ:\=/!"
+    >> "%LINK_RSP%" echo "!TEST_OBJ_RSP!"
+    set "OBJECTS=1"
 )
 
 if not defined OBJECTS goto :no_sources
@@ -158,8 +175,11 @@ echo.
 echo Linking...
 echo.
 
-%CXX% !OBJECTS! -o "%OUTPUT%" %FALLBACK_LDFLAGS%
+if exist "%OUTPUT%" del /q "%OUTPUT%" 2>nul
+if exist "%OUTPUT%" goto :link_error
+%CXX% @"%LINK_RSP%" -o "%OUTPUT%" %FALLBACK_LDFLAGS%
 if errorlevel 1 goto :link_error
+if not exist "%OUTPUT%" goto :link_error
 
 call :fallback_build_additional_targets
 if errorlevel 1 exit /b %ERRORLEVEL%
@@ -189,6 +209,16 @@ if /i "%FM_SKIP_RUN%"=="1" (
 if "%RUN_TESTS%"=="1" (
     call :run_requested_tests
     if errorlevel 1 exit /b %ERRORLEVEL%
+)
+
+if "%RUN_VERIFY%"=="1" (
+    call :run_requested_validate
+    if errorlevel 1 exit /b %ERRORLEVEL%
+    echo.
+    echo ========================================
+    echo   Verificacion completa exitosa
+    echo ========================================
+    exit /b 0
 )
 
 if /i "%RUN_MODE%"=="tests" exit /b 0
@@ -223,6 +253,7 @@ if not exist "%CMAKE_BIN_DIR%" mkdir "%CMAKE_BIN_DIR%"
 if exist "%ROOT_GUI_OUTPUT%" copy /y "%ROOT_GUI_OUTPUT%" "%CMAKE_GUI_OUTPUT%" >nul
 if exist "%ROOT_CLI_OUTPUT%" copy /y "%ROOT_CLI_OUTPUT%" "%CMAKE_CLI_OUTPUT%" >nul
 if exist "%ROOT_TEST_OUTPUT%" copy /y "%ROOT_TEST_OUTPUT%" "%CMAKE_TEST_OUTPUT%" >nul
+if exist "%ROOT_TEST_OUTPUT%" set "TEST_OUTPUT=%ROOT_TEST_OUTPUT%"
 goto :eof
 
 :fallback_build_additional_targets
@@ -233,22 +264,25 @@ if /i "%FM_FALLBACK_CHILD%"=="1" goto :eof
 echo %CMAKE_TARGETS% | findstr /C:"FootballManagerCLI" >nul
 if not errorlevel 1 if /i not "%PRIMARY_TARGET%"=="FootballManagerCLI" (
     echo Construyendo target adicional FootballManagerCLI por fallback...
-    set "FM_FORCE_FALLBACK=1"
-    set "FM_SKIP_RUN=1"
-    set "FM_FALLBACK_CHILD=1"
-    call "%~f0" --cli
+    call :call_fallback_child --cli
     if errorlevel 1 exit /b %ERRORLEVEL%
 )
 
 if "%RUN_TESTS%"=="1" if /i not "%PRIMARY_TARGET%"=="FootballManagerTests" (
     echo Construyendo target adicional FootballManagerTests por fallback...
-    set "FM_FORCE_FALLBACK=1"
-    set "FM_SKIP_RUN=1"
-    set "FM_FALLBACK_CHILD=1"
-    call "%~f0" --tests
+    call :call_fallback_child --tests
     if errorlevel 1 exit /b %ERRORLEVEL%
 )
 goto :eof
+
+:call_fallback_child
+setlocal
+set "FM_FORCE_FALLBACK=1"
+set "FM_SKIP_RUN=1"
+set "FM_FALLBACK_CHILD=1"
+call "%~f0" %*
+set "CHILD_EXIT=%ERRORLEVEL%"
+endlocal & exit /b %CHILD_EXIT%
 
 :run_requested_tests
 if /i "%BUILD_ROUTE%"=="CMake" if exist "%CMAKE_BUILD_DIR%\CTestTestfile.cmake" (
@@ -261,6 +295,15 @@ if /i "%BUILD_ROUTE%"=="CMake" if exist "%CMAKE_BUILD_DIR%\CTestTestfile.cmake" 
         popd
         exit /b %TEST_EXIT%
     )
+)
+
+if /i "%BUILD_ROUTE%"=="Fallback directo g++" if exist "%ROOT_TEST_OUTPUT%" (
+    echo Ejecutando FootballManagerTests...
+    pushd "%ROOT_DIR%"
+    "%ROOT_TEST_OUTPUT%"
+    set "TEST_EXIT=%ERRORLEVEL%"
+    popd
+    exit /b %TEST_EXIT%
 )
 
 if exist "%TEST_OUTPUT%" (
@@ -283,6 +326,38 @@ if /i "%PRIMARY_TARGET%"=="FootballManagerTests" if exist "%OUTPUT%" (
 
 echo.
 echo [ERROR] Se pidio ejecutar tests, pero no se encontro FootballManagerTests.
+exit /b 1
+
+:run_requested_validate
+if /i "%BUILD_ROUTE%"=="Fallback directo g++" if exist "%ROOT_CLI_OUTPUT%" (
+    echo Ejecutando FootballManagerCLI --validate...
+    pushd "%ROOT_DIR%"
+    "%ROOT_CLI_OUTPUT%" --validate
+    set "VALIDATE_EXIT=%ERRORLEVEL%"
+    popd
+    exit /b %VALIDATE_EXIT%
+)
+
+if exist "%CMAKE_CLI_OUTPUT%" (
+    echo Ejecutando FootballManagerCLI --validate...
+    pushd "%ROOT_DIR%"
+    "%CMAKE_CLI_OUTPUT%" --validate
+    set "VALIDATE_EXIT=%ERRORLEVEL%"
+    popd
+    exit /b %VALIDATE_EXIT%
+)
+
+if exist "%ROOT_CLI_OUTPUT%" (
+    echo Ejecutando FootballManagerCLI --validate...
+    pushd "%ROOT_DIR%"
+    "%ROOT_CLI_OUTPUT%" --validate
+    set "VALIDATE_EXIT=%ERRORLEVEL%"
+    popd
+    exit /b %VALIDATE_EXIT%
+)
+
+echo.
+echo [ERROR] Se pidio validar, pero no se encontro FootballManagerCLI.
 exit /b 1
 
 :compile_error
@@ -309,6 +384,7 @@ echo   --validate    Compila FootballManagerCLI y lo ejecuta con --validate.
 echo   --tests       Compila FootballManagerTests y ejecuta la suite.
 echo   --run-tests   Agrega FootballManagerTests al build actual y ejecuta la suite.
 echo   --all         Compila GUI, CLI y Tests; luego ejecuta la suite.
+echo   --verify      Compila todo, ejecuta tests y valida datos/proyecto.
 echo   --help, -h    Muestra esta ayuda.
 echo.
 echo Variables utiles:

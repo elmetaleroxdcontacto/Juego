@@ -1,0 +1,45 @@
+[
+  {
+    "team": "Santiago Federal",
+    "name": "Nicolas Arriagada",
+    "position": "MED",
+    "age": 19,
+    "market_value": 180000,
+    "potential": 78,
+    "personality": "Adaptable",
+    "discipline": 72,
+    "leadership": 58,
+    "injury_proneness": 18,
+    "adaptation": 82,
+    "current_form": 64,
+    "wage": 4200
+  },
+  {
+    "team": "Santiago Federal",
+    "name": "Matias Leiva",
+    "position": "DEL",
+    "age": 22,
+    "market_value": 220000,
+    "potential": 75,
+    "personality": "Profesional",
+    "discipline": 76,
+    "injury_proneness": 24,
+    "adaptation": 68,
+    "current_form": 67,
+    "wage": 5200
+  },
+  {
+    "team": "Puerto Sur FC",
+    "name": "Diego Cardenas",
+    "position": "DEF",
+    "age": 24,
+    "market_value": 160000,
+    "potential": 70,
+    "personality": "Equilibrado",
+    "discipline": 69,
+    "injury_proneness": 30,
+    "adaptation": 61,
+    "current_form": 59,
+    "wage": 3900
+  }
+]

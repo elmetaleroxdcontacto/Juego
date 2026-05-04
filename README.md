@@ -18,8 +18,10 @@ El proyecto ya es jugable y hoy combina tres capas que trabajan juntas:
 - objetivos de directiva y confianza del cargo
 - finanzas, deuda, sponsor, salarios e infraestructura
 - mercado con shortlist, scouting, precontratos, cesiones y negociacion estructurada
+- guardado/carga con versionado `save_version = 1`, validacion de integridad y rechazo de saves corruptos
 - desarrollo mensual, progresion juvenil y manejo de carga
 - vestuario con moral, promesas, tension social y reuniones de plantel
+- atributos avanzados por jugador: personalidad, disciplina, liderazgo, propension a lesiones, adaptacion y forma
 
 ### Profundidad tipo Football Manager
 
@@ -28,6 +30,7 @@ El proyecto ya es jugable y hoy combina tres capas que trabajan juntas:
 - scouting por cobertura regional, foco posicional y confianza de informe
 - lectura de proyecto de club en negociaciones: estilo, cantera, politica, clima interno y seguridad del cargo
 - dashboard con contexto de rival, microciclo, decisiones sugeridas y narrativa semanal
+- datos externos tolerantes a campos faltantes en `data/teams.json`, `data/players.json`, `data/leagues.json` y overlays en `mods/`
 
 ### Motor de partido
 
@@ -80,6 +83,14 @@ cmake -S . -B build-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAK
 cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests
 ```
 
+### VS Code
+
+1. Instala las extensiones de C/C++ y CMake Tools.
+2. Abre la carpeta del repo.
+3. Configura el kit de MinGW si CMake Tools lo solicita.
+4. Ejecuta `CMake: Configure` con `build-cmake` como carpeta de build.
+5. Ejecuta `CMake: Build Target` y elige `FootballManager`, `FootballManagerCLI` o `FootballManagerTests`.
+
 ### Opcion rapida en Windows
 
 ```powershell
@@ -101,10 +112,12 @@ build.bat --cli
 build.bat --tests --run-tests
 build.bat --all --run-tests
 build.bat --validate
+build.bat --verify
 ```
 
 El script ahora informa si uso la ruta CMake o la fallback, que targets compilo y donde quedaron los binarios.
 Tambien mantiene sincronizados los ejecutables visibles de la raiz del repo y `build-cmake/bin`, incluso si la compilacion cae al fallback directo con `g++`.
+`--verify` compila GUI, CLI y tests; ejecuta CTest; y luego corre la validacion completa de datos/proyecto sin abrir la GUI.
 
 ## Ejecucion
 
@@ -145,7 +158,7 @@ La suite valida, entre otras cosas:
 - scouting, shortlist y negociacion
 - riesgo medico y reemplazos por lesion
 - desarrollo mensual y servicios de carrera
-- guardado, carga, migracion de saves legacy y transicion de temporada
+- guardado, carga, integridad de saves, migracion legacy, JSON/mods y transicion de temporada
 
 ## Arquitectura
 
@@ -153,7 +166,7 @@ La suite valida, entre otras cosas:
 
 - `engine`: estado base, modelos y controlador del juego
 - `simulation`: contexto de partido, fases, eventos, resolucion y reportes
-- `career`: servicios de carrera, inbox, staff, narrativas, semana y mundo
+- `career`: servicios de carrera, managers ligeros, inbox, staff, narrativas, semana y mundo
 - `ai`: planificacion de plantilla, ajustes CPU y evaluacion de mercado
 - `transfers`: mercado, tipos y negociacion
 - `development`: entrenamiento, progresion y cantera
@@ -162,6 +175,17 @@ La suite valida, entre otras cosas:
 - `ui`: flujo de consola y pantallas de texto
 - `io`: guardado, carga y serializacion
 - `validators`: chequeos de integridad y arranque
+
+### Datos JSON y mods
+
+El juego sigue cargando la base historica desde `data/LigaChilena`, pero ahora tambien lee:
+
+- `data/leagues.json`: ligas adicionales o experimentales.
+- `data/teams.json`: equipos nuevos o ajustes livianos sobre equipos existentes.
+- `data/players.json`: jugadores externos con atributos avanzados opcionales.
+- `mods/leagues.json`, `mods/teams.json`, `mods/players.json`: overlays locales para agregar contenido sin tocar la base.
+
+Los campos faltantes usan fallback seguro; un jugador JSON con solo `team`, `name`, `position`, `age` y `market_value` ya puede entrar al juego.
 
 ### Estructura del repo
 
@@ -174,6 +198,14 @@ docs/
 saves/
 tools/
 ```
+
+### Estado actual
+
+- La carrera mantiene compatibilidad con el agregado `Career`, pero ya expone `TeamId`, `TeamRepository`, `SeasonManager`, `FinanceManager`, `TransferManager`, `InboxManager` y `NewsManager` como capa progresiva.
+- La simulacion semanal esta dividida en fases: partidos, estado fisico, transferencias, finanzas, noticias/sistemas y calendario.
+- El mundo guarda campeones, records, tabla historica del club controlado y fichajes importantes dentro del historial persistente.
+- Los tres ejecutables principales siguen vigentes: GUI, CLI y tests.
+- Los archivos temporales de ejecucion CLI se ignoran y no forman parte del codigo fuente.
 
 ## Flujo de entrada
 
@@ -198,6 +230,8 @@ tools/
 - ampliar staff y networking del mercado con mas memoria del mundo
 - enriquecer cantera, intake juvenil y narrativa de largo plazo
 - pulir la GUI con mas widgets de comparacion y centros de informacion
+- migrar usos internos de `Team*` hacia `TeamId` en reportes, UI y validadores
+- mover mas logica financiera y de mercado desde `week_simulation.cpp` hacia managers dedicados
 
 ## Repositorio
 

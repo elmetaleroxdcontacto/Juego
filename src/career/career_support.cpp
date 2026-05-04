@@ -131,3 +131,84 @@ string buildOpponentReport(const Career& career) {
            " | alerta " + vulnerability +
            (areRivalClubs(*career.myTeam, *opponent) ? " | clasico" : "");
 }
+
+vector<string> buildNextOpponentPlanLines(const Career& career, size_t limit) {
+    vector<string> lines;
+    const Team* opponent = nextOpponent(career);
+    if (!career.myTeam || !opponent || limit == 0) return lines;
+
+    const Team& team = *career.myTeam;
+    const TeamPersonalityProfile profile = buildTeamPersonalityProfile(*opponent);
+    const int defenseThreat = lineThreatScore(*opponent, "DEF");
+    const int midfieldThreat = lineThreatScore(*opponent, "MED");
+    const int attackThreat = lineThreatScore(*opponent, "DEL");
+    const int midfieldFitness = averageFitnessForLine(*opponent, "MED");
+    const int myHeavyLegs = count_if(team.players.begin(), team.players.end(), [](const Player& player) {
+        return player.fitness < 62 || player.fatigueLoad >= 60;
+    });
+
+    auto push = [&](const string& line) {
+        if (line.empty() || lines.size() >= limit) return;
+        if (find(lines.begin(), lines.end(), line) == lines.end()) lines.push_back(line);
+    };
+
+    string mainThreat = "estructura equilibrada";
+    if (attackThreat >= midfieldThreat + 4 && attackThreat >= defenseThreat + 4) {
+        mainThreat = "delantera";
+    } else if (midfieldThreat >= attackThreat + 4 && midfieldThreat >= defenseThreat + 4) {
+        mainThreat = "mediocampo";
+    } else if (defenseThreat >= attackThreat + 4 && defenseThreat >= midfieldThreat + 4) {
+        mainThreat = "bloque defensivo y balon parado";
+    }
+
+    string vulnerability = "no regalar transiciones y moverlos de lado a lado";
+    if (opponent->defensiveLine >= 4) {
+        vulnerability = "atacar el espacio a la espalda de la defensa";
+    } else if (opponent->width >= 4) {
+        vulnerability = "cerrar pasillos interiores y salir por dentro";
+    } else if (midfieldFitness < 62) {
+        vulnerability = "subir ritmo contra un mediocampo con fatiga";
+    } else if (opponent->pressingIntensity >= 4) {
+        vulnerability = "superar primera presion con pases simples";
+    } else if (opponent->defensiveLine <= 2) {
+        vulnerability = "abrir la cancha y cargar centros o segunda jugada";
+    }
+
+    string suggestedInstruction = "Equilibrado";
+    if (opponent->defensiveLine >= 4) {
+        suggestedInstruction = "Juego directo";
+    } else if (opponent->width <= 2 || opponent->defensiveLine <= 2) {
+        suggestedInstruction = "Por bandas";
+    } else if (opponent->pressingIntensity >= 4 || opponent->tempo >= 4) {
+        suggestedInstruction = "Pausar juego";
+    } else if (midfieldFitness < 62) {
+        suggestedInstruction = "Contra-presion";
+    }
+
+    push("Rival | " + opponent->name +
+         " | formacion " + opponent->formation +
+         " | DT " + profile.coachLabel +
+         " | moral " + to_string(opponent->morale));
+    push("Amenaza | " + mainThreat +
+         " | DEF " + to_string(defenseThreat) +
+         " MED " + to_string(midfieldThreat) +
+         " DEL " + to_string(attackThreat));
+    push("Vulnerabilidad | " + vulnerability + ".");
+    push("Plan sugerido | instruccion " + suggestedInstruction +
+         " | entrenamiento " + (myHeavyLegs >= 4 ? string("Recuperacion") : string("Preparacion partido")) + ".");
+
+    if (areRivalClubs(team, *opponent)) {
+        push("Riesgo emocional | clasico: cuida disciplina, promesas y liderazgo del vestuario.");
+    } else if (opponent->morale >= 72) {
+        push("Riesgo competitivo | rival con moral alta: evita inicio lento y controla los primeros 15 minutos.");
+    } else if (opponent->morale <= 42) {
+        push("Oportunidad | rival con moral baja: presiona temprano para instalar dudas.");
+    } else if (myHeavyLegs >= 4) {
+        push("Riesgo fisico | " + to_string(myHeavyLegs) +
+             " jugadores llegan exigidos: rota antes de apostar por presion alta.");
+    } else {
+        push("Decision clave | revisa XI, banca y balon parado antes de simular la semana.");
+    }
+
+    return lines;
+}

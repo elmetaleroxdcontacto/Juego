@@ -202,6 +202,20 @@ void Career::initializeLeague(bool forceReload) {
             divisions.push_back(div);
         }
     }
+    ExternalJsonLoadResult externalJson = loadExternalJsonData(allTeams);
+    loadWarnings.insert(loadWarnings.end(), externalJson.warnings.begin(), externalJson.warnings.end());
+    auto addDivisionIfMissing = [&](const DivisionInfo& division) {
+        if (division.id.empty()) return;
+        const bool exists = any_of(divisions.begin(), divisions.end(), [&](const DivisionInfo& current) {
+            return current.id == division.id;
+        });
+        if (!exists) divisions.push_back(division);
+    };
+    for (const auto& division : externalJson.divisions) addDivisionIfMissing(division);
+    for (const auto& team : allTeams) {
+        if (team.division.empty()) continue;
+        addDivisionIfMissing({team.division, "data/teams.json", divisionDisplay(team.division)});
+    }
     for (auto& team : allTeams) ensureTeamIdentity(team);
 
     const StartupValidationSummary startupValidation = buildStartupValidationSummary(6);
@@ -342,6 +356,36 @@ const Team* Career::findTeamByName(const string& name) const {
         if (team.name == name) return &team;
     }
     return nullptr;
+}
+
+TeamId Career::getTeamIdFor(const Team* team) const {
+    if (!team) return kInvalidTeamId;
+    for (size_t i = 0; i < allTeams.size(); ++i) {
+        if (&allTeams[i] == team) return static_cast<TeamId>(i);
+    }
+    return kInvalidTeamId;
+}
+
+TeamId Career::getTeamIdByName(const string& name) const {
+    for (size_t i = 0; i < allTeams.size(); ++i) {
+        if (allTeams[i].name == name) return static_cast<TeamId>(i);
+    }
+    return kInvalidTeamId;
+}
+
+Team* Career::getTeamById(TeamId id) {
+    if (id < 0 || id >= static_cast<TeamId>(allTeams.size())) return nullptr;
+    return &allTeams[static_cast<size_t>(id)];
+}
+
+const Team* Career::getTeamById(TeamId id) const {
+    if (id < 0 || id >= static_cast<TeamId>(allTeams.size())) return nullptr;
+    return &allTeams[static_cast<size_t>(id)];
+}
+
+TeamId Career::getActiveTeamIdAt(int index) const {
+    const Team* team = getActiveTeamAt(index);
+    return getTeamIdFor(team);
 }
 
 int Career::getActiveTeamCount() const {

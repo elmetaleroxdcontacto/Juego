@@ -24,9 +24,10 @@ DressingRoomDynamics initializeDressingRoom(const std::vector<std::string>& play
         group.personality = personalities[rand() % personalities.size()];
         
         // Asignar miembros a cliques
-        int membersInGroup = playerNames.size() / numCliques;
-        for (int j = 0; j < membersInGroup && (i * membersInGroup + j) < playerNames.size(); j++) {
-            group.memberNames.push_back(playerNames[i * membersInGroup + j]);
+        const size_t membersInGroup = playerNames.size() / static_cast<size_t>(numCliques);
+        const size_t groupOffset = static_cast<size_t>(i) * membersInGroup;
+        for (size_t j = 0; j < membersInGroup && groupOffset + j < playerNames.size(); j++) {
+            group.memberNames.push_back(playerNames[groupOffset + j]);
         }
         
         // Generar nombre automáticamente
@@ -89,6 +90,14 @@ void updateCliqueDynamics(DressingRoomDynamics& dynamics, bool hadWin, bool keyM
         }
     }
     
+    if (keyMatch) {
+        if (hadWin) {
+            dynamics.unityLevel = std::min(100, dynamics.unityLevel + 2);
+        } else {
+            dynamics.internalTension = std::min(100, dynamics.internalTension + 2);
+        }
+    }
+
     // Resolver conflictos cuando la tensión es muy baja
     if (dynamics.internalTension > 70) {
         for (auto& rel : dynamics.relationships) {

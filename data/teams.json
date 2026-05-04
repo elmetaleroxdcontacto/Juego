@@ -1,0 +1,24 @@
+[
+  {
+    "name": "Santiago Federal",
+    "division": "liga experimental",
+    "budget": 420000,
+    "tactics": "Balanced",
+    "formation": "4-3-3",
+    "match_instruction": "Equilibrado",
+    "youth_region": "Metropolitana",
+    "transfer_policy": "Cantera y valor futuro",
+    "fan_base": 18
+  },
+  {
+    "name": "Puerto Sur FC",
+    "division": "liga experimental",
+    "budget": 380000,
+    "tactics": "Counter",
+    "formation": "4-4-2",
+    "match_instruction": "Juego directo",
+    "youth_region": "Sur",
+    "transfer_policy": "Mercado de oportunidades",
+    "fan_base": 16
+  }
+]

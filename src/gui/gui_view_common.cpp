@@ -414,7 +414,11 @@ std::string buildPlayerProfile(const Team& team, const Player* player) {
     out << "Liderazgo " << player->leadership
         << " | Profesionalismo " << player->professionalism
         << " | Ambicion " << player->ambition
-        << " | Consistencia " << player->consistency << "\r\n\r\n";
+        << " | Consistencia " << player->consistency << "\r\n";
+    out << "Personalidad " << (player->personality.empty() ? "Equilibrado" : player->personality)
+        << " | Disciplina " << player->discipline
+        << " | Adaptacion " << player->adaptation
+        << " | Prop. lesiones " << player->injuryProneness << "\r\n\r\n";
     out << "Contrato\r\n";
     out << "Salario " << formatMoneyValue(player->wage)
         << " | Clausula " << formatMoneyValue(player->releaseClause)
@@ -681,6 +685,9 @@ ListPanelModel buildComparisonModel(const Career& career, const Player* selected
     model.rows.push_back({"Media", std::to_string(selected->skill), reference ? std::to_string(reference->skill) : "-", market ? std::to_string(market->skill) : "-"});
     model.rows.push_back({"Potencial", std::to_string(selected->potential), reference ? std::to_string(reference->potential) : "-", market ? std::to_string(market->potential) : "-"});
     model.rows.push_back({"Forma", std::to_string(selected->currentForm), reference ? std::to_string(reference->currentForm) : "-", market ? std::to_string(market->currentForm) : "-"});
+    model.rows.push_back({"Disciplina", std::to_string(selected->discipline), reference ? std::to_string(reference->discipline) : "-", market ? std::to_string(market->discipline) : "-"});
+    model.rows.push_back({"Adaptacion", std::to_string(selected->adaptation), reference ? std::to_string(reference->adaptation) : "-", market ? std::to_string(market->adaptation) : "-"});
+    model.rows.push_back({"Prop. lesiones", std::to_string(selected->injuryProneness), reference ? std::to_string(reference->injuryProneness) : "-", market ? std::to_string(market->injuryProneness) : "-"});
     model.rows.push_back({"Valor", formatMoneyValue(selected->value), reference ? formatMoneyValue(reference->value) : "-", market ? formatMoneyValue(market->value) : "-"});
     model.rows.push_back({"Salario", formatMoneyValue(selected->wage), reference ? formatMoneyValue(reference->wage) : "-", market ? formatMoneyValue(market->wage) : "-"});
     return model;

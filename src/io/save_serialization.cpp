@@ -12,7 +12,20 @@ using namespace std;
 
 namespace {
 
-static constexpr int kCareerSaveVersion = 14;
+static constexpr int kCareerSaveVersion = 15;
+static constexpr int kSaveSchemaVersion = 1;
+
+vector<string> splitEscapedFields(const string& encoded, char delimiter);
+int parseIntField(const string& text, int defaultValue);
+
+struct SaveIntegritySnapshot {
+    int schemaVersion = kSaveSchemaVersion;
+    int teamCount = 0;
+    int playerCount = 0;
+    int historyCount = 0;
+    int recordCount = 0;
+    int pendingTransferCount = 0;
+};
 
 string canonicalizeDivisionValue(const string& raw) {
     return canonicalDivisionId(raw);
@@ -27,6 +40,84 @@ void rebuildCareerDivisions(Career& career) {
         });
         if (hasTeams) career.divisions.push_back(division);
     }
+    for (const auto& team : career.allTeams) {
+        const string divisionId = canonicalizeDivisionValue(team.division);
+        if (divisionId.empty()) continue;
+        const bool known = std::any_of(career.divisions.begin(), career.divisions.end(), [&](const DivisionInfo& division) {
+            return division.id == divisionId;
+        });
+        if (!known) career.divisions.push_back({divisionId, "data/teams.json", divisionDisplay(divisionId)});
+    }
+}
+
+SaveIntegritySnapshot buildIntegritySnapshot(const Career& career) {
+    SaveIntegritySnapshot snapshot;
+    snapshot.teamCount = static_cast<int>(career.allTeams.size());
+    snapshot.historyCount = static_cast<int>(career.history.size());
+    snapshot.recordCount = static_cast<int>(career.historicalRecords.size());
+    snapshot.pendingTransferCount = static_cast<int>(career.pendingTransfers.size());
+    for (const auto& team : career.allTeams) {
+        snapshot.playerCount += static_cast<int>(team.players.size());
+    }
+    return snapshot;
+}
+
+string encodeIntegritySnapshot(const SaveIntegritySnapshot& snapshot) {
+    return to_string(snapshot.schemaVersion) + "|" + to_string(snapshot.teamCount) + "|" +
+           to_string(snapshot.playerCount) + "|" + to_string(snapshot.historyCount) + "|" +
+           to_string(snapshot.recordCount) + "|" + to_string(snapshot.pendingTransferCount);
+}
+
+bool parseSaveSchemaLine(const string& line, int& schemaVersion) {
+    const string lower = toLower(trim(line));
+    if (lower.rfind("save_version", 0) == 0) {
+        const size_t eq = lower.find('=');
+        const string value = eq == string::npos ? trim(lower.substr(12)) : trim(lower.substr(eq + 1));
+        schemaVersion = clampInt(parseIntField(value, kSaveSchemaVersion), 1, kSaveSchemaVersion);
+        return true;
+    }
+    if (lower.rfind("save_schema ", 0) == 0) {
+        schemaVersion = clampInt(parseIntField(trim(line.substr(12)), kSaveSchemaVersion), 1, kSaveSchemaVersion);
+        return true;
+    }
+    return false;
+}
+
+bool parseIntegrityLine(const string& line, SaveIntegritySnapshot& snapshot) {
+    if (line.rfind("INTEGRITY ", 0) != 0) return false;
+    const vector<string> parts = splitEscapedFields(line.substr(10), '|');
+    if (parts.size() < 6) return false;
+    snapshot.schemaVersion = parseIntField(parts[0], kSaveSchemaVersion);
+    snapshot.teamCount = parseIntField(parts[1], -1);
+    snapshot.playerCount = parseIntField(parts[2], -1);
+    snapshot.historyCount = parseIntField(parts[3], -1);
+    snapshot.recordCount = parseIntField(parts[4], -1);
+    snapshot.pendingTransferCount = parseIntField(parts[5], -1);
+    return snapshot.teamCount >= 0 && snapshot.playerCount >= 0 && snapshot.historyCount >= 0 &&
+           snapshot.recordCount >= 0 && snapshot.pendingTransferCount >= 0;
+}
+
+bool validateLoadedIntegrity(const Career& career, const SaveIntegritySnapshot& expected) {
+    const SaveIntegritySnapshot actual = buildIntegritySnapshot(career);
+    if (expected.schemaVersion > kSaveSchemaVersion) return false;
+    return expected.teamCount == actual.teamCount &&
+           expected.playerCount == actual.playerCount &&
+           expected.historyCount == actual.historyCount &&
+           expected.recordCount == actual.recordCount &&
+           expected.pendingTransferCount == actual.pendingTransferCount;
+}
+
+bool validateLoadedCareerBasics(const Career& career) {
+    if (career.currentSeason <= 0 || career.currentWeek <= 0) return false;
+    if (career.allTeams.empty()) return false;
+    if (!career.myTeam) return false;
+    for (const auto& team : career.allTeams) {
+        if (team.name.empty() || team.division.empty() || team.players.empty()) return false;
+        for (const auto& player : team.players) {
+            if (player.name.empty()) return false;
+        }
+    }
+    return true;
 }
 
 string escapeSaveField(const string& value) {
@@ -477,6 +568,10 @@ string encodePlayerFields(const Player& player) {
         to_string(player.bigMatches),
         to_string(player.currentForm),
         to_string(player.tacticalDiscipline),
+        player.personality,
+        to_string(player.discipline),
+        to_string(player.injuryProneness),
+        to_string(player.adaptation),
         to_string(player.versatility),
         to_string(player.moraleMomentum),
         to_string(player.fatigueLoad),
@@ -534,6 +629,7 @@ Player decodePlayerFields(const vector<string>& fields) {
     if (idx < fields.size()) player.seasonRedCards = parseIntField(fields[idx++]); else player.seasonRedCards = 0;
     if (idx < fields.size()) player.matchesSuspended = parseIntField(fields[idx++]); else player.matchesSuspended = 0;
     const bool hasIndividualInstruction = fields.size() >= 56;
+    const bool hasAdvancedPlayerAttributes = fields.size() >= 60;
     if (idx < fields.size()) player.role = fields[idx++]; else player.role = defaultRoleForPosition(player.position);
     if (idx < fields.size()) player.roleDuty = fields[idx++]; else player.roleDuty = defaultDutyForRole(player.role, player.position);
     if (hasIndividualInstruction && idx < fields.size()) player.individualInstruction = fields[idx++]; else player.individualInstruction = defaultInstructionForPosition(player.position);
@@ -561,6 +657,10 @@ Player decodePlayerFields(const vector<string>& fields) {
     if (idx < fields.size()) player.bigMatches = parseIntField(fields[idx++]); else player.bigMatches = 0;
     if (idx < fields.size()) player.currentForm = parseIntField(fields[idx++]); else player.currentForm = 0;
     if (idx < fields.size()) player.tacticalDiscipline = parseIntField(fields[idx++]); else player.tacticalDiscipline = 0;
+    if (hasAdvancedPlayerAttributes && idx < fields.size()) player.personality = fields[idx++]; else player.personality.clear();
+    if (hasAdvancedPlayerAttributes && idx < fields.size()) player.discipline = parseIntField(fields[idx++]); else player.discipline = 0;
+    if (hasAdvancedPlayerAttributes && idx < fields.size()) player.injuryProneness = parseIntField(fields[idx++]); else player.injuryProneness = 0;
+    if (hasAdvancedPlayerAttributes && idx < fields.size()) player.adaptation = parseIntField(fields[idx++]); else player.adaptation = 0;
     if (idx < fields.size()) player.versatility = parseIntField(fields[idx++]); else player.versatility = 0;
     if (idx < fields.size()) player.moraleMomentum = parseIntField(fields[idx++]); else player.moraleMomentum = 0;
     if (idx < fields.size()) player.fatigueLoad = parseIntField(fields[idx++]); else player.fatigueLoad = 0;
@@ -624,8 +724,11 @@ bool serializeCareer(ostream& file, const Career& career) {
     const string& lastMatchPlayerOfTheMatch = career.lastMatchPlayerOfTheMatch;
     const MatchCenterSnapshot& lastMatchCenter = career.lastMatchCenter;
     const deque<Team>& allTeams = career.allTeams;
+    const SaveIntegritySnapshot integrity = buildIntegritySnapshot(career);
 
     file << "VERSION " << kCareerSaveVersion << "\n";
+    file << "save_version = " << kSaveSchemaVersion << "\n";
+    file << "INTEGRITY " << encodeIntegritySnapshot(integrity) << "\n";
     file << "SEASON " << currentSeason << " WEEK " << currentWeek << "\n";
     file << "DIVISION " << escapeSaveField(activeDivision) << "\n";
     file << "MYTEAM " << escapeSaveField(myTeam ? myTeam->name : "") << "\n";
@@ -874,11 +977,31 @@ bool deserializeCareer(istream& file, Career& career) {
     line = trim(line);
 
     int saveVersion = 1;
+    int saveSchemaVersion = 0;
+    SaveIntegritySnapshot expectedIntegrity;
+    bool hasIntegrity = false;
     if (line.rfind("VERSION ", 0) == 0) {
         saveVersion = parseIntField(trim(line.substr(8)), 1);
         if (saveVersion > kCareerSaveVersion) return false;
         if (!getline(file, line)) return false;
         line = trim(line);
+    }
+    while (true) {
+        if (parseSaveSchemaLine(line, saveSchemaVersion)) {
+            if (saveSchemaVersion > kSaveSchemaVersion) return false;
+            if (!getline(file, line)) return false;
+            line = trim(line);
+            continue;
+        }
+        SaveIntegritySnapshot parsedIntegrity;
+        if (parseIntegrityLine(line, parsedIntegrity)) {
+            expectedIntegrity = parsedIntegrity;
+            hasIntegrity = true;
+            if (!getline(file, line)) return false;
+            line = trim(line);
+            continue;
+        }
+        break;
     }
 
     if (line.rfind("SEASON ", 0) == 0) {
@@ -1316,6 +1439,8 @@ bool deserializeCareer(istream& file, Career& career) {
         if (boardExpectedFinish <= 0) career.initializeBoardObjectives();
         if (boardMonthlyObjective.empty()) career.initializeDynamicObjective();
         if (!cupActive && !career.activeTeams.empty()) career.initializeSeasonCup();
+        if (hasIntegrity && !validateLoadedIntegrity(career, expectedIntegrity)) return false;
+        if (!validateLoadedCareerBasics(career)) return false;
         return true;
     }
 

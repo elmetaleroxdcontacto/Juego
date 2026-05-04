@@ -38,6 +38,7 @@ int workloadRisk(const Player& player, const Team& team) {
     risk += player.fatigueLoad;
     risk += max(0, 62 - player.stamina) / 2;
     risk += max(0, player.age - 29) * 2;
+    risk += player.injuryProneness / 5;
     risk += tacticalIntensityScore(team);
     risk -= max(0, team.fitnessCoach - 60) / 2;
     if (team.rotationPolicy == "Rotacion") risk -= 4;
@@ -51,6 +52,7 @@ int workloadRisk(const Player& player, const Team& team) {
 
 int relapseRisk(const Player& player, const Team& team) {
     int risk = player.injuryHistory * 12;
+    risk += player.injuryProneness / 3;
     risk += max(0, 68 - team.medicalTeam);
     risk += workloadRisk(player, team) / 3;
     risk += player.injured ? 18 : 0;
@@ -66,6 +68,8 @@ int readinessScore(const Player& player, const Team& team) {
     readiness += player.consistency / 5;
     readiness += player.chemistry / 6;
     readiness += player.tacticalDiscipline / 6;
+    readiness += player.adaptation / 10;
+    readiness += player.discipline / 12;
     readiness += player.moraleMomentum / 2;
     readiness += max(0, team.assistantCoach - 55) / 3;
     readiness -= workloadRisk(player, team) / 3;
@@ -79,6 +83,8 @@ int developmentStability(const Player& player, const Team& team, bool congestedW
     stability += player.professionalism / 2;
     stability += player.happiness / 3;
     stability += player.chemistry / 5;
+    stability += player.adaptation / 5;
+    stability += player.discipline / 8;
     stability += max(0, team.trainingFacilityLevel - 1) * 6;
     stability += max(0, team.assistantCoach - 55) / 3;
     stability += max(0, team.youthCoach - 55) / 3;

@@ -36,6 +36,10 @@ struct Player {
     int bigMatches = 0;
     int currentForm = 0;
     int tacticalDiscipline = 0;
+    std::string personality;
+    int discipline = 0;
+    int injuryProneness = 0;
+    int adaptation = 0;
     int versatility = 0;
     int happiness = 0;
     int chemistry = 0;
@@ -288,6 +292,9 @@ struct DivisionInfo {
 
 extern const std::vector<DivisionInfo> kDivisions;
 
+using TeamId = int;
+constexpr TeamId kInvalidTeamId = -1;
+
 struct Career {
     Team* myTeam;
     LeagueTable leagueTable;
@@ -372,6 +379,11 @@ struct Career {
     void agePlayers();
     Team* findTeamByName(const std::string& name);
     const Team* findTeamByName(const std::string& name) const;
+    TeamId getTeamIdFor(const Team* team) const;
+    TeamId getTeamIdByName(const std::string& name) const;
+    Team* getTeamById(TeamId id);
+    const Team* getTeamById(TeamId id) const;
+    TeamId getActiveTeamIdAt(int index) const;
     void addNews(const std::string& item);
     void addInboxItem(const std::string& item, const std::string& channel = "");
     void executePendingTransfers();

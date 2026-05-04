@@ -20,6 +20,15 @@ struct DivisionLoadResult {
     std::vector<std::string> warnings;
 };
 
+struct ExternalJsonLoadResult {
+    std::vector<DivisionInfo> divisions;
+    std::vector<std::string> warnings;
+    int teamsLoaded = 0;
+    int playersLoaded = 0;
+};
+
 DivisionLoadResult loadDivisionFromFolder(const std::string& folder,
                                           const std::string& divisionId,
                                           std::deque<Team>& allTeams);
+
+ExternalJsonLoadResult loadExternalJsonData(std::deque<Team>& allTeams);

@@ -3,6 +3,7 @@
 #include "ai/ai_transfer_manager.h"
 #include "career/career_reports.h"
 #include "career/manager_advice.h"
+#include "transfers/transfer_market.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -125,12 +126,20 @@ vector<string> buildMarketPulseLines(const Career& career, size_t limit) {
     const ClubTransferStrategy strategy = ai_transfer_manager::buildClubTransferStrategy(career, team);
     const auto preContracts = buildPreContractOptions(career, strategy.weakestPosition, 3);
     const auto loans = buildLoanOptions(career, strategy.weakestPosition, 3);
+    const bool windowOpen = transfer_market::isTransferWindowOpen(career);
+
+    for (const auto& line : transfer_market::buildTransferWindowLines(career, 2)) {
+        pushUniqueLine(lines, line);
+    }
 
     pushUniqueLine(lines,
                    "Necesidad principal: " + (strategy.weakestPosition.empty() ? string("MED") : strategy.weakestPosition) +
                        " | prioridades " + joinOrDash(strategy.priorityPositions));
 
-    if (strategy.needsLiquidity || team.budget < max(180000LL, team.sponsorWeekly * 3)) {
+    if (!windowOpen) {
+        pushUniqueLine(lines,
+                       "Accion de cierre: no cierres fichajes inmediatos; deja shortlist, precontratos y renovaciones listos.");
+    } else if (strategy.needsLiquidity || team.budget < max(180000LL, team.sponsorWeekly * 3)) {
         pushUniqueLine(lines,
                        "Caja ajustada: conviene vender o negociar cesiones antes de cargar salarios altos.");
     } else if (strategy.maxTransferBudget >= max(250000LL, team.sponsorWeekly * 8)) {

@@ -47,9 +47,121 @@ long long totalDealCost(const NegotiationState& state) {
     return state.agreedFee + state.agreedBonus + state.agreedAgentFee + state.agreedLoyaltyBonus;
 }
 
+void adjustCpuSquadTactics(Team& team, const SquadNeedReport& squad, const ClubTransferStrategy& strategy) {
+    int avgFitness = 0;
+    int avgDiscipline = 0;
+    int avgAdaptation = 0;
+    for (const auto& player : team.players) {
+        avgFitness += player.fitness;
+        avgDiscipline += player.discipline > 0 ? player.discipline : player.tacticalDiscipline;
+        avgAdaptation += player.adaptation;
+    }
+    const int count = max(1, static_cast<int>(team.players.size()));
+    avgFitness /= count;
+    avgDiscipline /= count;
+    avgAdaptation /= count;
+
+    if (strategy.needsLiquidity || team.debt > team.sponsorWeekly * 24) {
+        team.transferPolicy = "Vender antes de comprar";
+    }
+    if (strategy.youthFocus && team.transferPolicy.empty()) {
+        team.transferPolicy = "Cantera y valor futuro";
+    }
+
+    if (squad.rotationRisk >= 6 || avgFitness < 62) {
+        team.tactics = "Defensive";
+        team.matchInstruction = "Bloque bajo";
+        team.pressingIntensity = max(1, team.pressingIntensity - 1);
+        team.tempo = max(1, team.tempo - 1);
+    } else if (avgDiscipline >= 68 && avgFitness >= 70) {
+        team.tactics = "Pressing";
+        team.matchInstruction = "Contra-presion";
+        team.pressingIntensity = min(5, team.pressingIntensity + 1);
+    } else if (strategy.needsStarter && avgAdaptation >= 60) {
+        team.tactics = "Offensive";
+        team.matchInstruction = "Por bandas";
+        team.tempo = min(5, team.tempo + 1);
+    } else if (strategy.needsLiquidity) {
+        team.tactics = "Counter";
+        team.matchInstruction = "Juego directo";
+    } else {
+        team.tactics = "Balanced";
+        if (team.matchInstruction.empty()) team.matchInstruction = "Equilibrado";
+    }
+}
+
 }  // namespace
 
 namespace transfer_market {
+
+bool isTransferWindowOpen(const Career& career) {
+    if (career.currentWeek < 1) return true;
+    const int seasonWeeks = static_cast<int>(career.schedule.size());
+    if (seasonWeeks <= 0) return true;
+
+    const int openingEnd = min(4, seasonWeeks);
+    if (career.currentWeek <= openingEnd) return true;
+    if (seasonWeeks < 10) return false;
+
+    const int midStart = max(openingEnd + 1, seasonWeeks / 2);
+    const int midEnd = min(seasonWeeks, midStart + 2);
+    return career.currentWeek >= midStart && career.currentWeek <= midEnd;
+}
+
+int nextTransferWindowWeek(const Career& career) {
+    const int seasonWeeks = static_cast<int>(career.schedule.size());
+    if (seasonWeeks <= 0) return max(1, career.currentWeek);
+    if (isTransferWindowOpen(career)) return max(1, career.currentWeek);
+
+    const int openingEnd = min(4, seasonWeeks);
+    if (career.currentWeek < 1) return 1;
+    if (career.currentWeek <= openingEnd) return career.currentWeek;
+    if (seasonWeeks >= 10) {
+        const int midStart = max(openingEnd + 1, seasonWeeks / 2);
+        if (career.currentWeek < midStart) return midStart;
+    }
+    return 1;
+}
+
+string transferWindowLabel(const Career& career) {
+    const int seasonWeeks = static_cast<int>(career.schedule.size());
+    if (seasonWeeks <= 0) return "Mercado abierto: calendario aun sin fijar.";
+    if (isTransferWindowOpen(career)) {
+        return "Mercado abierto: puedes cerrar fichajes, clausulas y cesiones inmediatas.";
+    }
+
+    const int nextWeek = nextTransferWindowWeek(career);
+    if (nextWeek == 1 && career.currentWeek > 1) {
+        return "Mercado cerrado: prepara shortlist y precontratos hasta la proxima temporada.";
+    }
+    return "Mercado cerrado: proxima ventana en semana " + to_string(nextWeek) +
+           ". Puedes seguir scouteando, renovar o firmar precontratos elegibles.";
+}
+
+vector<string> buildTransferWindowLines(const Career& career, size_t limit) {
+    vector<string> lines;
+    if (limit == 0) return lines;
+    lines.push_back(transferWindowLabel(career));
+    if (lines.size() >= limit) return lines;
+
+    if (isTransferWindowOpen(career)) {
+        lines.push_back("Prioridad: cerrar solo operaciones que mejoren una necesidad real del XI o la rotacion.");
+    } else {
+        lines.push_back("Prioridad: crear informes, limpiar salarios y dejar listas las ofertas para la siguiente apertura.");
+    }
+    if (lines.size() >= limit) return lines;
+
+    const int seasonWeeks = static_cast<int>(career.schedule.size());
+    if (seasonWeeks >= 10) {
+        const int midStart = max(min(4, seasonWeeks) + 1, seasonWeeks / 2);
+        lines.push_back("Calendario: ventana inicial semanas 1-4; ventana media semanas " +
+                        to_string(midStart) + "-" + to_string(min(seasonWeeks, midStart + 2)) + ".");
+    } else {
+        lines.push_back("Calendario: ventana inicial semanas 1-" + to_string(min(4, max(1, seasonWeeks))) + ".");
+    }
+    if (lines.size() > limit) lines.resize(limit);
+    return lines;
+}
 
 string weakestSquadPosition(const Team& team) {
     return ai_squad_planner::analyzeSquad(team).weakestPosition;
@@ -87,6 +199,7 @@ vector<TransferTarget> buildTransferShortlist(const Career& career, const Team& 
 }
 
 void processCpuTransfers(Career& career) {
+    const bool windowOpen = isTransferWindowOpen(career);
     for (auto& teamRef : career.allTeams) {
         Team* team = &teamRef;
         if (team == career.myTeam) continue;
@@ -96,6 +209,9 @@ void processCpuTransfers(Career& career) {
         const SquadNeedReport squad = ai_squad_planner::analyzeSquad(*team);
         const ClubTransferStrategy strategy = ai_transfer_manager::buildClubTransferStrategy(career, *team);
         const int maxSquad = getCompetitionConfig(team->division).maxSquadSize;
+        adjustCpuSquadTactics(*team, squad, strategy);
+
+        if (!windowOpen) continue;
 
         if (team->players.size() > 18 &&
             ((maxSquad > 0 && static_cast<int>(team->players.size()) > maxSquad) ||
@@ -124,10 +240,15 @@ void processCpuTransfers(Career& career) {
                 }
             }
             if (sellIdx >= 0) {
+                const string soldName = team->players[static_cast<size_t>(sellIdx)].name;
                 const long long saleValue = team->players[static_cast<size_t>(sellIdx)].value;
                 team_mgmt::detachPlayerFromSelections(*team, team->players[static_cast<size_t>(sellIdx)].name);
                 team->players.erase(team->players.begin() + sellIdx);
                 team->budget += saleValue;
+                if (saleValue >= 250000 || strategy.needsLiquidity) {
+                    career.addNews("[Mercado IA] " + team->name + " vende a " + soldName +
+                                   " por $" + to_string(saleValue) + ".");
+                }
             }
         }
 
@@ -181,6 +302,25 @@ void processCpuTransfers(Career& career) {
             team->addPlayer(newPlayer);
             team_mgmt::detachPlayerFromSelections(*seller, newPlayer.name);
             seller->players.erase(seller->players.begin() + sellerIdx);
+            if (top.expectedFee >= 250000 || top.urgentNeed || top.availableForLoan) {
+                career.addNews("[Mercado IA] " + team->name + " incorpora a " + newPlayer.name +
+                               " desde " + seller->name + (newPlayer.onLoan ? " a prestamo." : "."));
+            }
+            if (!newPlayer.onLoan && top.expectedFee >= 300000) {
+                career.historicalRecords.push_back({
+                    "Fichaje importante T" + to_string(career.currentSeason) + " - " + newPlayer.name,
+                    newPlayer.name,
+                    team->name,
+                    career.currentSeason,
+                    static_cast<int>(min<long long>(top.expectedFee, 2000000000LL)),
+                    seller->name + " -> " + team->name
+                });
+                if (career.historicalRecords.size() > 60) {
+                    career.historicalRecords.erase(career.historicalRecords.begin(),
+                                                   career.historicalRecords.begin() +
+                                                       static_cast<long long>(career.historicalRecords.size() - 60));
+                }
+            }
         } else if (!strategy.needsLiquidity) {
             int minSkill, maxSkill;
             getDivisionSkillRange(team->division, minSkill, maxSkill);
@@ -192,6 +332,8 @@ void processCpuTransfers(Career& career) {
                 promoted.wage = max(2500LL, promoted.wage / 2);
                 promoted.releaseClause = max(promoted.value * 3, 120000LL);
                 team->addPlayer(promoted);
+                career.addNews("[Cantera IA] " + team->name + " promueve a " + promoted.name +
+                               " para cubrir " + targetPosition + ".");
                 continue;
             }
 
@@ -201,6 +343,13 @@ void processCpuTransfers(Career& career) {
                 team->budget -= fee;
                 generated.releaseClause = max(generated.value * 2, fee * 2);
                 team->addPlayer(generated);
+            } else if (team->players.size() < 21) {
+                generated.value = max(10000LL, generated.value / 3);
+                generated.wage = max(1500LL, generated.wage * 2 / 3);
+                generated.releaseClause = max(50000LL, generated.value * 2);
+                generated.contractWeeks = randInt(26, 78);
+                team->addPlayer(generated);
+                career.addNews("[Mercado IA] " + team->name + " suma agente libre: " + generated.name + ".");
             }
         }
     }

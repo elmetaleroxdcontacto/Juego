@@ -90,8 +90,17 @@ bool KeyboardShortcutManager::isCtrlPressed() {
 }
 
 bool KeyboardShortcutManager::checkShortcut(WPARAM key, ShortcutCommand expected) {
-    // Helper function for future extensibility
-    return true;
+    switch (expected) {
+        case ShortcutCommand::SearchPlayers: return key == 'F' && isCtrlPressed();
+        case ShortcutCommand::ScoutingMode: return key == 'S' && !isCtrlPressed();
+        case ShortcutCommand::SellPlayer: return key == 'V' && !isCtrlPressed();
+        case ShortcutCommand::TacticsMenu: return key == 'T' && !isCtrlPressed();
+        case ShortcutCommand::MarketWatch: return key == 'M' && !isCtrlPressed();
+        case ShortcutCommand::ReportsMenu: return key == 'R' && !isCtrlPressed();
+        case ShortcutCommand::StaffBriefing: return key == 'B' && !isCtrlPressed();
+        case ShortcutCommand::InventoryView: return key == 'I' && !isCtrlPressed();
+    }
+    return false;
 }
 
 }  // namespace keyboard_shortcuts

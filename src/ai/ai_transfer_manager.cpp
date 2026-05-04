@@ -111,6 +111,8 @@ TransferTarget evaluateTarget(const Career& career,
     target.upsideScore = max(0, player.potential - player.skill) +
                          player_condition::developmentStability(player, seller, false) / 5;
     target.fitScore = player.skill * 3 + player.potential * 2 - player.age * 2 + target.squadNeedScore;
+    target.fitScore += player.adaptation / 5 + player.discipline / 8;
+    target.fitScore -= player.injuryProneness / 8;
     const TeamPersonalityProfile profile = buildTeamPersonalityProfile(buyer);
     const int assignmentBoost = assignmentKnowledgeBoost(career, seller, player);
     const int styleFit = projectStyleFit(buyer, player);
@@ -134,6 +136,9 @@ TransferTarget evaluateTarget(const Career& career,
     }
     if (profile.marketPatience >= 68 && player.potential >= player.skill + 10) target.fitScore += 5;
     if (profile.saleBias >= 72 && player.age >= 28 && !target.contractRunningOut) target.fitScore -= 8;
+    if (buyer.headCoachStyle == "Intensidad" && player.discipline >= 66) target.fitScore += 3;
+    if (buyer.headCoachStyle == "Equilibrado" && player.personality == "Temperamental") target.fitScore -= 4;
+    if (player.personality == "Adaptable") target.fitScore += 4;
     target.fitScore += styleFit;
     target.fitScore += target.readinessScore / 6;
     target.fitScore += target.upsideScore / 7;
@@ -147,8 +152,8 @@ TransferTarget evaluateTarget(const Career& career,
     else target.affordabilityScore = -12;
     if (profile.saleBias >= 72 && totalCost > strategy.maxTransferBudget) target.affordabilityScore -= 6;
     if (profile.starterBias >= 72 && target.readinessScore >= 68) target.affordabilityScore += 2;
-    if (target.medicalRisk >= 72) target.affordabilityScore -= 8;
-    else if (target.medicalRisk >= 56) target.affordabilityScore -= 3;
+    if (target.medicalRisk >= 72 || player.injuryProneness >= 78) target.affordabilityScore -= 8;
+    else if (target.medicalRisk >= 56 || player.injuryProneness >= 62) target.affordabilityScore -= 3;
 
     target.competitionScore = clampInt(max(0, player.potential - strategy.averageStarterSkill) / 4 +
                                            max(0, teamPrestigeScore(seller) - strategy.prestigeScore + 4),
@@ -171,6 +176,15 @@ TransferTarget evaluateTarget(const Career& career,
     if (player.ambition >= 75) {
         target.scoutingNote += " | jugador ambicioso";
     }
+    if (!player.personality.empty() && player.personality != "Equilibrado") {
+        target.scoutingNote += " | personalidad " + player.personality;
+    }
+    if (player.adaptation >= 74) {
+        target.scoutingNote += " | adapta rapido";
+    }
+    if (player.discipline <= 42) {
+        target.scoutingNote += " | disciplina a vigilar";
+    }
     if (buyer.transferPolicy == "Cantera y valor futuro" && player.age <= 21) {
         target.scoutingNote += " | encaja con politica juvenil";
     } else if (buyer.transferPolicy == "Vender antes de comprar") {
@@ -192,7 +206,7 @@ TransferTarget evaluateTarget(const Career& career,
     }
     if (target.medicalRisk >= 72) {
         target.scoutingNote += " | riesgo fisico alto";
-    } else if (target.medicalRisk >= 56) {
+    } else if (target.medicalRisk >= 56 || player.injuryProneness >= 62) {
         target.scoutingNote += " | requiere control medico";
     }
     if (target.readinessScore >= 68) {
@@ -211,6 +225,7 @@ TransferTarget evaluateTarget(const Career& career,
     if (profile.youthTrust >= 72) {
         personalityScoreBias += max(0, 22 - player.age) * 1.3;
         personalityScoreBias += max(0, player.potential - player.skill) * 0.35;
+        personalityScoreBias += max(0, player.adaptation - 60) * 0.12;
     }
     if (profile.starterBias >= 72) {
         personalityScoreBias += (target.readinessScore >= 68 ? 8.0 : -6.0);
@@ -220,6 +235,8 @@ TransferTarget evaluateTarget(const Career& career,
     if (profile.saleBias >= 72) {
         personalityScoreBias -= max(0LL, totalCost - strategy.maxTransferBudget) / 60000.0;
     }
+    personalityScoreBias += max(0, player.discipline - 60) * 0.08;
+    personalityScoreBias -= max(0, player.injuryProneness - 55) * 0.10;
 
     target.totalScore = target.fitScore * 0.55 + target.potentialScore * 0.18 +
                         target.affordabilityScore * 2.1 + target.scoutingConfidence * 0.08 +

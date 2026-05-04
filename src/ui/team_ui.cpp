@@ -128,6 +128,10 @@ void viewTeam(Team& team) {
                  << ", Fel " << p.happiness << ", Quim " << p.chemistry
                  << ", Lider " << p.leadership << ", Profesionalismo " << p.professionalism
                  << ", Disciplina tactica " << p.tacticalDiscipline
+                 << ", Disciplina " << p.discipline
+                 << ", Adaptacion " << p.adaptation
+                 << ", Prop lesion " << p.injuryProneness
+                 << ", Personalidad " << (p.personality.empty() ? string("Equilibrado") : p.personality)
                  << ", Instr " << p.individualInstruction
                  << ", Plan " << p.developmentPlan << ", Promesa " << p.promisedRole
                  << ", Rasgos " << joinStringValues(p.traits, ", ")

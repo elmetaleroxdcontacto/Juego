@@ -1,12 +1,16 @@
 ﻿#include "io.h"
 
 #include "competition.h"
+#include "competition/league_registry.h"
 #include "utils.h"
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <set>
 #include <sstream>
 #include <unordered_set>
 
@@ -202,6 +206,245 @@ void finalizeLoadedTeam(Team& team, int minimumPlayers = 18) {
     if (maxSquad > 0) effectiveMinimum = min(effectiveMinimum, maxSquad);
     ensureMinimumSquad(team, effectiveMinimum);
     ensureCompetitiveRoleCoverage(team);
+}
+
+string jsonTextFromFile(const string& filename) {
+    vector<string> lines;
+    if (!readTextFileLines(filename, lines)) return "";
+    string text;
+    for (const string& line : lines) {
+        text += line;
+        text.push_back('\n');
+    }
+    return text;
+}
+
+vector<string> collectFlatJsonObjects(const string& text) {
+    vector<string> objects;
+    int depth = 0;
+    bool inString = false;
+    bool escaping = false;
+    size_t start = string::npos;
+    for (size_t i = 0; i < text.size(); ++i) {
+        const char ch = text[i];
+        if (escaping) {
+            escaping = false;
+            continue;
+        }
+        if (ch == '\\' && inString) {
+            escaping = true;
+            continue;
+        }
+        if (ch == '"') {
+            inString = !inString;
+            continue;
+        }
+        if (inString) continue;
+        if (ch == '{') {
+            if (depth == 0) start = i;
+            depth++;
+        } else if (ch == '}') {
+            depth--;
+            if (depth == 0 && start != string::npos) {
+                objects.push_back(text.substr(start, i - start + 1));
+                start = string::npos;
+            }
+        }
+    }
+    return objects;
+}
+
+string unquoteJsonValue(string value) {
+    value = trim(value);
+    if (value.size() >= 2 && value.front() == '"' && value.back() == '"') {
+        string out;
+        bool escaping = false;
+        for (size_t i = 1; i + 1 < value.size(); ++i) {
+            const char ch = value[i];
+            if (escaping) {
+                if (ch == 'n') out.push_back('\n');
+                else if (ch == 'r') out.push_back('\r');
+                else out.push_back(ch);
+                escaping = false;
+            } else if (ch == '\\') {
+                escaping = true;
+            } else {
+                out.push_back(ch);
+            }
+        }
+        return out;
+    }
+    return value;
+}
+
+map<string, string> parseFlatJsonObject(const string& objectText) {
+    map<string, string> fields;
+    size_t pos = 0;
+    while (pos < objectText.size()) {
+        size_t keyStart = objectText.find('"', pos);
+        if (keyStart == string::npos) break;
+        size_t keyEnd = objectText.find('"', keyStart + 1);
+        if (keyEnd == string::npos) break;
+        const string key = toLower(trim(objectText.substr(keyStart + 1, keyEnd - keyStart - 1)));
+        size_t colon = objectText.find(':', keyEnd + 1);
+        if (colon == string::npos) break;
+        size_t valueStart = colon + 1;
+        while (valueStart < objectText.size() && isspace(static_cast<unsigned char>(objectText[valueStart]))) valueStart++;
+        size_t valueEnd = valueStart;
+        if (valueStart < objectText.size() && objectText[valueStart] == '"') {
+            bool escaping = false;
+            valueEnd = valueStart + 1;
+            for (; valueEnd < objectText.size(); ++valueEnd) {
+                const char ch = objectText[valueEnd];
+                if (escaping) {
+                    escaping = false;
+                    continue;
+                }
+                if (ch == '\\') {
+                    escaping = true;
+                    continue;
+                }
+                if (ch == '"') {
+                    valueEnd++;
+                    break;
+                }
+            }
+        } else if (valueStart < objectText.size() && objectText[valueStart] == '[') {
+            int depth = 1;
+            valueEnd = valueStart + 1;
+            for (; valueEnd < objectText.size() && depth > 0; ++valueEnd) {
+                if (objectText[valueEnd] == '[') depth++;
+                else if (objectText[valueEnd] == ']') depth--;
+            }
+        } else {
+            while (valueEnd < objectText.size() && objectText[valueEnd] != ',' && objectText[valueEnd] != '}') {
+                valueEnd++;
+            }
+        }
+        if (!key.empty()) fields[key] = unquoteJsonValue(objectText.substr(valueStart, valueEnd - valueStart));
+        pos = valueEnd + 1;
+    }
+    return fields;
+}
+
+string jsonStringField(const map<string, string>& fields, const string& key, const string& fallback = "") {
+    auto it = fields.find(toLower(key));
+    if (it == fields.end()) return fallback;
+    string value = trim(it->second);
+    if (value == "null") return fallback;
+    return value.empty() ? fallback : value;
+}
+
+int jsonIntField(const map<string, string>& fields, const string& key, int fallback) {
+    const string value = jsonStringField(fields, key);
+    if (value.empty()) return fallback;
+    try {
+        return stoi(value);
+    } catch (...) {
+        return fallback;
+    }
+}
+
+long long jsonLongField(const map<string, string>& fields, const string& key, long long fallback) {
+    const string value = jsonStringField(fields, key);
+    if (value.empty()) return fallback;
+    long long parsed = parseMarketValue(value);
+    if (parsed > 0) return parsed;
+    try {
+        return stoll(value);
+    } catch (...) {
+        return fallback;
+    }
+}
+
+bool jsonBoolField(const map<string, string>& fields, const string& key, bool fallback) {
+    const string value = toLower(jsonStringField(fields, key));
+    if (value.empty()) return fallback;
+    if (value == "true" || value == "1" || value == "yes" || value == "si") return true;
+    if (value == "false" || value == "0" || value == "no") return false;
+    return fallback;
+}
+
+Team* findExternalTeam(deque<Team>& allTeams, const string& name) {
+    const string id = normalizeTeamId(name);
+    if (id.empty()) return nullptr;
+    for (auto& team : allTeams) {
+        if (normalizeTeamId(team.name) == id) return &team;
+    }
+    return nullptr;
+}
+
+bool hasDivisionInfo(const vector<DivisionInfo>& divisions, const string& id) {
+    const string canonical = canonicalDivisionId(id);
+    return any_of(divisions.begin(), divisions.end(), [&](const DivisionInfo& division) {
+        return canonicalDivisionId(division.id) == canonical;
+    });
+}
+
+void applyJsonTeamFields(Team& team, const map<string, string>& fields) {
+    team.division = canonicalDivisionId(jsonStringField(fields, "division", team.division.empty() ? "primera division" : team.division));
+    team.tactics = jsonStringField(fields, "tactics", team.tactics.empty() ? "Balanced" : team.tactics);
+    team.formation = jsonStringField(fields, "formation", team.formation.empty() ? "4-4-2" : team.formation);
+    team.matchInstruction = jsonStringField(fields, "match_instruction", team.matchInstruction.empty() ? "Equilibrado" : team.matchInstruction);
+    team.trainingFocus = jsonStringField(fields, "training_focus", team.trainingFocus.empty() ? "Balanceado" : team.trainingFocus);
+    team.youthRegion = jsonStringField(fields, "youth_region", team.youthRegion.empty() ? "Metropolitana" : team.youthRegion);
+    team.transferPolicy = jsonStringField(fields, "transfer_policy", team.transferPolicy);
+    team.headCoachStyle = jsonStringField(fields, "coach_style", team.headCoachStyle);
+    team.budget = max(0LL, jsonLongField(fields, "budget", team.budget));
+    team.sponsorWeekly = max(0LL, jsonLongField(fields, "sponsor_weekly", team.sponsorWeekly));
+    team.fanBase = clampInt(jsonIntField(fields, "fan_base", team.fanBase <= 0 ? 12 : team.fanBase), 1, 100);
+    team.morale = clampInt(jsonIntField(fields, "morale", team.morale <= 0 ? 50 : team.morale), 0, 100);
+    team.pressingIntensity = clampInt(jsonIntField(fields, "pressing", team.pressingIntensity <= 0 ? 3 : team.pressingIntensity), 1, 5);
+    team.tempo = clampInt(jsonIntField(fields, "tempo", team.tempo <= 0 ? 3 : team.tempo), 1, 5);
+    team.width = clampInt(jsonIntField(fields, "width", team.width <= 0 ? 3 : team.width), 1, 5);
+    team.defensiveLine = clampInt(jsonIntField(fields, "defensive_line", team.defensiveLine <= 0 ? 3 : team.defensiveLine), 1, 5);
+}
+
+void applyJsonPlayerOverrides(Player& player, const map<string, string>& fields) {
+    player.potential = clampInt(jsonIntField(fields, "potential", player.potential), player.skill, 99);
+    player.personality = jsonStringField(fields, "personality", player.personality);
+    player.discipline = clampInt(jsonIntField(fields, "discipline", player.discipline), 1, 99);
+    player.injuryProneness = clampInt(jsonIntField(fields, "injury_proneness",
+                                                   jsonIntField(fields, "injuryProneness", player.injuryProneness)),
+                                      1,
+                                      99);
+    player.adaptation = clampInt(jsonIntField(fields, "adaptation", player.adaptation), 1, 99);
+    player.currentForm = clampInt(jsonIntField(fields, "current_form",
+                                               jsonIntField(fields, "currentForm", player.currentForm)),
+                                  1,
+                                  99);
+    player.leadership = clampInt(jsonIntField(fields, "leadership", player.leadership), 1, 99);
+    player.wage = max(0LL, jsonLongField(fields, "wage", player.wage));
+    player.contractWeeks = max(1, jsonIntField(fields, "contract_weeks", player.contractWeeks));
+    player.onLoan = jsonBoolField(fields, "loan", player.onLoan);
+    if (player.onLoan) {
+        player.parentClub = jsonStringField(fields, "parent_club", player.parentClub);
+        player.loanWeeksRemaining = max(1, jsonIntField(fields, "loan_weeks", player.loanWeeksRemaining));
+    }
+    ensurePlayerProfile(player, player.traits.empty());
+}
+
+vector<map<string, string>> parseJsonObjectsFromFile(const string& filename) {
+    vector<map<string, string>> objects;
+    const string text = jsonTextFromFile(filename);
+    if (text.empty()) return objects;
+    for (const string& objectText : collectFlatJsonObjects(text)) {
+        objects.push_back(parseFlatJsonObject(objectText));
+    }
+    return objects;
+}
+
+void ensureExternalUniquePlayerNames(Team& team) {
+    unordered_set<string> used;
+    for (auto& player : team.players) {
+        const string base = trim(player.name).empty() ? "Jugador" : trim(player.name);
+        string candidate = base;
+        int suffix = 2;
+        while (!used.insert(toLower(candidate)).second) {
+            candidate = base + " " + to_string(suffix++);
+        }
+        player.name = candidate;
+    }
 }
 
 }  // namespace
@@ -675,5 +918,107 @@ DivisionLoadResult loadDivisionFromFolder(const string& folder, const string& di
         allTeams.push_back(std::move(team));
         result.teams.push_back(&allTeams.back());
     }
+    return result;
+}
+
+ExternalJsonLoadResult loadExternalJsonData(deque<Team>& allTeams) {
+    ExternalJsonLoadResult result;
+    set<string> touchedTeams;
+
+    const vector<string> leagueFiles = {"data/leagues.json", "mods/leagues.json"};
+    for (const string& filename : leagueFiles) {
+        if (!pathExists(filename)) continue;
+        for (const auto& fields : parseJsonObjectsFromFile(filename)) {
+            const string rawId = jsonStringField(fields, "id", jsonStringField(fields, "name"));
+            if (trim(rawId).empty()) {
+                result.warnings.push_back(filename + ": liga sin id ignorada.");
+                continue;
+            }
+            DivisionInfo division;
+            division.id = canonicalDivisionId(rawId);
+            division.folder = jsonStringField(fields, "folder", filename);
+            division.display = jsonStringField(fields, "display", rawId);
+            if (!hasDivisionInfo(result.divisions, division.id)) result.divisions.push_back(division);
+        }
+    }
+
+    const vector<string> teamFiles = {"data/teams.json", "mods/teams.json"};
+    for (const string& filename : teamFiles) {
+        if (!pathExists(filename)) continue;
+        for (const auto& fields : parseJsonObjectsFromFile(filename)) {
+            const string teamName = jsonStringField(fields, "name");
+            if (teamName.empty()) {
+                result.warnings.push_back(filename + ": equipo sin nombre ignorado.");
+                continue;
+            }
+
+            Team* team = findExternalTeam(allTeams, teamName);
+            if (!team) {
+                allTeams.emplace_back(teamName);
+                team = &allTeams.back();
+                team->division = canonicalDivisionId(jsonStringField(fields, "division", "primera division"));
+                result.teamsLoaded++;
+            }
+            applyJsonTeamFields(*team, fields);
+            if (team->budget <= 0) team->budget = max(200000LL, team->getSquadValue() / 6);
+            if (team->sponsorWeekly <= 0) team->sponsorWeekly = 25000;
+            if (!hasDivisionInfo(result.divisions, team->division) && !isRegisteredDivisionId(team->division)) {
+                result.divisions.push_back({team->division, filename, divisionDisplay(team->division)});
+            }
+            touchedTeams.insert(normalizeTeamId(team->name));
+        }
+    }
+
+    const vector<string> playerFiles = {"data/players.json", "mods/players.json"};
+    for (const string& filename : playerFiles) {
+        if (!pathExists(filename)) continue;
+        for (const auto& fields : parseJsonObjectsFromFile(filename)) {
+            const string teamName = jsonStringField(fields, "team", jsonStringField(fields, "club"));
+            const string playerName = jsonStringField(fields, "name");
+            if (teamName.empty() || playerName.empty()) {
+                result.warnings.push_back(filename + ": jugador sin equipo o nombre ignorado.");
+                continue;
+            }
+
+            Team* team = findExternalTeam(allTeams, teamName);
+            if (!team) {
+                allTeams.emplace_back(teamName);
+                team = &allTeams.back();
+                team->division = canonicalDivisionId(jsonStringField(fields, "division", "primera division"));
+                result.teamsLoaded++;
+            }
+            if (team->division.empty()) team->division = canonicalDivisionId(jsonStringField(fields, "division", "primera division"));
+            applyJsonTeamFields(*team, fields);
+
+            const string duplicateKey = toLower(playerName);
+            const bool duplicate = any_of(team->players.begin(), team->players.end(), [&](const Player& player) {
+                return toLower(player.name) == duplicateKey;
+            });
+            if (duplicate) {
+                result.warnings.push_back(filename + ": jugador duplicado ignorado: " + playerName + " (" + team->name + ").");
+                continue;
+            }
+
+            const string position = jsonStringField(fields, "position", "MED");
+            const int age = clampInt(jsonIntField(fields, "age", 24), 15, 45);
+            const long long value = jsonLongField(fields, "market_value", jsonLongField(fields, "value", 0));
+            Player player = buildLoadedPlayer(playerName, position, age, value, team->division);
+            applyJsonPlayerOverrides(player, fields);
+            team->addPlayer(player);
+            result.playersLoaded++;
+            touchedTeams.insert(normalizeTeamId(team->name));
+        }
+    }
+
+    for (auto& team : allTeams) {
+        if (touchedTeams.find(normalizeTeamId(team.name)) == touchedTeams.end()) continue;
+        if (team.division.empty()) team.division = "primera division";
+        finalizeLoadedTeam(team);
+        ensureExternalUniquePlayerNames(team);
+        if (team.budget <= 0) team.budget = max(200000LL, team.getSquadValue() / 6);
+        if (team.sponsorWeekly <= 0) team.sponsorWeekly = max(12000LL, team.getSquadValue() / 25);
+        ensureTeamIdentity(team);
+    }
+
     return result;
 }

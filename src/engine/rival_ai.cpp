@@ -98,6 +98,8 @@ std::vector<TacticalAdjustment> RivalAI::generateInMatchAdjustments(
     const std::string& myTactics, const std::string& oppTactics) const {
 
     std::vector<TacticalAdjustment> adjustments;
+    const std::string myTacticsLower = toLower(myTactics);
+    const std::string oppTacticsLower = toLower(oppTactics);
 
     if (myScore > oppScore) {
         if (personality.playstyle == "aggressive") {
@@ -117,7 +119,8 @@ std::vector<TacticalAdjustment> RivalAI::generateInMatchAdjustments(
         }
     } else if (oppScore > myScore && personality.adaptability > 50) {
         TacticalAdjustment adj;
-        adj.adjustmentType = "formation_change";
+        adj.adjustmentType =
+            (oppTacticsLower == "pressing" || myTacticsLower == "defensive") ? "counter_setup" : "formation_change";
         adj.intensity = 20;
         adj.minuteToApply = currentMinute + 10;
         adj.reactive = true;

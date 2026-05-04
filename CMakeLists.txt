@@ -17,41 +17,44 @@ if(MINGW)
     set(CMAKE_CXX_RESPONSE_FILE_LINK_FLAG "@")
 endif()
 
+# Career orchestration, state adapters and weekly simulation.
 set(FM_CAREER_SOURCES
     src/career/analytics_service.cpp
     src/career/app_services.cpp
-    src/career/inbox_service.cpp
-    src/career/manager_advice.cpp
-    src/career/medical_service.cpp
-    src/career/staff_service.cpp
+    src/career/career_manager.cpp
+    src/career/career_modules.cpp
+    src/career/career_reports.cpp
     src/career/career_runtime.cpp
     src/career/career_state.cpp
-    src/career/career_reports.cpp
-    src/career/transfer_briefing.cpp
-    src/career/career_manager.cpp
+    src/career/career_service.cpp
+    src/career/career_support.cpp
     src/career/dressing_room_service.cpp
+    src/career/game_events_system.cpp
+    src/career/gameplay_reports.cpp
+    src/career/inbox_service.cpp
+    src/career/manager_advice.cpp
     src/career/match_analysis_store.cpp
     src/career/match_center_service.cpp
+    src/career/medical_service.cpp
+    src/career/player_development.cpp
     src/career/season_flow_controller.cpp
     src/career/season_service.cpp
     src/career/season_transition.cpp
-    src/career/career_support.cpp
-    src/career/player_development.cpp
+    src/career/staff_service.cpp
+    src/career/sub_services.cpp
     src/career/team_management.cpp
+    src/career/transfer_briefing.cpp
     src/career/week_simulation.cpp
     src/career/weekly_focus_service.cpp
     src/career/world_state_service.cpp
-    src/career/game_events_system.cpp
-    src/career/gameplay_reports.cpp
-    src/career/career_service.cpp
-    src/career/sub_services.cpp
 )
 
+# CPU squad, tactic and market behavior.
 set(FM_AI_SOURCES
     src/ai/ai_match_manager.cpp
     src/ai/ai_squad_planner.cpp
-    src/ai/team_ai.cpp
     src/ai/ai_transfer_manager.cpp
+    src/ai/team_ai.cpp
 )
 
 set(FM_COMPETITION_SOURCES
@@ -231,6 +234,12 @@ list(REMOVE_DUPLICATES FM_FOOTBALLMANAGER_SOURCES)
 list(REMOVE_DUPLICATES FM_FOOTBALLMANAGER_CLI_SOURCES)
 list(REMOVE_DUPLICATES FM_FOOTBALLMANAGER_TEST_SOURCES)
 
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
+    ${FM_FOOTBALLMANAGER_SOURCES}
+    ${FM_FOOTBALLMANAGER_CLI_SOURCES}
+    ${FM_FOOTBALLMANAGER_TEST_SOURCES}
+)
+
 if(WIN32)
     add_executable(FootballManager WIN32
         ${FM_FOOTBALLMANAGER_SOURCES}
@@ -291,7 +300,4 @@ if(BUILD_TESTING)
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
 endif()
-
-
-
 

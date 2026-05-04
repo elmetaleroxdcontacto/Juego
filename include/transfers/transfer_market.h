@@ -8,6 +8,11 @@
 
 namespace transfer_market {
 
+bool isTransferWindowOpen(const Career& career);
+int nextTransferWindowWeek(const Career& career);
+std::string transferWindowLabel(const Career& career);
+std::vector<std::string> buildTransferWindowLines(const Career& career,
+                                                  std::size_t limit = 3);
 std::string weakestSquadPosition(const Team& team);
 std::vector<TransferTarget> buildTransferShortlist(const Career& career,
                                                    const Team& team,

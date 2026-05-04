@@ -78,14 +78,15 @@ bool checkCareerMilestone(const Career& career, int& outMilestoneWeek) {
 
 std::string GetMilestoneDescription(int weekNumber, const Career& career) {
     if (weekNumber < 0) return "¡Campeón de la temporada!";
+    const std::string managerPrefix = career.managerName.empty() ? "" : (career.managerName + ": ");
     
     switch (weekNumber) {
-        case 10: return "10 semanas de carrera completadas.";
-        case 50: return "50 semanas de carrera. Ya eres veterano.";
-        case 100: return "100 semanas. Centenario de partidos bajo tu mando.";
-        case 200: return "200 semanas. Tu legado crece.";
-        case 500: return "500 semanas. Leyenda viviente del fútbol.";
-        default: return "Hito alcanzado.";
+        case 10: return managerPrefix + "10 semanas de carrera completadas.";
+        case 50: return managerPrefix + "50 semanas de carrera. Ya eres veterano.";
+        case 100: return managerPrefix + "100 semanas. Centenario de partidos bajo tu mando.";
+        case 200: return managerPrefix + "200 semanas. Tu legado crece.";
+        case 500: return managerPrefix + "500 semanas. Leyenda viviente del fútbol.";
+        default: return managerPrefix + "Hito alcanzado.";
     }
 }
 

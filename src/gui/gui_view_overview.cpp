@@ -176,6 +176,11 @@ GuiPageModel buildDashboardModel(AppState& state) {
     }
     out << "Microciclo\r\n" << trainingSchedulePreview(team, congestedWeek) << "\r\n\r\n";
     out << "Lectura del rival\r\n" << buildOpponentReport(state.career);
+    const auto opponentPlan = buildNextOpponentPlanLines(state.career, 4);
+    if (!opponentPlan.empty()) {
+        out << "\r\n\r\nPlan de proximo rival\r\n";
+        for (const auto& line : opponentPlan) out << "- " << line << "\r\n";
+    }
     model.summary.content = out.str();
 
     const auto analyticsLines = analytics_service::buildTeamAnalyticsLines(state.career, team);

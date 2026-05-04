@@ -29,7 +29,11 @@ void CareerService::updatePlayerPhysicalState() {
     
     // Update each player's condition and injuries
     for (auto& player : career_.myTeam->players) {
-        // Existing condition update logic here
+        player.fitness = std::max(0, std::min(player.fitness, player.stamina));
+        if (player.injuryWeeks <= 0) {
+            player.injured = false;
+            player.injuryType.clear();
+        }
     }
 }
 
@@ -93,6 +97,7 @@ void CareerService::updateManagerStress(int performanceImpact) {
 }
 
 std::vector<Team*> CareerService::buildJobMarket(bool includeRelegated) {
+    (void)includeRelegated;
     std::vector<Team*> jobs;
     
     for (auto& team : career_.allTeams) {

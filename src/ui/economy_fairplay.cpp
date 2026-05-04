@@ -11,6 +11,7 @@ FairPlayRules EconomyFairPlaySystem::g_rules[3];
 bool EconomyFairPlaySystem::g_initialized = false;
 
 void EconomyFairPlaySystem::initialize(Career& career) {
+    (void)career;
     // Primera Division - Stricter rules
     g_rules[0].division = "Primera";
     g_rules[0].maxSalaryCap = 50000000LL;        // $50M salary cap
@@ -39,6 +40,7 @@ void EconomyFairPlaySystem::initialize(Career& career) {
 }
 
 bool EconomyFairPlaySystem::checkSalaryCompliance(const Team& team, Career& career) {
+    (void)career;
     FairPlayRules rules = getRulesForDivision(team.division);
     
     long long totalSalary = 0;
@@ -183,6 +185,7 @@ void EconomyFairPlaySystem::applyFairPlayPenalties(Team& team, const std::vector
 }
 
 long long EconomyFairPlaySystem::getMaxAllowedSalary(const Team& team, Career& career) {
+    (void)career;
     FairPlayRules rules = getRulesForDivision(team.division);
     
     // Calculate based on revenue
