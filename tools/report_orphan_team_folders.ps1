@@ -7,7 +7,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-function Normalize-Id([string]$Value) {
+function Convert-Id([string]$Value) {
     $value = $Value.Trim().ToLowerInvariant()
     $value = [regex]::Replace($value, "[^a-z0-9]+", " ").Trim()
     return $value
@@ -16,9 +16,9 @@ function Normalize-Id([string]$Value) {
 function Read-IgnoredFolders([string]$Path) {
     $ids = @{}
     if (-not (Test-Path $Path)) { return $ids }
-    foreach ($row in Import-Csv $Path) {
+    foreach ($row in Import-Csv -Path $Path -Encoding UTF8) {
         if (-not $row.division -or -not $row.folder) { continue }
-        $key = ((Normalize-Id $row.division) + "|" + (Normalize-Id $row.folder))
+        $key = ((Convert-Id $row.division) + "|" + (Convert-Id $row.folder))
         $ids[$key] = $true
     }
     return $ids
@@ -27,13 +27,13 @@ function Read-IgnoredFolders([string]$Path) {
 function Read-TeamList([string]$TeamsFile) {
     $ids = @{}
     if (-not (Test-Path $TeamsFile)) { return $ids }
-    foreach ($line in Get-Content $TeamsFile) {
+    foreach ($line in Get-Content -Path $TeamsFile -Encoding UTF8) {
         $trimmed = $line.Trim()
         if ([string]::IsNullOrWhiteSpace($trimmed) -or $trimmed.StartsWith("#")) { continue }
-        $parts = $trimmed.Split('|')
+        $parts = $trimmed -split '\|', 2
         $display = $parts[0].Trim()
-        $folder = if ($parts.Length -gt 1 -and -not [string]::IsNullOrWhiteSpace($parts[1])) { $parts[1].Trim() } else { $display }
-        $ids[(Normalize-Id $folder)] = $display
+        $folder = if ($parts.Count -gt 1 -and -not [string]::IsNullOrWhiteSpace($parts[1])) { $parts[1].Trim() } else { $display }
+        $ids[(Convert-Id $folder)] = $display
     }
     return $ids
 }
@@ -49,8 +49,8 @@ foreach ($division in $divisions) {
     $folders = Get-ChildItem $division.FullName -Directory | Where-Object { $_.Name -ne ".git" }
     $orphans = @()
     foreach ($folder in $folders) {
-        $id = Normalize-Id $folder.Name
-        $ignoreKey = (Normalize-Id $division.Name) + "|" + $id
+        $id = Convert-Id $folder.Name
+        $ignoreKey = (Convert-Id $division.Name) + "|" + $id
         if ($ignoredFolders.ContainsKey($ignoreKey)) { continue }
         if (-not $listed.ContainsKey($id)) { $orphans += $folder.Name }
     }

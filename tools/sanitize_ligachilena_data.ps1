@@ -8,7 +8,7 @@ $ErrorActionPreference = "Stop"
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 $euro = [string][char]0x20AC
 
-function Has-Mojibake([string]$Text) {
+function Test-Mojibake([string]$Text) {
     if ([string]::IsNullOrWhiteSpace($Text)) { return $false }
     return $Text.Contains([string][char]0x00C3) -or
            $Text.Contains([string][char]0x00C2) -or
@@ -16,9 +16,9 @@ function Has-Mojibake([string]$Text) {
            $Text.Contains([string][char]0xFFFD)
 }
 
-function Fix-Mojibake([string]$Text) {
+function Repair-Mojibake([string]$Text) {
     if ([string]::IsNullOrWhiteSpace($Text)) { return $Text }
-    if (-not (Has-Mojibake $Text)) { return $Text }
+    if (-not (Test-Mojibake $Text)) { return $Text }
     try {
         $bytes = [System.Text.Encoding]::GetEncoding(1252).GetBytes($Text)
         $decoded = [System.Text.Encoding]::UTF8.GetString($bytes)
@@ -42,15 +42,16 @@ function Remove-Diacritics([string]$Text) {
 }
 
 function Get-ComparableText([string]$Text) {
-    return (Remove-Diacritics (Fix-Mojibake $Text)).ToLowerInvariant()
+    $text = Format-Whitespace $Text
+    return (Remove-Diacritics (Repair-Mojibake $text)).ToLowerInvariant()
 }
 
-function Normalize-Whitespace([string]$Text) {
+function Format-Whitespace([string]$Text) {
     if ([string]::IsNullOrWhiteSpace($Text)) { return "" }
     return ([regex]::Replace($Text.Trim(), "\s+", " "))
 }
 
-function Normalize-PositionToken([string]$Text) {
+function Convert-PositionToken([string]$Text) {
     $value = Get-ComparableText $Text
     if ([string]::IsNullOrWhiteSpace($value) -or $value -eq "n/a" -or $value -eq "-") { return "N/A" }
 
@@ -69,21 +70,21 @@ function Normalize-PositionToken([string]$Text) {
 
 function Get-RoleHintFromName([string]$Name) {
     $value = Get-ComparableText $Name
-    if ($value -match "(^|\s)(portero|arquero)$") { return "ARQ" }
-    if ($value -match "(^|\s)(defensa|lateral|carrilero)$") { return "DEF" }
-    if ($value -match "(^|\s)(volante|mediocampista)$") { return "MED" }
-    if ($value -match "(^|\s)(delantero|punta)$") { return "DEL" }
+    if ($value -match "\b(portero|arquero)\b") { return "ARQ" }
+    if ($value -match "\b(defensa|lateral|carrilero)\b") { return "DEF" }
+    if ($value -match "\b(volante|mediocampista)\b") { return "MED" }
+    if ($value -match "\b(delantero|punta)\b") { return "DEL" }
     return "N/A"
 }
 
-function Clean-PlayerName([string]$Name) {
-    $clean = Normalize-Whitespace (Fix-Mojibake $Name)
+function Format-PlayerName([string]$Name) {
+    $clean = Format-Whitespace (Repair-Mojibake $Name)
     $clean = [regex]::Replace($clean, "^\d+\.\s*", "")
-    $clean = [regex]::Replace($clean, "\s+(Portero|Arquero|Defensa|Volante|Mediocampista|Delantero|Punta)$", "")
-    return (Normalize-Whitespace $clean)
+    $clean = [regex]::Replace($clean, "(?i)\s+(Portero|Arquero|Defensa|Volante|Mediocampista|Delantero|Punta)$", "")
+    return (Format-Whitespace $clean)
 }
 
-function Is-StaffName([string]$Name) {
+function Test-StaffName([string]$Name) {
     $value = Get-ComparableText $Name
     return $value -match "^(dt|director tecnico|entrenador|cuerpo tecnico|tecnico|coach)\b"
 }
@@ -108,7 +109,7 @@ function Get-CanonicalRaw([string]$Position, [int]$Variant = 0) {
 
 function Get-NameSeed([string]$Text) {
     $sum = 0
-    foreach ($char in (Fix-Mojibake $Text).ToCharArray()) {
+    foreach ($char in (Repair-Mojibake $Text).ToCharArray()) {
         $sum = ($sum + [int][char]$char) % 997
     }
     return $sum
@@ -169,7 +170,7 @@ function New-RosterRow([string]$Name,
     }
 }
 
-function Parse-TeamsFile([string]$Path) {
+function Import-TeamsFile([string]$Path) {
     $lines = [System.IO.File]::ReadAllLines((Resolve-Path $Path), [System.Text.Encoding]::UTF8)
     $fixedLines = New-Object System.Collections.Generic.List[string]
     $entries = @()
@@ -180,9 +181,9 @@ function Parse-TeamsFile([string]$Path) {
             continue
         }
 
-        $parts = $line.Split("|")
-        $display = Normalize-Whitespace (Fix-Mojibake $parts[0])
-        $folder = if ($parts.Count -gt 1) { Normalize-Whitespace (Fix-Mojibake $parts[1]) } else { $display }
+        $parts = $line -split '\|', 2
+        $display = Format-Whitespace (Repair-Mojibake $parts[0])
+        $folder = if ($parts.Count -gt 1) { Format-Whitespace (Repair-Mojibake $parts[1]) } else { $display }
         $entries += [pscustomobject]@{ Display = $display; Folder = $folder }
         if ($parts.Count -gt 1) {
             $fixedLines.Add("$display|$folder")
@@ -195,40 +196,40 @@ function Parse-TeamsFile([string]$Path) {
     return $entries
 }
 
-function Parse-PlayersTxt([string]$Path) {
+function Import-PlayersTxt([string]$Path) {
     $rows = @()
     $lines = [System.IO.File]::ReadAllLines((Resolve-Path $Path), [System.Text.Encoding]::UTF8)
     foreach ($rawLine in $lines) {
-        $line = Normalize-Whitespace $rawLine
+        $line = Format-Whitespace (Repair-Mojibake $rawLine)
         if ([string]::IsNullOrWhiteSpace($line)) { continue }
-        if ($line.StartsWith("-")) { $line = Normalize-Whitespace $line.Substring(1) }
-        $parts = $line.Split("|")
+        if ($line.StartsWith("-")) { $line = Format-Whitespace $line.Substring(1) }
+        $parts = $line -split '\|'
         if ($parts.Count -lt 2) { continue }
 
-        $name = Normalize-Whitespace $parts[0]
-        $positionField = Normalize-Whitespace $parts[1]
+        $name = Format-Whitespace (Repair-Mojibake $parts[0])
+        $positionField = Format-Whitespace (Repair-Mojibake $parts[1])
         $position = $positionField
         $positionRaw = ""
         if ($positionField -match "^(.*?)\((.*?)\)$") {
-            $position = Normalize-Whitespace $matches[1]
-            $positionRaw = Normalize-Whitespace $matches[2]
+            $position = Format-Whitespace $matches[1]
+            $positionRaw = Format-Whitespace $matches[2]
         }
 
         $age = "N/A"
         $number = "N/A"
         $marketValue = "-"
         foreach ($part in $parts) {
-            $segment = Normalize-Whitespace $part
-            if ($segment -match "^Edad:\s*(.*)$") { $age = Normalize-Whitespace $matches[1] }
-            elseif ($segment -match "^N[^:]*:\s*(.*)$") { $number = Normalize-Whitespace $matches[1] }
-            elseif ($segment -match "^Valor:\s*(.*)$") { $marketValue = Normalize-Whitespace $matches[1] }
+            $segment = Format-Whitespace (Repair-Mojibake $part)
+            if ($segment -match "^(?:Edad|Age)\s*:\s*(.*)$") { $age = Format-Whitespace $matches[1] }
+            elseif ($segment -match "^(?:N(?:úmero|umero|o)|No|Number)\s*:\s*(.*)$") { $number = Format-Whitespace $matches[1] }
+            elseif ($segment -match "^(?:Valor|Value)\s*:\s*(.*)$") { $marketValue = Format-Whitespace $matches[1] }
         }
         $rows += (New-RosterRow $name $position $positionRaw $age $number $marketValue "generated://from-txt")
     }
     return $rows
 }
 
-function Parse-PlayersJson([string]$Path) {
+function Import-PlayersJson([string]$Path) {
     $content = Get-Content -Path $Path -Raw -Encoding UTF8
     if ([string]::IsNullOrWhiteSpace($content)) { return @() }
     try {
@@ -268,14 +269,14 @@ function Convert-CsvInputToRows([object[]]$CsvRows) {
 
 function Get-PositionScore([hashtable]$Row) {
     $score = 0
-    if ((Normalize-PositionToken $Row.position) -ne "N/A") { $score += 3 }
-    if ((Normalize-PositionToken $Row.position_raw) -ne "N/A") { $score += 2 }
+    if ((Convert-PositionToken $Row.position) -ne "N/A") { $score += 3 }
+    if ((Convert-PositionToken $Row.position_raw) -ne "N/A") { $score += 2 }
     if ($Row.age -match "^\d+$") { $score += 1 }
     if (-not [string]::IsNullOrWhiteSpace($Row.market_value) -and $Row.market_value -ne "-" -and $Row.market_value -ne "N/A") { $score += 1 }
     return $score
 }
 
-function Ensure-MinimumCoverage([System.Collections.ArrayList]$Rows, [string]$Division, [string]$TeamName) {
+function Set-MinimumCoverage([System.Collections.ArrayList]$Rows, [string]$Division, [string]$TeamName) {
     $minimums = @(
         @{ Position = "ARQ"; Count = 2 },
         @{ Position = "DEF"; Count = 6 },
@@ -284,7 +285,7 @@ function Ensure-MinimumCoverage([System.Collections.ArrayList]$Rows, [string]$Di
     )
 
     foreach ($rule in $minimums) {
-        $current = @($Rows | Where-Object { (Normalize-PositionToken $_.position) -eq $rule.Position }).Count
+        $current = @($Rows | Where-Object { (Convert-PositionToken $_.position) -eq $rule.Position }).Count
         while ($current -lt $rule.Count) {
             $seed = Get-NameSeed "$TeamName|$($rule.Position)|$current"
             $name = "$TeamName Cantera $($Rows.Count + 1)"
@@ -301,47 +302,46 @@ function Ensure-MinimumCoverage([System.Collections.ArrayList]$Rows, [string]$Di
     }
 }
 
-function Finalize-RosterRows([object[]]$InputRows, [string]$Division, [string]$TeamName) {
-    $prepared = @()
+function Complete-RosterRows([object[]]$InputRows, [string]$Division, [string]$TeamName) {
     $seen = @{}
 
     foreach ($inputRow in $InputRows) {
-        $name = Clean-PlayerName ([string]$inputRow.name)
+        $name = Format-PlayerName ([string]$inputRow.name)
         if ([string]::IsNullOrWhiteSpace($name)) { continue }
-        if (Is-StaffName $name) { continue }
+        if (Test-StaffName $name) { continue }
 
         $roleHint = Get-RoleHintFromName $inputRow.name
-        $rawPosition = Normalize-Whitespace (Fix-Mojibake ([string]$inputRow.position_raw))
-        $directPosition = Normalize-PositionToken ([string]$inputRow.position)
-        $resolvedPosition = Normalize-PositionToken $rawPosition
+        $rawPosition = Format-Whitespace (Repair-Mojibake ([string]$inputRow.position_raw))
+        $directPosition = Convert-PositionToken ([string]$inputRow.position)
+        $resolvedPosition = Convert-PositionToken $rawPosition
         if ($resolvedPosition -eq "N/A") { $resolvedPosition = $roleHint }
         if ($resolvedPosition -eq "N/A") { $resolvedPosition = $directPosition }
 
-        $age = Normalize-Whitespace (Fix-Mojibake ([string]$inputRow.age))
+        $age = Format-Whitespace (Repair-Mojibake ([string]$inputRow.age))
         $seed = Get-NameSeed $name
         if ($age -notmatch "^\d+$" -or [int]$age -lt 15 -or [int]$age -gt 45) {
             if ($resolvedPosition -eq "N/A") { $resolvedPosition = "MED" }
             $age = [string](Get-DefaultAge $Division $resolvedPosition $seed)
         }
 
-        $marketValue = Normalize-Whitespace (Fix-Mojibake ([string]$inputRow.market_value))
+        $marketValue = Format-Whitespace (Repair-Mojibake ([string]$inputRow.market_value))
         if ([string]::IsNullOrWhiteSpace($marketValue) -or $marketValue -eq "N/A" -or $marketValue -eq "-") {
             if ($resolvedPosition -eq "N/A") { $resolvedPosition = "MED" }
             $marketValue = Get-DefaultMarketValue $Division $resolvedPosition $seed
         } else {
-            $marketValue = Fix-Mojibake $marketValue
+            $marketValue = Repair-Mojibake $marketValue
         }
 
-        $number = Normalize-Whitespace (Fix-Mojibake ([string]$inputRow.number))
+        $number = Format-Whitespace (Repair-Mojibake ([string]$inputRow.number))
         if ([string]::IsNullOrWhiteSpace($number)) { $number = "N/A" }
 
-        $source = Normalize-Whitespace (Fix-Mojibake ([string]$inputRow.source))
+        $source = Format-Whitespace (Repair-Mojibake ([string]$inputRow.source))
         if ([string]::IsNullOrWhiteSpace($source)) { $source = "generated://sanitized" }
 
         if ($resolvedPosition -eq "MED" -and (Get-ComparableText $rawPosition) -match "defensive midfield") {
             $rawPosition = "Holding Midfield"
         }
-        if ($resolvedPosition -eq "MED" -and (Normalize-PositionToken $rawPosition) -eq "DEF") {
+        if ($resolvedPosition -eq "MED" -and (Convert-PositionToken $rawPosition) -eq "DEF") {
             $rawPosition = "Central Midfield"
         }
 
@@ -364,7 +364,7 @@ function Finalize-RosterRows([object[]]$InputRows, [string]$Division, [string]$T
     $fallbackPlan = @("ARQ", "ARQ", "DEF", "DEF", "DEF", "DEF", "DEF", "MED", "MED", "MED", "MED", "MED", "MED", "DEL", "DEL", "DEL", "DEL", "MED")
     $fallbackIndex = 0
     foreach ($row in $orderedRows) {
-        if ((Normalize-PositionToken $row.position) -eq "N/A") {
+        if ((Convert-PositionToken $row.position) -eq "N/A") {
             $fallbackPosition = $fallbackPlan[[Math]::Min($fallbackIndex, $fallbackPlan.Count - 1)]
             $row.position = $fallbackPosition
             $row.position_raw = Get-CanonicalRaw $fallbackPosition $fallbackIndex
@@ -372,7 +372,7 @@ function Finalize-RosterRows([object[]]$InputRows, [string]$Division, [string]$T
         }
     }
 
-    Ensure-MinimumCoverage $orderedRows $Division $TeamName
+    Set-MinimumCoverage $orderedRows $Division $TeamName
 
     $defenders = @($orderedRows | Where-Object { $_.position -eq "DEF" })
     $cbCount = @($defenders | Where-Object { (Get-ComparableText $_.position_raw) -match "centre-back|center-back|defensa central|zaguero|\bcb\b" }).Count
@@ -390,7 +390,7 @@ function Finalize-RosterRows([object[]]$InputRows, [string]$Division, [string]$T
             $fbCount++
             continue
         }
-        if ((Normalize-PositionToken $row.position_raw) -eq "N/A") {
+        if ((Convert-PositionToken $row.position_raw) -eq "N/A") {
             $row.position_raw = Get-CanonicalRaw "DEF" $defVariant
         }
         $defVariant++
@@ -408,7 +408,7 @@ function Finalize-RosterRows([object[]]$InputRows, [string]$Division, [string]$T
     }
 
     foreach ($row in $orderedRows) {
-        if ((Normalize-PositionToken $row.position_raw) -eq "N/A") {
+        if ((Convert-PositionToken $row.position_raw) -eq "N/A") {
             $row.position_raw = Get-CanonicalRaw $row.position 0
         }
     }
@@ -438,12 +438,12 @@ function Finalize-RosterRows([object[]]$InputRows, [string]$Division, [string]$T
         }
     }
 
-    Ensure-MinimumCoverage $orderedRows $Division $TeamName
+    Set-MinimumCoverage $orderedRows $Division $TeamName
 
     return ,$orderedRows
 }
 
-function Write-RosterCsv([string]$Path, [System.Collections.ArrayList]$Rows) {
+function Export-RosterCsv([string]$Path, [System.Collections.ArrayList]$Rows) {
     $objects = foreach ($row in $Rows) {
         [pscustomobject]@{
             name = $row.name
@@ -476,7 +476,7 @@ foreach ($division in $divisions) {
 
     $teamsPath = Join-Path $divisionPath "teams.txt"
     if (-not (Test-Path $teamsPath)) { continue }
-    $entries = Parse-TeamsFile $teamsPath
+    $entries = Import-TeamsFile $teamsPath
 
     foreach ($entry in $entries) {
         $teamFolder = Join-Path $divisionPath $entry.Folder
@@ -492,15 +492,15 @@ foreach ($division in $divisions) {
         if (Test-Path $csvPath) {
             $inputRows = Convert-CsvInputToRows (Import-Csv -Path $csvPath)
         } elseif (Test-Path $txtPath) {
-            $inputRows = Parse-PlayersTxt $txtPath
+            $inputRows = Import-PlayersTxt $txtPath
         } elseif (Test-Path $jsonPath) {
-            $inputRows = Parse-PlayersJson $jsonPath
+            $inputRows = Import-PlayersJson $jsonPath
         } else {
             $generated++
         }
 
-        $finalRows = Finalize-RosterRows $inputRows $division $entry.Display
-        Write-RosterCsv $csvPath $finalRows
+        $finalRows = Complete-RosterRows $inputRows $division $entry.Display
+        Export-RosterCsv $csvPath $finalRows
         $processed++
     }
 }
