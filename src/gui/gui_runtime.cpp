@@ -135,7 +135,6 @@ bool canUseCachedModel(const AppState& state) {
 class ScopedRefreshRedrawLock {
 public:
     explicit ScopedRefreshRedrawLock(AppState& state) : state_(state), targets_(pageRefreshTargets(state)) {
-        if (state_.window) SendMessageW(state_.window, WM_SETREDRAW, FALSE, 0);
         for (HWND target : targets_) {
             if (target && IsWindow(target)) SendMessageW(target, WM_SETREDRAW, FALSE, 0);
         }
@@ -146,15 +145,14 @@ public:
             if (!target || !IsWindow(target)) continue;
             SendMessageW(target, WM_SETREDRAW, TRUE, 0);
             if (IsWindowVisible(target)) {
-                RedrawWindow(target, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_UPDATENOW);
+                RedrawWindow(target, nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME);
             }
         }
         if (state_.window) {
-            SendMessageW(state_.window, WM_SETREDRAW, TRUE, 0);
             RedrawWindow(state_.window,
                          nullptr,
                          nullptr,
-                         RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ALLCHILDREN | RDW_UPDATENOW);
+                         RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
         }
         state_.pageRefreshInProgress = false;
     }

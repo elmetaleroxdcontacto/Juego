@@ -120,14 +120,18 @@ void hideControlAndInvalidate(AppState& state, HWND hwnd, int padX, int padY) {
     }
     RECT rect = childRectOnParent(hwnd, state.window);
     clearWindowRegion(hwnd);
-    ShowWindow(hwnd, SW_HIDE);
-    SetWindowPos(hwnd,
-                 nullptr,
-                 kHiddenControlOrigin,
-                 kHiddenControlOrigin,
-                 0,
-                 0,
-                 SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOSENDCHANGING);
+    const bool wasVisible = IsWindowVisible(hwnd);
+    if (wasVisible) ShowWindow(hwnd, SW_HIDE);
+    RECT hiddenRect = childRectOnParent(hwnd, state.window);
+    if (hiddenRect.left != kHiddenControlOrigin || hiddenRect.top != kHiddenControlOrigin) {
+        SetWindowPos(hwnd,
+                     nullptr,
+                     kHiddenControlOrigin,
+                     kHiddenControlOrigin,
+                     0,
+                     0,
+                     SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOSENDCHANGING);
+    }
     if (state.window && IsWindow(state.window)) {
         InflateRect(&rect, scaleByDpi(state, padX), scaleByDpi(state, padY));
         InvalidateRect(state.window, &rect, TRUE);
@@ -137,7 +141,7 @@ void hideControlAndInvalidate(AppState& state, HWND hwnd, int padX, int padY) {
 void showControlAndInvalidate(AppState& state, HWND hwnd, int padX, int padY) {
     if (!hwnd || !IsWindow(hwnd)) return;
     clearWindowRegion(hwnd);
-    ShowWindow(hwnd, SW_SHOW);
+    if (!IsWindowVisible(hwnd)) ShowWindow(hwnd, SW_SHOW);
     RECT rect = childRectOnParent(hwnd, state.window);
     if (state.window && IsWindow(state.window)) {
         InflateRect(&rect, scaleByDpi(state, padX), scaleByDpi(state, padY));
@@ -158,6 +162,12 @@ void moveControlAndInvalidate(AppState& state, HWND hwnd, int x, int y, int widt
     if (!hwnd || !IsWindow(hwnd)) return;
 
     RECT oldRect = childRectOnParent(hwnd, state.window);
+    if (oldRect.left == x &&
+        oldRect.top == y &&
+        oldRect.right - oldRect.left == width &&
+        oldRect.bottom - oldRect.top == height) {
+        return;
+    }
     MoveWindow(hwnd, x, y, width, height, TRUE);
     RECT newRect = childRectOnParent(hwnd, state.window);
 
