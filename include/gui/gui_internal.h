@@ -242,6 +242,8 @@ struct AppState {
     HBRUSH backgroundBrush = nullptr;
     HBRUSH panelBrush = nullptr;
     HBRUSH headerBrush = nullptr;
+    HBRUSH topBarBrush = nullptr;
+    HBRUSH shellBrush = nullptr;
     HBRUSH inputBrush = nullptr;
 
     Career career;
@@ -360,6 +362,8 @@ struct AppState {
 
 static const COLORREF kThemeBg = RGB(7, 16, 22);
 static const COLORREF kThemeHeader = RGB(10, 28, 35);
+static const COLORREF kThemeTopBarPanel = RGB(10, 23, 30);
+static const COLORREF kThemeShell = RGB(10, 21, 29);
 static const COLORREF kThemePanel = RGB(16, 28, 39);
 static const COLORREF kThemePanelAlt = RGB(12, 24, 33);
 static const COLORREF kThemeInput = RGB(11, 19, 27);

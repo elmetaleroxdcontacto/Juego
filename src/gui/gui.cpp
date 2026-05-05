@@ -590,14 +590,21 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                     SetTextColor(hdc, kThemeText);
                     return reinterpret_cast<LRESULT>(state->inputBrush ? state->inputBrush : state->panelBrush);
                 }
-                if (control == state->summaryLabel || control == state->tableLabel || control == state->squadLabel ||
-                    control == state->transferLabel || control == state->detailLabel || control == state->newsLabel) {
+                const bool headerStatic = control == state->divisionLabel || control == state->teamLabel ||
+                                          control == state->managerLabel || control == state->managerHelpLabel;
+                const bool panelStatic = control == state->summaryLabel || control == state->tableLabel ||
+                                         control == state->squadLabel || control == state->transferLabel ||
+                                         control == state->detailLabel || control == state->newsLabel;
+                const bool shellStatic = control == state->pageTitleLabel || control == state->breadcrumbLabel ||
+                                         control == state->infoLabel || control == state->filterLabel;
+                const bool statusStatic = control == state->statusLabel;
+                if (panelStatic) {
                     SetTextColor(hdc, kThemeAccent);
                 } else if (control == state->pageTitleLabel) {
                     SetTextColor(hdc, RGB(242, 247, 249));
                 } else if (control == state->breadcrumbLabel) {
                     SetTextColor(hdc, kThemeMuted);
-                } else if (control == state->statusLabel) {
+                } else if (statusStatic) {
                     SetTextColor(hdc, RGB(188, 228, 216));
                 } else if (control == state->managerHelpLabel) {
                     if (state->career.myTeam || state->gameSetup.ready) {
@@ -618,7 +625,29 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 } else {
                     SetTextColor(hdc, kThemeMuted);
                 }
-                return reinterpret_cast<LRESULT>(GetStockObject(NULL_BRUSH));
+                if (headerStatic) {
+                    SetBkMode(hdc, OPAQUE);
+                    SetBkColor(hdc, kThemeTopBarPanel);
+                    return reinterpret_cast<LRESULT>(state->topBarBrush ? state->topBarBrush : state->headerBrush);
+                }
+                if (panelStatic) {
+                    SetBkMode(hdc, OPAQUE);
+                    SetBkColor(hdc, kThemePanel);
+                    return reinterpret_cast<LRESULT>(state->panelBrush ? state->panelBrush : state->backgroundBrush);
+                }
+                if (shellStatic) {
+                    SetBkMode(hdc, OPAQUE);
+                    SetBkColor(hdc, kThemeShell);
+                    return reinterpret_cast<LRESULT>(state->shellBrush ? state->shellBrush : state->backgroundBrush);
+                }
+                if (statusStatic) {
+                    SetBkMode(hdc, OPAQUE);
+                    SetBkColor(hdc, RGB(11, 23, 31));
+                    return reinterpret_cast<LRESULT>(state->shellBrush ? state->shellBrush : state->backgroundBrush);
+                }
+                SetBkMode(hdc, OPAQUE);
+                SetBkColor(hdc, kThemeBg);
+                return reinterpret_cast<LRESULT>(state->backgroundBrush ? state->backgroundBrush : GetStockObject(BLACK_BRUSH));
             }
             break;
         case WM_COMMAND:
@@ -845,6 +874,8 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 if (state->backgroundBrush) DeleteObject(state->backgroundBrush);
                 if (state->panelBrush) DeleteObject(state->panelBrush);
                 if (state->headerBrush) DeleteObject(state->headerBrush);
+                if (state->topBarBrush) DeleteObject(state->topBarBrush);
+                if (state->shellBrush) DeleteObject(state->shellBrush);
                 if (state->inputBrush) DeleteObject(state->inputBrush);
                 state->font = nullptr;
                 state->titleFont = nullptr;
@@ -854,6 +885,8 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 state->backgroundBrush = nullptr;
                 state->panelBrush = nullptr;
                 state->headerBrush = nullptr;
+                state->topBarBrush = nullptr;
+                state->shellBrush = nullptr;
                 state->inputBrush = nullptr;
                 state->teamLogoImageList = nullptr;
             }

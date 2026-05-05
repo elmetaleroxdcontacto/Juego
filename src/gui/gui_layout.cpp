@@ -1303,7 +1303,7 @@ void layoutWindow(AppState& state) {
     } else {
         int rowOneWidth = headerAvailableWidth - blockGap * 2;
         int divisionBlockWidth = clampValue(rowOneWidth * 28 / 100, s(300), s(360));
-        int managerBlockWidth = clampValue(rowOneWidth * 24 / 100, s(240), s(300));
+        int managerBlockWidth = clampValue(rowOneWidth * 32 / 100, s(380), s(460));
         int teamBlockWidth = rowOneWidth - divisionBlockWidth - managerBlockWidth;
         int divisionX = s(20);
         int teamX = divisionX + divisionBlockWidth + blockGap;
@@ -1489,7 +1489,15 @@ void layoutWindow(AppState& state) {
         ? s((client.right - client.left) < s(1380) ? kInsightStripCompactReserve : kInsightStripWideReserve)
         : 0;
     int panelsTop = scrollViewportTop;
-    panelsTop += dashboardSpotlightReserve + contextualInsightReserve;
+    const int insightReserve = dashboardSpotlightReserve + contextualInsightReserve;
+    if (insightReserve > 0) {
+        RECT spotlightDoc{contentLeft,
+                          panelsTop,
+                          contentLeft + availableMainWidth,
+                          panelsTop + insightReserve};
+        state.layout.spotlightBand = viewportRect(state, spotlightDoc, true);
+        panelsTop = spotlightDoc.bottom + s(kPanelGap);
+    }
     const int footerHeight = std::max(s(pageLayout.footerMinHeight), s(150));
     auto placeScrollablePanel = [&](PanelBounds& snapshotPanel, HWND label, HWND body, const RECT& docOuter) {
         const bool labelVisible = label && IsWindowVisible(label);
@@ -1524,13 +1532,7 @@ void layoutWindow(AppState& state) {
         const int sideHeight = std::max(s(170), (summaryHeight - s(34)) / 2);
         RECT summaryDoc{contentLeft, panelsTop, contentLeft + summaryWidth, panelsTop + summaryHeight};
         PanelBounds summaryDocPanel = placeScrollablePanel(state.layout.summaryPanel, state.summaryLabel, nullptr, summaryDoc);
-        const bool stackEmptyButtons = rectWidth(summaryDocPanel.body) < s(420);
-        const int buttonGap = s(12);
-        const int buttonHeight = s(34);
-        const int buttonRows = stackEmptyButtons ? 2 : 1;
-        const int buttonBlockHeight = buttonRows * buttonHeight + (buttonRows - 1) * buttonGap;
         RECT summaryEditDoc = summaryDocPanel.body;
-        summaryEditDoc.bottom = std::max(summaryEditDoc.top, summaryDocPanel.body.bottom - buttonBlockHeight - s(12));
         placeScrollableWindow(state.summaryEdit,
                               summaryEditDoc.left,
                               summaryEditDoc.top,
@@ -1548,33 +1550,9 @@ void layoutWindow(AppState& state) {
         (void)detailDocPanel;
         (void)newsDocPanel;
 
-        setControlVisibility(state, state.emptyNewButton, true);
-        setControlVisibility(state, state.emptyLoadButton, true);
+        setControlVisibility(state, state.emptyNewButton, false);
+        setControlVisibility(state, state.emptyLoadButton, false);
         setControlVisibility(state, state.emptyValidateButton, false);
-        if (stackEmptyButtons) {
-            placeScrollableWindow(state.emptyNewButton,
-                                  summaryDocPanel.body.left,
-                                  summaryEditDoc.bottom + s(12),
-                                  rectWidth(summaryDocPanel.body),
-                                  buttonHeight);
-            placeScrollableWindow(state.emptyLoadButton,
-                                  summaryDocPanel.body.left,
-                                  summaryEditDoc.bottom + s(12) + buttonHeight + buttonGap,
-                                  rectWidth(summaryDocPanel.body),
-                                  buttonHeight);
-        } else {
-            const int buttonWidth = std::max(s(164), (rectWidth(summaryDocPanel.body) - buttonGap) / 2);
-            placeScrollableWindow(state.emptyNewButton,
-                                  summaryDocPanel.body.left,
-                                  summaryEditDoc.bottom + s(12),
-                                  buttonWidth,
-                                  buttonHeight);
-            placeScrollableWindow(state.emptyLoadButton,
-                                  summaryDocPanel.body.left + buttonWidth + buttonGap,
-                                  summaryEditDoc.bottom + s(12),
-                                  buttonWidth,
-                                  buttonHeight);
-        }
 
         state.layout.centerColumn = projectPanelBounds(state, buildPanelBounds(summaryDoc, 0, 0, 0), true).outer;
         RECT rightColumnDoc{rightColumnX,
@@ -1673,6 +1651,8 @@ void initializeInterface(AppState& state) {
     state.backgroundBrush = CreateSolidBrush(kThemeBg);
     state.panelBrush = CreateSolidBrush(kThemePanel);
     state.headerBrush = CreateSolidBrush(kThemeHeader);
+    state.topBarBrush = CreateSolidBrush(kThemeTopBarPanel);
+    state.shellBrush = CreateSolidBrush(kThemeShell);
     state.inputBrush = CreateSolidBrush(kThemeInput);
 
     const DWORD buttonStyle = WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_OWNERDRAW;
@@ -1680,7 +1660,17 @@ void initializeInterface(AppState& state) {
     state.divisionLabel = createControl(state, 0, L"STATIC", L"Division", WS_CHILD | WS_VISIBLE, 18, 18, 82, 20, state.window, 0);
     state.teamLabel = createControl(state, 0, L"STATIC", L"Club", WS_CHILD | WS_VISIBLE, 354, 18, 72, 20, state.window, 0);
     state.managerLabel = createControl(state, 0, L"STATIC", L"Manager", WS_CHILD | WS_VISIBLE, 702, 18, 82, 20, state.window, 0);
-    state.managerHelpLabel = createControl(state, 0, L"STATIC", L"Completa el nombre del manager.", WS_CHILD | WS_VISIBLE, 676, 44, 220, 18, state.window, 0);
+    state.managerHelpLabel = createControl(state,
+                                           0,
+                                           L"STATIC",
+                                           L"Completa el nombre del manager.",
+                                           WS_CHILD | WS_VISIBLE | SS_LEFTNOWORDWRAP | SS_ENDELLIPSIS,
+                                           676,
+                                           44,
+                                           220,
+                                           18,
+                                           state.window,
+                                           0);
     state.filterLabel = createControl(state, 0, L"STATIC", L"Filtro", WS_CHILD | WS_VISIBLE, 0, 0, 50, 20, state.window, 0);
 
     state.divisionCombo = createControl(state, 0, L"COMBOBOX", L"", WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL, 92, 14, 184, 300, state.window, IDC_DIVISION_COMBO);
@@ -1904,49 +1894,51 @@ void paintWindowChrome(AppState& state, HDC hdc) {
     FillRect(hdc, &topBar, state.headerBrush ? state.headerBrush : state.backgroundBrush);
     drawRoundedPanel(hdc,
                      RECT{s(8), s(8), client.right - s(8), std::max(s(24), static_cast<int>(state.layout.topBar.bottom) - s(12))},
-                     RGB(10, 23, 30),
+                     kThemeTopBarPanel,
                      RGB(28, 53, 65),
                      s(18));
     drawTopMetrics(state, hdc, client);
 
     drawRoundedPanel(hdc, state.layout.sideMenu, RGB(12, 23, 31), RGB(34, 57, 70), s(18));
-    drawRoundedPanel(hdc, state.layout.contentShell, RGB(10, 21, 29), RGB(32, 53, 66), s(22));
-    if (rectHasArea(state.layout.summaryPanel.outer) && IsWindowVisible(state.summaryEdit)) {
-        drawRoundedPanel(hdc, state.layout.summaryPanel.outer, kThemePanel, RGB(40, 64, 79), s(16));
-    }
-    if (rectHasArea(state.layout.primaryPanel.outer) && (IsWindowVisible(state.tableList) || state.currentPage == GuiPage::Tactics)) {
-        drawRoundedPanel(hdc, state.layout.primaryPanel.outer, kThemePanel, RGB(40, 64, 79), s(16));
-    }
-    if (rectHasArea(state.layout.secondaryPanel.outer) && IsWindowVisible(state.squadList)) {
-        drawRoundedPanel(hdc, state.layout.secondaryPanel.outer, kThemePanel, RGB(40, 64, 79), s(16));
-    }
-    if (rectHasArea(state.layout.footerPanel.outer) && IsWindowVisible(state.transferList)) {
-        drawRoundedPanel(hdc, state.layout.footerPanel.outer, kThemePanel, RGB(40, 64, 79), s(16));
-    }
-    if (rectHasArea(state.layout.detailPanel.outer) && IsWindowVisible(state.detailEdit)) {
-        drawRoundedPanel(hdc, state.layout.detailPanel.outer, RGB(15, 27, 37), RGB(44, 72, 90), s(16));
-    }
-    if (rectHasArea(state.layout.newsPanel.outer) && IsWindowVisible(state.newsList)) {
-        drawRoundedPanel(hdc, state.layout.newsPanel.outer, RGB(15, 27, 37), RGB(44, 72, 90), s(16));
-    }
+    drawRoundedPanel(hdc, state.layout.contentShell, kThemeShell, RGB(32, 53, 66), s(22));
     if (rectHasArea(state.layout.statusBar)) {
         drawRoundedPanel(hdc, state.layout.statusBar, RGB(11, 23, 31), RGB(39, 65, 79), s(12));
     }
 
-    if (rectHasArea(state.layout.scrollViewport)) {
-        ScopedClipRect scrollClip(hdc, state.layout.scrollViewport);
+    auto drawScrollableChrome = [&]() {
+        if (rectHasArea(state.layout.summaryPanel.outer) && IsWindowVisible(state.summaryEdit)) {
+            drawRoundedPanel(hdc, state.layout.summaryPanel.outer, kThemePanel, RGB(40, 64, 79), s(16));
+        }
+        if (rectHasArea(state.layout.primaryPanel.outer) && (IsWindowVisible(state.tableList) || state.currentPage == GuiPage::Tactics)) {
+            drawRoundedPanel(hdc, state.layout.primaryPanel.outer, kThemePanel, RGB(40, 64, 79), s(16));
+        }
+        if (rectHasArea(state.layout.secondaryPanel.outer) && IsWindowVisible(state.squadList)) {
+            drawRoundedPanel(hdc, state.layout.secondaryPanel.outer, kThemePanel, RGB(40, 64, 79), s(16));
+        }
+        if (rectHasArea(state.layout.footerPanel.outer) && IsWindowVisible(state.transferList)) {
+            drawRoundedPanel(hdc, state.layout.footerPanel.outer, kThemePanel, RGB(40, 64, 79), s(16));
+        }
+        if (rectHasArea(state.layout.detailPanel.outer) && IsWindowVisible(state.detailEdit)) {
+            drawRoundedPanel(hdc, state.layout.detailPanel.outer, RGB(15, 27, 37), RGB(44, 72, 90), s(16));
+        }
+        if (rectHasArea(state.layout.newsPanel.outer) && IsWindowVisible(state.newsList)) {
+            drawRoundedPanel(hdc, state.layout.newsPanel.outer, RGB(15, 27, 37), RGB(44, 72, 90), s(16));
+        }
         if (state.currentPage == GuiPage::Dashboard && rectHasArea(state.layout.spotlightBand)) {
             drawDashboardSpotlights(state, hdc, state.layout.spotlightBand);
         } else if (pageUsesInsightStrip(state) && rectHasArea(state.layout.spotlightBand)) {
             drawContextSpotlights(state, hdc, state.layout.spotlightBand);
         }
-    }
+        if (rectHasArea(state.layout.contextCard)) {
+            drawContextTeamLogo(state, hdc);
+        }
+    };
 
-    if (rectHasArea(state.layout.scrollViewport) && rectHasArea(state.layout.contextCard)) {
-        ScopedClipRect contextClip(hdc, state.layout.scrollViewport);
-        drawContextTeamLogo(state, hdc);
+    if (rectHasArea(state.layout.scrollViewport)) {
+        ScopedClipRect scrollClip(hdc, state.layout.scrollViewport);
+        drawScrollableChrome();
     } else {
-        drawContextTeamLogo(state, hdc);
+        drawScrollableChrome();
     }
 
     RECT menuTitle = state.layout.sideMenuTitle;

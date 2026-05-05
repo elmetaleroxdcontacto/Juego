@@ -20,6 +20,13 @@ void clearWindowRegion(HWND hwnd) {
     SetWindowRgn(hwnd, nullptr, TRUE);
 }
 
+bool isComboBoxControl(HWND hwnd) {
+    if (!hwnd || !IsWindow(hwnd)) return false;
+    wchar_t className[32]{};
+    GetClassNameW(hwnd, className, static_cast<int>(sizeof(className) / sizeof(className[0])));
+    return lstrcmpiW(className, L"COMBOBOX") == 0;
+}
+
 }  // namespace
 
 int scaleByDpi(const AppState& state, int value) {
@@ -108,6 +115,9 @@ void updateDynamicStaticText(AppState& state, HWND hwnd, const std::string& text
 void hideControlAndInvalidate(AppState& state, HWND hwnd, int padX, int padY) {
     if (!hwnd || !IsWindow(hwnd)) return;
 
+    if (isComboBoxControl(hwnd)) {
+        SendMessageW(hwnd, CB_SHOWDROPDOWN, FALSE, 0);
+    }
     RECT rect = childRectOnParent(hwnd, state.window);
     clearWindowRegion(hwnd);
     ShowWindow(hwnd, SW_HIDE);

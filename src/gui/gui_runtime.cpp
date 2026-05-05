@@ -406,8 +406,7 @@ void syncSetupButtonsAndHints(AppState& state) {
                                              : "Manager listo. Completa los pasos pendientes.");
             }
         }
-        setWindowTextUtf8(state.managerHelpLabel, helper);
-        InvalidateRect(state.managerHelpLabel, nullptr, TRUE);
+        updateDynamicStaticText(state, state.managerHelpLabel, helper);
     }
     if (state.newCareerButton) InvalidateRect(state.newCareerButton, nullptr, TRUE);
     if (state.emptyNewButton) InvalidateRect(state.emptyNewButton, nullptr, TRUE);
@@ -609,7 +608,7 @@ void refreshCurrentPage(AppState& state) {
     bool showSquadLabel = showSquad;
     bool showFooter = !frontMenuPage && !dashboardEmptyState;
     bool showFooterLabel = showFooter;
-    bool showFilter = !frontMenuPage && !dashboardEmptyState;
+    bool showFilter = !frontMenuPage && !dashboardEmptyState && state.currentPage != GuiPage::Dashboard;
     setControlVisibility(state, state.tableList, showTable);
     setControlVisibility(state, state.tableLabel, showTableLabel);
     setControlVisibility(state, state.squadList, showSquad);
