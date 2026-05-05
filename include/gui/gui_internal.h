@@ -456,6 +456,7 @@ void refreshCurrentPage(AppState& state);
 void autosizeCurrentLists(AppState& state);
 void handleFilterChange(AppState& state);
 void handleListSelectionChange(AppState& state, int controlId);
+void activateListAction(AppState& state, int controlId);
 void handleListColumnClick(AppState& state, const NMLISTVIEW& view);
 
 void startNewCareer(AppState& state);

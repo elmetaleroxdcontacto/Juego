@@ -154,31 +154,31 @@ string formatLastMatchCenter(const Career& career,
     if (!view.available) return "No hay match center disponible.";
 
     ostringstream out;
-    out << "MatchCenter\r\n";
-    if (!view.scoreboard.empty()) out << view.scoreboard << "\r\n";
-    if (!view.headline.empty()) out << view.headline << "\r\n";
-    if (!view.playerOfTheMatch.empty()) out << "Figura: " << view.playerOfTheMatch << "\r\n";
+    out << "Resumen del partido\r\n";
+    if (!view.scoreboard.empty()) out << "Marcador: " << view.scoreboard << "\r\n";
+    if (!view.headline.empty()) out << "Lectura rapida: " << view.headline << "\r\n";
+    if (!view.playerOfTheMatch.empty()) out << "Jugador clave: " << view.playerOfTheMatch << "\r\n";
     if (!view.metrics.empty()) {
-        out << "\r\nMetricas\r\n";
+        out << "\r\nMetricas clave (tu equipo / rival)\r\n";
         for (const MatchCenterMetric& metric : view.metrics) {
             out << "- " << metric.label << ": " << metric.myValue << " / " << metric.oppValue << "\r\n";
         }
     }
-    if (!view.tacticalSummary.empty()) out << "\r\nTactica\r\n- " << view.tacticalSummary << "\r\n";
-    if (!view.fatigueSummary.empty()) out << "Fatiga\r\n- " << view.fatigueSummary << "\r\n";
-    if (!view.postMatchImpact.empty()) out << "Impacto\r\n- " << view.postMatchImpact << "\r\n";
+    if (!view.tacticalSummary.empty()) out << "\r\nLectura tactica\r\n- " << view.tacticalSummary << "\r\n";
+    if (!view.fatigueSummary.empty()) out << "Estado fisico\r\n- " << view.fatigueSummary << "\r\n";
+    if (!view.postMatchImpact.empty()) out << "Impacto postpartido\r\n- " << view.postMatchImpact << "\r\n";
     if (!view.phaseLines.empty()) {
-        out << "\r\nFases\r\n";
+        out << "\r\nFases del encuentro\r\n";
         for (const string& line : view.phaseLines) out << "- " << line << "\r\n";
     } else if (!career.lastMatchCenter.phaseSummaries.empty()) {
-        out << "\r\nFases\r\n- " << phaseLeadLabel(career.lastMatchCenter) << "\r\n";
+        out << "\r\nFases del encuentro\r\n- " << phaseLeadLabel(career.lastMatchCenter) << "\r\n";
     }
     if (!view.eventLines.empty()) {
-        out << "\r\nTimeline\r\n";
+        out << "\r\nEventos\r\n";
         for (const string& event : view.eventLines) out << "- " << event << "\r\n";
     }
     if (!view.recommendationLines.empty()) {
-        out << "\r\nAjustes sugeridos\r\n";
+        out << "\r\nSiguiente decision sugerida\r\n";
         for (const string& line : view.recommendationLines) out << "- " << line << "\r\n";
     }
     return out.str();

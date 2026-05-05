@@ -356,6 +356,25 @@ bool hasPersistedCareer(const AppState& state) {
     return pathExists(savePath) || (savePath == "saves/career_save.txt" && pathExists("career_save.txt"));
 }
 
+bool isDashboardActionCueList(const AppState& state, int controlId) {
+    return state.currentPage == GuiPage::Dashboard &&
+           controlId == IDC_TRANSFER_LIST &&
+           state.currentModel.footer.title == "ActionCuePanel";
+}
+
+GuiPage dashboardActionDestinationPage(const std::string& destination) {
+    const std::string normalized = toLower(trim(destination));
+    if (normalized == "plantilla") return GuiPage::Squad;
+    if (normalized == "fichajes" || normalized == "mercado") return GuiPage::Transfers;
+    if (normalized == "finanzas") return GuiPage::Finances;
+    if (normalized == "directiva") return GuiPage::Board;
+    if (normalized == "tacticas" || normalized == "tactica") return GuiPage::Tactics;
+    if (normalized == "liga") return GuiPage::League;
+    if (normalized == "calendario") return GuiPage::Calendar;
+    if (normalized == "noticias" || normalized == "inbox") return GuiPage::News;
+    return GuiPage::Dashboard;
+}
+
 }  // namespace
 
 bool isFrontMenuPage(GuiPage page) {
@@ -671,6 +690,13 @@ void handleListSelectionChange(AppState& state, int controlId) {
     if (controlId == IDC_TABLE_LIST) row = selectedListViewRow(state.tableList);
     if (row < 0) return;
 
+    if (isDashboardActionCueList(state, controlId)) {
+        const std::string destination = listViewText(state.transferList, row, 1);
+        const std::string action = listViewText(state.transferList, row, 2);
+        setStatus(state, "Doble click o Enter: " + action + " -> " + destination + ".");
+        return;
+    }
+
     if ((state.currentPage == GuiPage::Squad || state.currentPage == GuiPage::Youth) && controlId == IDC_SQUAD_LIST) {
         state.selectedPlayerName = listViewText(state.squadList, row, 0);
         refreshCurrentPage(state);
@@ -684,6 +710,27 @@ void handleListSelectionChange(AppState& state, int controlId) {
     }
     if ((state.currentPage == GuiPage::League || state.currentPage == GuiPage::Calendar) && controlId == IDC_TABLE_LIST) {
         InvalidateRect(state.window, nullptr, TRUE);
+    }
+}
+
+void activateListAction(AppState& state, int controlId) {
+    if (state.pageRefreshInProgress) return;
+    int row = -1;
+    if (controlId == IDC_SQUAD_LIST) row = selectedListViewRow(state.squadList);
+    if (controlId == IDC_TRANSFER_LIST) row = selectedListViewRow(state.transferList);
+    if (controlId == IDC_TABLE_LIST) row = selectedListViewRow(state.tableList);
+    if (row < 0) return;
+
+    if (isDashboardActionCueList(state, controlId)) {
+        const std::string destination = listViewText(state.transferList, row, 1);
+        const std::string action = listViewText(state.transferList, row, 2);
+        const GuiPage targetPage = dashboardActionDestinationPage(destination);
+        if (targetPage == GuiPage::Dashboard && toLower(trim(action)) == "simular") {
+            simulateWeek(state);
+            return;
+        }
+        setCurrentPage(state, targetPage);
+        setStatus(state, "Accion abierta: " + action + " -> " + pageTitleFor(targetPage) + ".");
     }
 }
 

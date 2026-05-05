@@ -7,10 +7,40 @@
 
 #include <sstream>
 
+namespace {
+
+std::string mainMenuSavePath(const gui_win32::AppState& state) {
+    std::string savePath = state.career.saveFile.empty() ? std::string("saves/career_save.txt") : state.career.saveFile;
+    if (!pathExists(savePath) && savePath == "saves/career_save.txt" && pathExists("career_save.txt")) {
+        savePath = "career_save.txt";
+    }
+    return savePath;
+}
+
+bool mainMenuHasSave(const gui_win32::AppState& state) {
+    return pathExists(mainMenuSavePath(state));
+}
+
+std::string mainMenuSaveStateLabel(const gui_win32::AppState& state) {
+    if (state.career.myTeam) return "Sesion activa";
+    return mainMenuHasSave(state) ? "Guardado listo" : "Sin guardado";
+}
+
+std::string mainMenuBackupStateLabel(const gui_win32::AppState& state) {
+    const std::string savePath = mainMenuSavePath(state);
+    return pathExists(savePath + ".bak") ? "Backup disponible" : "Sin backup";
+}
+
+}  // namespace
+
 namespace gui_win32 {
 
 GuiPageModel buildMainMenuModel(AppState& state) {
     GuiPageModel model;
+    const std::string savePath = mainMenuSavePath(state);
+    const std::string saveState = mainMenuSaveStateLabel(state);
+    const std::string backupState = mainMenuBackupStateLabel(state);
+
     model.title = game_settings::gameTitle();
     model.breadcrumb = "Inicio > Menu principal";
     model.infoLine = "Portada principal del manager. Continuar, cargar, creditos y configuraciones viven en el mismo frontend real.";
@@ -18,10 +48,10 @@ GuiPageModel buildMainMenuModel(AppState& state) {
     model.detail.title = "FrontMenuProfile";
     model.feed.title = "FrontMenuRoadmap";
     model.metrics = {
-        {"Continuar", state.career.myTeam ? "Sesion activa" : (pathExists(state.career.saveFile) || pathExists("career_save.txt") ? "Guardado listo" : "Sin guardado"), kThemeAccentBlue},
+        {"Continuar", saveState, kThemeAccentBlue},
+        {"Guardado", mainMenuHasSave(state) ? "Disponible" : "No existe", kThemeAccentGreen},
         {"Dificultad", game_settings::difficultyLabel(state.settings.difficulty), kThemeAccent},
         {"Velocidad", game_settings::simulationSpeedLabel(state.settings.simulationSpeed), kThemeWarning},
-        {"Modo", game_settings::simulationModeLabel(state.settings.simulationMode), kThemeAccentBlue},
         {"Audio", game_settings::menuMusicModeLabel(state.settings.menuMusicMode), kThemeAccentGreen}
     };
 
@@ -31,9 +61,17 @@ GuiPageModel buildMainMenuModel(AppState& state) {
         "- Jugar abre el flujo real del proyecto: dashboard, club, carrera, mercado, tacticas y noticias.\r\n"
         "- Cargar guardado fuerza la lectura del ultimo save disponible.\r\n"
         "- Configuraciones abre la cabina persistente de frontend.\r\n"
-        "- Creditos y Salir completan la portada como una base real, no decorativa.";
+        "- Creditos y Salir completan la portada como una base real, no decorativa.\r\n\r\n"
+        "Guardado visible\r\n"
+        "- Principal: " + saveState + " (" + savePath + ")\r\n"
+        "- Respaldo: " + backupState + "\r\n"
+        "- Simular crea un autosave antes de avanzar la semana.";
 
     std::ostringstream detail;
+    detail << "Guardado\r\n";
+    detail << "Ruta principal: " << savePath << "\r\n";
+    detail << "Estado: " << saveState << "\r\n";
+    detail << "Respaldo: " << backupState << "\r\n\r\n";
     detail << "Volumen: " << game_settings::volumeLabel(state.settings.volume) << "\r\n";
     detail << "Dificultad: " << game_settings::difficultyLabel(state.settings.difficulty) << "\r\n";
     detail << game_settings::difficultyDescription(state.settings.difficulty) << "\r\n\r\n";
@@ -50,10 +88,12 @@ GuiPageModel buildMainMenuModel(AppState& state) {
     model.detail.content = detail.str();
 
     model.feed.lines = {
+        "Guardado principal: " + savePath + " | " + saveState,
+        "Respaldo automatico: " + backupState,
         "Estado actual: frontend listo para una experiencia tipo manager game.",
         "Navegacion GUI: Tab, Enter, flechas, numeros, F11 y Esc desde ajustes o creditos.",
         "Continuar y Cargar ya usan el flujo real del proyecto en vez de una ruta separada.",
-        "La portada mantiene base lista para perfil, video, idiomas y resolucion."
+        "Simular guarda automaticamente antes de avanzar la semana."
     };
     return model;
 }

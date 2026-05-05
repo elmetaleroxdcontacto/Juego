@@ -323,6 +323,32 @@ void simulateWeek(AppState& state) {
     if (!state.career.myTeam) return;
     syncManagerNameFromUi(state);
     state.actionInProgress = true;
+
+    setStatus(state, "Guardando autosave antes de simular...");
+    UpdateWindow(state.window);
+    ServiceResult autosave = saveCareerService(state.career);
+    if (!autosave.ok) {
+        const std::string message = autosave.messages.empty()
+            ? std::string("No se pudo crear el autosave antes de simular.")
+            : autosave.messages.back();
+        const int choice = MessageBoxW(state.window,
+                                       utf8ToWide(message + "\n\nQuieres simular igual?").c_str(),
+                                       L"Autosave",
+                                       MB_YESNO | MB_ICONWARNING);
+        if (choice != IDYES) {
+            state.actionInProgress = false;
+            setStatus(state, "Simulacion cancelada: autosave no disponible.");
+            refreshAll(state);
+            return;
+        }
+        setStatus(state, "Autosave no disponible; simulando por decision del manager...");
+    } else {
+        setStatus(state, autosave.messages.empty()
+                             ? "Autosave listo. Simulando semana..."
+                             : autosave.messages.back() + " Simulando semana...");
+    }
+    UpdateWindow(state.window);
+
     setStatus(state,
               "Simulando semana en modo " +
                   game_settings::simulationModeLabel(state.settings.simulationMode) +

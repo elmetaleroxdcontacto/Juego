@@ -512,6 +512,11 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                     handleListSelectionChange(*state, static_cast<int>(reinterpret_cast<LPNMHDR>(lParam)->idFrom));
                     return 0;
                 }
+                if (static_cast<int>(reinterpret_cast<LPNMHDR>(lParam)->code) == NM_DBLCLK ||
+                    static_cast<int>(reinterpret_cast<LPNMHDR>(lParam)->code) == NM_RETURN) {
+                    activateListAction(*state, static_cast<int>(reinterpret_cast<LPNMHDR>(lParam)->idFrom));
+                    return 0;
+                }
             }
             break;
         case WM_DRAWITEM:

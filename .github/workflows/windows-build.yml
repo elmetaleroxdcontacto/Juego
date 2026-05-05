@@ -1,0 +1,42 @@
+name: Windows build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-and-validate:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install MinGW toolchain
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-make
+
+      - name: Configure
+        shell: msys2 {0}
+        run: >
+          cmake -S . -B build-ci
+          -G "MinGW Makefiles"
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_CXX_COMPILER=g++
+          -DBUILD_TESTING=OFF
+
+      - name: Build GUI and CLI
+        shell: msys2 {0}
+        run: cmake --build build-ci --config Release --target FootballManager FootballManagerCLI
+
+      - name: Validate data
+        shell: msys2 {0}
+        run: ./build-ci/bin/FootballManagerCLI.exe --validate
