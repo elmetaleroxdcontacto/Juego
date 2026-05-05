@@ -1,4 +1,5 @@
 #include "gui/gui_internal.h"
+#include "gui/gui_view_builders.h"
 
 #ifdef _WIN32
 
@@ -834,8 +835,8 @@ void setMenuButtonsVisible(AppState& state, bool visible) {
 void updateFrontendMenuButtonLabels(AppState& state) {
     if (state.menuContinueButton) setWindowTextUtf8(state.menuContinueButton, "Continuar");
     if (state.menuPlayButton) setWindowTextUtf8(state.menuPlayButton, "Jugar");
-    if (state.menuSettingsButton) setWindowTextUtf8(state.menuSettingsButton, "Configuraciones");
-    if (state.menuLoadButton) setWindowTextUtf8(state.menuLoadButton, state.currentPage == GuiPage::Saves ? "Abrir seleccionado" : "Guardados");
+    if (state.menuSettingsButton) setWindowTextUtf8(state.menuSettingsButton, "Opciones");
+    if (state.menuLoadButton) setWindowTextUtf8(state.menuLoadButton, state.currentPage == GuiPage::Saves ? "Abrir seleccionado" : "Cargar partida");
     if (state.menuDeleteSaveButton) setWindowTextUtf8(state.menuDeleteSaveButton, state.currentPage == GuiPage::Saves ? "Borrar seleccionado" : "Borrar guardado");
     if (state.menuCreditsButton) setWindowTextUtf8(state.menuCreditsButton, "Creditos");
     if (state.menuExitButton) setWindowTextUtf8(state.menuExitButton, "Salir");
@@ -878,6 +879,171 @@ void updateFrontendMenuButtonLabels(AppState& state) {
 }
 
 }  // namespace
+
+// Layout helper para el menú principal rediseñado: título grande y botones verticales centrados.
+void layoutMainMenuPanel(AppState& state, const RECT& client) {
+    const auto s = [&](int value) { return scaleByDpi(state, value); };
+    const int buttonWidth = s(220);
+    const int buttonHeight = s(50);
+    const int buttonGap = s(20);
+    const int titleHeight = s(80);
+    const int titleWidth = std::min(s(760), std::max(s(300), static_cast<int>(client.right - s(120))));
+    const int clientCenterX = (client.left + client.right) / 2;
+    const int titleLeft = clientCenterX - titleWidth / 2;
+    const int titleTop = std::max(s(96), static_cast<int>((client.bottom - (titleHeight + buttonHeight * 4 + buttonGap * 3 + s(40))) / 2));
+    const int buttonsTop = titleTop + titleHeight + s(30);
+
+    setWindowTextUtf8(state.pageTitleLabel, "Chilean Footballito");
+    setLabelFont(state.pageTitleLabel, state.heroFont);
+    setControlVisibility(state, state.pageTitleLabel, true);
+    MoveWindow(state.pageTitleLabel, titleLeft, titleTop, titleWidth, titleHeight, TRUE);
+    setControlVisibility(state, state.breadcrumbLabel, false);
+    setControlVisibility(state, state.infoLabel, false);
+    setControlVisibility(state, state.summaryLabel, false);
+    setControlVisibility(state, state.summaryEdit, false);
+    setControlVisibility(state, state.detailLabel, false);
+    setControlVisibility(state, state.detailEdit, false);
+    setControlVisibility(state, state.newsLabel, false);
+    setControlVisibility(state, state.newsList, false);
+
+    const int buttonLeft = clientCenterX - buttonWidth / 2;
+    MoveWindow(state.menuPlayButton, buttonLeft, buttonsTop, buttonWidth, buttonHeight, TRUE);
+    MoveWindow(state.menuLoadButton, buttonLeft, buttonsTop + (buttonHeight + buttonGap) * 1, buttonWidth, buttonHeight, TRUE);
+    MoveWindow(state.menuSettingsButton, buttonLeft, buttonsTop + (buttonHeight + buttonGap) * 2, buttonWidth, buttonHeight, TRUE);
+    MoveWindow(state.menuExitButton, buttonLeft, buttonsTop + (buttonHeight + buttonGap) * 3, buttonWidth, buttonHeight, TRUE);
+
+    setWindowTextUtf8(state.menuPlayButton, "Nueva carrera");
+    setWindowTextUtf8(state.menuLoadButton, "Cargar partida");
+    setWindowTextUtf8(state.menuSettingsButton, "Opciones");
+    setWindowTextUtf8(state.menuExitButton, "Salir");
+
+    setControlVisibility(state, state.menuPlayButton, true);
+    setControlVisibility(state, state.menuLoadButton, true);
+    setControlVisibility(state, state.menuSettingsButton, true);
+    setControlVisibility(state, state.menuExitButton, true);
+
+    setControlVisibility(state, state.menuContinueButton, false);
+    setControlVisibility(state, state.menuDeleteSaveButton, false);
+    setControlVisibility(state, state.menuCreditsButton, false);
+    setControlVisibility(state, state.menuBackButton, false);
+    setControlVisibility(state, state.menuVolumeButton, false);
+    setControlVisibility(state, state.menuDifficultyButton, false);
+    setControlVisibility(state, state.menuSpeedButton, false);
+    setControlVisibility(state, state.menuSimulationButton, false);
+    setControlVisibility(state, state.menuLanguageButton, false);
+    setControlVisibility(state, state.menuTextSpeedButton, false);
+    setControlVisibility(state, state.menuVisualButton, false);
+    setControlVisibility(state, state.menuMusicModeButton, false);
+    setControlVisibility(state, state.menuAudioFadeButton, false);
+}
+
+// Layout helper para el dashboard del modo carrera: panel de gestión con botones en grilla e info del club.
+void layoutCareerDashboard(AppState& state, const RECT& client) {
+    const auto s = [&](int value) { return scaleByDpi(state, value); };
+    const int padding = s(20);
+    const int titleHeight = s(60);
+    const int subtitleHeight = s(30);
+    const int infoHeight = s(120);
+    const int buttonWidth = s(180);
+    const int buttonHeight = s(45);
+    const int buttonGap = s(15);
+    const int gridCols = 3;
+
+    const int clientCenterX = (client.left + client.right) / 2;
+    const int contentWidth = std::min(s(1000), static_cast<int>(client.right - padding * 2));
+    const int contentLeft = clientCenterX - contentWidth / 2;
+    const int contentTop = s(40);
+
+    // Título principal
+    setWindowTextUtf8(state.pageTitleLabel, "Panel de Carrera");
+    setLabelFont(state.pageTitleLabel, state.heroFont);
+    setControlVisibility(state, state.pageTitleLabel, true);
+    MoveWindow(state.pageTitleLabel, contentLeft, contentTop, contentWidth, titleHeight, TRUE);
+
+    // Subtítulo: nombre del club
+    std::string clubName = "Sin club asignado";
+    if (state.career.myTeam) {
+        clubName = state.career.myTeam->name;
+    }
+    setWindowTextUtf8(state.infoLabel, ("Club: " + clubName).c_str());
+    setLabelFont(state.infoLabel, state.titleFont);
+    setControlVisibility(state, state.infoLabel, true);
+    MoveWindow(state.infoLabel, contentLeft, contentTop + titleHeight + s(10), contentWidth, subtitleHeight, TRUE);
+
+    // Panel de info resumida del club
+    std::string infoText = "Información del club:\n\n";
+    if (state.career.myTeam) {
+        const Team& team = *state.career.myTeam;
+        infoText += "División: " + team.division + "\n";
+        infoText += "Presupuesto: " + formatMoneyValue(team.budget) + "\n";
+        infoText += "Moral del equipo: " + std::to_string(team.morale) + "/100\n";
+        infoText += "Próximo partido: " + findNextMatchLine(state.career) + "\n";
+        infoText += "Objetivo: " + (state.career.boardMonthlyObjective.empty() ? "Sin objetivo mensual" : state.career.boardMonthlyObjective);
+    } else {
+        infoText += "División: Sin datos disponibles\n";
+        infoText += "Presupuesto: Pendiente\n";
+        infoText += "Moral del equipo: No asignado\n";
+        infoText += "Próximo partido: Sin datos disponibles\n";
+        infoText += "Objetivo: Pendiente";
+    }
+    setWindowTextUtf8(state.summaryEdit, infoText.c_str());
+    setControlVisibility(state, state.summaryLabel, true);
+    setControlVisibility(state, state.summaryEdit, true);
+    setWindowTextUtf8(state.summaryLabel, "Resumen del Club");
+    MoveWindow(state.summaryLabel, contentLeft, contentTop + titleHeight + subtitleHeight + s(20), contentWidth / 2 - s(10), s(24), TRUE);
+    MoveWindow(state.summaryEdit, contentLeft, contentTop + titleHeight + subtitleHeight + s(50), contentWidth / 2 - s(10), infoHeight, TRUE);
+
+    // Grilla de botones de navegación
+    const int gridTop = contentTop + titleHeight + subtitleHeight + infoHeight + s(40);
+    const int gridWidth = contentWidth;
+    const int gridLeft = contentLeft;
+    const int totalButtonWidth = buttonWidth * gridCols + buttonGap * (gridCols - 1);
+    const int gridStartLeft = gridLeft + (gridWidth - totalButtonWidth) / 2;
+
+    // Botones en orden: Club, Plantilla, Calendario, Mercado, Finanzas, Cantera, Scouting, Directiva, Guardar, Salir
+    std::vector<std::pair<HWND, std::string>> dashboardButtons = {
+        {state.leagueButton, "Club"},
+        {state.squadButton, "Plantilla"},
+        {state.calendarButton, "Calendario"},
+        {state.transfersButton, "Mercado"},
+        {state.financesButton, "Finanzas"},
+        {state.youthButton, "Cantera"},
+        {state.tacticsButton, "Scouting"}, // Reutilizando tacticsButton para Scouting
+        {state.boardButton, "Directiva"},
+        {state.saveButton, "Guardar partida"},
+        {state.frontMenuButton, "Salir al menú principal"}
+    };
+
+    for (size_t i = 0; i < dashboardButtons.size(); ++i) {
+        int row = static_cast<int>(i) / gridCols;
+        int col = static_cast<int>(i) % gridCols;
+        int x = gridStartLeft + col * (buttonWidth + buttonGap);
+        int y = gridTop + row * (buttonHeight + buttonGap);
+        MoveWindow(dashboardButtons[i].first, x, y, buttonWidth, buttonHeight, TRUE);
+        setWindowTextUtf8(dashboardButtons[i].first, dashboardButtons[i].second.c_str());
+        setControlVisibility(state, dashboardButtons[i].first, true);
+    }
+
+    // Ocultar elementos no usados
+    setControlVisibility(state, state.breadcrumbLabel, false);
+    setControlVisibility(state, state.detailLabel, false);
+    setControlVisibility(state, state.detailEdit, false);
+    setControlVisibility(state, state.newsLabel, false);
+    setControlVisibility(state, state.newsList, false);
+    setControlVisibility(state, state.tableLabel, false);
+    setControlVisibility(state, state.tableList, false);
+    setControlVisibility(state, state.squadLabel, false);
+    setControlVisibility(state, state.squadList, false);
+    setControlVisibility(state, state.transferLabel, false);
+    setControlVisibility(state, state.transferList, false);
+    setControlVisibility(state, state.dashboardButton, false); // Ya estamos en dashboard
+    setControlVisibility(state, state.newsButton, false);
+    setControlVisibility(state, state.simulateButton, false);
+    setControlVisibility(state, state.validateButton, false);
+    setControlVisibility(state, state.displayModeButton, false);
+    setControlVisibility(state, state.newCareerButton, false);
+    setControlVisibility(state, state.loadButton, false);
+}
 
 void rebuildFonts(AppState& state) {
     if (state.font) DeleteObject(state.font);
@@ -1099,8 +1265,6 @@ void layoutWindow(AppState& state) {
                                       client.right < s(1380) || client.bottom < s(920);
         const bool ultraWideFrontMenu = client.right > s(2140);
         const int buttonTop = shellTop + s(214);
-        const int primaryWidth = clampValue(shellWidth / 2 - s(24), s(220), ultraWideFrontMenu ? s(340) : s(300));
-        const int primaryGap = s(16);
         const int controlBlockHeight = state.currentPage == GuiPage::MainMenu ? s(compactFrontMenu ? 108 : 92)
                                                                               : s(state.currentPage == GuiPage::Settings ? 242 : 64);
         const int panelsTop = buttonTop + controlBlockHeight + s(28);
@@ -1121,47 +1285,8 @@ void layoutWindow(AppState& state) {
         placeScrollableWindow(state.newsList, shellLeft + s(34) + leftWidth, feedTop + s(kPanelBodyOffset), rightWidth, summaryHeight - detailHeight - s(18));
 
         if (state.currentPage == GuiPage::MainMenu) {
-            const int secondaryTop = buttonTop + s(50);
-            const int secondaryGap = s(12);
-            const int secondaryCount = 5;
-            const int secondaryWidth = std::max(s(100),
-                                                static_cast<int>((shellWidth - s(32) - secondaryGap * (secondaryCount - 1)) / secondaryCount));
-            placeFixedWindow(state.menuContinueButton, shellLeft + s(16), buttonTop, primaryWidth, s(42));
-            placeFixedWindow(state.menuPlayButton,
-                        shellLeft + s(16) + primaryWidth + primaryGap,
-                        buttonTop,
-                        primaryWidth,
-                        s(42));
-            placeFixedWindow(state.menuSettingsButton, shellLeft + s(16), secondaryTop, secondaryWidth, s(40));
-            placeFixedWindow(state.menuLoadButton, shellLeft + s(16) + (secondaryWidth + secondaryGap), secondaryTop, secondaryWidth, s(40));
-            placeFixedWindow(state.menuDeleteSaveButton, shellLeft + s(16) + (secondaryWidth + secondaryGap) * 2, secondaryTop, secondaryWidth, s(40));
-            placeFixedWindow(state.menuCreditsButton,
-                        shellLeft + s(16) + (secondaryWidth + secondaryGap) * 3,
-                        secondaryTop,
-                        secondaryWidth,
-                        s(40));
-            placeFixedWindow(state.menuExitButton,
-                        shellLeft + s(16) + (secondaryWidth + secondaryGap) * 4,
-                        secondaryTop,
-                        secondaryWidth,
-                        s(40));
-            setControlVisibility(state, state.menuContinueButton, true);
-            setControlVisibility(state, state.menuPlayButton, true);
-            setControlVisibility(state, state.menuSettingsButton, true);
-            setControlVisibility(state, state.menuLoadButton, true);
-            setControlVisibility(state, state.menuDeleteSaveButton, true);
-            setControlVisibility(state, state.menuCreditsButton, true);
-            setControlVisibility(state, state.menuExitButton, true);
-            setControlVisibility(state, state.menuBackButton, false);
-            setControlVisibility(state, state.menuVolumeButton, false);
-            setControlVisibility(state, state.menuDifficultyButton, false);
-            setControlVisibility(state, state.menuSpeedButton, false);
-            setControlVisibility(state, state.menuSimulationButton, false);
-            setControlVisibility(state, state.menuLanguageButton, false);
-            setControlVisibility(state, state.menuTextSpeedButton, false);
-            setControlVisibility(state, state.menuVisualButton, false);
-            setControlVisibility(state, state.menuMusicModeButton, false);
-            setControlVisibility(state, state.menuAudioFadeButton, false);
+            // Usar UI principal limpia del menú de inicio.
+            layoutMainMenuPanel(state, client);
         } else if (state.currentPage == GuiPage::Saves) {
             const int saveButtonWidth = clampValue((shellWidth - s(56)) / 3, s(190), s(320));
             placeFixedWindow(state.menuLoadButton, shellLeft + s(16), buttonTop, saveButtonWidth, s(40));
@@ -1247,6 +1372,13 @@ void layoutWindow(AppState& state) {
         applyEditInteriorPadding(state, state.summaryEdit, 10, 8);
         applyEditInteriorPadding(state, state.detailEdit, 10, 8);
         applyEditInteriorPadding(state, state.managerEdit, 8, 0);
+        if (syncScrollState()) return;
+        return;
+    }
+
+    if (dashboardLayout) {
+        layoutCareerDashboard(state, client);
+        applyEditInteriorPadding(state, state.summaryEdit, 10, 8);
         if (syncScrollState()) return;
         return;
     }
@@ -1707,7 +1839,7 @@ void initializeInterface(AppState& state) {
     SendMessageW(state.managerEdit, EM_SETCUEBANNER, TRUE, reinterpret_cast<LPARAM>(L"Ingresa nombre del manager"));
     SendMessageW(state.managerEdit, EM_LIMITTEXT, 48, 0);
 
-    state.newCareerButton = createControl(state, 0, L"BUTTON", L"Nueva partida", buttonStyle, 0, 0, 100, 28, state.window, IDC_NEW_CAREER_BUTTON);
+    state.newCareerButton = createControl(state, 0, L"BUTTON", L"Nueva carrera", buttonStyle, 0, 0, 100, 28, state.window, IDC_NEW_CAREER_BUTTON);
     state.loadButton = createControl(state, 0, L"BUTTON", L"Cargar", buttonStyle, 0, 0, 86, 28, state.window, IDC_LOAD_BUTTON);
     state.saveButton = createControl(state, 0, L"BUTTON", L"Guardar", buttonStyle, 0, 0, 86, 28, state.window, IDC_SAVE_BUTTON);
     state.simulateButton = createControl(state, 0, L"BUTTON", L"Simular", buttonStyle, 0, 0, 126, 28, state.window, IDC_SIMULATE_BUTTON);
@@ -1779,7 +1911,7 @@ void initializeInterface(AppState& state) {
     state.stadiumUpgradeButton = createControl(state, 0, L"BUTTON", L"Estadio+", buttonStyle, 0, 0, 96, 26, state.window, IDC_STADIUM_UPGRADE_BUTTON);
 
     state.breadcrumbLabel = createControl(state, 0, L"STATIC", L"", WS_CHILD | WS_VISIBLE, 0, 0, 320, 18, state.window, 0);
-    state.pageTitleLabel = createControl(state, 0, L"STATIC", L"", WS_CHILD | WS_VISIBLE, 0, 0, 360, 24, state.window, 0);
+    state.pageTitleLabel = createControl(state, 0, L"STATIC", L"", WS_CHILD | WS_VISIBLE | SS_CENTER, 0, 0, 360, 24, state.window, 0);
     state.infoLabel = createControl(state, 0, L"STATIC", L"", WS_CHILD | WS_VISIBLE, 0, 0, 400, 22, state.window, 0);
     state.summaryLabel = createControl(state, 0, L"STATIC", L"Proximo partido", WS_CHILD | WS_VISIBLE, 0, 0, 240, 18, state.window, 0);
     state.summaryEdit = createControl(state, WS_EX_CLIENTEDGE, L"EDIT", L"", WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL, 0, 0, 300, 180, state.window, IDC_SUMMARY_EDIT);

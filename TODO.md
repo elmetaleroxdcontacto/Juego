@@ -52,7 +52,11 @@
 - [x] Implementar asignacion automatica de posiciones para jugadores N/A al cargar equipos.
 - [x] Validar todas las ligas y equipos (0 N/A tras asignacion).
 - [x] Completar plantillas con <18 jugadores en Segunda Division (3 equipos).
+- [x] Mejora UI Menú Principal
 Resumen: Se corrigio el XI, se amplio la normalizacion de posiciones, se mejoro el scraper, se re-scrapeo la liga y se validaron/ajustaron plantillas en todas las divisiones.
+
+- [ ] Mejora UI Panel de Carrera
+Resumen: Actualizar la vista del dashboard de carrera para mostrar el club, división, presupuesto, moral, próximo partido y objetivo de directiva con botones grandes en grilla.
 
 - Actualizar las plantillas de todos los equipos de la Primera División con los jugadores reales actuales de la temporada 2024/2025, obtenidos de transfermarkt.com.
 
