@@ -1460,6 +1460,16 @@ void advanceCalendarPhase(Career& career) {
 }  // anonymous namespace
 // === END SEPARATION OF CONCERNS ===
 
+// simulateCareerWeek is intentionally organized into discrete phases to keep weekly simulation
+// behavior predictable and easy to maintain. Each phase has a single responsibility:
+// 1. simulateMatchesPhase: resuelve los partidos de la jornada.
+// 2. updateFitnessPhase: actualiza forma, lesiones y suspensiones.
+// 3. processTransfersPhase: ejecuta ofertas y movimientos pendientes.
+// 4. applyFinancesPhase: aplica ingresos y gastos semanales.
+// 5. generateNewsPhase: crea noticias y eventos derivados de la semana.
+// 6. advanceCalendarPhase: avanza la semana y maneja transicion de temporada.
+//
+// Esto es una mejora de claridad; no altera la lógica de simulacion ya existente.
 void simulateCareerWeek(Career& career) {
     if (career.activeTeams.empty() || career.schedule.empty()) {
         emitUiMessage("No hay calendario disponible.");

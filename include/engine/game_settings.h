@@ -8,7 +8,8 @@
 enum class GameDifficulty {
     Accessible,
     Normal,
-    Challenging
+    Challenging,
+    Realistic
 };
 
 enum class SimulationMode {

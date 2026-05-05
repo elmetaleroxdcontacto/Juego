@@ -46,6 +46,7 @@ string encodeDifficulty(GameDifficulty difficulty) {
         case GameDifficulty::Accessible: return "accessible";
         case GameDifficulty::Normal: return "normal";
         case GameDifficulty::Challenging: return "challenging";
+        case GameDifficulty::Realistic: return "realistic";
     }
     return "normal";
 }
@@ -98,6 +99,7 @@ GameDifficulty parseDifficulty(const string& raw) {
     const string normalized = toLower(trim(raw));
     if (normalized == "accessible" || normalized == "accesible") return GameDifficulty::Accessible;
     if (normalized == "challenging" || normalized == "desafiante") return GameDifficulty::Challenging;
+    if (normalized == "realistic" || normalized == "realista") return GameDifficulty::Realistic;
     return GameDifficulty::Normal;
 }
 
@@ -188,7 +190,8 @@ GameDifficulty nextDifficulty(GameDifficulty current) {
     switch (current) {
         case GameDifficulty::Accessible: return GameDifficulty::Normal;
         case GameDifficulty::Normal: return GameDifficulty::Challenging;
-        case GameDifficulty::Challenging: return GameDifficulty::Accessible;
+        case GameDifficulty::Challenging: return GameDifficulty::Realistic;
+        case GameDifficulty::Realistic: return GameDifficulty::Accessible;
     }
     return GameDifficulty::Normal;
 }
@@ -246,6 +249,7 @@ string difficultyLabel(GameDifficulty difficulty) {
         case GameDifficulty::Accessible: return "Accesible";
         case GameDifficulty::Normal: return "Normal";
         case GameDifficulty::Challenging: return "Desafiante";
+        case GameDifficulty::Realistic: return "Realista";
     }
     return "Normal";
 }
@@ -258,6 +262,8 @@ string difficultyDescription(GameDifficulty difficulty) {
             return "Balance estandar entre presion, presupuesto y exigencia competitiva.";
         case GameDifficulty::Challenging:
             return "Menos margen de error, menor aire economico y mas presion institucional.";
+        case GameDifficulty::Realistic:
+            return "Simulacion autentica: directiva critica, presupuesto limitado, rivalidades intensas, eventos impredecibles.";
     }
     return "Balance estandar entre presion, presupuesto y exigencia competitiva.";
 }

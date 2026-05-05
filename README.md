@@ -141,6 +141,51 @@ La CLI abre primero el frontend textual `Chilean Footballito`, con paneles ASCII
 .\build-cmake\bin\FootballManagerCLI.exe --validate
 ```
 
+## Cómo Jugar
+
+### Portada ("Chilean Footballito")
+
+1. **Nueva carrera**: Selecciona tu división (Primera, Primera B, Segunda), tu club y nombre del manager. Recibirás presupuesto inicial, objetivos de directiva y calendario de 34 semanas.
+2. **Cargar partida**: Abre tu último guardado. El juego restaura todos los datos, dinero, lesiones, progresión de jugadores, contratos pendientes y narrativa.
+3. **Configuraciones**: Ajusta volumen, dificultad (Accesible, Normal, Desafiante), velocidad de simulación, idioma, perfil visual y música del menú.
+4. **Créditos**: Información sobre el proyecto y contribuidores.
+
+### Panel de Carrera
+
+El corazón del juego. Desde aquí accedes a:
+
+- **Club**: Resumen división, presupuesto, moral del equipo, próximo partido y objetivo de directiva.
+- **Plantilla**: Lista de jugadores, posiciones, forma, salario y lesiones. Edita roles, formación y planes de desarrollo.
+- **Calendario**: Próximas fechas, rivales, ventas y competencias (Copa incluida en semanas clave).
+- **Mercado**: Busca jugadores, maneja shortlist, negocia traspasos, precontratos y cesiones.
+- **Finanzas**: Presupuesto, ingresos/gastos semanales, deuda, sponsor. Planifica a largo plazo.
+- **Cantera**: Jóvenes promesas, desarrollo mensual, llamadas a plantilla principal.
+- **Scouting**: Asigna scouts por región, observa cobertura, maneja reportes.
+- **Directiva**: Objetivos mensuales, confianza del cargo, eventos de club.
+- **Guardar partida**: Persiste todo el progreso (versión 15 del sistema).
+- **Salir al menú**: Regresa sin perder datos.
+
+### Simulación de Semana
+
+Avanza la carrera:
+
+1. Se simulan todos los partidos de la jornada (tu equipo + rivales de fondo).
+2. Se actualiza forma física, lesiones y suspensiones.
+3. Se procesan transferencias pendientes.
+4. Se aplican ingresos/gastos.
+5. Se generan noticias y eventos.
+6. Avanza a siguiente semana.
+
+### Tips Estratégicos
+
+- **Presupuesto**: Gasta en fichajes durante off-season; evita deudas severas que limitan operaciones.
+- **Plantilla**: Mantén 3-4 opciones por posición. Los jóvenes crecen si los usas regularmente.
+- **Táctica**: Cambia según rival. Equipos débiles = presión alta. Rivales fuertes = contención y contraataque.
+- **Staff**: Los asistentes dan recomendaciones semanales; úsalas para entrenamientos, rotaciones y ajustes tácticos.
+- **Moral**: Reuniones de plantel suben cohesión. Promesas incumplidas bajan moral y pueden generar conflictos.
+- **Scouting**: Cubre regiones con potencial joven. Los reportes mejoran cada semana; paciencia.
+- **Rivalidades**: El sistema recuerda enfrentamientos. Rivales intensos pueden jugar con más agresión.
+
 ## Tests
 
 Compilar y ejecutar:

@@ -144,6 +144,40 @@ Career::Career()
     infrastructure.totalUpgradeCapacity = 2000000;
 }
 
+Team* Career::getMyTeamSafe() {
+    return myTeam;
+}
+
+const Team* Career::getMyTeamSafe() const {
+    return myTeam;
+}
+
+Team* Career::getTeamAtIndexSafe(int index) {
+    if (!isValidTeamIndex(index)) return nullptr;
+    return &allTeams[static_cast<size_t>(index)];
+}
+
+const Team* Career::getTeamAtIndexSafe(int index) const {
+    if (!isValidTeamIndex(index)) return nullptr;
+    return &allTeams[static_cast<size_t>(index)];
+}
+
+int Career::getActiveTeamsCount() const {
+    return static_cast<int>(activeTeams.size());
+}
+
+bool Career::isValidTeamIndex(int index) const {
+    return index >= 0 && index < static_cast<int>(allTeams.size());
+}
+
+const std::vector<Team*>& Career::getActiveDivisionTeamsRef() const {
+    return activeTeams;
+}
+
+std::vector<Team*>& Career::getActiveDivisionTeamsRef() {
+    return activeTeams;
+}
+
 bool Career::usesSegundaFormat() const {
     const CompetitionConfig& config = getCompetitionConfig(activeDivision);
     return config.seasonHandler == CompetitionSeasonHandler::SegundaGroups &&

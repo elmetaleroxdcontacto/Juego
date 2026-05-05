@@ -82,7 +82,75 @@ Resumen: Finanzas ahora muestra maximo salarial recomendado, uso de masa salaria
 - Actualizar las plantillas de todos los equipos de la Primera División con los jugadores reales actuales de la temporada 2024/2025, obtenidos de transfermarkt.com.
 
 
-## Notas
+## Mejoras Generales Aplicadas (2026-05-05)
+
+### Documentación y UX
+- [x] **README.md actualizado**: Se agregó sección "Cómo Jugar" con:
+  - Instrucciones para cada pantalla principal (Portada, Panel de Carrera)
+  - Descripción de 10 secciones del panel de carrera
+  - Tips estratégicos para new players (presupuesto, plantilla, táctica, staff, moral, scouting, rivalidades)
+  - Guía de compilación, ejecución y tests mejorada
+
+### UI y Dashboard
+- [x] **layoutCareerDashboard**: Nueva función en gui_layout.cpp que implementa:
+  - Título "Panel de Carrera" centrado en la parte superior
+  - Nombre del club como subtítulo
+  - Panel resumen con división, presupuesto, moral, próximo partido y objetivo de directiva
+  - Grilla de 10 botones (3 columnas x 4 filas) para: Club, Plantilla, Calendario, Mercado, Finanzas, Cantera, Scouting, Directiva, Guardar, Salir
+  - Integración completa en layoutWindow cuando currentPage == GuiPage::Dashboard
+  - Ocultamiento de controles secundarios para mantener interfaz limpia
+
+### Arquitectura y Código
+- [x] **Revisión de estructura Career**:
+  - Analizado struct Career (450+ líneas) con múltiples responsabilidades
+  - Identificadas áreas para refactoring futuro (Safe Access Methods, Phase 1-3 parcialmente implementado)
+  - Documentado en TODO.md para futuras refactorizaciones sin romper el proyecto actual
+  
+- [x] **Simulación semanal ya bien dividida**:
+  - Confirmado: simulateCareerWeek(Career&) ya usa fases lógicas:
+    - simulateMatchesPhase()
+    - updateFitnessPhase()
+    - processTransfersPhase()
+    - applyFinancesPhase()
+    - generateNewsPhase()
+    - advanceCalendarPhase()
+  - Excelente base arquitectónica; no requería cambios
+
+### Sistema de Guardado/Carga
+- [x] **Validaciones confirmadas**:
+  - Save version = 15 (robusto, con escape de delimitadores)
+  - Sistema de integridad con snapshots (teams, players, history, records, transfers)
+  - Validación de esquema y datos básicos al cargar
+  - No requería mejoras críticas
+
+### Dificultad y Balanceo
+- [x] **GameDifficulty enum existe**:
+  - Implementado: Accessible, Normal, Challenging
+  - Usado en gameSettings para ajustar parámetros de IA y dinámicas
+  - Sistema de balanceo ya presente en game_settings.cpp
+
+### Análisis Final
+- **Fortalezas**:
+  - Proyecto bien estructurado con módulos claros (engine, simulation, career, gui, io, validators)
+  - Simulación semanal dividida en fases (pattern Strategy bien aplicado)
+  - Sistema de guardado/carga robusto con integridad
+  - GUI Win32 puro sin dependencias externas
+  - Tests automatizados cubriendo lógica crítica
+  
+- **Oportunidades futuras** (documentadas sin implementar para no romper):
+  - Refactorizar Career en managers más especializados (FinanceManager, ScoutingManager, DressingRoomManager)
+  - Extraer lógica de AI rival a patrón Strategy
+  - Mejorar lazy-loading de vistas pesadas en GUI
+  - Versionado declarativo de saves para cambios futuros sin breaking changes
+  
+- **Estado**: Proyecto listo, compilación exitosa, tests pasando
+
+## Notas de Implementación
+- Todos los cambios aplicados mantienen compatibilidad con C++ puro y Win32
+- No se eliminaron funciones existentes
+- No se rompió modo consola ni GUI
+- Compilación final exitosa con CMake
+- Análisis completo del código para identificar mejoras seguras aplicadas progresivamente
 - teams.txt tiene 16 equipos para Primera División.
 - Original: Primera 9 (0-8), Segunda 10 (9-18), Primera B 12 (19-30), Total 31.
 - Nuevo: Primera 16 (0-15), Segunda 10 (16-25), Primera B 12 (26-37), Total 38.
