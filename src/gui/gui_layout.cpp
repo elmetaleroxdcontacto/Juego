@@ -938,7 +938,7 @@ void layoutMainMenuPanel(AppState& state, const RECT& client) {
 }
 
 // Layout helper para el dashboard del modo carrera: panel de gestión con botones en grilla e info del club.
-void layoutCareerDashboard(AppState& state, const RECT& client) {
+void layoutCareerDashboardLegacy(AppState& state, const RECT& client) {
     const auto s = [&](int value) { return scaleByDpi(state, value); };
     const int padding = s(20);
     const int titleHeight = s(60);
@@ -1043,6 +1043,188 @@ void layoutCareerDashboard(AppState& state, const RECT& client) {
     setControlVisibility(state, state.displayModeButton, false);
     setControlVisibility(state, state.newCareerButton, false);
     setControlVisibility(state, state.loadButton, false);
+}
+
+void layoutCareerDashboard(AppState& state, const RECT& client) {
+    const auto s = [&](int value) { return scaleByDpi(state, value); };
+    const int padding = s(24);
+    const int gap = s(16);
+    const int innerWidth = std::max(s(320), static_cast<int>(client.right) - padding * 2);
+    const int contentWidth = std::min(innerWidth, clampValue(innerWidth, s(720), s(1500)));
+    const int contentLeft = padding + std::max(0, (innerWidth - contentWidth) / 2);
+    const int contentTop = s(32);
+    const int titleHeight = s(40);
+    const int infoHeight = s(24);
+    const int buttonGap = s(12);
+    const int buttonHeight = s(44);
+    const int gridCols = contentWidth < s(620) ? 2 : (contentWidth < s(1040) ? 3 : 4);
+    const int buttonWidth = std::max(s(140), (contentWidth - buttonGap * (gridCols - 1)) / gridCols);
+
+    const std::array<HWND, 36> hiddenControls = {
+        state.divisionLabel, state.teamLabel, state.managerLabel, state.managerHelpLabel,
+        state.divisionCombo, state.teamCombo, state.managerEdit,
+        state.filterLabel, state.filterCombo,
+        state.newCareerButton, state.loadButton, state.validateButton, state.displayModeButton,
+        state.breadcrumbLabel, state.newsLabel, state.newsList,
+        state.scoutActionButton, state.shortlistButton, state.followShortlistButton, state.buyButton,
+        state.preContractButton, state.renewButton, state.sellButton, state.planButton,
+        state.instructionButton, state.youthUpgradeButton, state.trainingUpgradeButton,
+        state.scoutingUpgradeButton, state.stadiumUpgradeButton,
+        state.menuContinueButton, state.menuPlayButton, state.menuLoadButton, state.menuBackButton,
+        state.emptyNewButton, state.emptyLoadButton, state.emptyValidateButton
+    };
+    for (HWND hwnd : hiddenControls) setControlVisibility(state, hwnd, false);
+    setMenuButtonsVisible(state, false);
+
+    Team* team = state.career.myTeam;
+    const std::string clubName = team ? team->name : std::string("Sin club");
+    const std::string divisionName = team ? divisionDisplay(team->division) : std::string("Sin division");
+    const std::string weekLabel = "Temp " + std::to_string(state.career.currentSeason) +
+                                  " / Sem " + std::to_string(state.career.currentWeek);
+
+    setLabelFont(state.pageTitleLabel, state.titleFont);
+    setWindowTextUtf8(state.pageTitleLabel, clubName);
+    setControlVisibility(state, state.pageTitleLabel, true);
+    MoveWindow(state.pageTitleLabel, contentLeft, contentTop, contentWidth, titleHeight, TRUE);
+
+    setLabelFont(state.infoLabel, state.font);
+    setWindowTextUtf8(state.infoLabel,
+                      divisionName + " | " + weekLabel +
+                          " | Reputacion " + std::to_string(state.career.managerReputation));
+    setControlVisibility(state, state.infoLabel, true);
+    MoveWindow(state.infoLabel, contentLeft, contentTop + titleHeight + s(2), contentWidth, infoHeight, TRUE);
+
+    const int buttonsTop = contentTop + titleHeight + infoHeight + s(14);
+    std::vector<std::pair<HWND, std::string> > dashboardButtons = {
+        {state.simulateButton, "Simular semana"},
+        {state.squadButton, "Plantilla"},
+        {state.tacticsButton, "Tacticas"},
+        {state.calendarButton, "Calendario"},
+        {state.leagueButton, "Liga"},
+        {state.transfersButton, "Fichajes"},
+        {state.financesButton, "Finanzas"},
+        {state.youthButton, "Cantera"},
+        {state.boardButton, "Directiva"},
+        {state.newsButton, "Noticias"},
+        {state.saveButton, "Guardar"},
+        {state.frontMenuButton, "Menu principal"}
+    };
+
+    for (size_t i = 0; i < dashboardButtons.size(); ++i) {
+        const int row = static_cast<int>(i) / gridCols;
+        const int col = static_cast<int>(i) % gridCols;
+        const int x = contentLeft + col * (buttonWidth + buttonGap);
+        const int y = buttonsTop + row * (buttonHeight + buttonGap);
+        MoveWindow(dashboardButtons[i].first, x, y, buttonWidth, buttonHeight, TRUE);
+        setWindowTextUtf8(dashboardButtons[i].first, dashboardButtons[i].second);
+        setControlVisibility(state, dashboardButtons[i].first, true);
+        EnableWindow(dashboardButtons[i].first, TRUE);
+    }
+    setControlVisibility(state, state.dashboardButton, false);
+
+    const int buttonRows = static_cast<int>((dashboardButtons.size() + gridCols - 1) / gridCols);
+    const int panelsTop = buttonsTop + buttonRows * buttonHeight + (buttonRows - 1) * buttonGap + s(22);
+    const int statusTop = static_cast<int>(client.bottom) - s(kStatusHeight);
+    const int availablePanelHeight = std::max(s(250), statusTop - panelsTop - s(14));
+    const int topPanelHeight = clampValue(availablePanelHeight * 48 / 100, s(150), s(230));
+    const int bottomPanelHeight = std::max(s(130), availablePanelHeight - topPanelHeight - gap);
+    const int leftWidth = std::max(s(300), contentWidth * 36 / 100);
+    const int rightWidth = contentWidth - leftWidth - gap;
+    const int bottomColWidth = std::max(s(220), (contentWidth - gap * 2) / 3);
+
+    std::string infoText = "Centro del club\r\n\r\n";
+    if (team) {
+        int playerCount = 0;
+        int totalAge = 0;
+        int totalSkill = 0;
+        int totalFitness = 0;
+        int totalForm = 0;
+        int injured = 0;
+        int suspended = 0;
+        int expiringContracts = 0;
+        long long weeklyWages = 0;
+        for (const Player& player : team->players) {
+            ++playerCount;
+            totalAge += player.age;
+            totalSkill += player.skill;
+            totalFitness += player.fitness;
+            totalForm += player.currentForm;
+            weeklyWages += player.wage;
+            if (player.injured) ++injured;
+            if (player.matchesSuspended > 0) ++suspended;
+            if (player.contractWeeks > 0 && player.contractWeeks <= 8) ++expiringContracts;
+        }
+        const int safeCount = std::max(1, playerCount);
+        const int available = std::max(0, playerCount - injured - suspended);
+        infoText += "Division: " + divisionDisplay(team->division) + "\r\n";
+        infoText += "Presupuesto: " + formatMoneyValue(team->budget) + "\r\n";
+        infoText += "Plantel: " + std::to_string(playerCount) +
+                    " | Disponibles: " + std::to_string(available) + "/" + std::to_string(playerCount) + "\r\n";
+        infoText += "Edad media: " + std::to_string(totalAge / safeCount) +
+                    " | Skill medio: " + std::to_string(totalSkill / safeCount) + "\r\n";
+        infoText += "Fisico: " + std::to_string(totalFitness / safeCount) +
+                    " | Forma: " + std::to_string(totalForm / safeCount) +
+                    " | Moral: " + std::to_string(team->morale) + "/100\r\n";
+        infoText += "Lesionados: " + std::to_string(injured) +
+                    " | Suspendidos: " + std::to_string(suspended) +
+                    " | Contratos <=8s: " + std::to_string(expiringContracts) + "\r\n";
+        infoText += "Salarios/sem: " + formatMoneyValue(weeklyWages) + "\r\n";
+        infoText += "Puesto: " + std::to_string(state.career.currentCompetitiveRank()) + "/" +
+                    std::to_string(state.career.currentCompetitiveFieldSize()) + "\r\n";
+        infoText += "Proximo: " + findNextMatchLine(state.career) + "\r\n";
+        infoText += "Objetivo: " + (state.career.boardMonthlyObjective.empty()
+                                      ? std::string("Sin objetivo mensual")
+                                      : state.career.boardMonthlyObjective);
+    } else {
+        infoText += "Division: Sin datos disponibles\r\n";
+        infoText += "Presupuesto: Pendiente\r\n";
+        infoText += "Moral: No asignado\r\n";
+        infoText += "Proximo: Sin datos disponibles\r\n";
+        infoText += "Objetivo: Pendiente";
+    }
+    setWindowTextUtf8(state.summaryLabel, "Resumen del club");
+    setWindowTextUtf8(state.summaryEdit, infoText);
+    setControlVisibility(state, state.summaryLabel, true);
+    setControlVisibility(state, state.summaryEdit, true);
+    MoveWindow(state.summaryLabel, contentLeft, panelsTop, leftWidth, s(kPanelLabelHeight), TRUE);
+    MoveWindow(state.summaryEdit, contentLeft, panelsTop + s(kPanelBodyOffset), leftWidth, topPanelHeight, TRUE);
+
+    setControlVisibility(state, state.transferLabel, true);
+    setControlVisibility(state, state.transferList, true);
+    MoveWindow(state.transferLabel, contentLeft + leftWidth + gap, panelsTop, rightWidth, s(kPanelLabelHeight), TRUE);
+    MoveWindow(state.transferList, contentLeft + leftWidth + gap, panelsTop + s(kPanelBodyOffset), rightWidth, topPanelHeight, TRUE);
+
+    const int bottomTop = panelsTop + s(kPanelBodyOffset) + topPanelHeight + gap;
+    setControlVisibility(state, state.tableLabel, true);
+    setControlVisibility(state, state.tableList, true);
+    MoveWindow(state.tableLabel, contentLeft, bottomTop, bottomColWidth, s(kPanelLabelHeight), TRUE);
+    MoveWindow(state.tableList, contentLeft, bottomTop + s(kPanelBodyOffset), bottomColWidth, bottomPanelHeight, TRUE);
+
+    setControlVisibility(state, state.detailLabel, true);
+    setControlVisibility(state, state.detailEdit, true);
+    MoveWindow(state.detailLabel, contentLeft + bottomColWidth + gap, bottomTop, bottomColWidth, s(kPanelLabelHeight), TRUE);
+    MoveWindow(state.detailEdit,
+               contentLeft + bottomColWidth + gap,
+               bottomTop + s(kPanelBodyOffset),
+               bottomColWidth,
+               bottomPanelHeight,
+               TRUE);
+
+    const int thirdLeft = contentLeft + (bottomColWidth + gap) * 2;
+    const int thirdWidth = contentWidth - (bottomColWidth + gap) * 2;
+    setControlVisibility(state, state.squadLabel, true);
+    setControlVisibility(state, state.squadList, true);
+    MoveWindow(state.squadLabel, thirdLeft, bottomTop, thirdWidth, s(kPanelLabelHeight), TRUE);
+    MoveWindow(state.squadList, thirdLeft, bottomTop + s(kPanelBodyOffset), thirdWidth, bottomPanelHeight, TRUE);
+
+    state.layout.statusBar = makeRect(padding, statusTop, std::max(0, static_cast<int>(client.right) - padding * 2), s(22));
+    MoveWindow(state.statusLabel,
+               state.layout.statusBar.left,
+               state.layout.statusBar.top,
+               rectWidth(state.layout.statusBar),
+               s(20),
+               TRUE);
+    setControlVisibility(state, state.statusLabel, true);
 }
 
 void rebuildFonts(AppState& state) {
@@ -1376,9 +1558,10 @@ void layoutWindow(AppState& state) {
         return;
     }
 
-    if (dashboardLayout) {
+    if (dashboardLayout && state.career.myTeam) {
         layoutCareerDashboard(state, client);
         applyEditInteriorPadding(state, state.summaryEdit, 10, 8);
+        applyEditInteriorPadding(state, state.detailEdit, 10, 8);
         if (syncScrollState()) return;
         return;
     }

@@ -209,13 +209,58 @@ GuiPageModel buildDashboardModel(AppState& state) {
     const auto hubLines = inbox_service::buildPriorityInboxLines(state.career, 5);
     int injured = 0;
     int lowMorale = 0;
+    int suspended = 0;
+    int lowFitness = 0;
+    int expiringContracts = 0;
+    int totalAge = 0;
+    int totalFitness = 0;
+    int totalForm = 0;
+    int totalSkill = 0;
+    long long weeklyWages = 0;
     for (const auto& player : team.players) {
+        totalAge += player.age;
+        totalFitness += player.fitness;
+        totalForm += player.currentForm;
+        totalSkill += player.skill;
+        weeklyWages += player.wage;
         if (player.injured) injured++;
+        if (player.matchesSuspended > 0) suspended++;
+        if (!player.injured && player.fitness < 68) lowFitness++;
+        if (player.contractWeeks > 0 && player.contractWeeks <= 8) expiringContracts++;
         if (player.happiness < 45) lowMorale++;
     }
+    const int playerCount = static_cast<int>(team.players.size());
+    const int safePlayerCount = std::max(1, playerCount);
+    const int avgAge = totalAge / safePlayerCount;
+    const int avgFitness = totalFitness / safePlayerCount;
+    const int avgForm = totalForm / safePlayerCount;
+    const int avgSkill = totalSkill / safePlayerCount;
+    const int availablePlayers = std::max(0, playerCount - injured - suspended);
 
     model.footer.title = "ActionCuePanel";
     model.footer.columns = {{L"Prioridad", 90}, {L"Destino", 110}, {L"Accion", 150}, {L"Motivo", 420}};
+    if (avgFitness < 72 || lowFitness >= 4) {
+        pushDashboardActionRow(model.footer,
+                               "Alta",
+                               "Fisico medio " + std::to_string(avgFitness) +
+                                   " y " + std::to_string(lowFitness) + " jugador(es) bajo 68.",
+                               "Plantilla",
+                               "Gestionar carga");
+    }
+    if (expiringContracts > 0) {
+        pushDashboardActionRow(model.footer,
+                               "Alta",
+                               std::to_string(expiringContracts) + " contrato(s) vencen en 8 semanas o menos.",
+                               "Fichajes",
+                               "Revisar contrato");
+    }
+    if (weeklyWages > 0 && team.budget < weeklyWages * 6) {
+        pushDashboardActionRow(model.footer,
+                               "Media",
+                               "Caja equivalente a menos de 6 semanas de salarios.",
+                               "Finanzas",
+                               "Revisar caja");
+    }
     if (lowMorale > 0 || team.morale < 52) {
         pushDashboardActionRow(model.footer,
                                "Alta",
@@ -247,6 +292,13 @@ GuiPageModel buildDashboardModel(AppState& state) {
     out << "Moral " << team.morale << " | Lesionados " << injured << " | Tension " << dressing.socialTension << "\r\n";
     out << "Plan semanal: " << team.trainingFocus << (congestedWeek ? " | semana congestionada" : " | semana regular") << "\r\n";
     out << "Objetivo: " << (state.career.boardMonthlyObjective.empty() ? "Sin objetivo mensual activo" : state.career.boardMonthlyObjective) << "\r\n\r\n";
+    out << "KPIs del club\r\n";
+    out << "- Plantel " << playerCount << " | Disponibles " << availablePlayers << "/" << playerCount
+        << " | Edad media " << avgAge << "\r\n";
+    out << "- Skill medio " << avgSkill << " | Fisico medio " << avgFitness
+        << " | Forma media " << avgForm << "\r\n";
+    out << "- Salarios semanales " << formatMoneyValue(weeklyWages)
+        << " | Contratos <=8s " << expiringContracts << "\r\n\r\n";
     if (!weeklyFocus.priorityLines.empty()) {
         out << "Cockpit semanal\r\n";
         for (const auto& line : weeklyFocus.priorityLines) out << "- " << line << "\r\n";

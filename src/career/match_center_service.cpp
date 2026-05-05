@@ -21,6 +21,24 @@ string phaseLeadLabel(const MatchCenterSnapshot& snapshot) {
     return snapshot.phaseSummaries.front();
 }
 
+string resultLabel(const MatchCenterSnapshot& snapshot) {
+    if (snapshot.opponentName.empty()) return "Sin marcador";
+    if (snapshot.myGoals > snapshot.oppGoals) return "Victoria";
+    if (snapshot.myGoals < snapshot.oppGoals) return "Derrota";
+    return "Empate";
+}
+
+string matchControlLabel(const MatchCenterSnapshot& snapshot) {
+    const int xgGap = snapshot.myExpectedGoalsTenths - snapshot.oppExpectedGoalsTenths;
+    const int shotGap = snapshot.myShots - snapshot.oppShots;
+    const int possessionGap = snapshot.myPossession - snapshot.oppPossession;
+    if (xgGap >= 5 && shotGap >= 3) return "El equipo genero las mejores ocasiones.";
+    if (xgGap <= -5 || shotGap <= -4) return "El rival encontro mas peligro y obligo a ajustar.";
+    if (possessionGap >= 10 && xgGap >= 0) return "Hubo control territorial con produccion suficiente.";
+    if (possessionGap <= -10 && xgGap <= 0) return "Falto control de mediocampo y salida limpia.";
+    return "Partido equilibrado, decidido por detalles.";
+}
+
 vector<string> buildRecommendationLines(const MatchCenterSnapshot& snapshot) {
     vector<string> lines;
     const int shotGap = snapshot.myShots - snapshot.oppShots;
@@ -154,31 +172,38 @@ string formatLastMatchCenter(const Career& career,
     if (!view.available) return "No hay match center disponible.";
 
     ostringstream out;
-    out << "Resumen del partido\r\n";
-    if (!view.scoreboard.empty()) out << "Marcador: " << view.scoreboard << "\r\n";
+    const MatchCenterSnapshot& snapshot = career.lastMatchCenter;
+    out << "Match Center\r\n";
+    out << "Resultado: " << resultLabel(snapshot);
+    if (!view.scoreboard.empty()) out << " | " << view.scoreboard;
+    out << "\r\n";
     if (!view.headline.empty()) out << "Lectura rapida: " << view.headline << "\r\n";
+    if (!snapshot.opponentName.empty()) out << "Control: " << matchControlLabel(snapshot) << "\r\n";
     if (!view.playerOfTheMatch.empty()) out << "Jugador clave: " << view.playerOfTheMatch << "\r\n";
     if (!view.metrics.empty()) {
-        out << "\r\nMetricas clave (tu equipo / rival)\r\n";
+        out << "\r\nIndicadores (tu equipo / rival)\r\n";
         for (const MatchCenterMetric& metric : view.metrics) {
             out << "- " << metric.label << ": " << metric.myValue << " / " << metric.oppValue << "\r\n";
         }
     }
-    if (!view.tacticalSummary.empty()) out << "\r\nLectura tactica\r\n- " << view.tacticalSummary << "\r\n";
-    if (!view.fatigueSummary.empty()) out << "Estado fisico\r\n- " << view.fatigueSummary << "\r\n";
-    if (!view.postMatchImpact.empty()) out << "Impacto postpartido\r\n- " << view.postMatchImpact << "\r\n";
+    if (!view.tacticalSummary.empty() || !view.fatigueSummary.empty() || !view.postMatchImpact.empty()) {
+        out << "\r\nDiagnostico\r\n";
+        if (!view.tacticalSummary.empty()) out << "- Tactica: " << view.tacticalSummary << "\r\n";
+        if (!view.fatigueSummary.empty()) out << "- Fisico: " << view.fatigueSummary << "\r\n";
+        if (!view.postMatchImpact.empty()) out << "- Impacto: " << view.postMatchImpact << "\r\n";
+    }
     if (!view.phaseLines.empty()) {
-        out << "\r\nFases del encuentro\r\n";
+        out << "\r\nMomentos del partido\r\n";
         for (const string& line : view.phaseLines) out << "- " << line << "\r\n";
     } else if (!career.lastMatchCenter.phaseSummaries.empty()) {
-        out << "\r\nFases del encuentro\r\n- " << phaseLeadLabel(career.lastMatchCenter) << "\r\n";
+        out << "\r\nMomentos del partido\r\n- " << phaseLeadLabel(career.lastMatchCenter) << "\r\n";
     }
     if (!view.eventLines.empty()) {
         out << "\r\nEventos\r\n";
         for (const string& event : view.eventLines) out << "- " << event << "\r\n";
     }
     if (!view.recommendationLines.empty()) {
-        out << "\r\nSiguiente decision sugerida\r\n";
+        out << "\r\nPlan inmediato\r\n";
         for (const string& line : view.recommendationLines) out << "- " << line << "\r\n";
     }
     return out.str();

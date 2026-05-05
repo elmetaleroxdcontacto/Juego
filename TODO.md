@@ -55,8 +55,20 @@
 - [x] Mejora UI Menú Principal
 Resumen: Se corrigio el XI, se amplio la normalizacion de posiciones, se mejoro el scraper, se re-scrapeo la liga y se validaron/ajustaron plantillas en todas las divisiones.
 
-- [ ] Mejora UI Panel de Carrera
-Resumen: Actualizar la vista del dashboard de carrera para mostrar el club, división, presupuesto, moral, próximo partido y objetivo de directiva con botones grandes en grilla.
+- [x] Mejora UI Panel de Carrera
+Resumen: Se actualizo el dashboard de carrera con botones grandes en grilla, resumen del club, proximas acciones, tabla, ultimo partido y estado del plantel.
+
+- [x] Limpieza de advertencias de plantillas
+Resumen: Se corrigieron las posiciones de Alan Medina y Javier Medina para que position y position_raw queden alineados; la auditoria queda en 0 errores y 0 advertencias.
+
+- [x] Mejora Match Center
+Resumen: El resumen del ultimo partido ahora muestra resultado, control del encuentro, indicadores, diagnostico, momentos, eventos y plan inmediato.
+
+- [x] Limpieza de transiciones GUI
+Resumen: El dashboard nuevo se aplica solo con carrera activa, el flujo de creacion conserva sus controles y el gestor de guardados queda incluido en el bloqueo de redibujado para evitar botones fantasma.
+
+- [x] KPIs accionables en Inicio
+Resumen: El Inicio de carrera ahora muestra edad media, skill medio, fisico, forma, disponibilidad, salarios semanales y contratos por vencer; Proximas acciones prioriza carga fisica, renovaciones y riesgo de caja.
 
 - Actualizar las plantillas de todos los equipos de la Primera División con los jugadores reales actuales de la temporada 2024/2025, obtenidos de transfermarkt.com.
 

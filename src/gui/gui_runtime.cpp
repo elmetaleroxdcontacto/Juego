@@ -33,6 +33,7 @@ std::vector<HWND> pageRefreshTargets(const AppState& state) {
         state.preContractButton, state.renewButton, state.sellButton, state.planButton, state.instructionButton,
         state.youthUpgradeButton, state.trainingUpgradeButton, state.scoutingUpgradeButton, state.stadiumUpgradeButton,
         state.menuContinueButton, state.menuPlayButton, state.menuSettingsButton, state.menuLoadButton,
+        state.menuDeleteSaveButton,
         state.menuCreditsButton, state.menuExitButton, state.menuBackButton, state.menuVolumeButton,
         state.menuDifficultyButton, state.menuSpeedButton, state.menuSimulationButton, state.menuLanguageButton,
         state.menuTextSpeedButton, state.menuVisualButton, state.menuMusicModeButton, state.menuAudioFadeButton,
