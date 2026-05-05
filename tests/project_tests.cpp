@@ -2271,6 +2271,34 @@ void testManagementViewFiltersChangeVisibleContent() {
            "Los filtros tacticos deben cambiar el enfoque visible de la pagina.");
 }
 
+void testFinancesModelShowsFairPlayPressure() {
+    gui_win32::AppState state;
+    state.currentPage = gui_win32::GuiPage::Finances;
+    state.currentFilter = "Resumen";
+    state.career.allTeams.push_back(makeTeam("Fair Play Club", "primera division", 68, 3, 3, "Balanced", "Equilibrado", 850000));
+    state.career.allTeams.push_back(makeTeam("Fair Play Rival", "primera division", 65, 2, 2, "Defensive", "Bloque bajo", 620000));
+    state.career.setActiveDivision("primera division");
+    state.career.myTeam = state.career.findTeamByName("Fair Play Club");
+    expect(state.career.myTeam != nullptr, "La prueba de fair play necesita club usuario.");
+
+    for (Player& player : state.career.myTeam->players) {
+        player.wage = 4000000;
+    }
+
+    const gui_win32::GuiPageModel model = gui_win32::buildFinancesModel(state);
+    string rows;
+    for (const auto& row : model.primary.rows) {
+        for (const auto& cell : row) rows += cell + "\n";
+    }
+
+    expect(rows.find("Fair play salarial") != string::npos,
+           "Finanzas debe mostrar el maximo salarial recomendado por fair play.");
+    expect(rows.find("Riesgos fair play") != string::npos,
+           "Finanzas debe mostrar cuantas alertas de fair play existen.");
+    expect(model.detail.content.find("Alertas fair play") != string::npos,
+           "El detalle financiero debe explicar las alertas de fair play.");
+}
+
 void testTransferFeedStaysMarketFocusedAcrossFilters() {
     gui_win32::AppState state;
     state.currentPage = gui_win32::GuiPage::Transfers;
@@ -2294,6 +2322,50 @@ void testTransferFeedStaysMarketFocusedAcrossFilters() {
            "La vista de mercado debe seguir mostrando noticias de fichajes con el filtro general.");
     expect(allFeed.find("Resultado de copa") == string::npos && defFeed.find("Resultado de copa") == string::npos,
            "El feed de Transfers no debe abrirse a noticias generales por cambiar el filtro de jugadores.");
+}
+
+void testDashboardActionCueHighlightsHardRisks() {
+    gui_win32::AppState state;
+    state.currentPage = gui_win32::GuiPage::Dashboard;
+    state.currentFilter = "Todo";
+    state.career.allTeams.push_back(makeTeam("Riesgo Club", "primera division", 66, 3, 3, "Balanced", "Equilibrado", 90000));
+    state.career.allTeams.push_back(makeTeam("Riesgo Rival", "primera division", 70, 3, 3, "Pressing", "Presion alta", 700000));
+    state.career.setActiveDivision("primera division");
+    state.career.myTeam = state.career.findTeamByName("Riesgo Club");
+    expect(state.career.myTeam != nullptr, "La prueba de proximas acciones necesita club usuario.");
+
+    Team& team = *state.career.myTeam;
+    state.career.boardConfidence = 38;
+    state.career.boardWarningWeeks = 2;
+    state.career.schedule = {{{0, 1}}};
+    team.budget = 20000;
+    team.players[0].injured = true;
+    team.players[1].injured = true;
+    team.players[2].matchesSuspended = 1;
+    team.players[3].fitness = 55;
+    team.players[4].fitness = 58;
+    team.players[5].contractWeeks = 5;
+    team.players[5].wage = 15000;
+
+    const gui_win32::GuiPageModel model = gui_win32::buildDashboardModel(state);
+    expect(model.footer.title == "ActionCuePanel",
+           "El dashboard debe usar el panel de proximas acciones.");
+
+    string dump;
+    for (const auto& row : model.footer.rows) {
+        for (const auto& cell : row) dump += cell + "\n";
+    }
+    expect(dump.find("jugadores disponibles") != string::npos,
+           "Proximas acciones debe avisar cuando la convocatoria queda corta.");
+    expect(dump.find("Bajas acumuladas") != string::npos,
+           "Proximas acciones debe agrupar lesiones y suspensiones.");
+    expect(dump.find("Directiva bajo presion") != string::npos,
+           "Proximas acciones debe detectar confianza baja o advertencias.");
+    expect(dump.find("contrato") != string::npos,
+           "Proximas acciones debe incluir contratos cortos.");
+
+    expect(model.summary.content.find("Riesgos inmediatos") != string::npos,
+           "El resumen de Inicio debe explicar los riesgos fuertes de la semana.");
 }
 #endif
 
@@ -2835,7 +2907,9 @@ int main() {
         {"loader_fallback", testLoadTeamFromDirectoryFallsBackAndResolvesRawPositions},
 #ifdef _WIN32
         {"management_view_filters", testManagementViewFiltersChangeVisibleContent},
+        {"finance_fair_play", testFinancesModelShowsFairPlayPressure},
         {"transfer_feed_focus", testTransferFeedStaysMarketFocusedAcrossFilters},
+        {"dashboard_action_cue", testDashboardActionCueHighlightsHardRisks},
 #endif
     };
 

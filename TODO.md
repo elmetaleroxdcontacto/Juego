@@ -70,6 +70,15 @@ Resumen: El dashboard nuevo se aplica solo con carrera activa, el flujo de creac
 - [x] KPIs accionables en Inicio
 Resumen: El Inicio de carrera ahora muestra edad media, skill medio, fisico, forma, disponibilidad, salarios semanales y contratos por vencer; Proximas acciones prioriza carga fisica, renovaciones y riesgo de caja.
 
+- [x] Riesgos criticos en Proximas acciones
+Resumen: El Inicio ahora prioriza convocatoria corta, bajas acumuladas y presion de directiva; la suite agrega un test GUI para proteger esas alertas accionables.
+
+- [x] Atajos rapidos en GUI
+Resumen: La GUI ahora acepta Ctrl+S para guardar, Ctrl+F para abrir el radar de mercado, Ctrl+Enter o F5 para simular y Ctrl+1..0 para saltar entre secciones; se evitan repeticiones peligrosas al mantener presionada la tecla.
+
+- [x] Fair play financiero visible
+Resumen: Finanzas ahora muestra maximo salarial recomendado, uso de masa salarial y alertas de fair play economico; se agrego cobertura automatizada para detectar presion salarial excesiva y el target de tests enlaza el modulo fair play.
+
 - Actualizar las plantillas de todos los equipos de la Primera División con los jugadores reales actuales de la temporada 2024/2025, obtenidos de transfermarkt.com.
 
 

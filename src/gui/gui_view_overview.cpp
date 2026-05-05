@@ -239,6 +239,31 @@ GuiPageModel buildDashboardModel(AppState& state) {
 
     model.footer.title = "ActionCuePanel";
     model.footer.columns = {{L"Prioridad", 90}, {L"Destino", 110}, {L"Accion", 150}, {L"Motivo", 420}};
+    if (availablePlayers < 18) {
+        pushDashboardActionRow(model.footer,
+                               "Alta",
+                               "Solo " + std::to_string(availablePlayers) +
+                                   " jugadores disponibles para la proxima convocatoria.",
+                               "Plantilla",
+                               "Ajustar convocatoria");
+    }
+    if (injured + suspended >= 3) {
+        pushDashboardActionRow(model.footer,
+                               "Alta",
+                               "Bajas acumuladas: " + std::to_string(injured) +
+                                   " lesionado(s) y " + std::to_string(suspended) + " suspendido(s).",
+                               "Plantilla",
+                               "Revisar rotacion");
+    }
+    if (state.career.boardWarningWeeks > 0 || state.career.boardConfidence < 45) {
+        pushDashboardActionRow(model.footer,
+                               "Alta",
+                               "Directiva bajo presion: confianza " +
+                                   std::to_string(state.career.boardConfidence) +
+                                   "/100 y advertencias " + std::to_string(state.career.boardWarningWeeks) + ".",
+                               "Directiva",
+                               "Revisar objetivo");
+    }
     if (avgFitness < 72 || lowFitness >= 4) {
         pushDashboardActionRow(model.footer,
                                "Alta",
@@ -299,6 +324,21 @@ GuiPageModel buildDashboardModel(AppState& state) {
         << " | Forma media " << avgForm << "\r\n";
     out << "- Salarios semanales " << formatMoneyValue(weeklyWages)
         << " | Contratos <=8s " << expiringContracts << "\r\n\r\n";
+    if (availablePlayers < 18 || injured + suspended >= 3 ||
+        state.career.boardWarningWeeks > 0 || state.career.boardConfidence < 45) {
+        out << "Riesgos inmediatos\r\n";
+        if (availablePlayers < 18) {
+            out << "- Convocatoria corta: " << availablePlayers << " disponibles.\r\n";
+        }
+        if (injured + suspended >= 3) {
+            out << "- Bajas acumuladas: " << injured << " lesionado(s), " << suspended << " suspendido(s).\r\n";
+        }
+        if (state.career.boardWarningWeeks > 0 || state.career.boardConfidence < 45) {
+            out << "- Directiva: confianza " << state.career.boardConfidence
+                << "/100 | advertencias " << state.career.boardWarningWeeks << "\r\n";
+        }
+        out << "\r\n";
+    }
     if (!weeklyFocus.priorityLines.empty()) {
         out << "Cockpit semanal\r\n";
         for (const auto& line : weeklyFocus.priorityLines) out << "- " << line << "\r\n";

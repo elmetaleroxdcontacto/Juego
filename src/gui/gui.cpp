@@ -429,6 +429,83 @@ bool handleFrontMenuKey(AppState& state, WPARAM key) {
 
 }  // namespace
 
+bool isCtrlKeyDown() {
+    return (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+}
+
+bool handleCareerShortcut(AppState& state, const MSG& msg) {
+    if (msg.message != WM_KEYDOWN || state.actionInProgress || isFrontMenuPage(state.currentPage)) return false;
+    const WPARAM key = msg.wParam;
+    const bool repeated = (msg.lParam & (1u << 30)) != 0;
+    const bool hasCareer = state.career.myTeam != nullptr;
+
+    if (key == VK_F5) {
+        if (repeated) return true;
+        if (hasCareer) {
+            simulateWeek(state);
+        } else {
+            setStatus(state, "Inicia o carga una carrera para simular.");
+        }
+        return true;
+    }
+
+    if (!isCtrlKeyDown()) return false;
+
+    if (key == 'S') {
+        if (repeated) return true;
+        if (hasCareer) {
+            saveCareer(state);
+        } else {
+            setStatus(state, "Inicia o carga una carrera para guardar.");
+        }
+        return true;
+    }
+
+    if (key == 'F') {
+        if (hasCareer) {
+            setCurrentPage(state, GuiPage::Transfers);
+            setStatus(state, "Radar de mercado abierto.");
+        } else {
+            setCurrentPage(state, GuiPage::Dashboard);
+            setStatus(state, "Completa la carrera para habilitar el radar de mercado.");
+        }
+        return true;
+    }
+
+    if (key == VK_RETURN) {
+        if (repeated) return true;
+        if (hasCareer) {
+            simulateWeek(state);
+        } else {
+            setStatus(state, "Inicia o carga una carrera para simular.");
+        }
+        return true;
+    }
+
+    const std::vector<GuiPage> shortcutPages = {
+        GuiPage::Dashboard,
+        GuiPage::Squad,
+        GuiPage::Tactics,
+        GuiPage::Calendar,
+        GuiPage::League,
+        GuiPage::Transfers,
+        GuiPage::Finances,
+        GuiPage::Youth,
+        GuiPage::Board,
+        GuiPage::News
+    };
+    if (key >= '1' && key <= '9') {
+        setCurrentPage(state, shortcutPages[static_cast<size_t>(key - '1')]);
+        return true;
+    }
+    if (key == '0') {
+        setCurrentPage(state, GuiPage::News);
+        return true;
+    }
+
+    return false;
+}
+
 void cycleDisplayMode(AppState& state) {
     switch (currentDisplayMode(state)) {
         case DisplayMode::RestoredWindow:
@@ -974,6 +1051,9 @@ int runGuiApp(GameSettings& settings) {
     while (GetMessageW(&msg, nullptr, 0, 0) > 0) {
         if (msg.message == WM_KEYDOWN && msg.wParam == VK_F11 && (msg.lParam & (1u << 30)) == 0) {
             gui_win32::cycleDisplayMode(state);
+            continue;
+        }
+        if (gui_win32::handleCareerShortcut(state, msg)) {
             continue;
         }
         if (msg.message == WM_KEYDOWN && gui_win32::handleFrontMenuKey(state, msg.wParam)) {

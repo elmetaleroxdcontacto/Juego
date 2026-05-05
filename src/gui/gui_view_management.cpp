@@ -8,6 +8,7 @@
 #include "career/manager_advice.h"
 #include "finance/finance_system.h"
 #include "transfers/negotiation_system.h"
+#include "ui/economy_fairplay.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -174,9 +175,13 @@ GuiPageModel buildFinancesModel(AppState& state) {
 
     Team& team = *state.career.myTeam;
     WeeklyFinanceReport finance = finance_system::projectWeeklyReport(team);
+    economy_fairplay::EconomyFairPlaySystem::initialize(state.career);
+    const long long allowedSalary = economy_fairplay::EconomyFairPlaySystem::getMaxAllowedSalary(team, state.career);
+    const int salaryPressure = static_cast<int>(finance.wageBill * 100 / std::max(1LL, allowedSalary));
+    const auto fairPlayViolations = economy_fairplay::EconomyFairPlaySystem::getTeamViolations(team, state.career);
     model.summary.content = buildClubSummaryService(state.career) + "\r\nFiltro actual: " + state.currentFilter;
 
-    const std::vector<std::vector<std::string> > financeRows = {
+    std::vector<std::vector<std::string> > financeRows = {
         {"Presupuesto", formatMoneyValue(team.budget), team.budget >= 0 ? "Caja operativa positiva" : "Caja comprometida"},
         {"Deuda", formatMoneyValue(team.debt), team.debt > 0 ? "Vigilar amortizacion" : "Sin deuda relevante"},
         {"Sponsor semanal", formatMoneyValue(finance.sponsorIncome), "Ingreso fijo"},
@@ -186,6 +191,12 @@ GuiPageModel buildFinancesModel(AppState& state) {
         {"Masa salarial", formatMoneyValue(finance.wageBill), "Costo semanal proyectado"},
         {"Buffer de mercado", formatMoneyValue(finance.transferBuffer), finance.riskLevel}
     };
+    financeRows.push_back({"Fair play salarial",
+                           formatMoneyValue(allowedSalary),
+                           "Uso " + std::to_string(salaryPressure) + "% del maximo recomendado"});
+    financeRows.push_back({"Riesgos fair play",
+                           std::to_string(fairPlayViolations.size()),
+                           fairPlayViolations.empty() ? "Sin alertas activas" : "Revisar detalle financiero"});
 
     std::vector<const Player*> players;
     for (const auto& player : team.players) players.push_back(&player);
@@ -223,8 +234,17 @@ GuiPageModel buildFinancesModel(AppState& state) {
                            "\r\nTaquilla " + formatMoneyValue(finance.matchdayIncome) +
                            "\r\nMerchandising " + formatMoneyValue(finance.merchandisingIncome) +
                            "\r\nBonos variables " + formatMoneyValue(finance.bonusIncome) +
+                           "\r\nFair play salarial " + formatMoneyValue(allowedSalary) +
+                           "\r\nUso salarial " + std::to_string(salaryPressure) + "%" +
                            "\r\nBuffer de mercado " + formatMoneyValue(finance.transferBuffer) +
                            "\r\nRiesgo " + finance.riskLevel;
+    if (!fairPlayViolations.empty()) {
+        model.detail.content += "\r\n\r\nAlertas fair play";
+        for (const auto& violation : fairPlayViolations) {
+            model.detail.content += "\r\n- " + violation.description +
+                                    " | severidad " + std::to_string(violation.severityLevel);
+        }
+    }
 
     if (state.currentFilter == "Salarios") {
         model.infoLine = "Masa salarial, contratos cortos y riesgo de salida.";
@@ -240,6 +260,8 @@ GuiPageModel buildFinancesModel(AppState& state) {
         model.feed.lines = salaryFeed;
         model.detail.content =
             "Masa salarial " + formatMoneyValue(finance.wageBill) +
+            "\r\nMaximo fair play " + formatMoneyValue(allowedSalary) +
+            "\r\nUso recomendado " + std::to_string(salaryPressure) + "%" +
             "\r\nJugadores monitorizados " + std::to_string(salaryRows.size()) +
             "\r\nContratos cortos " + std::to_string(std::count_if(team.players.begin(),
                                                                      team.players.end(),
