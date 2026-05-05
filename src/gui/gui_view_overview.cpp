@@ -36,6 +36,85 @@ std::vector<std::string> focusedAlertLines(const std::vector<std::string>& alert
     return out.empty() ? alerts : out;
 }
 
+std::string inferActionDestination(const std::string& text) {
+    const std::string lower = toLower(text);
+    if (lower.find("fatiga") != std::string::npos ||
+        lower.find("fisico") != std::string::npos ||
+        lower.find("lesion") != std::string::npos ||
+        lower.find("moral") != std::string::npos ||
+        lower.find("vestuario") != std::string::npos ||
+        lower.find("plantel") != std::string::npos ||
+        lower.find("promesa") != std::string::npos) {
+        return "Plantilla";
+    }
+    if (lower.find("fich") != std::string::npos ||
+        lower.find("mercado") != std::string::npos ||
+        lower.find("shortlist") != std::string::npos ||
+        lower.find("contrato") != std::string::npos ||
+        lower.find("renov") != std::string::npos) {
+        return "Fichajes";
+    }
+    if (lower.find("presupuesto") != std::string::npos ||
+        lower.find("caja") != std::string::npos ||
+        lower.find("deuda") != std::string::npos ||
+        lower.find("salario") != std::string::npos ||
+        lower.find("finanz") != std::string::npos) {
+        return "Finanzas";
+    }
+    if (lower.find("directiva") != std::string::npos ||
+        lower.find("objetivo") != std::string::npos ||
+        lower.find("confianza") != std::string::npos ||
+        lower.find("staff") != std::string::npos) {
+        return "Directiva";
+    }
+    if (lower.find("rival") != std::string::npos ||
+        lower.find("partido") != std::string::npos ||
+        lower.find("tact") != std::string::npos ||
+        lower.find("formacion") != std::string::npos ||
+        lower.find("presion") != std::string::npos) {
+        return "Tacticas";
+    }
+    if (lower.find("liga") != std::string::npos ||
+        lower.find("puesto") != std::string::npos ||
+        lower.find("puntos") != std::string::npos) {
+        return "Liga";
+    }
+    if (lower.find("decision") != std::string::npos ||
+        lower.find("noticia") != std::string::npos ||
+        lower.find("inbox") != std::string::npos) {
+        return "Noticias";
+    }
+    return "Inicio";
+}
+
+std::string inferActionCommand(const std::string& text) {
+    const std::string lower = toLower(text);
+    if (lower.find("fatiga") != std::string::npos || lower.find("fisico") != std::string::npos) return "Gestionar carga";
+    if (lower.find("moral") != std::string::npos || lower.find("vestuario") != std::string::npos) return "Reunion/charla";
+    if (lower.find("lesion") != std::string::npos) return "Revisar medico";
+    if (lower.find("contrato") != std::string::npos || lower.find("renov") != std::string::npos) return "Revisar contrato";
+    if (lower.find("fich") != std::string::npos || lower.find("mercado") != std::string::npos) return "Abrir mercado";
+    if (lower.find("presupuesto") != std::string::npos || lower.find("finanz") != std::string::npos) return "Revisar caja";
+    if (lower.find("objetivo") != std::string::npos || lower.find("directiva") != std::string::npos) return "Revisar objetivo";
+    if (lower.find("rival") != std::string::npos || lower.find("partido") != std::string::npos) return "Preparar partido";
+    if (lower.find("decision") != std::string::npos) return "Aplicar decision";
+    return "Revisar";
+}
+
+void pushDashboardActionRow(gui_win32::ListPanelModel& model,
+                            const std::string& priority,
+                            const std::string& text,
+                            const std::string& destination = std::string(),
+                            const std::string& command = std::string()) {
+    if (text.empty() || model.rows.size() >= 7) return;
+    model.rows.push_back({
+        priority,
+        destination.empty() ? inferActionDestination(text) : destination,
+        command.empty() ? inferActionCommand(text) : command,
+        text
+    });
+}
+
 }  // namespace
 
 namespace gui_win32 {
@@ -133,6 +212,32 @@ GuiPageModel buildDashboardModel(AppState& state) {
     for (const auto& player : team.players) {
         if (player.injured) injured++;
         if (player.happiness < 45) lowMorale++;
+    }
+
+    model.footer.title = "ActionCuePanel";
+    model.footer.columns = {{L"Prioridad", 90}, {L"Destino", 110}, {L"Accion", 150}, {L"Motivo", 420}};
+    if (lowMorale > 0 || team.morale < 52) {
+        pushDashboardActionRow(model.footer,
+                               "Alta",
+                               "Moral colectiva " + std::to_string(team.morale) +
+                                   " y " + std::to_string(lowMorale) + " jugador(es) bajo 45.",
+                               "Plantilla",
+                               "Reunion/charla");
+    }
+    for (const auto& line : weeklyFocus.priorityLines) {
+        pushDashboardActionRow(model.footer, "Alta", line);
+    }
+    for (const auto& line : actionLines) {
+        pushDashboardActionRow(model.footer, model.footer.rows.size() < 3 ? "Alta" : "Media", line);
+    }
+    for (const auto& option : weeklyDecisionOptions) {
+        pushDashboardActionRow(model.footer, "Media", option, "Noticias", "Aplicar decision");
+    }
+    for (const auto& alert : alerts) {
+        pushDashboardActionRow(model.footer, "Media", alert, inferActionDestination(alert), "Atender alerta");
+    }
+    if (model.footer.rows.empty()) {
+        model.footer.rows.push_back({"Baja", "Inicio", "Simular", "No hay alertas criticas: puedes preparar el partido y avanzar la semana."});
     }
 
     std::ostringstream out;

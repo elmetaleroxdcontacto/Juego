@@ -177,6 +177,7 @@ std::string friendlyPanelTitle(const std::string& title) {
     if (title == "UpcomingMatchWidget") return "Proximo encuentro";
     if (title == "LastResultPanel") return "Ultimo partido";
     if (title == "TeamStatusPanel") return "Estado del plantel";
+    if (title == "ActionCuePanel") return "Proximas acciones";
     if (title == "LeaguePositionWidget") return "Posicion competitiva";
     if (title == "TeamMoraleWidget") return "Estado del vestuario";
     if (title == "PlayerTableView") return "Plantilla";
