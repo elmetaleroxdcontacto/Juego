@@ -33,6 +33,27 @@ string joinOrDash(const vector<string>& values) {
 
 namespace transfer_briefing {
 
+string scoutingAttributeLabel(int value, int scoutingConfidence) {
+    const int confidence = clampInt(scoutingConfidence, 0, 100);
+    const int clampedValue = clampInt(value, 1, 99);
+    if (confidence >= 82) return to_string(clampedValue);
+
+    const int spread = confidence >= 68 ? 2 : (confidence >= 52 ? 4 : 7);
+    const int low = clampInt(clampedValue - spread, 1, 99);
+    const int high = clampInt(clampedValue + spread + (confidence < 52 ? 1 : 0), 1, 99);
+    return to_string(low) + "-" + to_string(high);
+}
+
+string scoutingMoneyLabel(long long value, int scoutingConfidence) {
+    const int confidence = clampInt(scoutingConfidence, 0, 100);
+    if (confidence >= 82) return formatMoneyValue(value);
+
+    const long long spreadPercent = confidence >= 68 ? 12LL : (confidence >= 52 ? 22LL : 35LL);
+    const long long low = max(0LL, value * (100LL - spreadPercent) / 100LL);
+    const long long high = max(low, value * (100LL + spreadPercent) / 100LL);
+    return formatMoneyValue(low) + "-" + formatMoneyValue(high);
+}
+
 vector<TransferOptionBrief> buildTransferOptions(const Career& career,
                                                  const string& filterPos,
                                                  bool includeShortSquads,
@@ -71,6 +92,10 @@ vector<TransferOptionBrief> buildTransferOptions(const Career& career,
             option.contractRunningOut = target.contractRunningOut;
             option.onShortlist = target.onShortlist;
             option.scoutingConfidence = target.scoutingConfidence;
+            option.skillLabel = scoutingAttributeLabel(player.skill, target.scoutingConfidence);
+            option.potentialLabel = scoutingAttributeLabel(player.potential, target.scoutingConfidence);
+            option.marketValueLabel = scoutingMoneyLabel(player.value, target.scoutingConfidence);
+            option.wageLabel = scoutingMoneyLabel(player.wage, target.scoutingConfidence);
             option.readinessScore = target.readinessScore;
             option.medicalRisk = target.medicalRisk;
             option.competitionLabel = manager_advice::buildTransferCompetitionLabel(career, seller, player, target);
@@ -197,9 +222,12 @@ vector<string> buildTransferOpportunityLines(const Career& career,
     for (const auto& option : buildTransferOptions(career, filterPos, true, limit)) {
         string line = option.playerName + " (" + option.sellerName + ")" +
                       " | " + option.position +
+                      " | media " + option.skillLabel +
+                      " | pot " + option.potentialLabel +
                       " | " + option.actionLabel +
                       " | " + option.competitionLabel +
                       " | " + option.packageLabel +
+                      " | informe " + to_string(option.scoutingConfidence) + "%" +
                       " | listo " + to_string(option.readinessScore) +
                       " | riesgo " + to_string(option.medicalRisk);
         if (option.scoutingConfidence >= 78) line += " | informe fuerte";

@@ -5,6 +5,7 @@ CareerState::CareerState()
     : currentSeason(0),
       currentWeek(0),
       activeDivision(""),
+      activeTeamCount(0),
       saveFile(""),
       initialized(false) {}
 
@@ -18,6 +19,7 @@ void CareerState::captureFrom(const Career& career) {
     currentSeason = career.currentSeason;
     currentWeek = career.currentWeek;
     activeDivision = career.activeDivision;
+    activeTeamCount = career.getActiveTeamCount();
     saveFile = career.saveFile;
     divisions = career.divisions;
     initialized = career.initialized;
@@ -25,18 +27,18 @@ void CareerState::captureFrom(const Career& career) {
 
 bool CareerState::usesSegundaFormat() const {
     const CompetitionConfig& config = getCompetitionConfig(activeDivision);
-    // Note: This method now assumes team count is not available here; may need adjustment
-    return config.seasonHandler == CompetitionSeasonHandler::SegundaGroups;
+    return config.seasonHandler == CompetitionSeasonHandler::SegundaGroups &&
+           (config.expectedTeamCount <= 0 || activeTeamCount == config.expectedTeamCount);
 }
 
 bool CareerState::usesTerceraBFormat() const {
     const CompetitionConfig& config = getCompetitionConfig(activeDivision);
-    return config.seasonHandler == CompetitionSeasonHandler::TerceraB;
+    return config.seasonHandler == CompetitionSeasonHandler::TerceraB &&
+           (config.expectedTeamCount <= 0 || activeTeamCount == config.expectedTeamCount);
 }
 
 bool CareerState::usesGroupFormat() const {
-    // Note: Need team count; placeholder
-    return competitionUsesGroupStage(activeDivision, 0); // Adjust as needed
+    return competitionUsesGroupStage(activeDivision, activeTeamCount);
 }
 
 void CareerState::setActiveDivision(const std::string& id) {

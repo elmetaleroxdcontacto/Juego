@@ -10,6 +10,7 @@ public:
     int currentSeason;
     int currentWeek;
     std::string activeDivision;
+    int activeTeamCount;
     std::string saveFile;
     std::vector<DivisionInfo> divisions;
     bool initialized;

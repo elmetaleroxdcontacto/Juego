@@ -8,6 +8,7 @@
 #include "career/manager_advice.h"
 #include "career/medical_service.h"
 #include "career/staff_service.h"
+#include "career/transfer_briefing.h"
 #include "ai/ai_transfer_manager.h"
 #include "career/dressing_room_service.h"
 #include "career/match_analysis_store.h"
@@ -745,6 +746,8 @@ std::vector<TransferPreviewItem> buildTransferTargets(const Career& career, cons
                 player.age,
                 player.skill,
                 player.potential,
+                transfer_briefing::scoutingAttributeLabel(player.skill, target.scoutingConfidence),
+                transfer_briefing::scoutingAttributeLabel(player.potential, target.scoutingConfidence),
                 target.expectedFee,
                 target.expectedWage,
                 target.expectedAgentFee,

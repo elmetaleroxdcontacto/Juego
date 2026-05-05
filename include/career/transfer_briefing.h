@@ -15,11 +15,15 @@ struct TransferOptionBrief {
     std::string position;
     int skill = 0;
     int potential = 0;
+    std::string skillLabel;
+    std::string potentialLabel;
     int age = 0;
     int contractWeeks = 0;
     long long marketValue = 0;
     long long releaseClause = 0;
     long long wage = 0;
+    std::string marketValueLabel;
+    std::string wageLabel;
     bool availableForLoan = false;
     bool contractRunningOut = false;
     bool onShortlist = false;
@@ -32,6 +36,9 @@ struct TransferOptionBrief {
     std::string scoutingNote;
     double totalScore = 0.0;
 };
+
+std::string scoutingAttributeLabel(int value, int scoutingConfidence);
+std::string scoutingMoneyLabel(long long value, int scoutingConfidence);
 
 std::vector<TransferOptionBrief> buildTransferOptions(const Career& career,
                                                       const std::string& filterPos = "",

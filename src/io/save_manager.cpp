@@ -86,6 +86,14 @@ bool replaceFileAtomically(const string& sourcePath, const string& targetPath) {
 }
 
 bool overwriteFromTempFile(const string& sourcePath, const string& targetPath) {
+#ifdef _WIN32
+    const wstring wideSource = utf8ToWidePath(sourcePath);
+    const wstring wideTarget = utf8ToWidePath(targetPath);
+    if (!wideSource.empty() && !wideTarget.empty()) {
+        if (CopyFileW(wideSource.c_str(), wideTarget.c_str(), FALSE) != 0) return true;
+    }
+#endif
+
     ifstream source(sourcePath, ios::binary);
     if (!source.is_open()) return false;
 
@@ -132,11 +140,12 @@ bool saveCareer(Career& career) {
         return false;
     }
 
+    if (overwriteFromTempFile(tempPath, savePath)) {
+        std::remove(tempPath.c_str());
+        return true;
+    }
+
     if (!replaceFileAtomically(tempPath, savePath)) {
-        if (overwriteFromTempFile(tempPath, savePath)) {
-            std::remove(tempPath.c_str());
-            return true;
-        }
         std::remove(tempPath.c_str());
         if (backupReady && pathExists(backupPath)) {
             overwriteFromTempFile(backupPath, savePath);

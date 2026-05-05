@@ -1516,22 +1516,44 @@ ServiceResult resolveInboxDecisionService(Career& career) {
     Team& team = *career.myTeam;
     ensureTeamIdentity(team);
 
+    const auto actionableEntries = inbox_service::buildActionableInbox(career, 8);
     const auto inboxEntries = inbox_service::buildCombinedInbox(career, 8);
     const auto medicalStatuses = medical_service::buildMedicalStatuses(team);
-    if (inboxEntries.empty() && medicalStatuses.empty()) {
+    const bool hasRealActionableEntry =
+        !actionableEntries.empty() &&
+        !(actionableEntries.size() == 1 && actionableEntries.front().urgency <= 12 &&
+          actionableEntries.front().text.find("Inbox limpio") != string::npos);
+    if (!hasRealActionableEntry && inboxEntries.empty() && medicalStatuses.empty()) {
         return failure("No hay decisiones urgentes en el inbox.");
     }
 
     string latestText;
+    string latestCommand;
+    string latestDestination;
+    string latestChannel;
     bool scoutingEntry = false;
-    if (!inboxEntries.empty()) {
+    if (hasRealActionableEntry) {
+        latestText = actionableEntries.front().text;
+        latestCommand = actionableEntries.front().command;
+        latestDestination = actionableEntries.front().destination;
+        latestChannel = actionableEntries.front().channel;
+        scoutingEntry = actionableEntries.front().scouting;
+    } else if (!inboxEntries.empty()) {
         latestText = inboxEntries.back().text;
+        latestChannel = inboxEntries.back().channel;
         scoutingEntry = inboxEntries.back().scouting;
     }
-    const string lower = toLower(latestText);
+    const string lower = toLower(latestChannel + " " + latestDestination + " " + latestCommand + " " + latestText);
 
     ServiceResult result;
-    if (!medicalStatuses.empty() && (lower.find("lesion") != string::npos || lower.find("fatiga") != string::npos || lower.empty())) {
+    const bool needsRecovery = lower.find("lesion") != string::npos ||
+                               lower.find("fatiga") != string::npos ||
+                               lower.find("fisico") != string::npos ||
+                               lower.find("carga") != string::npos ||
+                               lower.find("recuperacion") != string::npos ||
+                               lower.find("medico") != string::npos ||
+                               (!medicalStatuses.empty() && lower.empty());
+    if (needsRecovery) {
         team.trainingFocus = "Recuperacion";
         int protectedPlayers = 0;
         for (const auto& status : medicalStatuses) {
@@ -1546,6 +1568,24 @@ ServiceResult resolveInboxDecisionService(Career& career) {
         result.ok = true;
         result.messages.push_back("Decision de inbox: se prioriza recuperacion y se protegen " + to_string(protectedPlayers) + " jugador(es)." );
         result.messages.push_back("Plan semanal actualizado a Recuperacion.");
+    } else if (lower.find("contrato") != string::npos || lower.find("renov") != string::npos) {
+        string renewalTarget;
+        for (const auto& player : team.players) {
+            if (player.contractWeeks > 0 && player.contractWeeks <= 12) {
+                renewalTarget = player.name;
+                break;
+            }
+        }
+        if (!renewalTarget.empty()) {
+            result = renewPlayerContractService(career, renewalTarget, NegotiationProfile::Balanced, NegotiationPromise::None);
+            if (result.ok) result.messages.insert(result.messages.begin(), "Decision de inbox: se atiende renovacion prioritaria.");
+        } else {
+            result = applyWeeklyDecisionService(career, WeeklyDecision::MatchPreparation);
+        }
+    } else if (lower.find("deuda") != string::npos || lower.find("caja") != string::npos ||
+               lower.find("presupuesto") != string::npos || lower.find("salario") != string::npos ||
+               lower.find("finanz") != string::npos) {
+        result = applyWeeklyDecisionService(career, WeeklyDecision::FinancialControl);
     } else if (lower.find("staff") != string::npos) {
         result = reviewStaffStructureService(career);
     } else if (scoutingEntry || lower.find("scouting") != string::npos || lower.find("mercado") != string::npos || lower.find("shortlist") != string::npos) {
@@ -1553,6 +1593,9 @@ ServiceResult resolveInboxDecisionService(Career& career) {
         else result = createScoutingAssignmentService(career, "", detectScoutingNeed(team), 3);
     } else if (lower.find("promesa") != string::npos || lower.find("directiva") != string::npos || lower.find("vestuario") != string::npos) {
         result = holdTeamMeetingService(career);
+    } else if (lower.find("rival") != string::npos || lower.find("partido") != string::npos ||
+               lower.find("tact") != string::npos || lower.find("instruccion") != string::npos) {
+        result = applyWeeklyDecisionService(career, WeeklyDecision::MatchPreparation);
     } else {
         result = cycleMatchInstructionService(career);
     }

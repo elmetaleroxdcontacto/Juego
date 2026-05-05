@@ -1,6 +1,14 @@
 #include "career/career_service.h"
+
+#include "career/career_reports.h"
+#include "career/staff_service.h"
+#include "career/week_simulation.h"
+#include "transfers/transfer_market.h"
 #include "utils/safe_references.h"
+
 #include <algorithm>
+#include <cstddef>
+#include <stdexcept>
 
 // ============================================================================
 // CareerService Implementation
@@ -9,7 +17,6 @@
 // and event dispatching without reimplementing existing logic
 
 void CareerService::simulateWeekMatches() {
-    // Delegate to existing week simulation but with safety checks
     if (!career_.myTeam) {
         throw std::runtime_error("Career myTeam is null");
     }
@@ -18,8 +25,7 @@ void CareerService::simulateWeekMatches() {
         throw std::runtime_error("Invalid team pointers in activeTeams");
     }
 
-    // Existing simulation logic can be called here
-    // simulateCareerWeek(career_); // Refactored to accept service
+    simulateCareerWeek(career_);
 }
 
 void CareerService::updatePlayerPhysicalState() {
@@ -99,6 +105,7 @@ void CareerService::updateManagerStress(int performanceImpact) {
 std::vector<Team*> CareerService::buildJobMarket(bool includeRelegated) {
     (void)includeRelegated;
     std::vector<Team*> jobs;
+    if (!career_.myTeam) return jobs;
     
     for (auto& team : career_.allTeams) {
         if (team.name != career_.myTeam->name) {
@@ -120,11 +127,23 @@ void CareerService::processContractUpdates() {
 }
 
 void CareerService::generateDevelopmentReports() {
-    // Delegate to existing development systems
+    if (!career_.myTeam) return;
+
+    const CareerReport report = buildClubReport(career_);
+    for (const auto& block : report.blocks) {
+        if (block.title.find("Entrenamiento") == std::string::npos &&
+            block.title.find("Cantera") == std::string::npos &&
+            block.title.find("Desarrollo") == std::string::npos) {
+            continue;
+        }
+        for (std::size_t i = 0; i < block.lines.size() && i < 2; ++i) {
+            career_.addInboxItem(block.title + " | " + block.lines[i], "Desarrollo");
+        }
+    }
 }
 
 void CareerService::processIncomingOffers() {
-    // Delegate to existing transfer systems
+    transfer_market::processCpuTransfers(career_);
 }
 
 void CareerService::updatePendingTransfers() {
@@ -136,15 +155,50 @@ void CareerService::updatePendingTransfers() {
 }
 
 void CareerService::generateWeeklyNarrative() {
-    // Delegate to existing narrative systems
+    const CareerReport report = buildWeeklyDashboardReport(career_);
+    int added = 0;
+    for (const auto& block : report.blocks) {
+        for (const auto& line : block.lines) {
+            if (line.empty()) continue;
+            career_.addNews(block.title + ": " + line);
+            if (++added >= 3) return;
+        }
+    }
 }
 
 void CareerService::dispatchStaffBriefing() {
-    // Delegate to existing staff systems
+    for (const auto& line : staff_service::buildWeeklyStaffBriefingLines(career_, 4)) {
+        career_.addInboxItem(line, "Staff");
+    }
 }
 
 void CareerService::addSquadAlerts() {
-    // Delegate to existing alert systems
+    if (!career_.myTeam) return;
+
+    int injuredPlayers = 0;
+    int lowFitnessPlayers = 0;
+    int expiringContracts = 0;
+    for (const auto& player : career_.myTeam->players) {
+        if (player.injured || player.injuryWeeks > 0) injuredPlayers++;
+        if (player.fitness < 55) lowFitnessPlayers++;
+        if (player.contractWeeks > 0 && player.contractWeeks <= 8) expiringContracts++;
+    }
+
+    if (injuredPlayers > 0) {
+        career_.addInboxItem("Plantel | " + std::to_string(injuredPlayers) +
+                                 " jugador(es) lesionado(s) requieren seguimiento.",
+                             "Medical");
+    }
+    if (lowFitnessPlayers >= 3) {
+        career_.addInboxItem("Plantel | " + std::to_string(lowFitnessPlayers) +
+                                 " jugador(es) llegan con condicion baja.",
+                             "Staff");
+    }
+    if (expiringContracts > 0) {
+        career_.addInboxItem("Contratos | " + std::to_string(expiringContracts) +
+                                 " renovacion(es) entran en zona urgente.",
+                             "Directiva");
+    }
 }
 
 void CareerService::updateManagerReputation(int matchResult) {

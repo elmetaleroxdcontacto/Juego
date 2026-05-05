@@ -26,8 +26,8 @@ El proyecto ya es jugable y hoy combina tres capas que trabajan juntas:
 ### Profundidad tipo Football Manager
 
 - mesa de staff con recomendaciones semanales priorizadas
-- centro del manager con agenda, scouting, mercado e inbox combinado
-- scouting por cobertura regional, foco posicional y confianza de informe
+- centro del manager con agenda, scouting, mercado e inbox accionable con prioridad, destino y accion sugerida
+- scouting por cobertura regional, foco posicional, confianza de informe y rangos de atributos cuando el dato aun es incierto
 - lectura de proyecto de club en negociaciones: estilo, cantera, politica, clima interno y seguridad del cargo
 - dashboard con contexto de rival, microciclo, decisiones sugeridas y narrativa semanal
 - datos externos tolerantes a campos faltantes en `data/teams.json`, `data/players.json`, `data/leagues.json` y overlays en `mods/`
@@ -51,6 +51,7 @@ El proyecto ya es jugable y hoy combina tres capas que trabajan juntas:
 - arranque maximizado con soporte DPI
 - boton y `F11` para alternar ventana, maximizado y fullscreen sin borde
 - dashboard owner-draw con KPIs e insights clicables
+- Noticias/Centro del manager muestra cola accionable para decidir entre plantilla, tacticas, mercado, finanzas y directiva
 - tablas con autosize por vista y suavizado entre refrescos
 - cambio de pagina diferido con cache basica para vistas pesadas como `Fichajes`, `Finanzas` y `Noticias`
 

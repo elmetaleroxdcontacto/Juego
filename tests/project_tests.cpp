@@ -6,6 +6,7 @@
 #include "career/career_modules.h"
 #include "career/career_reports.h"
 #include "career/career_runtime.h"
+#include "career/career_service.h"
 #include "career/career_state.h"
 #include "career/inbox_service.h"
 #include "career/manager_advice.h"
@@ -436,6 +437,11 @@ void testCompetitionGroupTableScopesActiveGroup() {
     const LeagueTable relevant = buildRelevantCompetitionTable(career);
     expect(relevant.teams.size() == 7 && relevant.teams[0]->name == "Norte Azul",
            "La tabla relevante debe quedarse con el grupo del club usuario.");
+
+    const CareerState snapshot = CareerState::fromCareer(career);
+    expect(snapshot.activeTeamCount == 14, "CareerState debe capturar el numero de equipos activos.");
+    expect(snapshot.usesGroupFormat() == career.usesGroupFormat(),
+           "CareerState debe conservar el formato real de grupos de la carrera activa.");
 }
 
 void testTeamRepositoryResolvesStableIds() {
@@ -468,6 +474,41 @@ void testTeamRepositoryResolvesStableIds() {
     expect(snapshot.currentSeason == 2 && snapshot.currentWeek == 7,
            "CareerState debe capturar temporada y semana desde Career.");
     expect(snapshot.activeDivision == "primera division", "CareerState debe capturar la division activa.");
+    expect(snapshot.activeTeamCount == 2, "CareerState debe capturar el conteo de equipos activos.");
+}
+
+void testCareerServiceWrapperProducesGameplayOutputs() {
+    Career career;
+    career.currentSeason = 1;
+    career.currentWeek = 5;
+    career.allTeams.push_back(makeTeam("Servicio FC", "primera division", 66, 3, 3, "Balanced", "Equilibrado"));
+    career.allTeams.push_back(makeTeam("Servicio Rival", "primera division", 64, 2, 3, "Defensive", "Pausar juego"));
+    career.activeTeams.push_back(&career.allTeams[0]);
+    career.activeTeams.push_back(&career.allTeams[1]);
+    career.myTeam = career.activeTeams[0];
+    career.activeDivision = "primera division";
+    career.boardConfidence = 42;
+    career.myTeam->assistantCoach = 42;
+    career.myTeam->fitnessCoach = 39;
+    career.myTeam->performanceAnalyst = 38;
+    career.myTeam->players[0].injured = true;
+    career.myTeam->players[0].injuryWeeks = 2;
+    for (size_t i = 1; i <= 3; ++i) {
+        career.myTeam->players[i].fitness = 48;
+    }
+    career.myTeam->players[4].contractWeeks = 4;
+
+    CareerService service(career);
+    service.dispatchStaffBriefing();
+    service.addSquadAlerts();
+    service.generateWeeklyNarrative();
+
+    const string inbox = joinLines(career.managerInbox);
+    expect(inbox.find("Staff") != string::npos || inbox.find("Plantel") != string::npos,
+           "CareerService debe escribir alertas reales en el inbox compilado.");
+    expect(inbox.find("Contratos") != string::npos,
+           "CareerService debe traducir renovaciones urgentes a alerta de directiva.");
+    expect(!career.newsFeed.empty(), "CareerService debe generar narrativa semanal real.");
 }
 
 void testTransferEvaluationPenalizesUnaffordableDeals() {
@@ -1433,6 +1474,10 @@ void testInboxDecisionPrioritizesRecovery() {
     player.fatigueLoad = 78;
     career.addInboxItem("Lesion y fatiga acumulada en el lateral titular.", "Medical");
 
+    const auto actionable = inbox_service::buildActionableInbox(career, 5);
+    expect(!actionable.empty() && actionable.front().command == "Revisar medico",
+           "El inbox accionable debe traducir una alerta medica a comando concreto.");
+
     const ServiceResult result = resolveInboxDecisionService(career);
     expect(result.ok, "El inbox debe poder disparar una decision medica automatizada.");
     expect(career.myTeam->trainingFocus == "Recuperacion", "La decision medica debe orientar la semana a recuperacion.");
@@ -1748,9 +1793,14 @@ void testManagerHubDigestCombinesStaffAndAgenda() {
     career.addInboxItem("La directiva pide reaccion inmediata.", "Directiva");
 
     const auto priority = inbox_service::buildPriorityInboxLines(career, 6);
+    const auto actionable = inbox_service::buildActionableInbox(career, 6);
     const string digest = inbox_service::buildManagerHubDigest(career, 6);
 
     expect(!priority.empty(), "El hub del manager debe producir lineas priorizadas.");
+    expect(!actionable.empty() && !actionable.front().destination.empty() && !actionable.front().command.empty(),
+           "El hub debe producir entradas accionables con destino y comando.");
+    expect(joinLines(priority).find("->") != string::npos,
+           "Las lineas priorizadas deben mostrar hacia donde actuar.");
     expect(joinLines(priority).find("Staff |") != string::npos,
            "El hub debe mezclar alertas del staff.");
     expect(joinLines(priority).find("Agenda |") != string::npos,
@@ -1838,6 +1888,46 @@ void testTransferBriefingBuildsActionableMarketView() {
     const auto opportunities = transfer_briefing::buildTransferOpportunityLines(career, "MED", 2);
     expect(!opportunities.empty() && opportunities.front().find("Entrada") != string::npos,
            "Las oportunidades resumidas deben incluir el paquete economico recomendado.");
+}
+
+void testScoutingBriefingMasksUncertainAttributes() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 4;
+    career.allTeams.push_back(makeTeam("Radar Bajo", "primera division", 66, 3, 3, "Balanced", "Equilibrado", 700000));
+    career.allTeams.push_back(makeTeam("Cantera Oculta", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Radar Bajo");
+    expect(career.myTeam != nullptr, "La prueba de scouting incierto necesita club usuario.");
+    career.myTeam->scoutingChief = 18;
+
+    Team* seller = career.findTeamByName("Cantera Oculta");
+    expect(seller != nullptr, "La prueba de scouting incierto necesita club vendedor.");
+    seller->players.clear();
+    Player target = makePlayer("Volante Tapado", "MED", 77, 88, 24, 74, 76);
+    target.contractWeeks = 60;
+    target.value = 520000;
+    target.wage = 16000;
+    seller->addPlayer(target);
+
+    auto lowOptions = transfer_briefing::buildTransferOptions(career, "MED", true, 3);
+    auto lowIt = find_if(lowOptions.begin(), lowOptions.end(), [](const transfer_briefing::TransferOptionBrief& option) {
+        return option.playerName == "Volante Tapado";
+    });
+    expect(lowIt != lowOptions.end(), "El briefing debe listar al objetivo con scouting bajo.");
+    expect(lowIt->skillLabel.find("-") != string::npos && lowIt->potentialLabel.find("-") != string::npos,
+           "Con baja confianza el scouting debe mostrar rangos, no valores exactos.");
+
+    career.myTeam->scoutingChief = 92;
+    career.scoutingShortlist.push_back("Cantera Oculta|Volante Tapado");
+    career.scoutingAssignments.push_back({"Cantera Oculta", "MED", "Urgente", 4, 95});
+    auto highOptions = transfer_briefing::buildTransferOptions(career, "MED", true, 3);
+    auto highIt = find_if(highOptions.begin(), highOptions.end(), [](const transfer_briefing::TransferOptionBrief& option) {
+        return option.playerName == "Volante Tapado";
+    });
+    expect(highIt != highOptions.end(), "El briefing debe mantener al objetivo tras subir la cobertura.");
+    expect(highIt->skillLabel == "77" && highIt->potentialLabel == "88",
+           "Con alta confianza el scouting debe desbloquear valores exactos.");
 }
 
 void testTransferWindowBlocksImmediateDeals() {
@@ -2838,6 +2928,7 @@ int main() {
         {"startup_data_validation", testStartupValidationSummaryExposesExternalAudit},
         {"competition_group_table", testCompetitionGroupTableScopesActiveGroup},
         {"team_id_repository", testTeamRepositoryResolvesStableIds},
+        {"career_service_wrapper", testCareerServiceWrapperProducesGameplayOutputs},
         {"game_settings_cycle", testGameSettingsCycleAndDifficultyImpact},
         {"game_settings_persistence", testGameSettingsPersistenceAndFrontendScope},
         {"transfer_affordability", testTransferEvaluationPenalizesUnaffordableDeals},
@@ -2873,6 +2964,7 @@ int main() {
         {"manager_hub_digest", testManagerHubDigestCombinesStaffAndAgenda},
         {"manager_advice", testManagerAdviceHighlightsUrgentActions},
         {"transfer_briefing", testTransferBriefingBuildsActionableMarketView},
+        {"scouting_briefing_uncertainty", testScoutingBriefingMasksUncertainAttributes},
         {"transfer_window_rules", testTransferWindowBlocksImmediateDeals},
         {"market_pulse_window", testMarketPulseReflectsClosedWindow},
         {"career_runtime_scope", testCareerRuntimeScopeRestoresContext},

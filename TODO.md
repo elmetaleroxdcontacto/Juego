@@ -5285,3 +5285,19 @@ Fecha: 2026-04-04
 - `cmake --build build-cmake --config Release --target FootballManager` -> compilado correctamente.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
 - `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+
+## Manager Hub accionable + scouting incierto (2026-05-05)
+
+### Cambios aplicados
+- `include/career/inbox_service.h` y `src/career/inbox_service.cpp`: se agrego `ActionableInboxEntry` y `buildActionableInbox(...)` para convertir staff, agenda, mercado, inbox y scouting en una cola con prioridad, destino y comando.
+- `src/career/app_services.cpp`: `resolveInboxDecisionService(...)` ahora usa la cola accionable para aplicar recuperacion, renovacion, control financiero, scouting, vestuario o preparacion rival segun la urgencia detectada.
+- `include/career/transfer_briefing.h` y `src/career/transfer_briefing.cpp`: el mercado ahora muestra rangos de media/potencial/valor/salario cuando la confianza del informe es baja, y desbloquea valores exactos con scouting fuerte.
+- `src/gui/gui_view_management.cpp` y `src/gui/gui_view_common.cpp`: la vista de Fichajes usa rangos de scouting y Noticias muestra el inbox accionable con columnas de prioridad, destino y accion.
+- `README.md`: se actualizo el estado del proyecto para reflejar el centro del manager accionable y scouting con incertidumbre.
+
+### Validacion
+- `cmake -S . -B build-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DBUILD_TESTING=ON`
+- `cmake --build build-cmake --config Release --target FootballManagerTests`
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI` -> compilado correctamente fuera del sandbox tras bloqueo temporal de MinGW con `objects.a`.

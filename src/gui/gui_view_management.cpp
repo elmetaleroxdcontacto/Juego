@@ -99,8 +99,8 @@ GuiPageModel buildTransfersModel(AppState& state) {
             target.player,
             target.position,
             std::to_string(target.age),
-            std::to_string(target.skill),
-            std::to_string(target.potential),
+            target.skillLabel.empty() ? std::to_string(target.skill) : target.skillLabel,
+            target.potentialLabel.empty() ? std::to_string(target.potential) : target.potentialLabel,
             formatMoneyValue(target.expectedFee),
             formatMoneyValue(target.expectedWage),
             target.scoutingLabel,
@@ -123,8 +123,11 @@ GuiPageModel buildTransfersModel(AppState& state) {
     } else {
         std::ostringstream detail;
         detail << player->name << " | " << seller->name << " | " << normalizePosition(player->position) << "\r\n";
-        detail << "Media " << player->skill << " | Potencial " << player->potential << " | Edad " << player->age << "\r\n";
         if (selectedPreview != targets.end()) {
+            detail << "Media " << selectedPreview->skillLabel
+                   << " | Potencial " << selectedPreview->potentialLabel
+                   << " | Confianza informe " << selectedPreview->scoutingConfidence << "%"
+                   << " | Edad " << player->age << "\r\n";
             detail << "Costo estimado " << formatMoneyValue(selectedPreview->expectedFee)
                    << " | Agente " << formatMoneyValue(selectedPreview->expectedAgentFee)
                    << " | Salario esperado " << formatMoneyValue(selectedPreview->expectedWage) << "\r\n";
@@ -135,6 +138,7 @@ GuiPageModel buildTransfersModel(AppState& state) {
             detail << "Plan economico: " << selectedPreview->packageLabel << "\r\n";
             detail << "Lectura scouting: " << selectedPreview->scoutingNote << "\r\n";
         } else {
+            detail << "Media " << player->skill << " | Potencial " << player->potential << " | Edad " << player->age << "\r\n";
             detail << "Valor " << formatMoneyValue(player->value) << " | Salario " << formatMoneyValue(player->wage) << "\r\n";
         }
         detail << "Interes jugador " << playerInterestLabel(state.career, *seller, *player)
@@ -416,8 +420,8 @@ GuiPageModel buildNewsModel(AppState& state) {
     model.summary.title = "ScoutingInbox";
     model.primary.title = "NewsCardList";
     model.primary.columns = {{L"Tipo", 120}, {L"Titular", 620}};
-    model.secondary.title = "ScoutingInbox";
-    model.secondary.columns = {{L"Tipo", 140}, {L"Detalle", 540}};
+    model.secondary.title = "ActionableInbox";
+    model.secondary.columns = {{L"Tipo", 90}, {L"Prioridad", 82}, {L"Destino", 95}, {L"Accion", 126}, {L"Detalle", 360}};
     model.footer.title = "AlertPanel";
     model.footer.columns = {{L"Nivel", 120}, {L"Detalle", 560}};
     model.detail.title = "NewsDetail";
@@ -434,17 +438,16 @@ GuiPageModel buildNewsModel(AppState& state) {
         model.primary.rows.push_back({type, line});
     }
 
-    for (const auto& line : hubLines) {
-        std::string channel = "Centro";
-        std::string detail = line;
-        const std::size_t separator = line.find(" | ");
-        if (separator != std::string::npos) {
-            channel = line.substr(0, separator);
-            detail = line.substr(separator + 3);
-        }
-        model.secondary.rows.push_back({channel, detail});
+    for (const auto& entry : inbox_service::buildActionableInbox(state.career, 12)) {
+        model.secondary.rows.push_back({
+            entry.channel,
+            entry.priority,
+            entry.destination,
+            entry.command,
+            entry.text
+        });
     }
-    if (model.secondary.rows.empty()) model.secondary.rows.push_back({"Inbox", "Sin novedades recientes"});
+    if (model.secondary.rows.empty()) model.secondary.rows.push_back({"Inbox", "-", "-", "Revisar", "Sin novedades recientes"});
 
     for (const auto& alert : alerts) {
         model.footer.rows.push_back({"Alerta", alert});

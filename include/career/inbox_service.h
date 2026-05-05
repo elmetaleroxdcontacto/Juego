@@ -14,7 +14,18 @@ struct InboxEntry {
     bool scouting = false;
 };
 
+struct ActionableInboxEntry {
+    std::string channel;
+    std::string priority;
+    int urgency = 0;
+    std::string destination;
+    std::string command;
+    std::string text;
+    bool scouting = false;
+};
+
 std::vector<InboxEntry> buildCombinedInbox(const Career& career, std::size_t limit = 12);
+std::vector<ActionableInboxEntry> buildActionableInbox(const Career& career, std::size_t limit = 12);
 std::vector<std::string> buildInboxSummaryLines(const Career& career, std::size_t limit = 8);
 std::string buildInboxDigest(const Career& career, std::size_t limit = 6);
 std::vector<std::string> buildPriorityInboxLines(const Career& career, std::size_t limit = 8);

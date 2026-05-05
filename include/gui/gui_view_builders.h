@@ -17,6 +17,8 @@ struct TransferPreviewItem {
     int age = 0;
     int skill = 0;
     int potential = 0;
+    std::string skillLabel;
+    std::string potentialLabel;
     long long expectedFee = 0;
     long long expectedWage = 0;
     long long expectedAgentFee = 0;
