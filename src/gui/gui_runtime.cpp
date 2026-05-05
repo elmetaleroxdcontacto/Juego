@@ -166,6 +166,9 @@ std::string friendlyPanelTitle(const std::string& title) {
     if (title == "FrontMenuOverview") return "Panorama de arranque";
     if (title == "FrontMenuProfile") return "Perfil del manager";
     if (title == "FrontMenuRoadmap") return "Hoja de ruta";
+    if (title == "SaveBrowserOverview") return "Guardados disponibles";
+    if (title == "SaveBrowserDetail") return "Detalle del guardado";
+    if (title == "SaveBrowserList") return "Lista de guardados";
     if (title == "SettingsDesk") return "Cabina de ajustes";
     if (title == "SettingsImpact") return "Impacto";
     if (title == "SettingsReturn") return "Retorno y estado";
@@ -232,6 +235,7 @@ std::vector<std::string> filterOptionsForPage(GuiPage page) {
         case GuiPage::MainMenu:
         case GuiPage::Settings:
         case GuiPage::Credits:
+        case GuiPage::Saves:
             return {};
         case GuiPage::Dashboard: return {"Todo", "Alertas", "Lesiones", "Contratos"};
         case GuiPage::Squad: return {"Todos", "XI", "ARQ", "DEF", "MED", "DEL", "Lesionados"};
@@ -375,10 +379,22 @@ GuiPage dashboardActionDestinationPage(const std::string& destination) {
     return GuiPage::Dashboard;
 }
 
+void syncSaveBrowserSelection(AppState& state) {
+    if (state.currentPage != GuiPage::Saves || !state.newsList) return;
+    int selectedIndex = -1;
+    for (size_t i = 0; i < state.saveSlotPaths.size(); ++i) {
+        if (state.saveSlotPaths[i] == state.selectedSavePath) {
+            selectedIndex = static_cast<int>(i);
+            break;
+        }
+    }
+    SendMessageW(state.newsList, LB_SETCURSEL, selectedIndex, 0);
+}
+
 }  // namespace
 
 bool isFrontMenuPage(GuiPage page) {
-    return page == GuiPage::MainMenu || page == GuiPage::Settings || page == GuiPage::Credits;
+    return page == GuiPage::MainMenu || page == GuiPage::Settings || page == GuiPage::Credits || page == GuiPage::Saves;
 }
 
 bool isHeavyPage(GuiPage page) {
@@ -397,7 +413,12 @@ void syncSetupButtonsAndHints(AppState& state) {
     EnableWindow(state.saveButton, hasCareer);
     EnableWindow(state.simulateButton, hasCareer);
     EnableWindow(state.menuContinueButton, hasCareer || hasSavedCareer);
-    EnableWindow(state.menuLoadButton, hasSavedCareer);
+    EnableWindow(state.menuLoadButton, state.currentPage == GuiPage::MainMenu
+                                           ? TRUE
+                                           : (state.currentPage == GuiPage::Saves ? !state.selectedSavePath.empty() : hasSavedCareer));
+    EnableWindow(state.menuDeleteSaveButton, state.currentPage == GuiPage::MainMenu
+                                                ? TRUE
+                                                : (state.currentPage == GuiPage::Saves ? (!state.selectedSavePath.empty() && !hasCareer) : hasSavedCareer));
 
     if (state.divisionLabel) {
         std::string badge = "Division";
@@ -579,6 +600,7 @@ void refreshCurrentPage(AppState& state) {
             state.modelCacheSignatures[cacheKey] = cacheSignature;
         }
     }
+    syncSetupButtonsAndHints(state);
     syncMenuMusicForPage(state);
     state.insightHotspots.clear();
     bool dashboardEmptyState = state.currentPage == GuiPage::Dashboard && !state.career.myTeam;
@@ -619,6 +641,7 @@ void refreshCurrentPage(AppState& state) {
     renderListPanel(state, state.squadLabel, state.squadList, state.currentModel.secondary);
     renderListPanel(state, state.transferLabel, state.transferList, state.currentModel.footer);
     renderFeed(state.newsList, state.currentModel.feed.lines);
+    syncSaveBrowserSelection(state);
 
     bool showTable = !frontMenuPage && state.currentPage != GuiPage::Tactics && !dashboardEmptyState;
     bool showTableLabel = showTable;
@@ -711,6 +734,15 @@ void handleListSelectionChange(AppState& state, int controlId) {
     if ((state.currentPage == GuiPage::League || state.currentPage == GuiPage::Calendar) && controlId == IDC_TABLE_LIST) {
         InvalidateRect(state.window, nullptr, TRUE);
     }
+}
+
+void handleFeedSelectionChange(AppState& state, int controlId) {
+    if (state.pageRefreshInProgress || controlId != IDC_NEWS_LIST || state.currentPage != GuiPage::Saves) return;
+    const LRESULT row = SendMessageW(state.newsList, LB_GETCURSEL, 0, 0);
+    if (row == LB_ERR || row < 0 || row >= static_cast<LRESULT>(state.saveSlotPaths.size())) return;
+    state.selectedSavePath = state.saveSlotPaths[static_cast<size_t>(row)];
+    refreshCurrentPage(state);
+    setStatus(state, "Guardado seleccionado: " + state.selectedSavePath + ".");
 }
 
 void activateListAction(AppState& state, int controlId) {

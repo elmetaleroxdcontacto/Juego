@@ -247,6 +247,9 @@ void continueCareer(AppState& state) {
 
 void loadCareer(AppState& state) {
     pulseFrontendTiming(state);
+    if (state.currentPage == GuiPage::Saves && !state.selectedSavePath.empty()) {
+        state.career.saveFile = state.selectedSavePath;
+    }
     ServiceResult result = loadCareerService(state.career);
     if (!result.ok) {
         std::string message = result.messages.empty() ? "No se encontro una carrera guardada." : result.messages.front();
@@ -283,7 +286,9 @@ void deleteCareerSave(AppState& state) {
         return;
     }
 
-    std::string savePath = state.career.saveFile.empty() ? std::string("saves/career_save.txt") : state.career.saveFile;
+    std::string savePath = (state.currentPage == GuiPage::Saves && !state.selectedSavePath.empty())
+        ? state.selectedSavePath
+        : (state.career.saveFile.empty() ? std::string("saves/career_save.txt") : state.career.saveFile);
     
     if (!pathExists(savePath) && savePath == "saves/career_save.txt" && pathExists("career_save.txt")) {
         savePath = "career_save.txt";
@@ -307,6 +312,8 @@ void deleteCareerSave(AppState& state) {
                 std::remove((savePath + ".bak").c_str());
             }
             state.career.myTeam = nullptr;
+            state.selectedSavePath.clear();
+            state.saveSlotPaths.clear();
             refreshAll(state);
             setStatus(state, "Guardado eliminado correctamente.");
             MessageBoxW(state.window, L"El guardado ha sido eliminado.", L"Football Manager", MB_OK | MB_ICONINFORMATION);
@@ -518,6 +525,14 @@ void openCreditsPage(AppState& state) {
     setCurrentPage(state, GuiPage::Credits);
     setStatus(state, "Creditos abiertos. La portada mantiene la identidad del manager game.");
     if (state.menuBackButton) SetFocus(state.menuBackButton);
+}
+
+void openSavesPage(AppState& state) {
+    pulseFrontendTiming(state);
+    setCurrentPage(state, GuiPage::Saves);
+    setStatus(state, "Guardados abiertos. Selecciona un save y usa Abrir o Borrar.");
+    if (state.menuLoadButton && IsWindowEnabled(state.menuLoadButton)) SetFocus(state.menuLoadButton);
+    else if (state.menuBackButton) SetFocus(state.menuBackButton);
 }
 
 void cycleFrontendVolume(AppState& state) {

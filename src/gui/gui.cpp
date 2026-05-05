@@ -264,8 +264,9 @@ std::vector<HWND> activeFrontMenuButtons(const AppState& state) {
         return {
             state.menuContinueButton,
             state.menuPlayButton,
-            state.menuLoadButton,
             state.menuSettingsButton,
+            state.menuLoadButton,
+            state.menuDeleteSaveButton,
             state.menuCreditsButton,
             state.menuExitButton
         };
@@ -286,6 +287,13 @@ std::vector<HWND> activeFrontMenuButtons(const AppState& state) {
     }
     if (state.currentPage == GuiPage::Credits) {
         return {state.menuBackButton};
+    }
+    if (state.currentPage == GuiPage::Saves) {
+        return {
+            state.menuLoadButton,
+            state.menuDeleteSaveButton,
+            state.menuBackButton
+        };
     }
     return {};
 }
@@ -354,7 +362,10 @@ bool handleFrontMenuKey(AppState& state, WPARAM key) {
         case 'C':
             return state.currentPage == GuiPage::MainMenu && clickFrontMenuButton(state.menuSettingsButton);
         case 'L':
-            return state.currentPage == GuiPage::MainMenu && clickFrontMenuButton(state.menuLoadButton);
+            if (state.currentPage == GuiPage::MainMenu || state.currentPage == GuiPage::Saves) {
+                return clickFrontMenuButton(state.menuLoadButton);
+            }
+            return false;
         case 'R':
             return state.currentPage == GuiPage::MainMenu && clickFrontMenuButton(state.menuCreditsButton);
         case 'X':
@@ -376,8 +387,12 @@ bool handleFrontMenuKey(AppState& state, WPARAM key) {
         case 'F':
             return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuAudioFadeButton);
         case 'B':
+            if (state.currentPage == GuiPage::MainMenu || state.currentPage == GuiPage::Saves) {
+                return clickFrontMenuButton(state.menuDeleteSaveButton);
+            }
+            return false;
         case VK_ESCAPE:
-            if (state.currentPage == GuiPage::Settings || state.currentPage == GuiPage::Credits) {
+            if (state.currentPage == GuiPage::Settings || state.currentPage == GuiPage::Credits || state.currentPage == GuiPage::Saves) {
                 return clickFrontMenuButton(state.menuBackButton);
             }
             return false;
@@ -686,6 +701,11 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                         handleFilterChange(*state);
                     }
                     return 0;
+                case IDC_NEWS_LIST:
+                    if (HIWORD(wParam) == LBN_SELCHANGE) {
+                        handleFeedSelectionChange(*state, IDC_NEWS_LIST);
+                    }
+                    return 0;
                 case IDC_NEW_CAREER_BUTTON:
                     startNewCareer(*state);
                     return 0;
@@ -718,10 +738,12 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                     openSettingsMenu(*state);
                     return 0;
                 case IDC_MENU_LOAD_BUTTON:
-                    loadCareer(*state);
+                    if (state->currentPage == GuiPage::Saves) loadCareer(*state);
+                    else openSavesPage(*state);
                     return 0;
                 case IDC_MENU_DELETE_SAVE_BUTTON:
-                    deleteCareerSave(*state);
+                    if (state->currentPage == GuiPage::Saves) deleteCareerSave(*state);
+                    else openSavesPage(*state);
                     return 0;
                 case IDC_MENU_CREDITS_BUTTON:
                     openCreditsPage(*state);
@@ -833,7 +855,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
         case WM_KEYDOWN:
             if (state) {
                 if (isFrontMenuPage(state->currentPage) && wParam == VK_ESCAPE) {
-                    if (state->currentPage == GuiPage::Settings || state->currentPage == GuiPage::Credits) {
+                    if (state->currentPage == GuiPage::Settings || state->currentPage == GuiPage::Credits || state->currentPage == GuiPage::Saves) {
                         openFrontendMenu(*state);
                         return 0;
                     }

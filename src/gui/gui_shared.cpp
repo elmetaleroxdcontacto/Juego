@@ -890,13 +890,16 @@ static bool isFrontMenuMainActionButtonId(int id) {
 static bool shouldRenderButtonOnCurrentPage(const AppState& state, int id) {
     if (id == IDC_MENU_CONTINUE_BUTTON || id == IDC_MENU_PLAY_BUTTON || id == IDC_MENU_LOAD_BUTTON ||
         id == IDC_MENU_DELETE_SAVE_BUTTON || id == IDC_MENU_SETTINGS_BUTTON || id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON) {
+        if (id == IDC_MENU_LOAD_BUTTON || id == IDC_MENU_DELETE_SAVE_BUTTON) {
+            return state.currentPage == GuiPage::MainMenu || state.currentPage == GuiPage::Saves;
+        }
         return state.currentPage == GuiPage::MainMenu;
     }
     if (isFrontMenuSettingButtonId(id)) {
         return state.currentPage == GuiPage::Settings;
     }
     if (id == IDC_MENU_BACK_BUTTON) {
-        return state.currentPage == GuiPage::Settings || state.currentPage == GuiPage::Credits;
+        return state.currentPage == GuiPage::Settings || state.currentPage == GuiPage::Credits || state.currentPage == GuiPage::Saves;
     }
     if (id == IDC_NEW_CAREER_BUTTON || id == IDC_LOAD_BUTTON || id == IDC_SAVE_BUTTON ||
         id == IDC_SIMULATE_BUTTON || id == IDC_VALIDATE_BUTTON || id == IDC_DISPLAY_MODE_BUTTON ||

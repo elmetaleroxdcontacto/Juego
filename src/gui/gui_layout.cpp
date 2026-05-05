@@ -229,6 +229,7 @@ PageLayoutProfile buildPageLayoutProfile(GuiPage page) {
         case GuiPage::MainMenu:
         case GuiPage::Settings:
         case GuiPage::Credits:
+        case GuiPage::Saves:
             return {360, 320, 52, 360, 220, 220, 160, 148, 140};
         case GuiPage::Dashboard:
             return {340, 300, 56, 348, 226, 166, 160, 148, 132};
@@ -815,6 +816,7 @@ void setMenuButtonsVisible(AppState& state, bool visible) {
     setControlVisibility(state, state.menuPlayButton, visible);
     setControlVisibility(state, state.menuSettingsButton, visible);
     setControlVisibility(state, state.menuLoadButton, visible);
+    setControlVisibility(state, state.menuDeleteSaveButton, visible);
     setControlVisibility(state, state.menuCreditsButton, visible);
     setControlVisibility(state, state.menuExitButton, visible);
     setControlVisibility(state, state.menuBackButton, visible);
@@ -833,7 +835,8 @@ void updateFrontendMenuButtonLabels(AppState& state) {
     if (state.menuContinueButton) setWindowTextUtf8(state.menuContinueButton, "Continuar");
     if (state.menuPlayButton) setWindowTextUtf8(state.menuPlayButton, "Jugar");
     if (state.menuSettingsButton) setWindowTextUtf8(state.menuSettingsButton, "Configuraciones");
-    if (state.menuLoadButton) setWindowTextUtf8(state.menuLoadButton, "Cargar guardado");
+    if (state.menuLoadButton) setWindowTextUtf8(state.menuLoadButton, state.currentPage == GuiPage::Saves ? "Abrir seleccionado" : "Guardados");
+    if (state.menuDeleteSaveButton) setWindowTextUtf8(state.menuDeleteSaveButton, state.currentPage == GuiPage::Saves ? "Borrar seleccionado" : "Borrar guardado");
     if (state.menuCreditsButton) setWindowTextUtf8(state.menuCreditsButton, "Creditos");
     if (state.menuExitButton) setWindowTextUtf8(state.menuExitButton, "Salir");
     if (state.menuBackButton) setWindowTextUtf8(state.menuBackButton, "Volver");
@@ -1159,6 +1162,28 @@ void layoutWindow(AppState& state) {
             setControlVisibility(state, state.menuVisualButton, false);
             setControlVisibility(state, state.menuMusicModeButton, false);
             setControlVisibility(state, state.menuAudioFadeButton, false);
+        } else if (state.currentPage == GuiPage::Saves) {
+            const int saveButtonWidth = clampValue((shellWidth - s(56)) / 3, s(190), s(320));
+            placeFixedWindow(state.menuLoadButton, shellLeft + s(16), buttonTop, saveButtonWidth, s(40));
+            placeFixedWindow(state.menuDeleteSaveButton, shellLeft + s(28) + saveButtonWidth, buttonTop, saveButtonWidth, s(40));
+            placeFixedWindow(state.menuBackButton, shellLeft + s(40) + saveButtonWidth * 2, buttonTop, saveButtonWidth, s(40));
+            setControlVisibility(state, state.menuContinueButton, false);
+            setControlVisibility(state, state.menuPlayButton, false);
+            setControlVisibility(state, state.menuSettingsButton, false);
+            setControlVisibility(state, state.menuLoadButton, true);
+            setControlVisibility(state, state.menuDeleteSaveButton, true);
+            setControlVisibility(state, state.menuCreditsButton, false);
+            setControlVisibility(state, state.menuExitButton, false);
+            setControlVisibility(state, state.menuBackButton, true);
+            setControlVisibility(state, state.menuVolumeButton, false);
+            setControlVisibility(state, state.menuDifficultyButton, false);
+            setControlVisibility(state, state.menuSpeedButton, false);
+            setControlVisibility(state, state.menuSimulationButton, false);
+            setControlVisibility(state, state.menuLanguageButton, false);
+            setControlVisibility(state, state.menuTextSpeedButton, false);
+            setControlVisibility(state, state.menuVisualButton, false);
+            setControlVisibility(state, state.menuMusicModeButton, false);
+            setControlVisibility(state, state.menuAudioFadeButton, false);
         } else if (state.currentPage == GuiPage::Settings) {
             const int settingsWidth = clampValue((shellWidth - s(44)) / 2, s(280), s(420));
             const int rightColumnLeft = shellLeft + s(28) + settingsWidth;
@@ -1176,6 +1201,7 @@ void layoutWindow(AppState& state) {
             setControlVisibility(state, state.menuPlayButton, false);
             setControlVisibility(state, state.menuSettingsButton, false);
             setControlVisibility(state, state.menuLoadButton, false);
+            setControlVisibility(state, state.menuDeleteSaveButton, false);
             setControlVisibility(state, state.menuCreditsButton, false);
             setControlVisibility(state, state.menuExitButton, false);
             setControlVisibility(state, state.menuBackButton, true);
@@ -1194,6 +1220,7 @@ void layoutWindow(AppState& state) {
             setControlVisibility(state, state.menuPlayButton, false);
             setControlVisibility(state, state.menuSettingsButton, false);
             setControlVisibility(state, state.menuLoadButton, false);
+            setControlVisibility(state, state.menuDeleteSaveButton, false);
             setControlVisibility(state, state.menuCreditsButton, false);
             setControlVisibility(state, state.menuExitButton, false);
             setControlVisibility(state, state.menuBackButton, true);
@@ -1713,6 +1740,7 @@ void initializeInterface(AppState& state) {
     ShowWindow(state.menuContinueButton, SW_HIDE);
     ShowWindow(state.menuBackButton, SW_HIDE);
     ShowWindow(state.menuLoadButton, SW_HIDE);
+    ShowWindow(state.menuDeleteSaveButton, SW_HIDE);
     ShowWindow(state.menuCreditsButton, SW_HIDE);
     ShowWindow(state.menuExitButton, SW_HIDE);
     ShowWindow(state.menuVolumeButton, SW_HIDE);
@@ -1764,7 +1792,7 @@ void initializeInterface(AppState& state) {
     state.detailLabel = createControl(state, 0, L"STATIC", L"Ultimo resultado", WS_CHILD | WS_VISIBLE, 0, 0, 220, 18, state.window, 0);
     state.detailEdit = createControl(state, WS_EX_CLIENTEDGE, L"EDIT", L"", WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL, 0, 0, 280, 240, state.window, IDC_DETAIL_EDIT);
     state.newsLabel = createControl(state, 0, L"STATIC", L"Noticias", WS_CHILD | WS_VISIBLE, 0, 0, 240, 18, state.window, 0);
-    state.newsList = createControl(state, WS_EX_CLIENTEDGE, L"LISTBOX", L"", WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_NOINTEGRALHEIGHT, 0, 0, 280, 220, state.window, IDC_NEWS_LIST);
+    state.newsList = createControl(state, WS_EX_CLIENTEDGE, L"LISTBOX", L"", WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_NOINTEGRALHEIGHT | LBS_NOTIFY, 0, 0, 280, 220, state.window, IDC_NEWS_LIST);
     state.statusLabel = createControl(state, 0, L"STATIC", L"Interfaz lista.", WS_CHILD | WS_VISIBLE, 0, 0, 420, 18, state.window, 0);
 
     applyInterfaceFonts(state);
@@ -1844,10 +1872,12 @@ void paintWindowChrome(AppState& state, HDC hdc) {
         SelectObject(hdc, state.font ? state.font : static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT)));
         SetTextColor(hdc, RGB(188, 209, 220));
         const wchar_t* subtitleText = state.currentPage == GuiPage::MainMenu
-            ? L"Portada del manager: continua, carga, configura o entra al juego real desde un solo frontend."
+            ? L"Portada del manager: continua, abre guardados, configura o entra al juego real desde un solo frontend."
             : (state.currentPage == GuiPage::Settings
                 ? L"Cabina de configuracion: audio, accesibilidad, timing y perfil visual comparten persistencia."
-                : L"Creditos y hoja tecnica del proyecto, con la misma identidad visual del frontend principal.");
+                : (state.currentPage == GuiPage::Saves
+                    ? L"Gestor de guardados: elige una carrera, revisa su detalle y decide si cargarla o borrarla."
+                    : L"Creditos y hoja tecnica del proyecto, con la misma identidad visual del frontend principal."));
         DrawTextW(hdc, subtitleText, -1, &subtitleRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
 
         auto drawChip = [&](const RECT& area, const std::wstring& label, COLORREF fill, COLORREF border) {

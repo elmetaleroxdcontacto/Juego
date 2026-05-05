@@ -5,9 +5,21 @@
 #include "engine/game_settings.h"
 #include "utils/utils.h"
 
+#include <algorithm>
+#include <cstdio>
 #include <sstream>
 
 namespace {
+
+struct SaveBrowserSlot {
+    std::string path;
+    std::string club = "Sin club";
+    std::string division = "Sin division";
+    std::string manager = "Sin manager";
+    std::string seasonWeek = "Sin fecha";
+    std::string modified = "Sin fecha de archivo";
+    bool hasBackup = false;
+};
 
 std::string mainMenuSavePath(const gui_win32::AppState& state) {
     std::string savePath = state.career.saveFile.empty() ? std::string("saves/career_save.txt") : state.career.saveFile;
@@ -29,6 +41,134 @@ std::string mainMenuSaveStateLabel(const gui_win32::AppState& state) {
 std::string mainMenuBackupStateLabel(const gui_win32::AppState& state) {
     const std::string savePath = mainMenuSavePath(state);
     return pathExists(savePath + ".bak") ? "Backup disponible" : "Sin backup";
+}
+
+bool startsWith(const std::string& text, const std::string& prefix) {
+    return text.rfind(prefix, 0) == 0;
+}
+
+std::string firstField(const std::string& text, char delimiter) {
+    const size_t pos = text.find(delimiter);
+    return trim(pos == std::string::npos ? text : text.substr(0, pos));
+}
+
+std::string saveModifiedLabel(const std::string& path) {
+#ifdef _WIN32
+    WIN32_FILE_ATTRIBUTE_DATA data{};
+    const std::string resolved = resolveProjectPath(path);
+    if (!GetFileAttributesExW(gui_win32::utf8ToWide(resolved).c_str(), GetFileExInfoStandard, &data)) {
+        return "Sin fecha de archivo";
+    }
+    FILETIME localTime{};
+    SYSTEMTIME systemTime{};
+    if (!FileTimeToLocalFileTime(&data.ftLastWriteTime, &localTime) ||
+        !FileTimeToSystemTime(&localTime, &systemTime)) {
+        return "Sin fecha de archivo";
+    }
+    char buffer[32]{};
+    std::snprintf(buffer,
+                  sizeof(buffer),
+                  "%02u-%02u-%04u %02u:%02u",
+                  static_cast<unsigned>(systemTime.wDay),
+                  static_cast<unsigned>(systemTime.wMonth),
+                  static_cast<unsigned>(systemTime.wYear),
+                  static_cast<unsigned>(systemTime.wHour),
+                  static_cast<unsigned>(systemTime.wMinute));
+    return buffer;
+#else
+    (void)path;
+    return "Fecha no disponible";
+#endif
+}
+
+bool parseSaveSlot(const std::string& path, SaveBrowserSlot& slot) {
+    std::vector<std::string> lines;
+    if (!pathExists(path) || !readTextFileLines(path, lines)) return false;
+
+    bool hasSeason = false;
+    bool hasClub = false;
+    slot = SaveBrowserSlot{};
+    slot.path = path;
+    slot.modified = saveModifiedLabel(path);
+    slot.hasBackup = pathExists(path + ".bak");
+
+    for (const std::string& rawLine : lines) {
+        const std::string line = trim(rawLine);
+        if (startsWith(line, "SEASON ")) {
+            std::istringstream in(line);
+            std::string seasonLabel;
+            std::string weekLabel;
+            int season = 0;
+            int week = 0;
+            in >> seasonLabel >> season >> weekLabel >> week;
+            if (season > 0 && week > 0) {
+                slot.seasonWeek = "Temp " + std::to_string(season) + " / Sem " + std::to_string(week);
+                hasSeason = true;
+            }
+        } else if (startsWith(line, "DIVISION ")) {
+            slot.division = divisionDisplay(trim(line.substr(9)));
+        } else if (startsWith(line, "MYTEAM ")) {
+            slot.club = trim(line.substr(7));
+            hasClub = !slot.club.empty();
+        } else if (startsWith(line, "MANAGER ")) {
+            slot.manager = firstField(line.substr(8), '|');
+            if (slot.manager.empty()) slot.manager = "Sin manager";
+        }
+    }
+
+    return hasSeason && hasClub;
+}
+
+void addUniqueCandidate(std::vector<std::string>& candidates, const std::string& path) {
+    if (path.empty()) return;
+    if (std::find(candidates.begin(), candidates.end(), path) == candidates.end()) {
+        candidates.push_back(path);
+    }
+}
+
+void addSaveFolderCandidates(std::vector<std::string>& candidates) {
+#ifdef _WIN32
+    const std::string savesRoot = resolveProjectPath("saves");
+    WIN32_FIND_DATAW findData{};
+    HANDLE handle = FindFirstFileW(gui_win32::utf8ToWide(joinPath(savesRoot, "*.txt")).c_str(), &findData);
+    if (handle == INVALID_HANDLE_VALUE) return;
+    do {
+        const std::string name = gui_win32::wideToUtf8(findData.cFileName);
+        if (name == "." || name == "..") continue;
+        const std::string lowerName = toLower(name);
+        if (lowerName.find("validation") != std::string::npos || lowerName.find("test_") == 0) continue;
+        if ((findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) continue;
+        addUniqueCandidate(candidates, joinPath("saves", name));
+    } while (FindNextFileW(handle, &findData));
+    FindClose(handle);
+#else
+    (void)candidates;
+#endif
+}
+
+std::vector<SaveBrowserSlot> discoverSaveSlots(const gui_win32::AppState& state) {
+    std::vector<std::string> candidates;
+    addUniqueCandidate(candidates, state.career.saveFile.empty() ? std::string("saves/career_save.txt") : state.career.saveFile);
+    addUniqueCandidate(candidates, "saves/career_save.txt");
+    addUniqueCandidate(candidates, "career_save.txt");
+    addSaveFolderCandidates(candidates);
+
+    std::vector<SaveBrowserSlot> slots;
+    for (const std::string& path : candidates) {
+        SaveBrowserSlot slot;
+        if (parseSaveSlot(path, slot)) slots.push_back(slot);
+    }
+    std::sort(slots.begin(), slots.end(), [](const SaveBrowserSlot& a, const SaveBrowserSlot& b) {
+        return a.path < b.path;
+    });
+    return slots;
+}
+
+const SaveBrowserSlot* selectedSlot(const std::vector<SaveBrowserSlot>& slots, const std::string& selectedPath) {
+    for (const SaveBrowserSlot& slot : slots) {
+        if (slot.path == selectedPath) return &slot;
+    }
+    return slots.empty() ? nullptr : &slots.front();
 }
 
 }  // namespace
@@ -59,7 +199,7 @@ GuiPageModel buildMainMenuModel(AppState& state) {
         "Panel de acceso\r\n"
         "- Continuar retoma la sesion activa o intenta cargar el ultimo guardado.\r\n"
         "- Jugar abre el flujo real del proyecto: dashboard, club, carrera, mercado, tacticas y noticias.\r\n"
-        "- Cargar guardado fuerza la lectura del ultimo save disponible.\r\n"
+        "- Guardados abre el gestor para elegir, cargar o borrar saves.\r\n"
         "- Configuraciones abre la cabina persistente de frontend.\r\n"
         "- Creditos y Salir completan la portada como una base real, no decorativa.\r\n\r\n"
         "Guardado visible\r\n"
@@ -92,9 +232,85 @@ GuiPageModel buildMainMenuModel(AppState& state) {
         "Respaldo automatico: " + backupState,
         "Estado actual: frontend listo para una experiencia tipo manager game.",
         "Navegacion GUI: Tab, Enter, flechas, numeros, F11 y Esc desde ajustes o creditos.",
-        "Continuar y Cargar ya usan el flujo real del proyecto en vez de una ruta separada.",
+        "Continuar usa el flujo real y Guardados abre el selector de saves.",
         "Simular guarda automaticamente antes de avanzar la semana."
     };
+    return model;
+}
+
+GuiPageModel buildSavesPageModel(AppState& state) {
+    GuiPageModel model;
+    model.title = "Guardados";
+    model.breadcrumb = "Inicio > Guardados";
+    model.infoLine = "Administra los guardados detectados en la carpeta saves.";
+    model.summary.title = "SaveBrowserOverview";
+    model.detail.title = "SaveBrowserDetail";
+    model.feed.title = "SaveBrowserList";
+
+    const std::vector<SaveBrowserSlot> slots = discoverSaveSlots(state);
+    state.saveSlotPaths.clear();
+    for (const SaveBrowserSlot& slot : slots) {
+        state.saveSlotPaths.push_back(slot.path);
+    }
+    if (slots.empty()) {
+        state.selectedSavePath.clear();
+    } else if (state.selectedSavePath.empty() ||
+               std::find(state.saveSlotPaths.begin(), state.saveSlotPaths.end(), state.selectedSavePath) == state.saveSlotPaths.end()) {
+        state.selectedSavePath = slots.front().path;
+    }
+
+    const SaveBrowserSlot* selected = selectedSlot(slots, state.selectedSavePath);
+    model.metrics = {
+        {"Guardados", std::to_string(slots.size()), slots.empty() ? kThemeDanger : kThemeAccentGreen},
+        {"Seleccion", selected ? selected->club : "Sin seleccion", selected ? kThemeAccentBlue : kThemeDanger},
+        {"Backup", selected && selected->hasBackup ? "Disponible" : "No disponible", selected && selected->hasBackup ? kThemeAccentGreen : kThemeWarning},
+        {"Sesion", state.career.myTeam ? "Activa" : "Libre", state.career.myTeam ? kThemeAccentBlue : kThemeAccent},
+        {"Ruta", selected ? selected->path : "Sin guardado", selected ? kThemeWarning : kThemeDanger}
+    };
+
+    std::ostringstream summary;
+    summary << "Centro de guardados\r\n\r\n";
+    summary << "Guardados detectados: " << slots.size() << "\r\n";
+    summary << "Carpetas revisadas: saves/ y guardado legado de la raiz.\r\n\r\n";
+    summary << "Acciones\r\n";
+    summary << "- Abrir seleccionado carga el save marcado en la lista.\r\n";
+    summary << "- Borrar seleccionado elimina el save y su backup .bak.\r\n";
+    summary << "- Volver regresa al menu principal.\r\n\r\n";
+    if (state.career.myTeam) {
+        summary << "Hay una carrera activa en memoria. Para borrar un guardado debes salir de esa carrera o volver a la portada sin sesion activa.";
+    } else if (selected) {
+        summary << "Seleccion actual: " << selected->club << " (" << selected->path << ").";
+    } else {
+        summary << "No hay guardados validos para cargar.";
+    }
+    model.summary.content = summary.str();
+
+    std::ostringstream detail;
+    if (selected) {
+        detail << "Club: " << selected->club << "\r\n";
+        detail << "Division: " << selected->division << "\r\n";
+        detail << "Manager: " << selected->manager << "\r\n";
+        detail << "Fecha carrera: " << selected->seasonWeek << "\r\n";
+        detail << "Archivo: " << selected->path << "\r\n";
+        detail << "Modificado: " << selected->modified << "\r\n";
+        detail << "Backup: " << (selected->hasBackup ? selected->path + ".bak" : std::string("No disponible")) << "\r\n\r\n";
+        detail << "Pulsa Abrir seleccionado para cargar esta carrera.";
+    } else {
+        detail << "No se encontraron archivos de carrera validos.\r\n\r\n";
+        detail << "Crea una carrera nueva y usa Guardar para generar saves/career_save.txt.";
+    }
+    model.detail.content = detail.str();
+
+    if (slots.empty()) {
+        model.feed.lines.push_back("Sin guardados validos en saves/.");
+    } else {
+        for (const SaveBrowserSlot& slot : slots) {
+            model.feed.lines.push_back(slot.club + " | " + slot.division + " | " + slot.seasonWeek +
+                                      " | " + slot.manager + " | " + slot.modified +
+                                      (slot.hasBackup ? " | backup" : "") +
+                                      " | " + slot.path);
+        }
+    }
     return model;
 }
 

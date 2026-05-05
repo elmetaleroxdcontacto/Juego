@@ -92,6 +92,7 @@ enum class GuiPage {
     MainMenu,
     Settings,
     Credits,
+    Saves,
     Dashboard,
     Squad,
     Tactics,
@@ -269,6 +270,8 @@ struct AppState {
     std::string selectedPlayerName;
     std::string selectedTransferPlayer;
     std::string selectedTransferClub;
+    std::string selectedSavePath;
+    std::vector<std::string> saveSlotPaths;
     GuiPageModel currentModel;
     std::vector<InsightHotspot> insightHotspots;
     std::map<std::string, std::vector<int> > columnWidthMemory;
@@ -456,6 +459,7 @@ void refreshCurrentPage(AppState& state);
 void autosizeCurrentLists(AppState& state);
 void handleFilterChange(AppState& state);
 void handleListSelectionChange(AppState& state, int controlId);
+void handleFeedSelectionChange(AppState& state, int controlId);
 void activateListAction(AppState& state, int controlId);
 void handleListColumnClick(AppState& state, const NMLISTVIEW& view);
 
@@ -479,6 +483,7 @@ void runUpgradeAction(AppState& state, ClubUpgrade upgrade, const std::string& t
 void openFrontendMenu(AppState& state);
 void openSettingsMenu(AppState& state);
 void openCreditsPage(AppState& state);
+void openSavesPage(AppState& state);
 void cycleFrontendVolume(AppState& state);
 void cycleFrontendDifficulty(AppState& state);
 void cycleFrontendSimulationSpeed(AppState& state);
