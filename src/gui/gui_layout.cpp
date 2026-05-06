@@ -1401,12 +1401,13 @@ void layoutWindow(AppState& state) {
 
         SCROLLINFO info{};
         info.cbSize = sizeof(info);
-        info.fMask = SIF_RANGE | SIF_PAGE | SIF_POS | SIF_DISABLENOSCROLL;
+        info.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
         info.nMin = 0;
         info.nMax = std::max(0, contentHeight - 1);
         info.nPage = viewportHeight;
         info.nPos = clamped;
         SetScrollInfo(state.window, SB_VERT, &info, TRUE);
+        ShowScrollBar(state.window, SB_VERT, maxScroll > 0 ? TRUE : FALSE);
 
         if (clamped != state.pageScrollY) {
             state.pageScrollY = clamped;
@@ -1866,7 +1867,9 @@ void layoutWindow(AppState& state) {
     };
 
     if (dashboardEmptyState) {
-        const int summaryHeight = std::max(s(380), rectHeight(state.layout.scrollViewport) - s(18));
+        const int consumedBySetupStrip = std::max(0, panelsTop - scrollViewportTop);
+        const int visibleSetupHeight = rectHeight(state.layout.scrollViewport) - consumedBySetupStrip - s(18);
+        const int summaryHeight = std::max(s(380), visibleSetupHeight);
         const int summaryWidth = stackedMainColumns ? availableMainWidth : contentWidth;
         const int rightColumnWidth = stackedMainColumns ? availableMainWidth : infoWidth;
         const int rightColumnX = stackedMainColumns ? contentLeft : infoLeft;
@@ -1969,12 +1972,14 @@ void layoutWindow(AppState& state) {
     state.layout.rightColumn = viewportRect(state,
                                             RECT{rightColumnX, rightStartTop, rightColumnX + rightColumnWidth, newsDoc.bottom},
                                             true);
-    if (currentContextTeam(state)) {
-        const int contextTop = stackedMainColumns ? panelsTop - s(kContextCardHeight + kPanelGap) : panelsTop;
+    const int contextCardBottomLimit = rightStartTop - s(kPanelGap);
+    const int contextCardHeight = std::min(s(kContextCardHeight),
+                                           std::max(0, contextCardBottomLimit - panelsTop));
+    if (currentContextTeam(state) && !stackedMainColumns && contextCardHeight >= s(96)) {
         RECT contextDoc{rightColumnX,
-                        std::max(scrollViewportTop, contextTop),
+                        panelsTop,
                         rightColumnX + rightColumnWidth,
-                        std::max(scrollViewportTop, contextTop) + s(kContextCardHeight)};
+                        panelsTop + contextCardHeight};
         state.layout.contextCard = viewportRect(state, contextDoc, true);
     }
 
