@@ -7,6 +7,7 @@
 #include "engine/game_settings.h"
 #include "utils/utils.h"
 
+#include <algorithm>
 #include <memory>
 #include <sstream>
 #include <utility>
@@ -169,15 +170,21 @@ struct SimulationProgressPayload {
     std::string phase;
     std::string detail;
     int percent = 0;
+    std::vector<std::string> events;
 };
 
 struct SimulationWorkerProgressContext {
     HWND window = nullptr;
     GameSettings settings;
     int spinner = 0;
+    std::vector<std::string> events;
+    int lastPercent = 35;
 };
 
 thread_local SimulationWorkerProgressContext* g_workerProgressContext = nullptr;
+
+constexpr size_t kMaxSimulationProgressEvents = 4;
+constexpr size_t kMaxSimulationProgressEventChars = 118;
 
 std::string buildSimulationStatus(const GameSettings& settings, int spinnerIndex) {
     static const char spinner[] = "|/-\\";
@@ -200,11 +207,13 @@ std::string progressStatusLine(const std::string& phase, const std::string& deta
 void setSimulationProgress(AppState& state,
                            const std::string& phase,
                            const std::string& detail,
-                           int percent) {
+                           int percent,
+                           const std::vector<std::string>& events = {}) {
     state.simulationProgressActive = true;
     state.simulationProgressPhase = phase;
     state.simulationProgressDetail = detail;
     state.simulationProgressPercent = clampValue(percent, 0, 100);
+    state.simulationProgressEvents = events;
     setStatus(state, progressStatusLine(phase, detail, state.simulationProgressPercent));
     if (state.window && IsWindow(state.window)) {
         InvalidateRect(state.window, nullptr, TRUE);
@@ -215,6 +224,7 @@ void clearSimulationProgress(AppState& state) {
     state.simulationProgressActive = false;
     state.simulationProgressPhase.clear();
     state.simulationProgressDetail.clear();
+    state.simulationProgressEvents.clear();
     state.simulationProgressPercent = 0;
     if (state.window && IsWindow(state.window)) {
         InvalidateRect(state.window, nullptr, TRUE);
@@ -248,12 +258,115 @@ void relinkCareerPointers(Career& career, const std::string& teamName) {
 void postSimulationProgress(HWND window,
                             const std::string& phase,
                             const std::string& detail,
-                            int percent) {
+                            int percent,
+                            const std::vector<std::string>& events = {}) {
     if (!window || !IsWindow(window)) return;
-    auto* payload = new SimulationProgressPayload{phase, detail, clampValue(percent, 0, 100)};
+    auto* payload = new SimulationProgressPayload{phase, detail, clampValue(percent, 0, 100), events};
     if (!PostMessageW(window, kGuiSimulationProgressMessage, 0, reinterpret_cast<LPARAM>(payload))) {
         delete payload;
     }
+}
+
+std::string compactSimulationEvent(const std::string& message) {
+    std::string event = trim(message);
+    if (event.empty()) return {};
+    std::replace(event.begin(), event.end(), '\r', ' ');
+    std::replace(event.begin(), event.end(), '\n', ' ');
+    while (event.find("  ") != std::string::npos) {
+        event.replace(event.find("  "), 2, " ");
+    }
+    if (event.size() > kMaxSimulationProgressEventChars) {
+        event = event.substr(0, kMaxSimulationProgressEventChars - 3) + "...";
+    }
+    return event;
+}
+
+bool shouldShowSimulationEvent(const std::string& event) {
+    if (event.empty()) return false;
+    if (event.rfind("---", 0) == 0 || event.rfind("===", 0) == 0) return false;
+
+    const std::string lower = toLower(event);
+    return lower.find("simulando semana") != std::string::npos ||
+           lower.find("[evento]") != std::string::npos ||
+           lower.find("[mundo]") != std::string::npos ||
+           lower.find("[staff]") != std::string::npos ||
+           lower.find("[deuda]") != std::string::npos ||
+           lower.find("[vestuario]") != std::string::npos ||
+           lower.find("[directiva]") != std::string::npos ||
+           lower.find("[hito]") != std::string::npos ||
+           lower.find("finanzas semanales") != std::string::npos ||
+           lower.find("oferta recibida") != std::string::npos ||
+           lower.find("transferencia aceptada") != std::string::npos ||
+           lower.find("contraoferta") != std::string::npos ||
+           lower.find("contrato expirado") != std::string::npos ||
+           lower.find("renovado.") != std::string::npos ||
+           lower.find("deja el club") != std::string::npos ||
+           lower.find("copa") != std::string::npos ||
+           lower.find("campeon") != std::string::npos ||
+           lower.find("logro desbloqueado") != std::string::npos ||
+           lower.find("no hay calendario") != std::string::npos ||
+           lower.find("semana invalida") != std::string::npos;
+}
+
+std::string simulationPhaseForEvent(const std::string& event) {
+    const std::string lower = toLower(event);
+    if (lower.find("finanzas") != std::string::npos ||
+        lower.find("deuda") != std::string::npos ||
+        lower.find("patrocinio") != std::string::npos) {
+        return "Finanzas";
+    }
+    if (lower.find("mercado") != std::string::npos ||
+        lower.find("oferta") != std::string::npos ||
+        lower.find("transferencia") != std::string::npos ||
+        lower.find("contraoferta") != std::string::npos ||
+        lower.find("contrato") != std::string::npos ||
+        lower.find("renovado") != std::string::npos) {
+        return "Mercado";
+    }
+    if (lower.find("lesion") != std::string::npos ||
+        lower.find("entrenamiento") != std::string::npos ||
+        lower.find("vestuario") != std::string::npos ||
+        lower.find("moral") != std::string::npos ||
+        lower.find("staff") != std::string::npos ||
+        lower.find("cantera") != std::string::npos) {
+        return "Plantel";
+    }
+    if (lower.find("mundo") != std::string::npos ||
+        lower.find("directiva") != std::string::npos ||
+        lower.find("hito") != std::string::npos ||
+        lower.find("cierre") != std::string::npos ||
+        lower.find("logro") != std::string::npos) {
+        return "Noticias";
+    }
+    return "Partidos";
+}
+
+int progressPercentForEventPhase(const std::string& phase, int fallback) {
+    int phasePercent = 45;
+    if (phase == "Plantel") phasePercent = 62;
+    else if (phase == "Mercado") phasePercent = 70;
+    else if (phase == "Finanzas") phasePercent = 78;
+    else if (phase == "Noticias") phasePercent = 86;
+    return clampValue(std::max(fallback, phasePercent), 0, 95);
+}
+
+void postWorkerSimulationEvent(const std::string& message) {
+    if (!g_workerProgressContext) return;
+
+    SimulationWorkerProgressContext& progress = *g_workerProgressContext;
+    const std::string event = compactSimulationEvent(message);
+    if (!shouldShowSimulationEvent(event)) return;
+
+    if (progress.events.empty() || progress.events.back() != event) {
+        progress.events.push_back(event);
+        if (progress.events.size() > kMaxSimulationProgressEvents) {
+            progress.events.erase(progress.events.begin());
+        }
+    }
+
+    const std::string phase = simulationPhaseForEvent(event);
+    progress.lastPercent = progressPercentForEventPhase(phase, progress.lastPercent);
+    postSimulationProgress(progress.window, phase, event, progress.lastPercent, progress.events);
 }
 
 void pumpWorkerSimulationProgress() {
@@ -261,12 +374,14 @@ void pumpWorkerSimulationProgress() {
 
     SimulationWorkerProgressContext& progress = *g_workerProgressContext;
     const int sweep = (progress.spinner % 36);
-    const int percent = 35 + std::min(35, sweep);
+    const int percent = std::max(progress.lastPercent, 35 + std::min(35, sweep));
+    progress.lastPercent = percent;
     if ((progress.spinner % 8) == 0) {
         postSimulationProgress(progress.window,
                                "Partidos",
                                buildSimulationStatus(progress.settings, progress.spinner),
-                               percent);
+                               percent,
+                               progress.events);
     }
     progress.spinner = (progress.spinner + 1) % 64;
 }
@@ -275,16 +390,23 @@ DWORD WINAPI simulationThreadProc(LPVOID rawArgs) {
     std::unique_ptr<SimulationThreadArgs> args(static_cast<SimulationThreadArgs*>(rawArgs));
     if (!args) return 0;
 
-    SimulationWorkerProgressContext progress{args->window, args->settings, 0};
+    SimulationWorkerProgressContext progress;
+    progress.window = args->window;
+    progress.settings = args->settings;
     g_workerProgressContext = &progress;
     postSimulationProgress(args->window, "Partidos", "Simulando partidos de la semana...", 35);
 
     CareerRuntimeContext runtime = currentCareerRuntimeContext();
     runtime.presentation = WeekSimulationPresentation::Compact;
+    runtime.uiMessage = postWorkerSimulationEvent;
     runtime.idle = pumpWorkerSimulationProgress;
     ScopedCareerRuntimeContext scopedRuntime(runtime);
     ServiceResult result = simulateCareerWeekService(args->career, pumpWorkerSimulationProgress);
-    postSimulationProgress(args->window, "Tabla y noticias", "Actualizando finanzas, tabla e inbox semanal.", 88);
+    postSimulationProgress(args->window,
+                           "Tabla y noticias",
+                           "Actualizando finanzas, tabla e inbox semanal.",
+                           88,
+                           progress.events);
     g_workerProgressContext = nullptr;
 
     const std::string teamName = managedTeamName(args->career);
@@ -509,7 +631,7 @@ void simulateWeek(AppState& state) {
 void handleSimulationProgress(AppState& state, LPARAM payload) {
     std::unique_ptr<SimulationProgressPayload> progress(reinterpret_cast<SimulationProgressPayload*>(payload));
     if (!progress) return;
-    setSimulationProgress(state, progress->phase, progress->detail, progress->percent);
+    setSimulationProgress(state, progress->phase, progress->detail, progress->percent, progress->events);
 }
 
 void completeSimulationWeek(AppState& state, LPARAM payload) {

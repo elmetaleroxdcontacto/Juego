@@ -2701,6 +2701,39 @@ void testCareerRuntimeScopeRestoresContext() {
     setWeekSimulationPresentation(previous.presentation);
 }
 
+void testSeasonServiceForwardsRuntimeMessages() {
+    g_runtimeMessagesA.clear();
+
+    Career career;
+    career.allTeams.push_back(makeTeam("Forward Club", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
+    career.allTeams.push_back(makeTeam("Forward Rival", "primera division", 66, 2, 2, "Defensive", "Bloque bajo", 620000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Forward Club");
+    career.managerName = "Manager Forward";
+    career.currentSeason = 1;
+    career.currentWeek = 1;
+    expect(career.myTeam != nullptr, "La prueba de forwarding necesita club usuario.");
+    expect(!career.schedule.empty(), "La prueba de forwarding necesita calendario.");
+
+    CareerRuntimeContext runtime = currentCareerRuntimeContext();
+    runtime.uiMessage = collectRuntimeMessageA;
+    runtime.presentation = WeekSimulationPresentation::Compact;
+
+    ServiceResult result;
+    {
+        ScopedCareerRuntimeContext runtimeScope(runtime);
+        result = simulateCareerWeekService(career, idleRuntimeProbe);
+    }
+
+    const string resultMessages = joinLines(result.messages);
+    const string forwardedMessages = joinLines(g_runtimeMessagesA);
+    expect(result.ok, "La simulacion semanal de prueba debe completarse.");
+    expect(resultMessages.find("Simulando semana") != string::npos,
+           "SeasonService debe conservar los mensajes emitidos por la simulacion.");
+    expect(forwardedMessages.find("Simulando semana") != string::npos,
+           "SeasonService debe reenviar los mensajes al callback runtime activo.");
+}
+
 void testHumanManagerProfilesPersistAcrossSaveSerialization() {
     Career career;
     career.allTeams.push_back(makeTeam("Control Uno", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 800000));
@@ -3006,6 +3039,7 @@ int main() {
         {"transfer_window_rules", testTransferWindowBlocksImmediateDeals},
         {"market_pulse_window", testMarketPulseReflectsClosedWindow},
         {"career_runtime_scope", testCareerRuntimeScopeRestoresContext},
+        {"season_service_runtime_forwarding", testSeasonServiceForwardsRuntimeMessages},
         {"human_manager_persistence", testHumanManagerProfilesPersistAcrossSaveSerialization},
         {"weekly_dashboard_report", testWeeklyDashboardReportHighlightsHumanManagersAndAgenda},
         {"weekly_focus_snapshot", testWeeklyFocusSnapshotPrioritizesUrgentClubState},

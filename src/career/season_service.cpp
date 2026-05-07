@@ -14,9 +14,13 @@ using namespace std;
 namespace {
 
 thread_local vector<string>* g_seasonMessages = nullptr;
+thread_local UiMessageCallback g_forwardSeasonMessage = nullptr;
 
 void collectSeasonMessage(const string& message) {
     if (g_seasonMessages && !message.empty()) g_seasonMessages->push_back(message);
+    if (g_forwardSeasonMessage && g_forwardSeasonMessage != collectSeasonMessage) {
+        g_forwardSeasonMessage(message);
+    }
 }
 
 vector<string> splitOutputLines(const string& text) {
@@ -64,6 +68,7 @@ SeasonStepResult SeasonService::simulateWeek(Career& career,
     g_seasonMessages = &messages;
     StdoutCapture stdoutCapture;
     CareerRuntimeContext runtimeContext = currentCareerRuntimeContext();
+    g_forwardSeasonMessage = runtimeContext.uiMessage;
     runtimeContext.uiMessage = collectSeasonMessage;
     runtimeContext.incomingOfferDecision = offerDecision;
     runtimeContext.contractRenewalDecision = renewDecision;
@@ -74,6 +79,7 @@ SeasonStepResult SeasonService::simulateWeek(Career& career,
         simulateCareerWeek(career);
     }
     g_seasonMessages = nullptr;
+    g_forwardSeasonMessage = nullptr;
 
     week.ok = true;
     week.weekAfter = career.currentWeek;

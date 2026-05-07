@@ -2168,7 +2168,7 @@ void drawSimulationProgressOverlay(AppState& state, HDC hdc, const RECT& client)
     const int clientWidth = static_cast<int>(client.right - client.left);
     const int clientHeight = static_cast<int>(client.bottom - client.top);
     const int panelWidth = clampValue(clientWidth - s(160), s(420), s(760));
-    const int panelHeight = s(148);
+    const int panelHeight = s(214);
     const int panelLeft = client.left + (clientWidth - panelWidth) / 2;
     const int panelTop = client.top + std::max(s(92), (clientHeight - panelHeight) / 2 - s(72));
     RECT panel{panelLeft, panelTop, panelLeft + panelWidth, panelTop + panelHeight};
@@ -2229,6 +2229,35 @@ void drawSimulationProgressOverlay(AppState& state, HDC hdc, const RECT& client)
         chipText.right -= s(8);
         SetTextColor(hdc, reached ? RGB(232, 247, 239) : kThemeMuted);
         DrawTextW(hdc, steps[i].first, -1, &chipText, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+    }
+
+    RECT eventsTitle{panel.left + s(24), panel.top + s(154), panel.right - s(24), panel.top + s(176)};
+    SetTextColor(hdc, kThemeAccent);
+    DrawTextW(hdc, L"Eventos recientes", -1, &eventsTitle, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+
+    SetTextColor(hdc, RGB(205, 220, 228));
+    const int eventLineHeight = s(18);
+    const int firstEventTop = panel.top + s(178);
+    if (state.simulationProgressEvents.empty()) {
+        RECT eventRect{panel.left + s(24), firstEventTop, panel.right - s(24), firstEventTop + eventLineHeight};
+        DrawTextW(hdc,
+                  L"Esperando eventos de la simulacion...",
+                  -1,
+                  &eventRect,
+                  DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+    } else {
+        const size_t maxVisibleEvents = std::min<size_t>(state.simulationProgressEvents.size(), 2);
+        const size_t firstEvent = state.simulationProgressEvents.size() - maxVisibleEvents;
+        for (size_t i = 0; i < maxVisibleEvents; ++i) {
+            RECT eventRect{
+                panel.left + s(24),
+                firstEventTop + static_cast<int>(i) * eventLineHeight,
+                panel.right - s(24),
+                firstEventTop + static_cast<int>(i + 1) * eventLineHeight
+            };
+            const std::wstring eventText = utf8ToWide("- " + state.simulationProgressEvents[firstEvent + i]);
+            DrawTextW(hdc, eventText.c_str(), -1, &eventRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+        }
     }
 
     SelectObject(hdc, oldFont);

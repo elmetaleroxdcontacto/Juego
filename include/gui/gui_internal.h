@@ -279,6 +279,7 @@ struct AppState {
     std::string selectedSavePath;
     std::string simulationProgressPhase;
     std::string simulationProgressDetail;
+    std::vector<std::string> simulationProgressEvents;
     std::vector<std::string> saveSlotPaths;
     GuiPageModel currentModel;
     std::vector<InsightHotspot> insightHotspots;

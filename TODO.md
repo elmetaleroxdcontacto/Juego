@@ -5392,3 +5392,26 @@ Fecha: 2026-04-04
 - `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
 - `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+
+## Avance GUI - eventos reales en overlay semanal (2026-05-07)
+
+### Cambios aplicados
+- `SeasonService` ahora conserva los mensajes de simulacion semanal y tambien los reenvia al callback runtime activo, para que la GUI pueda observarlos sin perder el resumen del servicio.
+- El worker de simulacion semanal captura mensajes reales como finanzas, mercado, vestuario, staff, mundo, deuda, hitos y eventos de club.
+- `AppState` guarda una lista corta de eventos recientes de simulacion.
+- El overlay semanal crecio para mostrar `Eventos recientes` debajo de la barra y los chips de fase.
+- El progreso ya no retrocede cuando llegan eventos de fases posteriores; mantiene el porcentaje mas avanzado del worker.
+- Se agrego el test `season_service_runtime_forwarding` para proteger que los mensajes se guarden y se reenvien al runtime.
+
+### Archivos modificados
+- `include/gui/gui_internal.h`
+- `src/career/season_service.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_layout.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
