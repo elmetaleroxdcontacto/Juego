@@ -2161,6 +2161,79 @@ void initializeInterface(AppState& state) {
     if (state.menuContinueButton) SetFocus(state.menuContinueButton);
 }
 
+void drawSimulationProgressOverlay(AppState& state, HDC hdc, const RECT& client) {
+    if (!state.simulationProgressActive) return;
+
+    const auto s = [&](int value) { return scaleByDpi(state, value); };
+    const int clientWidth = static_cast<int>(client.right - client.left);
+    const int clientHeight = static_cast<int>(client.bottom - client.top);
+    const int panelWidth = clampValue(clientWidth - s(160), s(420), s(760));
+    const int panelHeight = s(148);
+    const int panelLeft = client.left + (clientWidth - panelWidth) / 2;
+    const int panelTop = client.top + std::max(s(92), (clientHeight - panelHeight) / 2 - s(72));
+    RECT panel{panelLeft, panelTop, panelLeft + panelWidth, panelTop + panelHeight};
+
+    drawRoundedPanel(hdc, panel, RGB(10, 24, 32), RGB(77, 130, 166), s(18));
+
+    RECT titleRect{panel.left + s(24), panel.top + s(16), panel.right - s(24), panel.top + s(42)};
+    SetBkMode(hdc, TRANSPARENT);
+    SetTextColor(hdc, RGB(242, 247, 249));
+    HGDIOBJ oldFont = SelectObject(hdc, state.sectionFont ? state.sectionFont : state.font);
+    DrawTextW(hdc, L"Simulando semana", -1, &titleRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+
+    RECT phaseRect{panel.left + s(24), panel.top + s(48), panel.right - s(24), panel.top + s(74)};
+    const std::string phase = state.simulationProgressPhase.empty() ? "Procesando" : state.simulationProgressPhase;
+    const std::wstring phaseText = utf8ToWide(phase + " | " + std::to_string(clampValue(state.simulationProgressPercent, 0, 100)) + "%");
+    SetTextColor(hdc, kThemeAccent);
+    DrawTextW(hdc, phaseText.c_str(), -1, &phaseRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+
+    RECT detailRect{panel.left + s(24), panel.top + s(74), panel.right - s(24), panel.top + s(100)};
+    SetTextColor(hdc, RGB(195, 213, 224));
+    const std::wstring detailText = utf8ToWide(state.simulationProgressDetail.empty()
+                                                  ? std::string("Actualizando el mundo de la carrera.")
+                                                  : state.simulationProgressDetail);
+    DrawTextW(hdc, detailText.c_str(), -1, &detailRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+
+    RECT barBg{panel.left + s(24), panel.top + s(108), panel.right - s(24), panel.top + s(122)};
+    drawRoundedPanel(hdc, barBg, RGB(16, 35, 45), RGB(45, 76, 94), s(7));
+    RECT barFill = barBg;
+    barFill.right = barFill.left + std::max(s(8), rectWidth(barBg) * clampValue(state.simulationProgressPercent, 0, 100) / 100);
+    HBRUSH fillBrush = CreateSolidBrush(kThemeAccentGreen);
+    FillRect(hdc, &barFill, fillBrush);
+    DeleteObject(fillBrush);
+
+    const std::array<std::pair<const wchar_t*, int>, 4> steps = {{
+        {L"Autosave", 10},
+        {L"Partidos", 35},
+        {L"Tabla", 75},
+        {L"Final", 100}
+    }};
+    const int chipGap = s(8);
+    const int chipTop = panel.top + s(128);
+    const int chipWidth = (panelWidth - s(48) - chipGap * 3) / 4;
+    for (size_t i = 0; i < steps.size(); ++i) {
+        RECT chip{
+            panel.left + s(24) + static_cast<int>(i) * (chipWidth + chipGap),
+            chipTop,
+            panel.left + s(24) + static_cast<int>(i) * (chipWidth + chipGap) + chipWidth,
+            chipTop + s(18)
+        };
+        const bool reached = state.simulationProgressPercent >= steps[i].second;
+        drawRoundedPanel(hdc,
+                         chip,
+                         reached ? RGB(25, 78, 58) : RGB(18, 36, 46),
+                         reached ? kThemeAccentGreen : RGB(49, 74, 88),
+                         s(9));
+        RECT chipText = chip;
+        chipText.left += s(8);
+        chipText.right -= s(8);
+        SetTextColor(hdc, reached ? RGB(232, 247, 239) : kThemeMuted);
+        DrawTextW(hdc, steps[i].first, -1, &chipText, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+    }
+
+    SelectObject(hdc, oldFont);
+}
+
 void paintWindowChrome(AppState& state, HDC hdc) {
     RECT client{};
     GetClientRect(state.window, &client);
@@ -2257,6 +2330,7 @@ void paintWindowChrome(AppState& state, HDC hdc) {
         if (IsWindowVisible(state.newsList)) drawRoundedPanel(hdc, newsCard, RGB(15, 27, 37), RGB(44, 72, 90), s(18));
         drawRoundedPanel(hdc, statusCard, RGB(11, 23, 31), RGB(39, 65, 79), s(12));
         SelectObject(hdc, oldFont);
+        drawSimulationProgressOverlay(state, hdc, client);
         return;
     }
 
@@ -2325,6 +2399,7 @@ void paintWindowChrome(AppState& state, HDC hdc) {
             drawTacticsBoard(state, hdc, boardRect);
         }
     }
+    drawSimulationProgressOverlay(state, hdc, client);
 }
 
 }  // namespace gui_win32

@@ -259,8 +259,10 @@ struct AppState {
     bool pageChangeQueued = false;
     bool menuMusicOpened = false;
     bool actionInProgress = false;
+    bool simulationProgressActive = false;
     bool menuMusicPlaying = false;
     bool menuMusicMissingReported = false;
+    int simulationProgressPercent = 0;
     int menuMusicAppliedVolume = -1;
     int pageScrollY = 0;
     int maxPageScrollY = 0;
@@ -275,6 +277,8 @@ struct AppState {
     std::string selectedTransferPlayer;
     std::string selectedTransferClub;
     std::string selectedSavePath;
+    std::string simulationProgressPhase;
+    std::string simulationProgressDetail;
     std::vector<std::string> saveSlotPaths;
     GuiPageModel currentModel;
     std::vector<InsightHotspot> insightHotspots;

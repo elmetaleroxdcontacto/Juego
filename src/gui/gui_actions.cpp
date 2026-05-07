@@ -169,6 +169,12 @@ struct SimulationJobResult {
     std::string managedTeamName;
 };
 
+struct SimulationProgressPayload {
+    std::string phase;
+    std::string detail;
+    int percent = 0;
+};
+
 std::string buildSimulationStatus(const GameSettings& settings, int spinnerIndex) {
     static const char spinner[] = "|/-\\";
     std::ostringstream status;
@@ -178,6 +184,37 @@ std::string buildSimulationStatus(const GameSettings& settings, int spinnerIndex
            << game_settings::simulationSpeedLabel(settings.simulationSpeed)
            << " " << spinner[spinnerIndex % 4];
     return status.str();
+}
+
+std::string progressStatusLine(const std::string& phase, const std::string& detail, int percent) {
+    std::ostringstream status;
+    status << phase << " (" << clampValue(percent, 0, 100) << "%)";
+    if (!detail.empty()) status << ": " << detail;
+    return status.str();
+}
+
+void setSimulationProgress(AppState& state,
+                           const std::string& phase,
+                           const std::string& detail,
+                           int percent) {
+    state.simulationProgressActive = true;
+    state.simulationProgressPhase = phase;
+    state.simulationProgressDetail = detail;
+    state.simulationProgressPercent = clampValue(percent, 0, 100);
+    setStatus(state, progressStatusLine(phase, detail, state.simulationProgressPercent));
+    if (state.window && IsWindow(state.window)) {
+        InvalidateRect(state.window, nullptr, TRUE);
+    }
+}
+
+void clearSimulationProgress(AppState& state) {
+    state.simulationProgressActive = false;
+    state.simulationProgressPhase.clear();
+    state.simulationProgressDetail.clear();
+    state.simulationProgressPercent = 0;
+    if (state.window && IsWindow(state.window)) {
+        InvalidateRect(state.window, nullptr, TRUE);
+    }
 }
 
 std::string managedTeamName(const Career& career) {
@@ -204,18 +241,25 @@ void relinkCareerPointers(Career& career, const std::string& teamName) {
     career.myTeam = teamName.empty() ? nullptr : career.findTeamByName(teamName);
 }
 
-void postSimulationProgress(HWND window, const std::string& text) {
+void postSimulationProgress(HWND window,
+                            const std::string& phase,
+                            const std::string& detail,
+                            int percent) {
     if (!window || !IsWindow(window)) return;
-    auto* payload = new std::string(text);
+    auto* payload = new SimulationProgressPayload{phase, detail, clampValue(percent, 0, 100)};
     if (!PostMessageW(window, kGuiSimulationProgressMessage, 0, reinterpret_cast<LPARAM>(payload))) {
         delete payload;
     }
 }
 
 void pumpWorkerSimulationProgress() {
+    const int sweep = (g_workerProgressSpinner % 36);
+    const int percent = 35 + std::min(35, sweep);
     if ((g_workerProgressSpinner % 8) == 0) {
         postSimulationProgress(g_workerProgressWindow,
-                               buildSimulationStatus(g_workerProgressSettings, g_workerProgressSpinner));
+                               "Partidos",
+                               buildSimulationStatus(g_workerProgressSettings, g_workerProgressSpinner),
+                               percent);
     }
     g_workerProgressSpinner = (g_workerProgressSpinner + 1) % 64;
 }
@@ -227,12 +271,13 @@ DWORD WINAPI simulationThreadProc(LPVOID rawArgs) {
     g_workerProgressWindow = args->window;
     g_workerProgressSettings = args->settings;
     g_workerProgressSpinner = 0;
-    postSimulationProgress(args->window, "Simulando partidos de la semana...");
+    postSimulationProgress(args->window, "Partidos", "Simulando partidos de la semana...", 35);
 
     const WeekSimulationPresentation previousPresentation = weekSimulationPresentation();
     setWeekSimulationPresentation(WeekSimulationPresentation::Compact);
     ServiceResult result = simulateCareerWeekService(args->career, pumpWorkerSimulationProgress);
     setWeekSimulationPresentation(previousPresentation);
+    postSimulationProgress(args->window, "Tabla y noticias", "Actualizando finanzas, tabla e inbox semanal.", 88);
 
     const std::string teamName = managedTeamName(args->career);
     auto* payload = new SimulationJobResult{std::move(args->career), std::move(result), teamName};
@@ -391,7 +436,7 @@ void simulateWeek(AppState& state) {
     if (state.actionInProgress) return;
     syncManagerNameFromUi(state);
 
-    setStatus(state, "Guardando autosave antes de simular...");
+    setSimulationProgress(state, "Autosave", "Guardando carrera antes de simular.", 8);
     UpdateWindow(state.window);
     ServiceResult autosave = saveCareerService(state.career);
     if (!autosave.ok) {
@@ -403,22 +448,27 @@ void simulateWeek(AppState& state) {
                                        L"Autosave",
                                        MB_YESNO | MB_ICONWARNING);
         if (choice != IDYES) {
+            clearSimulationProgress(state);
             setStatus(state, "Simulacion cancelada: autosave no disponible.");
             refreshAll(state);
             return;
         }
-        setStatus(state, "Autosave no disponible; simulando por decision del manager...");
+        setSimulationProgress(state, "Autosave", "Autosave no disponible; simulando por decision del manager.", 18);
     } else {
-        setStatus(state, autosave.messages.empty()
-                             ? "Autosave listo. Simulando semana..."
-                             : autosave.messages.back() + " Simulando semana...");
+        setSimulationProgress(state,
+                              "Autosave",
+                              autosave.messages.empty()
+                                  ? "Autosave listo. Preparando la semana."
+                                  : autosave.messages.back() + " Preparando la semana.",
+                              22);
     }
     UpdateWindow(state.window);
 
-    setStatus(state,
-              "Simulando semana en modo " +
-                  game_settings::simulationModeLabel(state.settings.simulationMode) +
-                  " a velocidad " + game_settings::simulationSpeedLabel(state.settings.simulationSpeed) + "...");
+    setSimulationProgress(state,
+                          "Preparacion",
+                          "Modo " + game_settings::simulationModeLabel(state.settings.simulationMode) +
+                              " | Velocidad " + game_settings::simulationSpeedLabel(state.settings.simulationSpeed),
+                          30);
     UpdateWindow(state.window);
 
     const std::string teamName = managedTeamName(state.career);
@@ -435,6 +485,7 @@ void simulateWeek(AppState& state) {
         delete args;
         state.actionInProgress = false;
         if (state.simulateButton) setWindowTextUtf8(state.simulateButton, "Simular");
+        clearSimulationProgress(state);
         refreshAll(state);
         MessageBoxW(state.window,
                     L"No se pudo iniciar la simulacion en segundo plano.",
@@ -444,13 +495,13 @@ void simulateWeek(AppState& state) {
         return;
     }
     CloseHandle(thread);
-    setStatus(state, "Simulacion semanal en progreso. La interfaz sigue disponible.");
+    setSimulationProgress(state, "Partidos", "Simulacion semanal en progreso. La interfaz sigue disponible.", 34);
 }
 
 void handleSimulationProgress(AppState& state, LPARAM payload) {
-    std::unique_ptr<std::string> text(reinterpret_cast<std::string*>(payload));
-    if (!text) return;
-    setStatus(state, *text);
+    std::unique_ptr<SimulationProgressPayload> progress(reinterpret_cast<SimulationProgressPayload*>(payload));
+    if (!progress) return;
+    setSimulationProgress(state, progress->phase, progress->detail, progress->percent);
 }
 
 void completeSimulationWeek(AppState& state, LPARAM payload) {
@@ -462,7 +513,9 @@ void completeSimulationWeek(AppState& state, LPARAM payload) {
     syncCombosFromCareer(state);
     state.actionInProgress = false;
     if (state.simulateButton) setWindowTextUtf8(state.simulateButton, "Simular");
+    setSimulationProgress(state, "Finalizando", "Refrescando paneles y estado de carrera.", 100);
     refreshAll(state);
+    clearSimulationProgress(state);
     setStatus(state, job->result.messages.empty() ? "Semana simulada." : job->result.messages.back());
 }
 

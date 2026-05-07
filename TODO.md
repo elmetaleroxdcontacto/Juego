@@ -5340,6 +5340,33 @@ Fecha: 2026-04-04
 - `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
 
 ### Pendiente recomendado
-- Evaluar una pantalla de progreso mas rica para la simulacion semanal, con fases visibles como autosave, partidos, tabla, finanzas, noticias y guardado.
+- [x] Agregar una pantalla/overlay de progreso mas rica para la simulacion semanal, con fases visibles como autosave, partidos, tabla, finanzas, noticias y finalizacion.
 - Mover gradualmente el estado global de presentacion semanal a un contexto por simulacion si en el futuro se permite mas de una simulacion paralela.
 - Seguir revisando vistas con tablas y escudos para detectar cualquier otro caso de solape visual en columnas estrechas.
+
+## Avance GUI - overlay de progreso semanal (2026-05-07)
+
+### Cambios aplicados
+- Se agrego estado de progreso de simulacion a `AppState`:
+  - fase actual
+  - detalle visible
+  - porcentaje
+  - indicador de overlay activo
+- `simulateWeek(...)` ahora marca fases explicitas:
+  - `Autosave`
+  - `Preparacion`
+  - `Partidos`
+  - `Tabla y noticias`
+  - `Finalizando`
+- `paintWindowChrome(...)` dibuja un overlay central mientras la simulacion semanal esta activa.
+- El overlay muestra titulo, fase, detalle, barra de progreso y chips de etapa (`Autosave`, `Partidos`, `Tabla`, `Final`).
+- Los mensajes del hilo de simulacion ahora transportan fase/detalle/porcentaje, no solo una linea de texto.
+
+### Archivos modificados
+- `include/gui/gui_internal.h`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_layout.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager` -> compilado correctamente.
