@@ -768,6 +768,10 @@ void activateListAction(AppState& state, int controlId) {
         const std::string action = listViewText(state.transferList, row, 2);
         const GuiPage targetPage = dashboardActionDestinationPage(destination);
         if (targetPage == GuiPage::Dashboard && toLower(trim(action)) == "simular") {
+            if (state.actionInProgress) {
+                setStatus(state, "Simulacion en progreso: la accion de simular ya esta corriendo.");
+                return;
+            }
             simulateWeek(state);
             return;
         }

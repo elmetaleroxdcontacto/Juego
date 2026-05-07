@@ -5436,3 +5436,22 @@ Fecha: 2026-04-04
 - `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
 - `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
+
+## Avance GUI - bloqueo de acciones indirectas en simulacion (2026-05-07)
+
+### Cambios aplicados
+- Los hotspots/insights ahora distinguen entre acciones de navegacion segura y acciones que mutan carrera.
+- Durante la simulacion semanal se permiten insights de lectura como abrir liga, plantilla, finanzas o directiva.
+- Durante la simulacion semanal se bloquean insights que ejecutan servicios o setup, como scouting, seguimiento de mercado, iniciar carrera o enfocar controles de setup.
+- El cursor de mano ya no aparece sobre hotspots bloqueados mientras una accion semanal esta en progreso.
+- El doble click/Enter del panel de proximas acciones ya no puede disparar otra simulacion si la semana actual ya esta corriendo.
+
+### Archivos modificados
+- `src/gui/gui.cpp`
+- `src/gui/gui_runtime.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.

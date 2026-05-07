@@ -195,7 +195,36 @@ const InsightHotspot* hitInsightHotspot(const AppState& state, POINT point) {
     return nullptr;
 }
 
+bool insightActionAllowedDuringAction(InsightAction action) {
+    switch (action) {
+        case InsightAction::OpenLeague:
+        case InsightAction::OpenSquad:
+        case InsightAction::OpenBoard:
+        case InsightAction::OpenFinanceSummary:
+        case InsightAction::OpenFinanceSalaries:
+        case InsightAction::OpenFinanceInfrastructure:
+        case InsightAction::OpenBoardSummary:
+        case InsightAction::OpenBoardObjectives:
+        case InsightAction::OpenBoardHistory:
+        case InsightAction::None:
+            return true;
+        case InsightAction::FocusDivision:
+        case InsightAction::FocusClub:
+        case InsightAction::FocusManager:
+        case InsightAction::StartCareer:
+        case InsightAction::RefreshMarketPulse:
+        case InsightAction::RunScouting:
+            return false;
+    }
+    return false;
+}
+
 void executeInsightAction(AppState& state, InsightAction action) {
+    if (state.actionInProgress && !insightActionAllowedDuringAction(action)) {
+        setStatus(state, "Simulacion en progreso: espera el cierre de la semana para ejecutar esa accion.");
+        return;
+    }
+
     switch (action) {
         case InsightAction::FocusDivision:
             SetFocus(state.divisionCombo);
@@ -584,7 +613,8 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 POINT cursor{};
                 GetCursorPos(&cursor);
                 ScreenToClient(hwnd, &cursor);
-                if (hitInsightHotspot(*state, cursor)) {
+                const InsightHotspot* hotspot = hitInsightHotspot(*state, cursor);
+                if (hotspot && (!state->actionInProgress || insightActionAllowedDuringAction(hotspot->action))) {
                     SetCursor(LoadCursor(nullptr, IDC_HAND));
                     return TRUE;
                 }
