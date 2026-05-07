@@ -5341,7 +5341,7 @@ Fecha: 2026-04-04
 
 ### Pendiente recomendado
 - [x] Agregar una pantalla/overlay de progreso mas rica para la simulacion semanal, con fases visibles como autosave, partidos, tabla, finanzas, noticias y finalizacion.
-- Mover gradualmente el estado global de presentacion semanal a un contexto por simulacion si en el futuro se permite mas de una simulacion paralela.
+- [x] Mover gradualmente el estado de progreso semanal a un contexto por simulacion para evitar mezcla de datos si en el futuro hay mas tareas paralelas.
 - Seguir revisando vistas con tablas y escudos para detectar cualquier otro caso de solape visual en columnas estrechas.
 
 ## Avance GUI - overlay de progreso semanal (2026-05-07)
@@ -5370,3 +5370,25 @@ Fecha: 2026-04-04
 
 ### Validacion
 - `cmake --build build-cmake --config Release --target FootballManager` -> compilado correctamente.
+
+## Avance tecnico - contexto thread-local de simulacion GUI (2026-05-07)
+
+### Cambios aplicados
+- Se elimino el uso de globals compartidos para el progreso del worker de simulacion (`HWND`, `GameSettings` y spinner).
+- Se agrego `SimulationWorkerProgressContext` como contexto propio de cada hilo de simulacion.
+- `pumpWorkerSimulationProgress()` ahora lee el contexto del hilo actual mediante `thread_local`, evitando que un futuro worker pise el progreso de otro.
+- La simulacion GUI ahora usa `ScopedCareerRuntimeContext` para fijar presentacion compacta e idle callback dentro del hilo worker.
+- Esto prepara el flujo para futuras tareas paralelas sin mezclar estado visual, aunque la GUI sigue bloqueando reentradas por seguridad.
+
+### Archivos modificados
+- `src/gui/gui_actions.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager` -> compilado correctamente.
+- `cmake --build build-cmake --config Release --target FootballManagerCLI` -> compilado correctamente.
+- `cmake -S . -B build-cmake -DBUILD_TESTING=ON` -> configuracion de tests activada.
+- `cmake --build build-cmake --config Release --target FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.

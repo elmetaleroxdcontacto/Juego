@@ -153,10 +153,6 @@ void pulseFrontendTiming(AppState& state) {
     }
 }
 
-HWND g_workerProgressWindow = nullptr;
-GameSettings g_workerProgressSettings;
-int g_workerProgressSpinner = 0;
-
 struct SimulationThreadArgs {
     HWND window = nullptr;
     Career career;
@@ -174,6 +170,14 @@ struct SimulationProgressPayload {
     std::string detail;
     int percent = 0;
 };
+
+struct SimulationWorkerProgressContext {
+    HWND window = nullptr;
+    GameSettings settings;
+    int spinner = 0;
+};
+
+thread_local SimulationWorkerProgressContext* g_workerProgressContext = nullptr;
 
 std::string buildSimulationStatus(const GameSettings& settings, int spinnerIndex) {
     static const char spinner[] = "|/-\\";
@@ -253,31 +257,35 @@ void postSimulationProgress(HWND window,
 }
 
 void pumpWorkerSimulationProgress() {
-    const int sweep = (g_workerProgressSpinner % 36);
+    if (!g_workerProgressContext) return;
+
+    SimulationWorkerProgressContext& progress = *g_workerProgressContext;
+    const int sweep = (progress.spinner % 36);
     const int percent = 35 + std::min(35, sweep);
-    if ((g_workerProgressSpinner % 8) == 0) {
-        postSimulationProgress(g_workerProgressWindow,
+    if ((progress.spinner % 8) == 0) {
+        postSimulationProgress(progress.window,
                                "Partidos",
-                               buildSimulationStatus(g_workerProgressSettings, g_workerProgressSpinner),
+                               buildSimulationStatus(progress.settings, progress.spinner),
                                percent);
     }
-    g_workerProgressSpinner = (g_workerProgressSpinner + 1) % 64;
+    progress.spinner = (progress.spinner + 1) % 64;
 }
 
 DWORD WINAPI simulationThreadProc(LPVOID rawArgs) {
     std::unique_ptr<SimulationThreadArgs> args(static_cast<SimulationThreadArgs*>(rawArgs));
     if (!args) return 0;
 
-    g_workerProgressWindow = args->window;
-    g_workerProgressSettings = args->settings;
-    g_workerProgressSpinner = 0;
+    SimulationWorkerProgressContext progress{args->window, args->settings, 0};
+    g_workerProgressContext = &progress;
     postSimulationProgress(args->window, "Partidos", "Simulando partidos de la semana...", 35);
 
-    const WeekSimulationPresentation previousPresentation = weekSimulationPresentation();
-    setWeekSimulationPresentation(WeekSimulationPresentation::Compact);
+    CareerRuntimeContext runtime = currentCareerRuntimeContext();
+    runtime.presentation = WeekSimulationPresentation::Compact;
+    runtime.idle = pumpWorkerSimulationProgress;
+    ScopedCareerRuntimeContext scopedRuntime(runtime);
     ServiceResult result = simulateCareerWeekService(args->career, pumpWorkerSimulationProgress);
-    setWeekSimulationPresentation(previousPresentation);
     postSimulationProgress(args->window, "Tabla y noticias", "Actualizando finanzas, tabla e inbox semanal.", 88);
+    g_workerProgressContext = nullptr;
 
     const std::string teamName = managedTeamName(args->career);
     auto* payload = new SimulationJobResult{std::move(args->career), std::move(result), teamName};
