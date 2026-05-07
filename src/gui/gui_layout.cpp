@@ -805,10 +805,11 @@ void showActionButtonsForPage(AppState& state) {
     };
 
     bool hasCareer = state.career.myTeam != nullptr;
+    const bool actionsEnabled = !state.actionInProgress;
     for (const auto& mapping : mappings) {
         bool visible = hasCareer && std::find(mapping.pages.begin(), mapping.pages.end(), state.currentPage) != mapping.pages.end();
         setControlVisibility(state, mapping.hwnd, visible);
-        EnableWindow(mapping.hwnd, visible);
+        EnableWindow(mapping.hwnd, visible && actionsEnabled);
     }
 }
 
@@ -1104,7 +1105,7 @@ void layoutCareerDashboard(AppState& state, const RECT& client) {
 
     const int buttonsTop = contentTop + titleHeight + infoHeight + s(14);
     std::vector<std::pair<HWND, std::string> > dashboardButtons = {
-        {state.simulateButton, "Simular semana"},
+        {state.simulateButton, state.actionInProgress ? "Simulando..." : "Simular semana"},
         {state.squadButton, "Plantilla"},
         {state.tacticsButton, "Tacticas"},
         {state.calendarButton, "Calendario"},
@@ -1126,7 +1127,9 @@ void layoutCareerDashboard(AppState& state, const RECT& client) {
         MoveWindow(dashboardButtons[i].first, x, y, buttonWidth, buttonHeight, TRUE);
         setWindowTextUtf8(dashboardButtons[i].first, dashboardButtons[i].second);
         setControlVisibility(state, dashboardButtons[i].first, true);
-        EnableWindow(dashboardButtons[i].first, TRUE);
+        const int controlId = static_cast<int>(GetDlgCtrlID(dashboardButtons[i].first));
+        const bool navigationAllowed = isPageButtonId(controlId);
+        EnableWindow(dashboardButtons[i].first, !state.actionInProgress || navigationAllowed);
     }
     setControlVisibility(state, state.dashboardButton, false);
 

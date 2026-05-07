@@ -414,8 +414,12 @@ void syncSetupButtonsAndHints(AppState& state) {
     EnableWindow(state.managerEdit, !busy);
     EnableWindow(state.newCareerButton, !busy && !hasCareer && state.gameSetup.ready);
     EnableWindow(state.emptyNewButton, !busy && state.gameSetup.ready);
+    EnableWindow(state.loadButton, !busy);
     EnableWindow(state.saveButton, !busy && hasCareer);
     EnableWindow(state.simulateButton, !busy && hasCareer);
+    EnableWindow(state.validateButton, !busy);
+    EnableWindow(state.displayModeButton, !busy);
+    EnableWindow(state.frontMenuButton, !busy);
     EnableWindow(state.menuContinueButton, !busy && (hasCareer || hasSavedCareer));
     EnableWindow(state.menuLoadButton, state.currentPage == GuiPage::MainMenu
                                            ? !busy

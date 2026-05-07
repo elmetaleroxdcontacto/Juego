@@ -335,6 +335,13 @@ bool clickFrontMenuButton(HWND button) {
     return true;
 }
 
+bool commandAllowedDuringAction(int id, int notifyCode) {
+    if (isPageButtonId(id)) return true;
+    if (id == IDC_FILTER_COMBO && notifyCode == CBN_SELCHANGE) return true;
+    if (id == IDC_NEWS_LIST && notifyCode == LBN_SELCHANGE) return true;
+    return false;
+}
+
 bool handleFrontMenuKey(AppState& state, WPARAM key) {
     if (!isFrontMenuPage(state.currentPage)) return false;
 
@@ -755,7 +762,8 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
             break;
         case WM_COMMAND:
             if (!state) break;
-            if (state->actionInProgress) {
+            if (state->actionInProgress &&
+                !commandAllowedDuringAction(static_cast<int>(LOWORD(wParam)), static_cast<int>(HIWORD(wParam)))) {
                 return 0;
             }
             switch (LOWORD(wParam)) {

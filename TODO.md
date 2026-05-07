@@ -5415,3 +5415,24 @@ Fecha: 2026-04-04
 - `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
 - `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
+
+## Avance GUI - controles coherentes durante simulacion semanal (2026-05-07)
+
+### Cambios aplicados
+- Durante `actionInProgress`, la GUI ahora bloquea comandos que mutan la carrera, pero permite navegacion de paginas, cambios de filtro y seleccion de noticias.
+- El dashboard mantiene visible `Simulando...` en el boton de simulacion aunque el layout se refresque mientras corre el worker.
+- Los botones de accion contextual (`Otear`, `Fichar`, `Renovar`, mejoras, etc.) se ven deshabilitados mientras avanza la semana.
+- En el dashboard de carrera, los botones de navegacion siguen activos para revisar secciones, pero `Simular`, `Guardar` y `Menu principal` quedan bloqueados hasta que termine la semana.
+- Se amplio la sincronizacion de botones para deshabilitar cargar, auditar, modo pantalla y menu principal durante operaciones activas.
+
+### Archivos modificados
+- `src/gui/gui.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake -S . -B build-cmake -DBUILD_TESTING=ON` -> configuracion de tests activada.
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
