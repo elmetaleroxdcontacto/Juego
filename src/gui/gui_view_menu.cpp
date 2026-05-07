@@ -361,7 +361,7 @@ GuiPageModel buildSettingsPageModel(AppState& state) {
     detail << "Musica: " << game_settings::menuMusicModeLabel(state.settings.menuMusicMode) << "\r\n";
     detail << game_settings::menuMusicModeDescription(state.settings.menuMusicMode) << "\r\n";
     detail << game_settings::menuAudioFadeDescription(state.settings.menuAudioFade) << "\r\n\r\n";
-    detail << "Los cambios se guardan automaticamente en disco y vuelven al abrir el juego.";
+    detail << "Usa Aplicar ajustes para confirmar, guardar en disco y refrescar audio/interfaz.";
     model.detail.content = detail.str();
 
     model.feed.lines = {
@@ -370,7 +370,8 @@ GuiPageModel buildSettingsPageModel(AppState& state) {
         std::string("Velocidad actual: ") + game_settings::simulationSpeedLabel(state.settings.simulationSpeed),
         std::string("Modo actual: ") + game_settings::simulationModeLabel(state.settings.simulationMode),
         std::string("Idioma / texto: ") + game_settings::languageLabel(state.settings.language) + " / " + game_settings::textSpeedLabel(state.settings.textSpeed),
-        std::string("Visual / musica: ") + game_settings::visualProfileLabel(state.settings.visualProfile) + " / " + game_settings::menuMusicModeLabel(state.settings.menuMusicMode)
+        std::string("Visual / musica: ") + game_settings::visualProfileLabel(state.settings.visualProfile) + " / " + game_settings::menuMusicModeLabel(state.settings.menuMusicMode),
+        "Aplicar ajustes guarda la configuracion y actualiza audio/interfaz."
     };
     return model;
 }

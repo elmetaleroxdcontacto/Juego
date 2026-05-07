@@ -83,6 +83,7 @@ enum ControlId {
     IDC_MENU_VISUAL_BUTTON,
     IDC_MENU_MUSICMODE_BUTTON,
     IDC_MENU_AUDIOFADE_BUTTON,
+    IDC_MENU_APPLY_SETTINGS_BUTTON,
     IDC_EMPTY_NEW_BUTTON,
     IDC_EMPTY_LOAD_BUTTON,
     IDC_EMPTY_VALIDATE_BUTTON
@@ -327,6 +328,7 @@ struct AppState {
     HWND menuVisualButton = nullptr;
     HWND menuMusicModeButton = nullptr;
     HWND menuAudioFadeButton = nullptr;
+    HWND menuApplySettingsButton = nullptr;
     HWND emptyNewButton = nullptr;
     HWND emptyLoadButton = nullptr;
     HWND emptyValidateButton = nullptr;
@@ -493,6 +495,7 @@ void cycleFrontendTextSpeed(AppState& state);
 void cycleFrontendVisualProfile(AppState& state);
 void cycleFrontendMenuMusicMode(AppState& state);
 void toggleFrontendAudioFade(AppState& state);
+void applyFrontendSettings(AppState& state);
 
 }  // namespace gui_win32
 

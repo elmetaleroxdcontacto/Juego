@@ -61,6 +61,7 @@
 
 #ifdef _WIN32
 #include <direct.h>
+#include <windows.h>
 #else
 #include <unistd.h>
 #endif
@@ -240,6 +241,19 @@ void collectRuntimeMessageB(const string& message) {
 
 void idleRuntimeProbe() {}
 
+#ifdef _WIN32
+struct ValidationThreadProbe {
+    bool ok = false;
+};
+
+DWORD WINAPI runValidationThreadProbe(LPVOID param) {
+    auto* probe = static_cast<ValidationThreadProbe*>(param);
+    if (!probe) return 1;
+    probe->ok = buildValidationSuiteSummary().ok;
+    return 0;
+}
+#endif
+
 void testValidationSuiteReflectsRosterAudit() {
     const DataValidationReport report = buildRosterDataValidationReport();
     const ValidationSuiteSummary summary = buildValidationSuiteSummary();
@@ -250,6 +264,29 @@ void testValidationSuiteReflectsRosterAudit() {
     } else {
         expect(summary.ok, "La suite debe quedar sana cuando no existen errores de datos ni fallas logicas.");
     }
+}
+
+void testValidationSuiteSupportsConcurrentRuns() {
+#ifdef _WIN32
+    ValidationThreadProbe firstProbe;
+    ValidationThreadProbe secondProbe;
+    HANDLE handles[2] = {
+        CreateThread(nullptr, 0, runValidationThreadProbe, &firstProbe, 0, nullptr),
+        CreateThread(nullptr, 0, runValidationThreadProbe, &secondProbe, 0, nullptr)
+    };
+    expect(handles[0] != nullptr && handles[1] != nullptr,
+           "La prueba de concurrencia debe poder crear threads de validacion.");
+    WaitForMultipleObjects(2, handles, TRUE, INFINITE);
+    CloseHandle(handles[0]);
+    CloseHandle(handles[1]);
+    expect(firstProbe.ok && secondProbe.ok,
+           "La suite de validacion debe poder ejecutarse en paralelo sin pisar su save temporal.");
+#else
+    const ValidationSuiteSummary firstSummary = buildValidationSuiteSummary();
+    const ValidationSuiteSummary secondSummary = buildValidationSuiteSummary();
+    expect(firstSummary.ok && secondSummary.ok,
+           "La suite de validacion debe soportar ejecuciones repetidas sin pisar su save temporal.");
+#endif
 }
 
 void testLoadedPlayersHaveBoundedProfileMetrics() {
@@ -2919,6 +2956,7 @@ void testLocalizationSupportsMultipleLanguages() {
 int main() {
     const vector<pair<string, void (*)()>> tests = {
         {"validation_suite", testValidationSuiteReflectsRosterAudit},
+        {"validation_suite_concurrency", testValidationSuiteSupportsConcurrentRuns},
         {"loaded_player_profiles", testLoadedPlayersHaveBoundedProfileMetrics},
         {"match_engine_structure", testMatchSimulationProducesStructuredPhases},
         {"tactical_fatigue", testHighPressRaisesPhaseFatigue},

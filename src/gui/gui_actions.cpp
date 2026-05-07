@@ -328,6 +328,7 @@ void deleteCareerSave(AppState& state) {
 
 void simulateWeek(AppState& state) {
     if (!state.career.myTeam) return;
+    if (state.actionInProgress) return;
     syncManagerNameFromUi(state);
     state.actionInProgress = true;
 
@@ -361,7 +362,7 @@ void simulateWeek(AppState& state) {
                   game_settings::simulationModeLabel(state.settings.simulationMode) +
                   " a velocidad " + game_settings::simulationSpeedLabel(state.settings.simulationSpeed) + "...");
     UpdateWindow(state.window);
-    pulseFrontendTiming(state);
+    pumpUiMessages();
     const WeekSimulationPresentation previousPresentation = weekSimulationPresentation();
     // La GUI no muestra el volcado crudo del partido; el detalle ya vive en el match center.
     setWeekSimulationPresentation(WeekSimulationPresentation::Compact);
@@ -597,6 +598,21 @@ void toggleFrontendAudioFade(AppState& state) {
     persistSettings(state);
     refreshCurrentPage(state);
     setStatus(state, "Audio del menu: " + game_settings::menuAudioFadeLabel(state.settings.menuAudioFade) + ".");
+}
+
+void applyFrontendSettings(AppState& state) {
+    game_settings::sanitize(state.settings);
+    const bool saved = game_settings::saveToDisk(state.settings);
+    refreshCurrentPage(state);
+    if (!saved) {
+        MessageBoxW(state.window,
+                    L"No se pudieron guardar los ajustes en disco.",
+                    L"Configuraciones",
+                    MB_OK | MB_ICONWARNING);
+        setStatus(state, "Ajustes aplicados en esta sesion, pero no se pudieron guardar.");
+        return;
+    }
+    setStatus(state, "Ajustes aplicados y guardados: " + game_settings::settingsSummary(state.settings) + ".");
 }
 
 }  // namespace gui_win32

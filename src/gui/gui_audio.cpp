@@ -181,25 +181,8 @@ void setDeviceVolume(AppState& state, int volume) {
 void fadeDeviceVolume(AppState& state, int targetVolume) {
     if (!state.menuMusicOpened) return;
     const int clampedTarget = game_settings::clampVolume(targetVolume);
-    if (!state.settings.menuAudioFade || state.menuMusicAppliedVolume < 0) {
-        setDeviceVolume(state, clampedTarget);
-        return;
-    }
-
-    const int current = state.menuMusicAppliedVolume;
-    if (current == clampedTarget) return;
-    const int stepDelay = game_settings::audioFadeStepDelayMs(state.settings);
-    if (stepDelay <= 0) {
-        setDeviceVolume(state, clampedTarget);
-        return;
-    }
-
-    const int direction = clampedTarget > current ? 1 : -1;
-    for (int volume = current; volume != clampedTarget; volume += direction * 10) {
-        const int next = direction > 0 ? std::min(volume + 10, clampedTarget) : std::max(volume - 10, clampedTarget);
-        setDeviceVolume(state, next);
-        Sleep(static_cast<DWORD>(stepDelay));
-    }
+    // Sleeping in this path freezes the Win32 message loop while settings or pages refresh.
+    setDeviceVolume(state, clampedTarget);
 }
 
 void closeMenuMusicDevice(AppState& state) {

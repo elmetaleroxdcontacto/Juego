@@ -836,7 +836,8 @@ static bool isActivePageButton(const AppState& state, int id) {
 static bool usesButtonBadge(int id) {
     return isPageButtonId(id) || id == IDC_DISPLAY_MODE_BUTTON || id == IDC_FRONT_MENU_BUTTON || id == IDC_MENU_CONTINUE_BUTTON ||
            id == IDC_MENU_PLAY_BUTTON || id == IDC_MENU_LOAD_BUTTON || id == IDC_MENU_DELETE_SAVE_BUTTON || id == IDC_MENU_SETTINGS_BUTTON ||
-           id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON || id == IDC_MENU_BACK_BUTTON;
+           id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON || id == IDC_MENU_BACK_BUTTON ||
+           id == IDC_MENU_APPLY_SETTINGS_BUTTON;
 }
 
 static DisplayMode displayModeForButton(const AppState& state) {
@@ -871,7 +872,8 @@ static bool isFrontMenuButtonId(int id) {
            id == IDC_MENU_BACK_BUTTON || id == IDC_MENU_VOLUME_BUTTON || id == IDC_MENU_DIFFICULTY_BUTTON ||
            id == IDC_MENU_SPEED_BUTTON || id == IDC_MENU_SIMULATION_BUTTON || id == IDC_MENU_LANGUAGE_BUTTON ||
            id == IDC_MENU_TEXT_SPEED_BUTTON || id == IDC_MENU_VISUAL_BUTTON ||
-           id == IDC_MENU_MUSICMODE_BUTTON || id == IDC_MENU_AUDIOFADE_BUTTON;
+           id == IDC_MENU_MUSICMODE_BUTTON || id == IDC_MENU_AUDIOFADE_BUTTON ||
+           id == IDC_MENU_APPLY_SETTINGS_BUTTON;
 }
 
 static bool isFrontMenuSettingButtonId(int id) {
@@ -884,7 +886,7 @@ static bool isFrontMenuSettingButtonId(int id) {
 static bool isFrontMenuMainActionButtonId(int id) {
     return id == IDC_MENU_CONTINUE_BUTTON || id == IDC_MENU_PLAY_BUTTON || id == IDC_MENU_LOAD_BUTTON ||
            id == IDC_MENU_DELETE_SAVE_BUTTON || id == IDC_MENU_SETTINGS_BUTTON || id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON ||
-           id == IDC_MENU_BACK_BUTTON;
+           id == IDC_MENU_BACK_BUTTON || id == IDC_MENU_APPLY_SETTINGS_BUTTON;
 }
 
 static bool shouldRenderButtonOnCurrentPage(const AppState& state, int id) {
@@ -896,6 +898,9 @@ static bool shouldRenderButtonOnCurrentPage(const AppState& state, int id) {
         return state.currentPage == GuiPage::MainMenu;
     }
     if (isFrontMenuSettingButtonId(id)) {
+        return state.currentPage == GuiPage::Settings;
+    }
+    if (id == IDC_MENU_APPLY_SETTINGS_BUTTON) {
         return state.currentPage == GuiPage::Settings;
     }
     if (id == IDC_MENU_BACK_BUTTON) {
@@ -924,6 +929,7 @@ static wchar_t buttonBadgeGlyph(int id, DisplayMode displayMode) {
     if (id == IDC_MENU_CREDITS_BUTTON) return L'R';
     if (id == IDC_MENU_EXIT_BUTTON) return L'S';
     if (id == IDC_MENU_BACK_BUTTON) return L'V';
+    if (id == IDC_MENU_APPLY_SETTINGS_BUTTON) return L'A';
     return pageButtonGlyph(id);
 }
 
@@ -963,6 +969,9 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     } else if (id == IDC_MENU_CREDITS_BUTTON) {
         fill = RGB(57, 45, 20);
         border = kThemeAccent;
+    } else if (id == IDC_MENU_APPLY_SETTINGS_BUTTON) {
+        fill = RGB(18, 75, 56);
+        border = RGB(71, 180, 128);
     } else if (id == IDC_MENU_EXIT_BUTTON) {
         fill = RGB(55, 27, 32);
         border = RGB(186, 92, 104);
@@ -1025,6 +1034,7 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     if (id == IDC_MENU_SETTINGS_BUTTON) accentColor = kThemeAccentBlue;
     if (id == IDC_MENU_LOAD_BUTTON) accentColor = RGB(110, 157, 215);
     if (id == IDC_MENU_CREDITS_BUTTON) accentColor = kThemeAccent;
+    if (id == IDC_MENU_APPLY_SETTINGS_BUTTON) accentColor = kThemeAccentGreen;
     if (id == IDC_MENU_EXIT_BUTTON) accentColor = RGB(207, 101, 114);
     if (id == IDC_MENU_BACK_BUTTON) accentColor = RGB(108, 131, 145);
     if (id == IDC_MENU_DIFFICULTY_BUTTON) accentColor = kThemeAccent;
@@ -1065,6 +1075,7 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
         else if (id == IDC_MENU_LOAD_BUTTON) badgeFill = RGB(110, 157, 215);
         else if (id == IDC_MENU_SETTINGS_BUTTON) badgeFill = kThemeAccentBlue;
         else if (id == IDC_MENU_CREDITS_BUTTON) badgeFill = kThemeAccent;
+        else if (id == IDC_MENU_APPLY_SETTINGS_BUTTON) badgeFill = kThemeAccentGreen;
         else if (id == IDC_MENU_EXIT_BUTTON) badgeFill = RGB(207, 101, 114);
         else if (id == IDC_MENU_BACK_BUTTON) badgeFill = RGB(108, 131, 145);
         HBRUSH badgeBrush = CreateSolidBrush(badgeFill);

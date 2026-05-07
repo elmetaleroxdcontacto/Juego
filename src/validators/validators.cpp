@@ -7,6 +7,8 @@
 #include "utils.h"
 
 #include <algorithm>
+#include <atomic>
+#include <chrono>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -14,6 +16,12 @@
 #include <set>
 #include <string>
 #include <vector>
+
+#ifdef _WIN32
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
 
 using namespace std;
 
@@ -54,6 +62,23 @@ struct CachedRosterAudit {
     bool ready = false;
     DataValidationReport report;
 };
+
+static int currentProcessId() {
+#ifdef _WIN32
+    return _getpid();
+#else
+    return getpid();
+#endif
+}
+
+static string runtimeValidationSavePath() {
+    static atomic<unsigned long long> counter{0};
+    const auto stamp = chrono::steady_clock::now().time_since_epoch().count();
+    return "saves/validation_career_save_runtime_" +
+           to_string(currentProcessId()) + "_" +
+           to_string(stamp) + "_" +
+           to_string(counter.fetch_add(1)) + ".txt";
+}
 
 static CachedRosterAudit& rosterAuditCache() {
     static CachedRosterAudit cache;
@@ -503,18 +528,29 @@ static ValidationResult validateSchedules(Career& career) {
 static ValidationResult validateSaveLoad() {
     Career career;
     career.initializeLeague(true);
+    const auto makeFailure = [](const string& detail) {
+        return ValidationResult{"Guardado/carga", false, detail};
+    };
     if (career.divisions.empty()) {
-        return {"Guardado/carga", false, "No hay divisiones para validar."};
+        return makeFailure("No hay divisiones para validar.");
     }
     career.setActiveDivision(career.divisions.front().id);
     if (career.activeTeams.empty()) {
-        return {"Guardado/carga", false, "No hay equipos en la division inicial."};
+        return makeFailure("No hay equipos en la division inicial.");
     }
     career.myTeam = career.activeTeams.front();
-    career.saveFile = "saves/validation_career_save_runtime.txt";
+    career.saveFile = runtimeValidationSavePath();
     const string resolvedValidationSave = resolveProjectPath(career.saveFile);
-    std::remove(resolvedValidationSave.c_str());
-    std::remove((resolvedValidationSave + ".tmp").c_str());
+    auto cleanupValidationSave = [&]() {
+        std::remove(resolvedValidationSave.c_str());
+        std::remove((resolvedValidationSave + ".tmp").c_str());
+        std::remove((resolvedValidationSave + ".bak").c_str());
+    };
+    cleanupValidationSave();
+    auto fail = [&](const string& detail) {
+        cleanupValidationSave();
+        return makeFailure(detail);
+    };
     career.currentSeason = 2;
     career.currentWeek = 3;
     career.resetSeason();
@@ -553,27 +589,31 @@ static ValidationResult validateSaveLoad() {
     career.addNews("Prueba de guardado.");
     career.scoutingShortlist.push_back("Club Prueba|Jugador Prueba");
     if (!career.saveCareer()) {
-        return {"Guardado/carga", false, "No se pudo escribir el archivo de validacion."};
+        return fail("No se pudo escribir el archivo de validacion.");
     }
 
     ifstream rawSave(resolvedValidationSave);
     string firstLine;
     const string expectedVersionLine = "VERSION " + to_string(save_serialization::currentCareerSaveVersion());
-    if (!rawSave.is_open() || !getline(rawSave, firstLine) || trim(firstLine) != expectedVersionLine) {
-        return {"Guardado/carga", false, "El archivo guardado no incluye version de save."};
+    const bool hasExpectedVersionLine = rawSave.is_open() &&
+                                        static_cast<bool>(getline(rawSave, firstLine)) &&
+                                        trim(firstLine) == expectedVersionLine;
+    rawSave.close();
+    if (!hasExpectedVersionLine) {
+        return fail("El archivo guardado no incluye version de save.");
     }
 
     Career loaded;
     loaded.saveFile = career.saveFile;
     loaded.initializeLeague(true);
     if (!loaded.loadCareer()) {
-        return {"Guardado/carga", false, "No pudo recargar el archivo de validacion."};
+        return fail("No pudo recargar el archivo de validacion.");
     }
     if (!loaded.myTeam || !career.myTeam || loaded.myTeam->name != career.myTeam->name) {
-        return {"Guardado/carga", false, "El equipo cargado no coincide."};
+        return fail("El equipo cargado no coincide.");
     }
     if (loaded.currentSeason != career.currentSeason || loaded.currentWeek != career.currentWeek) {
-        return {"Guardado/carga", false, "Temporada o semana no coinciden tras carga."};
+        return fail("Temporada o semana no coinciden tras carga.");
     }
     if (loaded.myTeam->assistantCoach != career.myTeam->assistantCoach ||
         loaded.myTeam->medicalTeam != career.myTeam->medicalTeam ||
@@ -582,7 +622,7 @@ static ValidationResult validateSaveLoad() {
         loaded.myTeam->clubStyle != career.myTeam->clubStyle ||
         loaded.myTeam->youthIdentity != career.myTeam->youthIdentity ||
         loaded.myTeam->primaryRival != career.myTeam->primaryRival) {
-        return {"Guardado/carga", false, "No se preservaron correctamente los datos de staff."};
+        return fail("No se preservaron correctamente los datos de staff.");
     }
     if (!loaded.myTeam->players.empty() && !career.myTeam->players.empty()) {
         const Player& loadedPlayer = loaded.myTeam->players.front();
@@ -597,16 +637,17 @@ static ValidationResult validateSaveLoad() {
             loadedPlayer.currentForm != savedPlayer.currentForm ||
             loadedPlayer.tacticalDiscipline != savedPlayer.tacticalDiscipline ||
             loadedPlayer.versatility != savedPlayer.versatility) {
-            return {"Guardado/carga", false, "No se preservaron correctamente los datos avanzados del jugador."};
+            return fail("No se preservaron correctamente los datos avanzados del jugador.");
         }
     }
     if (loaded.boardMonthlyObjective != career.boardMonthlyObjective ||
         loaded.lastMatchAnalysis != career.lastMatchAnalysis) {
-        return {"Guardado/carga", false, "No se preservaron correctamente datos avanzados de carrera."};
+        return fail("No se preservaron correctamente datos avanzados de carrera.");
     }
     if (loaded.scoutingShortlist != career.scoutingShortlist) {
-        return {"Guardado/carga", false, "No se preservo correctamente la shortlist de scouting."};
+        return fail("No se preservo correctamente la shortlist de scouting.");
     }
+    cleanupValidationSave();
     return {"Guardado/carga", true, "Guardado y carga basicos verificados."};
 }
 

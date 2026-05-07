@@ -282,6 +282,7 @@ std::vector<HWND> activeFrontMenuButtons(const AppState& state) {
             state.menuVisualButton,
             state.menuMusicModeButton,
             state.menuAudioFadeButton,
+            state.menuApplySettingsButton,
             state.menuBackButton
         };
     }
@@ -386,6 +387,8 @@ bool handleFrontMenuKey(AppState& state, WPARAM key) {
             return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuMusicModeButton);
         case 'F':
             return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuAudioFadeButton);
+        case 'A':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuApplySettingsButton);
         case 'B':
             if (state.currentPage == GuiPage::MainMenu || state.currentPage == GuiPage::Saves) {
                 return clickFrontMenuButton(state.menuDeleteSaveButton);
@@ -857,6 +860,9 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                     return 0;
                 case IDC_MENU_AUDIOFADE_BUTTON:
                     toggleFrontendAudioFade(*state);
+                    return 0;
+                case IDC_MENU_APPLY_SETTINGS_BUTTON:
+                    applyFrontendSettings(*state);
                     return 0;
                 case IDC_EMPTY_NEW_BUTTON:
                     startNewCareer(*state);
