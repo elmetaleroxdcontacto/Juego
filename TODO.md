@@ -5301,3 +5301,45 @@ Fecha: 2026-04-04
 - `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
 - `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI` -> compilado correctamente fuera del sandbox tras bloqueo temporal de MinGW con `objects.a`.
+
+## GUI, ajustes y simulacion semanal no bloqueante (2026-05-07)
+
+### Cambios aplicados
+- Commit `553da0b` (`Fix GUI layout overlap and scroll behavior`): se corrigieron solapes de layout en la GUI, especialmente entre cabecera, paneles y comportamiento de scroll.
+- Commit `ae1448a` (`Fix settings apply flow and UI stalls`): se agrego el boton `Aplicar ajustes`, se evito el bloqueo del hilo Win32 al cambiar ajustes/audio y se agrego proteccion contra doble simulacion.
+- Commit `a2a7f93` (`Add async weekly simulation and settings apply flow`): la simulacion semanal ahora corre en segundo plano y reporta progreso en la barra de estado.
+- Los botones/acciones principales quedan deshabilitados mientras hay una simulacion activa para evitar reentradas peligrosas.
+- La pantalla de ajustes ahora distingue entre cambios pendientes, aplicar y restaurar:
+  - cambiar un ajuste marca estado pendiente
+  - `Aplicar ajustes` guarda en disco y limpia el estado pendiente
+  - `Restaurar` vuelve al ultimo estado aplicado
+  - si se sale sin aplicar, los cambios pendientes no se guardan accidentalmente al cerrar la GUI
+- Se corrigio el dibujo de columnas con escudo de club para que el texto no quede encima del logo.
+- La validacion runtime ahora usa nombres temporales unicos para evitar choques entre guardado/carga concurrente.
+- Se agrego cobertura automatizada `validation_suite_concurrency` para proteger la validacion concurrente.
+
+### Archivos principales modificados
+- `include/gui/gui_internal.h`
+- `src/gui/gui.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_audio.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+- `src/gui/gui_shared.cpp`
+- `src/gui/gui_view_menu.cpp`
+- `src/validators/validators.cpp`
+- `tests/project_tests.cpp`
+
+### Validacion realizada
+- `cmake --build build-cmake --config Release --target FootballManager` -> compilado correctamente.
+- `cmake --build build-cmake --config Release --target FootballManagerCLI` -> compilado correctamente.
+- `cmake -S . -B build-cmake -DBUILD_TESTING=ON` -> configuracion de tests activada.
+- `cmake --build build-cmake --config Release --target FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+
+### Pendiente recomendado
+- Evaluar una pantalla de progreso mas rica para la simulacion semanal, con fases visibles como autosave, partidos, tabla, finanzas, noticias y guardado.
+- Mover gradualmente el estado global de presentacion semanal a un contexto por simulacion si en el futuro se permite mas de una simulacion paralela.
+- Seguir revisando vistas con tablas y escudos para detectar cualquier otro caso de solape visual en columnas estrechas.
