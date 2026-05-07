@@ -318,7 +318,9 @@ GuiPageModel buildSettingsPageModel(AppState& state) {
     GuiPageModel model;
     model.title = "Configuraciones";
     model.breadcrumb = "Inicio > Configuraciones";
-    model.infoLine = "Cabina inicial de ajustes. Cambia el tono del juego antes de entrar al centro del club.";
+    model.infoLine = state.settingsDirty
+        ? "Cabina inicial de ajustes. Hay cambios pendientes por aplicar o restaurar."
+        : "Cabina inicial de ajustes. Cambia el tono del juego antes de entrar al centro del club.";
     model.summary.title = "SettingsDesk";
     model.detail.title = "SettingsImpact";
     model.feed.title = "SettingsReturn";
@@ -361,7 +363,9 @@ GuiPageModel buildSettingsPageModel(AppState& state) {
     detail << "Musica: " << game_settings::menuMusicModeLabel(state.settings.menuMusicMode) << "\r\n";
     detail << game_settings::menuMusicModeDescription(state.settings.menuMusicMode) << "\r\n";
     detail << game_settings::menuAudioFadeDescription(state.settings.menuAudioFade) << "\r\n\r\n";
-    detail << "Usa Aplicar ajustes para confirmar, guardar en disco y refrescar audio/interfaz.";
+    detail << (state.settingsDirty
+                   ? "Hay cambios pendientes. Aplicar guarda en disco; Restaurar vuelve al ultimo estado aplicado."
+                   : "Ajustes aplicados. Puedes cambiar valores y confirmar solo cuando estes conforme.");
     model.detail.content = detail.str();
 
     model.feed.lines = {
@@ -371,7 +375,7 @@ GuiPageModel buildSettingsPageModel(AppState& state) {
         std::string("Modo actual: ") + game_settings::simulationModeLabel(state.settings.simulationMode),
         std::string("Idioma / texto: ") + game_settings::languageLabel(state.settings.language) + " / " + game_settings::textSpeedLabel(state.settings.textSpeed),
         std::string("Visual / musica: ") + game_settings::visualProfileLabel(state.settings.visualProfile) + " / " + game_settings::menuMusicModeLabel(state.settings.menuMusicMode),
-        "Aplicar ajustes guarda la configuracion y actualiza audio/interfaz."
+        state.settingsDirty ? "Pendiente: usa Aplicar ajustes o Restaurar." : "Estado: ajustes aplicados y guardados."
     };
     return model;
 }

@@ -7,7 +7,9 @@
 #include "engine/game_settings.h"
 #include "utils/utils.h"
 
+#include <memory>
 #include <sstream>
+#include <utility>
 
 namespace gui_win32 {
 
@@ -151,42 +153,100 @@ void pulseFrontendTiming(AppState& state) {
     }
 }
 
-void persistSettings(AppState& state) {
-    game_settings::saveToDisk(state.settings);
-}
+HWND g_workerProgressWindow = nullptr;
+GameSettings g_workerProgressSettings;
+int g_workerProgressSpinner = 0;
 
-AppState* g_pumpState = nullptr;
+struct SimulationThreadArgs {
+    HWND window = nullptr;
+    Career career;
+    GameSettings settings;
+};
 
-std::string buildSimulationStatus(const AppState& state, int spinnerIndex) {
+struct SimulationJobResult {
+    Career career;
+    ServiceResult result;
+    std::string managedTeamName;
+};
+
+std::string buildSimulationStatus(const GameSettings& settings, int spinnerIndex) {
     static const char spinner[] = "|/-\\";
     std::ostringstream status;
     status << "Simulando semana en modo "
-           << game_settings::simulationModeLabel(state.settings.simulationMode)
+           << game_settings::simulationModeLabel(settings.simulationMode)
            << " a velocidad "
-           << game_settings::simulationSpeedLabel(state.settings.simulationSpeed)
+           << game_settings::simulationSpeedLabel(settings.simulationSpeed)
            << " " << spinner[spinnerIndex % 4];
     return status.str();
 }
 
-void pumpUiMessages() {
-    static int spinnerIndex = 0;
-    if (g_pumpState) {
-        if ((spinnerIndex % 10) == 0) {
-            setStatus(*g_pumpState, buildSimulationStatus(*g_pumpState, spinnerIndex));
-            UpdateWindow(g_pumpState->window);
+std::string managedTeamName(const Career& career) {
+    return career.myTeam ? career.myTeam->name : std::string();
+}
+
+void relinkCareerPointers(Career& career, const std::string& teamName) {
+    std::string divisionId = career.activeDivision;
+    if (divisionId.empty() && !teamName.empty()) {
+        if (Team* team = career.findTeamByName(teamName)) {
+            divisionId = team->division;
         }
-        spinnerIndex = (spinnerIndex + 1) % 4;
     }
 
-    MSG msg{};
-    while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
-        if (msg.message == WM_QUIT) {
-            PostQuitMessage(static_cast<int>(msg.wParam));
-            return;
-        }
-        TranslateMessage(&msg);
-        DispatchMessageW(&msg);
+    career.activeDivision = divisionId;
+    career.activeTeams = divisionId.empty() ? std::vector<Team*>() : career.getDivisionTeams(divisionId);
+    career.leagueTable.clear();
+    career.leagueTable.title = divisionDisplay(divisionId);
+    career.leagueTable.ruleId = divisionId;
+    for (Team* team : career.activeTeams) {
+        if (team) career.leagueTable.addTeam(team);
     }
+    career.leagueTable.sortTable();
+    career.myTeam = teamName.empty() ? nullptr : career.findTeamByName(teamName);
+}
+
+void postSimulationProgress(HWND window, const std::string& text) {
+    if (!window || !IsWindow(window)) return;
+    auto* payload = new std::string(text);
+    if (!PostMessageW(window, kGuiSimulationProgressMessage, 0, reinterpret_cast<LPARAM>(payload))) {
+        delete payload;
+    }
+}
+
+void pumpWorkerSimulationProgress() {
+    if ((g_workerProgressSpinner % 8) == 0) {
+        postSimulationProgress(g_workerProgressWindow,
+                               buildSimulationStatus(g_workerProgressSettings, g_workerProgressSpinner));
+    }
+    g_workerProgressSpinner = (g_workerProgressSpinner + 1) % 64;
+}
+
+DWORD WINAPI simulationThreadProc(LPVOID rawArgs) {
+    std::unique_ptr<SimulationThreadArgs> args(static_cast<SimulationThreadArgs*>(rawArgs));
+    if (!args) return 0;
+
+    g_workerProgressWindow = args->window;
+    g_workerProgressSettings = args->settings;
+    g_workerProgressSpinner = 0;
+    postSimulationProgress(args->window, "Simulando partidos de la semana...");
+
+    const WeekSimulationPresentation previousPresentation = weekSimulationPresentation();
+    setWeekSimulationPresentation(WeekSimulationPresentation::Compact);
+    ServiceResult result = simulateCareerWeekService(args->career, pumpWorkerSimulationProgress);
+    setWeekSimulationPresentation(previousPresentation);
+
+    const std::string teamName = managedTeamName(args->career);
+    auto* payload = new SimulationJobResult{std::move(args->career), std::move(result), teamName};
+    if (!args->window || !IsWindow(args->window) ||
+        !PostMessageW(args->window, kGuiSimulationCompleteMessage, 0, reinterpret_cast<LPARAM>(payload))) {
+        delete payload;
+    }
+    return 0;
+}
+
+void markSettingsDirty(AppState& state, const std::string& status) {
+    state.settingsDirty = true;
+    refreshCurrentPage(state);
+    setStatus(state, status + " Pendiente: aplica o restaura los ajustes.");
 }
 
 }  // namespace
@@ -330,7 +390,6 @@ void simulateWeek(AppState& state) {
     if (!state.career.myTeam) return;
     if (state.actionInProgress) return;
     syncManagerNameFromUi(state);
-    state.actionInProgress = true;
 
     setStatus(state, "Guardando autosave antes de simular...");
     UpdateWindow(state.window);
@@ -344,7 +403,6 @@ void simulateWeek(AppState& state) {
                                        L"Autosave",
                                        MB_YESNO | MB_ICONWARNING);
         if (choice != IDYES) {
-            state.actionInProgress = false;
             setStatus(state, "Simulacion cancelada: autosave no disponible.");
             refreshAll(state);
             return;
@@ -362,18 +420,50 @@ void simulateWeek(AppState& state) {
                   game_settings::simulationModeLabel(state.settings.simulationMode) +
                   " a velocidad " + game_settings::simulationSpeedLabel(state.settings.simulationSpeed) + "...");
     UpdateWindow(state.window);
-    pumpUiMessages();
-    const WeekSimulationPresentation previousPresentation = weekSimulationPresentation();
-    // La GUI no muestra el volcado crudo del partido; el detalle ya vive en el match center.
-    setWeekSimulationPresentation(WeekSimulationPresentation::Compact);
-    g_pumpState = &state;
-    ServiceResult result = simulateCareerWeekService(state.career, pumpUiMessages);
-    g_pumpState = nullptr;
-    setWeekSimulationPresentation(previousPresentation);
-    syncCombosFromCareer(state);
+
+    const std::string teamName = managedTeamName(state.career);
+    Career workerCareer = state.career;
+    relinkCareerPointers(workerCareer, teamName);
+    auto* args = new SimulationThreadArgs{state.window, std::move(workerCareer), state.settings};
+
+    state.actionInProgress = true;
+    if (state.simulateButton) setWindowTextUtf8(state.simulateButton, "Simulando...");
     refreshAll(state);
+
+    HANDLE thread = CreateThread(nullptr, 0, simulationThreadProc, args, 0, nullptr);
+    if (!thread) {
+        delete args;
+        state.actionInProgress = false;
+        if (state.simulateButton) setWindowTextUtf8(state.simulateButton, "Simular");
+        refreshAll(state);
+        MessageBoxW(state.window,
+                    L"No se pudo iniciar la simulacion en segundo plano.",
+                    L"Simulacion",
+                    MB_OK | MB_ICONERROR);
+        setStatus(state, "No se pudo iniciar la simulacion de la semana.");
+        return;
+    }
+    CloseHandle(thread);
+    setStatus(state, "Simulacion semanal en progreso. La interfaz sigue disponible.");
+}
+
+void handleSimulationProgress(AppState& state, LPARAM payload) {
+    std::unique_ptr<std::string> text(reinterpret_cast<std::string*>(payload));
+    if (!text) return;
+    setStatus(state, *text);
+}
+
+void completeSimulationWeek(AppState& state, LPARAM payload) {
+    std::unique_ptr<SimulationJobResult> job(reinterpret_cast<SimulationJobResult*>(payload));
+    if (!job) return;
+
+    state.career = std::move(job->career);
+    relinkCareerPointers(state.career, job->managedTeamName);
+    syncCombosFromCareer(state);
     state.actionInProgress = false;
-    setStatus(state, result.messages.empty() ? "Semana simulada." : result.messages.back());
+    if (state.simulateButton) setWindowTextUtf8(state.simulateButton, "Simular");
+    refreshAll(state);
+    setStatus(state, job->result.messages.empty() ? "Semana simulada." : job->result.messages.back());
 }
 
 void validateSystem(AppState& state) {
@@ -539,70 +629,56 @@ void openSavesPage(AppState& state) {
 void cycleFrontendVolume(AppState& state) {
     game_settings::cycleVolume(state.settings);
     refreshMenuMusicVolume(state);
-    persistSettings(state);
-    refreshCurrentPage(state);
-    setStatus(state, "Volumen ajustado a " + game_settings::volumeLabel(state.settings.volume) + ".");
+    markSettingsDirty(state, "Volumen ajustado a " + game_settings::volumeLabel(state.settings.volume) + ".");
 }
 
 void cycleFrontendDifficulty(AppState& state) {
     game_settings::cycleDifficulty(state.settings);
-    persistSettings(state);
-    refreshCurrentPage(state);
-    setStatus(state, "Dificultad actual: " + game_settings::difficultyLabel(state.settings.difficulty) + ".");
+    markSettingsDirty(state, "Dificultad actual: " + game_settings::difficultyLabel(state.settings.difficulty) + ".");
 }
 
 void cycleFrontendSimulationSpeed(AppState& state) {
     game_settings::cycleSimulationSpeed(state.settings);
-    persistSettings(state);
-    refreshCurrentPage(state);
-    setStatus(state, "Velocidad actual: " + game_settings::simulationSpeedLabel(state.settings.simulationSpeed) + ".");
+    markSettingsDirty(state, "Velocidad actual: " + game_settings::simulationSpeedLabel(state.settings.simulationSpeed) + ".");
 }
 
 void cycleFrontendSimulationMode(AppState& state) {
     game_settings::cycleSimulationMode(state.settings);
-    persistSettings(state);
-    refreshCurrentPage(state);
-    setStatus(state, "Modo de simulacion actual: " + game_settings::simulationModeLabel(state.settings.simulationMode) + ".");
+    markSettingsDirty(state, "Modo de simulacion actual: " + game_settings::simulationModeLabel(state.settings.simulationMode) + ".");
 }
 
 void cycleFrontendLanguage(AppState& state) {
     game_settings::cycleLanguage(state.settings);
-    persistSettings(state);
-    refreshCurrentPage(state);
-    setStatus(state, "Idioma actual: " + game_settings::languageLabel(state.settings.language) + ".");
+    markSettingsDirty(state, "Idioma actual: " + game_settings::languageLabel(state.settings.language) + ".");
 }
 
 void cycleFrontendTextSpeed(AppState& state) {
     game_settings::cycleTextSpeed(state.settings);
-    persistSettings(state);
-    refreshCurrentPage(state);
-    setStatus(state, "Velocidad de texto: " + game_settings::textSpeedLabel(state.settings.textSpeed) + ".");
+    markSettingsDirty(state, "Velocidad de texto: " + game_settings::textSpeedLabel(state.settings.textSpeed) + ".");
 }
 
 void cycleFrontendVisualProfile(AppState& state) {
     game_settings::cycleVisualProfile(state.settings);
-    persistSettings(state);
-    refreshCurrentPage(state);
-    setStatus(state, "Perfil visual: " + game_settings::visualProfileLabel(state.settings.visualProfile) + ".");
+    markSettingsDirty(state, "Perfil visual: " + game_settings::visualProfileLabel(state.settings.visualProfile) + ".");
 }
 
 void cycleFrontendMenuMusicMode(AppState& state) {
     game_settings::cycleMenuMusicMode(state.settings);
-    persistSettings(state);
-    refreshCurrentPage(state);
-    setStatus(state, "Musica del frontend: " + game_settings::menuMusicModeLabel(state.settings.menuMusicMode) + ".");
+    markSettingsDirty(state, "Musica del frontend: " + game_settings::menuMusicModeLabel(state.settings.menuMusicMode) + ".");
 }
 
 void toggleFrontendAudioFade(AppState& state) {
     game_settings::toggleMenuAudioFade(state.settings);
-    persistSettings(state);
-    refreshCurrentPage(state);
-    setStatus(state, "Audio del menu: " + game_settings::menuAudioFadeLabel(state.settings.menuAudioFade) + ".");
+    markSettingsDirty(state, "Audio del menu: " + game_settings::menuAudioFadeLabel(state.settings.menuAudioFade) + ".");
 }
 
 void applyFrontendSettings(AppState& state) {
     game_settings::sanitize(state.settings);
     const bool saved = game_settings::saveToDisk(state.settings);
+    if (saved) {
+        state.savedSettings = state.settings;
+        state.settingsDirty = false;
+    }
     refreshCurrentPage(state);
     if (!saved) {
         MessageBoxW(state.window,
@@ -613,6 +689,14 @@ void applyFrontendSettings(AppState& state) {
         return;
     }
     setStatus(state, "Ajustes aplicados y guardados: " + game_settings::settingsSummary(state.settings) + ".");
+}
+
+void restoreFrontendSettings(AppState& state) {
+    state.settings = state.savedSettings;
+    game_settings::sanitize(state.settings);
+    state.settingsDirty = false;
+    refreshCurrentPage(state);
+    setStatus(state, "Ajustes restaurados al ultimo estado aplicado.");
 }
 
 }  // namespace gui_win32

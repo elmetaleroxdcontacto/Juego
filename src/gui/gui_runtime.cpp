@@ -37,7 +37,7 @@ std::vector<HWND> pageRefreshTargets(const AppState& state) {
         state.menuCreditsButton, state.menuExitButton, state.menuBackButton, state.menuVolumeButton,
         state.menuDifficultyButton, state.menuSpeedButton, state.menuSimulationButton, state.menuLanguageButton,
         state.menuTextSpeedButton, state.menuVisualButton, state.menuMusicModeButton,
-        state.menuAudioFadeButton, state.menuApplySettingsButton,
+        state.menuAudioFadeButton, state.menuApplySettingsButton, state.menuResetSettingsButton,
         state.emptyNewButton, state.emptyLoadButton, state.emptyValidateButton
     };
 }
@@ -408,19 +408,23 @@ namespace {
 void syncSetupButtonsAndHints(AppState& state) {
     const bool hasCareer = state.career.myTeam != nullptr;
     const bool hasSavedCareer = hasPersistedCareer(state);
-    EnableWindow(state.divisionCombo, !hasCareer);
-    EnableWindow(state.teamCombo, !hasCareer && hasAvailableTeams(state, state.gameSetup.division));
-    EnableWindow(state.newCareerButton, !hasCareer && state.gameSetup.ready);
-    EnableWindow(state.emptyNewButton, state.gameSetup.ready);
-    EnableWindow(state.saveButton, hasCareer);
-    EnableWindow(state.simulateButton, hasCareer);
-    EnableWindow(state.menuContinueButton, hasCareer || hasSavedCareer);
+    const bool busy = state.actionInProgress;
+    EnableWindow(state.divisionCombo, !busy && !hasCareer);
+    EnableWindow(state.teamCombo, !busy && !hasCareer && hasAvailableTeams(state, state.gameSetup.division));
+    EnableWindow(state.managerEdit, !busy);
+    EnableWindow(state.newCareerButton, !busy && !hasCareer && state.gameSetup.ready);
+    EnableWindow(state.emptyNewButton, !busy && state.gameSetup.ready);
+    EnableWindow(state.saveButton, !busy && hasCareer);
+    EnableWindow(state.simulateButton, !busy && hasCareer);
+    EnableWindow(state.menuContinueButton, !busy && (hasCareer || hasSavedCareer));
     EnableWindow(state.menuLoadButton, state.currentPage == GuiPage::MainMenu
-                                           ? TRUE
-                                           : (state.currentPage == GuiPage::Saves ? !state.selectedSavePath.empty() : hasSavedCareer));
+                                           ? !busy
+                                           : (!busy && (state.currentPage == GuiPage::Saves ? !state.selectedSavePath.empty() : hasSavedCareer)));
     EnableWindow(state.menuDeleteSaveButton, state.currentPage == GuiPage::MainMenu
-                                                ? TRUE
-                                                : (state.currentPage == GuiPage::Saves ? (!state.selectedSavePath.empty() && !hasCareer) : hasSavedCareer));
+                                                ? !busy
+                                                : (!busy && (state.currentPage == GuiPage::Saves ? (!state.selectedSavePath.empty() && !hasCareer) : hasSavedCareer)));
+    EnableWindow(state.menuApplySettingsButton, !busy && state.settingsDirty);
+    EnableWindow(state.menuResetSettingsButton, !busy && state.settingsDirty);
 
     if (state.divisionLabel) {
         std::string badge = "Division";

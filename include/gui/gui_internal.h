@@ -84,6 +84,7 @@ enum ControlId {
     IDC_MENU_MUSICMODE_BUTTON,
     IDC_MENU_AUDIOFADE_BUTTON,
     IDC_MENU_APPLY_SETTINGS_BUTTON,
+    IDC_MENU_RESET_SETTINGS_BUTTON,
     IDC_EMPTY_NEW_BUTTON,
     IDC_EMPTY_LOAD_BUTTON,
     IDC_EMPTY_VALIDATE_BUTTON
@@ -250,6 +251,8 @@ struct AppState {
 
     Career career;
     GameSettings settings;
+    GameSettings savedSettings;
+    bool settingsDirty = false;
     bool suppressComboEvents = false;
     bool suppressFilterEvents = false;
     bool pageRefreshInProgress = false;
@@ -329,6 +332,7 @@ struct AppState {
     HWND menuMusicModeButton = nullptr;
     HWND menuAudioFadeButton = nullptr;
     HWND menuApplySettingsButton = nullptr;
+    HWND menuResetSettingsButton = nullptr;
     HWND emptyNewButton = nullptr;
     HWND emptyLoadButton = nullptr;
     HWND emptyValidateButton = nullptr;
@@ -381,6 +385,8 @@ static const COLORREF kThemeDanger = RGB(186, 78, 78);
 static const COLORREF kThemeWarning = RGB(208, 167, 72);
 static const COLORREF kThemeSelection = RGB(64, 91, 109);
 static const UINT kGuiPageTransitionMessage = WM_APP + 17;
+static const UINT kGuiSimulationProgressMessage = WM_APP + 18;
+static const UINT kGuiSimulationCompleteMessage = WM_APP + 19;
 
 RECT childRectOnParent(HWND child, HWND parent);
 RECT expandedRect(RECT rect, int dx, int dy);
@@ -471,6 +477,8 @@ void loadCareer(AppState& state);
 void saveCareer(AppState& state);
 void deleteCareerSave(AppState& state);
 void simulateWeek(AppState& state);
+void handleSimulationProgress(AppState& state, LPARAM payload);
+void completeSimulationWeek(AppState& state, LPARAM payload);
 void validateSystem(AppState& state);
 void runScoutingAction(AppState& state);
 void runBuyAction(AppState& state);
@@ -496,6 +504,7 @@ void cycleFrontendVisualProfile(AppState& state);
 void cycleFrontendMenuMusicMode(AppState& state);
 void toggleFrontendAudioFade(AppState& state);
 void applyFrontendSettings(AppState& state);
+void restoreFrontendSettings(AppState& state);
 
 }  // namespace gui_win32
 

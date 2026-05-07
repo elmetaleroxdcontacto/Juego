@@ -831,6 +831,7 @@ void setMenuButtonsVisible(AppState& state, bool visible) {
     setControlVisibility(state, state.menuMusicModeButton, visible);
     setControlVisibility(state, state.menuAudioFadeButton, visible);
     setControlVisibility(state, state.menuApplySettingsButton, visible);
+    setControlVisibility(state, state.menuResetSettingsButton, visible);
 }
 
 void updateFrontendMenuButtonLabels(AppState& state) {
@@ -877,7 +878,10 @@ void updateFrontendMenuButtonLabels(AppState& state) {
         setWindowTextUtf8(state.menuAudioFadeButton,
                           "Audio: " + game_settings::menuAudioFadeLabel(state.settings.menuAudioFade));
     }
-    if (state.menuApplySettingsButton) setWindowTextUtf8(state.menuApplySettingsButton, "Aplicar ajustes");
+    if (state.menuApplySettingsButton) {
+        setWindowTextUtf8(state.menuApplySettingsButton, state.settingsDirty ? "Aplicar ajustes *" : "Aplicado");
+    }
+    if (state.menuResetSettingsButton) setWindowTextUtf8(state.menuResetSettingsButton, "Restaurar");
 }
 
 }  // namespace
@@ -938,6 +942,7 @@ void layoutMainMenuPanel(AppState& state, const RECT& client) {
     setControlVisibility(state, state.menuMusicModeButton, false);
     setControlVisibility(state, state.menuAudioFadeButton, false);
     setControlVisibility(state, state.menuApplySettingsButton, false);
+    setControlVisibility(state, state.menuResetSettingsButton, false);
 }
 
 // Layout helper para el dashboard del modo carrera: panel de gestión con botones en grilla e info del club.
@@ -1282,7 +1287,7 @@ void applyInterfaceFonts(AppState& state) {
     const std::array<HWND, 3> tablePanels = {state.tableList, state.squadList, state.transferList};
     for (HWND hwnd : tablePanels) setControlFont(hwnd, state.font);
 
-    const std::array<HWND, 38> buttons = {
+    const std::array<HWND, 39> buttons = {
         state.newCareerButton, state.loadButton, state.saveButton, state.simulateButton, state.validateButton, state.displayModeButton, state.frontMenuButton,
         state.dashboardButton, state.squadButton, state.tacticsButton, state.calendarButton, state.leagueButton,
         state.transfersButton, state.financesButton, state.youthButton, state.boardButton, state.newsButton,
@@ -1290,7 +1295,7 @@ void applyInterfaceFonts(AppState& state) {
         state.menuDeleteSaveButton, state.menuCreditsButton, state.menuExitButton, state.menuBackButton, state.menuVolumeButton,
         state.menuDifficultyButton, state.menuSpeedButton, state.menuSimulationButton,
         state.menuLanguageButton, state.menuTextSpeedButton, state.menuVisualButton,
-        state.menuMusicModeButton, state.menuAudioFadeButton, state.menuApplySettingsButton,
+        state.menuMusicModeButton, state.menuAudioFadeButton, state.menuApplySettingsButton, state.menuResetSettingsButton,
         state.emptyNewButton, state.emptyLoadButton, state.emptyValidateButton
     };
     for (HWND hwnd : buttons) setControlFont(hwnd, state.font);
@@ -1496,6 +1501,7 @@ void layoutWindow(AppState& state) {
             setControlVisibility(state, state.menuMusicModeButton, false);
             setControlVisibility(state, state.menuAudioFadeButton, false);
             setControlVisibility(state, state.menuApplySettingsButton, false);
+            setControlVisibility(state, state.menuResetSettingsButton, false);
         } else if (state.currentPage == GuiPage::Settings) {
             const int settingsWidth = clampValue((shellWidth - s(44)) / 2, s(280), s(420));
             const int rightColumnLeft = shellLeft + s(28) + settingsWidth;
@@ -1509,6 +1515,7 @@ void layoutWindow(AppState& state) {
             placeFixedWindow(state.menuMusicModeButton, rightColumnLeft, buttonTop + s(138), settingsWidth, s(38));
             placeFixedWindow(state.menuAudioFadeButton, shellLeft + s(16), buttonTop + s(184), settingsWidth, s(38));
             placeFixedWindow(state.menuApplySettingsButton, rightColumnLeft, buttonTop + s(184), settingsWidth, s(38));
+            placeFixedWindow(state.menuResetSettingsButton, shellLeft + s(16), buttonTop + s(230), settingsWidth, s(36));
             placeFixedWindow(state.menuBackButton, rightColumnLeft, buttonTop + s(230), settingsWidth, s(36));
             setControlVisibility(state, state.menuContinueButton, false);
             setControlVisibility(state, state.menuPlayButton, false);
@@ -1528,6 +1535,7 @@ void layoutWindow(AppState& state) {
             setControlVisibility(state, state.menuMusicModeButton, true);
             setControlVisibility(state, state.menuAudioFadeButton, true);
             setControlVisibility(state, state.menuApplySettingsButton, true);
+            setControlVisibility(state, state.menuResetSettingsButton, true);
         } else {
             placeFixedWindow(state.menuBackButton, shellLeft + s(16), buttonTop, s(220), s(38));
             setControlVisibility(state, state.menuContinueButton, false);
@@ -1548,6 +1556,7 @@ void layoutWindow(AppState& state) {
             setControlVisibility(state, state.menuMusicModeButton, false);
             setControlVisibility(state, state.menuAudioFadeButton, false);
             setControlVisibility(state, state.menuApplySettingsButton, false);
+            setControlVisibility(state, state.menuResetSettingsButton, false);
         }
 
         state.layout.statusBar = makeRect(padding,
@@ -2059,6 +2068,7 @@ void initializeInterface(AppState& state) {
     state.menuMusicModeButton = createControl(state, 0, L"BUTTON", L"Musica: Solo portada", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_MUSICMODE_BUTTON);
     state.menuAudioFadeButton = createControl(state, 0, L"BUTTON", L"Audio: Fade activo", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_AUDIOFADE_BUTTON);
     state.menuApplySettingsButton = createControl(state, 0, L"BUTTON", L"Aplicar ajustes", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_APPLY_SETTINGS_BUTTON);
+    state.menuResetSettingsButton = createControl(state, 0, L"BUTTON", L"Restaurar", buttonStyle, 0, 0, 280, 34, state.window, IDC_MENU_RESET_SETTINGS_BUTTON);
     state.emptyNewButton = createControl(state, 0, L"BUTTON", L"Crear carrera", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_NEW_BUTTON);
     state.emptyLoadButton = createControl(state, 0, L"BUTTON", L"Abrir guardado", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_LOAD_BUTTON);
     state.emptyValidateButton = createControl(state, 0, L"BUTTON", L"Validar datos", buttonStyle, 0, 0, 140, 30, state.window, IDC_EMPTY_VALIDATE_BUTTON);
@@ -2081,6 +2091,7 @@ void initializeInterface(AppState& state) {
     ShowWindow(state.menuMusicModeButton, SW_HIDE);
     ShowWindow(state.menuAudioFadeButton, SW_HIDE);
     ShowWindow(state.menuApplySettingsButton, SW_HIDE);
+    ShowWindow(state.menuResetSettingsButton, SW_HIDE);
 
     state.dashboardButton = createControl(state, 0, L"BUTTON", L"Inicio", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_DASHBOARD_BUTTON);
     state.squadButton = createControl(state, 0, L"BUTTON", L"Plantilla", buttonStyle, 0, 0, 132, 34, state.window, IDC_PAGE_SQUAD_BUTTON);

@@ -283,6 +283,7 @@ std::vector<HWND> activeFrontMenuButtons(const AppState& state) {
             state.menuMusicModeButton,
             state.menuAudioFadeButton,
             state.menuApplySettingsButton,
+            state.menuResetSettingsButton,
             state.menuBackButton
         };
     }
@@ -389,6 +390,8 @@ bool handleFrontMenuKey(AppState& state, WPARAM key) {
             return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuAudioFadeButton);
         case 'A':
             return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuApplySettingsButton);
+        case 'O':
+            return state.currentPage == GuiPage::Settings && clickFrontMenuButton(state.menuResetSettingsButton);
         case 'B':
             if (state.currentPage == GuiPage::MainMenu || state.currentPage == GuiPage::Saves) {
                 return clickFrontMenuButton(state.menuDeleteSaveButton);
@@ -864,6 +867,9 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 case IDC_MENU_APPLY_SETTINGS_BUTTON:
                     applyFrontendSettings(*state);
                     return 0;
+                case IDC_MENU_RESET_SETTINGS_BUTTON:
+                    restoreFrontendSettings(*state);
+                    return 0;
                 case IDC_EMPTY_NEW_BUTTON:
                     startNewCareer(*state);
                     return 0;
@@ -932,6 +938,18 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
             if (state) {
                 state->pageChangeQueued = false;
                 setCurrentPage(*state, static_cast<GuiPage>(static_cast<int>(wParam)));
+                return 0;
+            }
+            break;
+        case kGuiSimulationProgressMessage:
+            if (state) {
+                handleSimulationProgress(*state, lParam);
+                return 0;
+            }
+            break;
+        case kGuiSimulationCompleteMessage:
+            if (state) {
+                completeSimulationWeek(*state, lParam);
                 return 0;
             }
             break;
@@ -1022,6 +1040,7 @@ int runGuiApp(GameSettings& settings) {
     gui_win32::AppState state;
     state.instance = GetModuleHandleW(nullptr);
     state.settings = settings;
+    state.savedSettings = settings;
 
     WNDCLASSEXW windowClass{};
     windowClass.cbSize = sizeof(windowClass);
@@ -1069,7 +1088,7 @@ int runGuiApp(GameSettings& settings) {
         DispatchMessageW(&msg);
     }
 
-    settings = state.settings;
+    settings = state.settingsDirty ? state.savedSettings : state.settings;
     return static_cast<int>(msg.wParam);
 }
 

@@ -837,7 +837,7 @@ static bool usesButtonBadge(int id) {
     return isPageButtonId(id) || id == IDC_DISPLAY_MODE_BUTTON || id == IDC_FRONT_MENU_BUTTON || id == IDC_MENU_CONTINUE_BUTTON ||
            id == IDC_MENU_PLAY_BUTTON || id == IDC_MENU_LOAD_BUTTON || id == IDC_MENU_DELETE_SAVE_BUTTON || id == IDC_MENU_SETTINGS_BUTTON ||
            id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON || id == IDC_MENU_BACK_BUTTON ||
-           id == IDC_MENU_APPLY_SETTINGS_BUTTON;
+           id == IDC_MENU_APPLY_SETTINGS_BUTTON || id == IDC_MENU_RESET_SETTINGS_BUTTON;
 }
 
 static DisplayMode displayModeForButton(const AppState& state) {
@@ -848,6 +848,54 @@ static DisplayMode displayModeForButton(const AppState& state) {
 
 static bool titleMatches(const std::string& value, const char* expected) {
     return value == expected;
+}
+
+static bool isTeamLogoSubItem(const AppState& state, HWND list, int subItem) {
+    const std::string title = panelTitleForList(state, list);
+    if (title == "LeagueTableView") return subItem == 1;
+    if (title == "FixtureListView") return subItem == 2;
+    if (title == "RaceContext") return subItem == 1;
+    if (title == "SeasonHistory" || title == "SeasonRecords") return subItem == 1;
+    if (title == "TransferMarketView") return subItem == 10;
+    return false;
+}
+
+static LRESULT drawTeamLogoSubItem(AppState& state, NMLVCUSTOMDRAW* draw, HWND list) {
+    if (!draw || !list || !isTeamLogoSubItem(state, list, draw->iSubItem)) return CDRF_DODEFAULT;
+
+    LVITEMW item{};
+    item.mask = LVIF_IMAGE;
+    item.iItem = static_cast<int>(draw->nmcd.dwItemSpec);
+    item.iSubItem = draw->iSubItem;
+    item.iImage = -1;
+    ListView_GetItem(list, &item);
+    if (item.iImage < 0) return CDRF_DODEFAULT;
+
+    RECT rect{};
+    if (!ListView_GetSubItemRect(list, item.iItem, item.iSubItem, LVIR_BOUNDS, &rect)) return CDRF_DODEFAULT;
+
+    HIMAGELIST images = ListView_GetImageList(list, LVSIL_SMALL);
+    int iconWidth = 0;
+    int iconHeight = 0;
+    if (images) {
+        ImageList_GetIconSize(images, &iconWidth, &iconHeight);
+        const int iconX = rect.left + 5;
+        const int iconY = static_cast<int>(rect.top) +
+                          std::max(0, (static_cast<int>(rect.bottom - rect.top) - iconHeight) / 2);
+        ImageList_Draw(images, item.iImage, draw->nmcd.hdc, iconX, iconY, ILD_TRANSPARENT);
+    }
+
+    RECT textRect = rect;
+    textRect.left += std::max(24, iconWidth + 10);
+    textRect.right -= 6;
+    const std::wstring text = utf8ToWide(listViewText(list, item.iItem, item.iSubItem));
+    SetBkMode(draw->nmcd.hdc, TRANSPARENT);
+    SetTextColor(draw->nmcd.hdc, (draw->nmcd.uItemState & CDIS_SELECTED) ? RGB(255, 255, 255) : kThemeText);
+    HGDIOBJ oldFont = SelectObject(draw->nmcd.hdc,
+                                   state.font ? state.font : static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT)));
+    DrawTextW(draw->nmcd.hdc, text.c_str(), -1, &textRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+    SelectObject(draw->nmcd.hdc, oldFont);
+    return CDRF_SKIPDEFAULT;
 }
 
 static wchar_t pageButtonGlyph(int id) {
@@ -873,7 +921,7 @@ static bool isFrontMenuButtonId(int id) {
            id == IDC_MENU_SPEED_BUTTON || id == IDC_MENU_SIMULATION_BUTTON || id == IDC_MENU_LANGUAGE_BUTTON ||
            id == IDC_MENU_TEXT_SPEED_BUTTON || id == IDC_MENU_VISUAL_BUTTON ||
            id == IDC_MENU_MUSICMODE_BUTTON || id == IDC_MENU_AUDIOFADE_BUTTON ||
-           id == IDC_MENU_APPLY_SETTINGS_BUTTON;
+           id == IDC_MENU_APPLY_SETTINGS_BUTTON || id == IDC_MENU_RESET_SETTINGS_BUTTON;
 }
 
 static bool isFrontMenuSettingButtonId(int id) {
@@ -886,7 +934,7 @@ static bool isFrontMenuSettingButtonId(int id) {
 static bool isFrontMenuMainActionButtonId(int id) {
     return id == IDC_MENU_CONTINUE_BUTTON || id == IDC_MENU_PLAY_BUTTON || id == IDC_MENU_LOAD_BUTTON ||
            id == IDC_MENU_DELETE_SAVE_BUTTON || id == IDC_MENU_SETTINGS_BUTTON || id == IDC_MENU_CREDITS_BUTTON || id == IDC_MENU_EXIT_BUTTON ||
-           id == IDC_MENU_BACK_BUTTON || id == IDC_MENU_APPLY_SETTINGS_BUTTON;
+           id == IDC_MENU_BACK_BUTTON || id == IDC_MENU_APPLY_SETTINGS_BUTTON || id == IDC_MENU_RESET_SETTINGS_BUTTON;
 }
 
 static bool shouldRenderButtonOnCurrentPage(const AppState& state, int id) {
@@ -900,7 +948,7 @@ static bool shouldRenderButtonOnCurrentPage(const AppState& state, int id) {
     if (isFrontMenuSettingButtonId(id)) {
         return state.currentPage == GuiPage::Settings;
     }
-    if (id == IDC_MENU_APPLY_SETTINGS_BUTTON) {
+    if (id == IDC_MENU_APPLY_SETTINGS_BUTTON || id == IDC_MENU_RESET_SETTINGS_BUTTON) {
         return state.currentPage == GuiPage::Settings;
     }
     if (id == IDC_MENU_BACK_BUTTON) {
@@ -930,6 +978,7 @@ static wchar_t buttonBadgeGlyph(int id, DisplayMode displayMode) {
     if (id == IDC_MENU_EXIT_BUTTON) return L'S';
     if (id == IDC_MENU_BACK_BUTTON) return L'V';
     if (id == IDC_MENU_APPLY_SETTINGS_BUTTON) return L'A';
+    if (id == IDC_MENU_RESET_SETTINGS_BUTTON) return L'O';
     return pageButtonGlyph(id);
 }
 
@@ -972,6 +1021,9 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     } else if (id == IDC_MENU_APPLY_SETTINGS_BUTTON) {
         fill = RGB(18, 75, 56);
         border = RGB(71, 180, 128);
+    } else if (id == IDC_MENU_RESET_SETTINGS_BUTTON) {
+        fill = RGB(57, 45, 20);
+        border = kThemeWarning;
     } else if (id == IDC_MENU_EXIT_BUTTON) {
         fill = RGB(55, 27, 32);
         border = RGB(186, 92, 104);
@@ -1035,6 +1087,7 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
     if (id == IDC_MENU_LOAD_BUTTON) accentColor = RGB(110, 157, 215);
     if (id == IDC_MENU_CREDITS_BUTTON) accentColor = kThemeAccent;
     if (id == IDC_MENU_APPLY_SETTINGS_BUTTON) accentColor = kThemeAccentGreen;
+    if (id == IDC_MENU_RESET_SETTINGS_BUTTON) accentColor = kThemeWarning;
     if (id == IDC_MENU_EXIT_BUTTON) accentColor = RGB(207, 101, 114);
     if (id == IDC_MENU_BACK_BUTTON) accentColor = RGB(108, 131, 145);
     if (id == IDC_MENU_DIFFICULTY_BUTTON) accentColor = kThemeAccent;
@@ -1076,6 +1129,7 @@ void drawThemedButton(AppState& state, const DRAWITEMSTRUCT* drawItem) {
         else if (id == IDC_MENU_SETTINGS_BUTTON) badgeFill = kThemeAccentBlue;
         else if (id == IDC_MENU_CREDITS_BUTTON) badgeFill = kThemeAccent;
         else if (id == IDC_MENU_APPLY_SETTINGS_BUTTON) badgeFill = kThemeAccentGreen;
+        else if (id == IDC_MENU_RESET_SETTINGS_BUTTON) badgeFill = kThemeWarning;
         else if (id == IDC_MENU_EXIT_BUTTON) badgeFill = RGB(207, 101, 114);
         else if (id == IDC_MENU_BACK_BUTTON) badgeFill = RGB(108, 131, 145);
         HBRUSH badgeBrush = CreateSolidBrush(badgeFill);
@@ -1168,6 +1222,9 @@ LRESULT handleListCustomDraw(AppState& state, LPNMHDR header) {
     auto* draw = reinterpret_cast<NMLVCUSTOMDRAW*>(header);
     if (draw->nmcd.dwDrawStage == CDDS_PREPAINT) {
         return CDRF_NOTIFYITEMDRAW;
+    }
+    if (draw->nmcd.dwDrawStage == (CDDS_ITEMPREPAINT | CDDS_SUBITEM)) {
+        return drawTeamLogoSubItem(state, draw, header->hwndFrom);
     }
     if (draw->nmcd.dwDrawStage != CDDS_ITEMPREPAINT) {
         return CDRF_DODEFAULT;
@@ -1267,7 +1324,7 @@ LRESULT handleListCustomDraw(AppState& state, LPNMHDR header) {
 
     draw->clrText = text;
     draw->clrTextBk = bg;
-    return CDRF_NEWFONT;
+    return CDRF_NEWFONT | CDRF_NOTIFYSUBITEMDRAW;
 }
 
 }  // namespace gui_win32
