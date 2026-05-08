@@ -113,8 +113,10 @@ bool validateLoadedCareerBasics(const Career& career) {
     if (!career.myTeam) return false;
     for (const auto& team : career.allTeams) {
         if (team.name.empty() || team.division.empty() || team.players.empty()) return false;
+        if (team.budget < 0 || team.debt < 0) return false;  // Validate budget/debt non-negative
         for (const auto& player : team.players) {
             if (player.name.empty()) return false;
+            if (player.wage < 0 || player.value < 0) return false;  // Validate player finances
         }
     }
     return true;

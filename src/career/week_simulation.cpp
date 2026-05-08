@@ -45,6 +45,16 @@ void pushUniqueLimited(vector<string>& lines, const string& line, size_t limit =
     lines.push_back(line);
 }
 
+// Safety helpers for vector access
+Team* safeActiveTeamAt(Career& career, size_t index) {
+    if (index >= career.activeTeams.size()) return nullptr;
+    return career.activeTeams[index];
+}
+
+bool isValidWeekIndex(const Career& career, int week) {
+    return week >= 1 && week <= static_cast<int>(career.schedule.size());
+}
+
 Team* scheduledTeam(Career& career, int index) {
     TeamRepository teams(career);
     return teams.getActiveTeamByScheduleIndex(index);
@@ -158,7 +168,7 @@ long long weeklyWage(const Team& team) {
 
 void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore) {
     unordered_map<Team*, int> homeGames;
-    if (career.currentWeek >= 1 && career.currentWeek <= static_cast<int>(career.schedule.size())) {
+    if (isValidWeekIndex(career, career.currentWeek)) {
         for (const auto& match : career.schedule[static_cast<size_t>(career.currentWeek - 1)]) {
             if (Team* home = scheduledTeam(career, match.first)) {
                 homeGames[home]++;
@@ -167,7 +177,7 @@ void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore) {
     }
 
     for (size_t i = 0; i < career.activeTeams.size(); ++i) {
-        Team* team = career.activeTeams[i];
+        Team* team = safeActiveTeamAt(career, i);
         if (!team || i >= pointsBefore.size()) continue;
         const FacilityLevel levels = (team == career.myTeam)
                                          ? career.infrastructure.levels
@@ -1197,7 +1207,9 @@ void processWeekMatches(Career& career, const vector<pair<int, int>>& matches,
     // Calculate points delta for player team
     if (career.myTeam) {
         for (size_t i = 0; i < career.activeTeams.size(); ++i) {
-            if (career.activeTeams[i] == career.myTeam) {
+            if (i >= pointsBefore.size()) break;  // Bounds check
+            Team* team = safeActiveTeamAt(career, i);
+            if (team == career.myTeam) {
                 outMyTeamPointsDelta = career.myTeam->points - pointsBefore[i];
                 break;
             }
@@ -1209,7 +1221,9 @@ void processWeekMatches(Career& career, const vector<pair<int, int>>& matches,
 void updateTeamPhysicalStates(Career& career, const vector<vector<int>>& suspensionsBefore, bool cupWeek) {
     maybeInvokeIdle();
     for (size_t i = 0; i < career.activeTeams.size(); ++i) {
-        Team* team = career.activeTeams[i];
+        if (i >= suspensionsBefore.size()) break;  // Bounds check
+        Team* team = safeActiveTeamAt(career, i);
+        if (!team) continue;  // Safety check
         const auto& snapshot = suspensionsBefore[i];
         size_t limit = min(snapshot.size(), team->players.size());
         for (size_t j = 0; j < limit; ++j) {
