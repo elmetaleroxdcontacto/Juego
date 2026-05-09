@@ -5,6 +5,8 @@
 #include "career/career_reports.h"
 #include "career/career_runtime.h"
 #include "career/career_support.h"
+#include "career/match_center_service.h"
+#include "career/weekly_focus_service.h"
 #include "career/world_state_service.h"
 #include "career/week_simulation.h"
 #include "career/team_management.h"
@@ -115,6 +117,13 @@ void consumeMatchingInboxEntry(vector<string>& inbox, const string& text) {
     }
 }
 
+string latestWeeklyDigestInboxEntry(const Career& career) {
+    for (auto it = career.managerInbox.rbegin(); it != career.managerInbox.rend(); ++it) {
+        if (it->find("[Centro semanal]") != string::npos) return *it;
+    }
+    return {};
+}
+
 ClubUpgrade staffUpgradeForRole(const string& role) {
     const string lower = toLower(trim(role));
     if (lower.find("asistente") != string::npos) return ClubUpgrade::AssistantCoach;
@@ -199,6 +208,28 @@ void syncTeamFromInfrastructure(const Career& career, Team& team) {
     team.assistantCoach = max(team.assistantCoach, 42 + career.infrastructure.levels.facilities * 7);
 }
 
+WeeklyDecision decisionFromLastMatchCenter(const Career& career, int fatiguedPlayers) {
+    const MatchCenterSnapshot& match = career.lastMatchCenter;
+    if (match.opponentName.empty()) return WeeklyDecision::Auto;
+
+    const bool lost = match.myGoals < match.oppGoals;
+    const bool avoidedLoss = match.myGoals >= match.oppGoals;
+    const int xgGap = match.myExpectedGoalsTenths - match.oppExpectedGoalsTenths;
+    const int shotGap = match.myShots - match.oppShots;
+    const int shotOnTargetGap = match.myShotsOnTarget - match.oppShotsOnTarget;
+    const bool attackStalled = match.myExpectedGoalsTenths <= 10 || match.myShots <= 8 ||
+                               (match.myGoals == 0 && match.myExpectedGoalsTenths <= 12);
+    const bool defenseExposed = match.oppExpectedGoalsTenths >= 16 || shotOnTargetGap <= -3 || shotGap <= -6;
+
+    if (avoidedLoss && xgGap >= 4 && fatiguedPlayers >= 2) {
+        return WeeklyDecision::Recovery;
+    }
+    if ((lost && attackStalled) || (lost && defenseExposed) || defenseExposed || attackStalled) {
+        return WeeklyDecision::HighIntensityTraining;
+    }
+    return WeeklyDecision::Auto;
+}
+
 WeeklyDecision chooseAutomaticWeeklyDecision(const Career& career) {
     if (!career.myTeam) return WeeklyDecision::Auto;
     const Team& team = *career.myTeam;
@@ -221,6 +252,8 @@ WeeklyDecision chooseAutomaticWeeklyDecision(const Career& career) {
     }
     if (fatigued >= 4) return WeeklyDecision::Recovery;
     if (lowMorale >= 3 || team.morale < 48) return WeeklyDecision::DressingRoom;
+    const WeeklyDecision matchDecision = decisionFromLastMatchCenter(career, fatigued);
+    if (matchDecision != WeeklyDecision::Auto) return matchDecision;
     if ((objectiveYouth || career.boardYouthTarget > 0) && youth >= 2) return WeeklyDecision::YouthPathway;
     if (!career.lastMatchCenter.opponentName.empty() || nextOpponent(career) != nullptr) {
         return WeeklyDecision::MatchPreparation;
@@ -413,6 +446,48 @@ void registerNegotiatedPromise(Career& career, const Player& player, Negotiation
     });
 }
 
+string recommendedWeeklyDecisionSummary(const Career& career) {
+    const vector<string> options = buildWeeklyDecisionOptions(career);
+    if (options.empty()) return "revisar el centro semanal antes de avanzar";
+
+    string recommendation = options.front();
+    const string marker = "El staff recomienda:";
+    const size_t markerPos = recommendation.find(marker);
+    if (markerPos != string::npos) {
+        recommendation = trim(recommendation.substr(markerPos + marker.size()));
+    }
+    if (recommendation.empty()) recommendation = options.front();
+    return recommendation;
+}
+
+void appendPostWeekActionDigest(Career& career, ServiceResult& result) {
+    if (!result.ok || !career.myTeam) return;
+
+    const weekly_focus_service::WeeklyFocusSnapshot focus =
+        weekly_focus_service::buildWeeklyFocusSnapshot(career, 2, 2, 1);
+    const MatchCenterView matchCenter = match_center_service::buildLastMatchCenter(career, 1, 2);
+    const string decision = recommendedWeeklyDecisionSummary(career);
+
+    vector<string> digest;
+    digest.push_back("Post-semana: " + focus.headline);
+    if (!focus.priorityLines.empty()) {
+        digest.push_back("Prioridad 1: " + focus.priorityLines.front());
+    }
+    if (matchCenter.available && !matchCenter.recommendationLines.empty()) {
+        digest.push_back("Ajuste del partido: " + matchCenter.recommendationLines.front());
+    }
+    digest.push_back("Decision sugerida: " + decision + ".");
+    digest.push_back("Siguiente accion: abre Noticias y usa Instruccion para aplicar la decision semanal.");
+
+    result.messages.insert(result.messages.end(), digest.begin(), digest.end());
+
+    string inboxLine = focus.headline;
+    if (!focus.priorityLines.empty()) inboxLine += " | " + focus.priorityLines.front();
+    inboxLine += " | Decision: " + decision;
+    career.addInboxItem(inboxLine, "Centro semanal");
+    career.addNews("Centro semanal post-simulacion: " + decision + ".");
+}
+
 }  // namespace
 
 ServiceResult startCareerService(Career& career,
@@ -528,7 +603,18 @@ SeasonStepResult simulateSeasonStepService(Career& career, IdleCallback idleCall
 }
 
 ServiceResult simulateCareerWeekService(Career& career, IdleCallback idleCallback) {
-    return toServiceResult(simulateSeasonStepService(career, idleCallback));
+    ServiceResult result = toServiceResult(simulateSeasonStepService(career, idleCallback));
+    appendPostWeekActionDigest(career, result);
+    return result;
+}
+
+bool consumeLatestWeeklyDigestService(Career& career) {
+    for (auto it = career.managerInbox.rbegin(); it != career.managerInbox.rend(); ++it) {
+        if (it->find("[Centro semanal]") == string::npos) continue;
+        career.managerInbox.erase(next(it).base());
+        return true;
+    }
+    return false;
 }
 
 ScoutingSessionResult runScoutingSessionService(Career& career, const string& region, const string& focusPos) {
@@ -1532,7 +1618,11 @@ ServiceResult resolveInboxDecisionService(Career& career) {
     string latestDestination;
     string latestChannel;
     bool scoutingEntry = false;
-    if (hasRealActionableEntry) {
+    const string weeklyDigestText = latestWeeklyDigestInboxEntry(career);
+    if (!weeklyDigestText.empty()) {
+        latestText = weeklyDigestText;
+        latestChannel = "Centro semanal";
+    } else if (hasRealActionableEntry) {
         latestText = actionableEntries.front().text;
         latestCommand = actionableEntries.front().command;
         latestDestination = actionableEntries.front().destination;
@@ -1546,6 +1636,10 @@ ServiceResult resolveInboxDecisionService(Career& career) {
     const string lower = toLower(latestChannel + " " + latestDestination + " " + latestCommand + " " + latestText);
 
     ServiceResult result;
+    const bool weeklyDigestEntry =
+        lower.find("centro semanal") != string::npos ||
+        (lower.find("cockpit semanal") != string::npos && lower.find("decision:") != string::npos) ||
+        lower.find("decision sugerida") != string::npos;
     const bool needsRecovery = lower.find("lesion") != string::npos ||
                                lower.find("fatiga") != string::npos ||
                                lower.find("fisico") != string::npos ||
@@ -1553,7 +1647,13 @@ ServiceResult resolveInboxDecisionService(Career& career) {
                                lower.find("recuperacion") != string::npos ||
                                lower.find("medico") != string::npos ||
                                (!medicalStatuses.empty() && lower.empty());
-    if (needsRecovery) {
+    if (weeklyDigestEntry) {
+        result = applyWeeklyDecisionService(career, WeeklyDecision::Auto);
+        if (result.ok) {
+            result.messages.insert(result.messages.begin(),
+                                   "Decision de inbox: se aplica la recomendacion del cierre semanal.");
+        }
+    } else if (needsRecovery) {
         team.trainingFocus = "Recuperacion";
         int protectedPlayers = 0;
         for (const auto& status : medicalStatuses) {

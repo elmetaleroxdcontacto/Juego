@@ -5,6 +5,7 @@
 #include "career/career_support.h"
 #include "career/dressing_room_service.h"
 #include "career/staff_service.h"
+#include "engine/rivalry_system.h"
 
 #include <algorithm>
 
@@ -57,6 +58,31 @@ bool monthlyObjectiveUnderPressure(const Career& career) {
         return career.boardMonthlyProgress > 0 && career.boardMonthlyProgress > career.boardMonthlyTarget;
     }
     return career.boardMonthlyProgress < career.boardMonthlyTarget;
+}
+
+string nextFixtureVenueLabel(const Career& career) {
+    if (!career.myTeam || career.currentWeek <= 0 ||
+        career.currentWeek > static_cast<int>(career.schedule.size())) {
+        return "";
+    }
+
+    const vector<pair<int, int>>& matches = career.schedule[static_cast<size_t>(career.currentWeek - 1)];
+    for (const auto& match : matches) {
+        if (match.first < 0 || match.second < 0 ||
+            match.first >= static_cast<int>(career.activeTeams.size()) ||
+            match.second >= static_cast<int>(career.activeTeams.size())) {
+            continue;
+        }
+        const Team* home = career.activeTeams[static_cast<size_t>(match.first)];
+        const Team* away = career.activeTeams[static_cast<size_t>(match.second)];
+        if (home == career.myTeam) return "Local";
+        if (away == career.myTeam) return "Visita";
+    }
+    return "";
+}
+
+string regionLabel(const Team& team) {
+    return team.youthRegion.empty() ? "zona sin definir" : team.youthRegion;
 }
 
 }  // namespace
@@ -133,8 +159,34 @@ vector<string> buildCareerStorylines(const Career& career, size_t limit) {
     const int fieldSize = max(1, career.currentCompetitiveFieldSize());
     const int youthCount = youthProjects(team);
 
-    if (opponent && !team.primaryRival.empty() && opponent->name == team.primaryRival) {
-        pushUniqueLine(lines, "Se viene el clasico ante " + opponent->name + ", una semana con carga emocional alta.");
+    if (opponent) {
+        const int rivalryIntensity = getRivalryIntensity(career.rivalryDynamics, team.name, opponent->name);
+        const bool rivalryWeek = areRivalClubs(team, *opponent) || rivalryIntensity >= 65;
+        const string venue = nextFixtureVenueLabel(career);
+        if (rivalryWeek) {
+            pushUniqueLine(lines,
+                           "Semana de clasico ante " + opponent->name +
+                               ": prensa, hinchas y vestuario van a medir cada decision.");
+        }
+        if (venue == "Visita" && !team.youthRegion.empty() && !opponent->youthRegion.empty() &&
+            team.youthRegion != opponent->youthRegion) {
+            pushUniqueLine(lines,
+                           "Semana de viaje: de " + regionLabel(team) + " a " + regionLabel(*opponent) +
+                               " para visitar a " + opponent->name + "; conviene cuidar cargas y ritmo.");
+        } else if (venue == "Visita") {
+            pushUniqueLine(lines,
+                           "Salida de visita ante " + opponent->name +
+                               ": el primer tramo puede marcar si el partido se juega a tu plan o al suyo.");
+        } else if (venue == "Local" && team.fanBase >= opponent->fanBase) {
+            pushUniqueLine(lines,
+                           "Semana de localia fuerte: la hinchada de " + team.name +
+                               " puede empujar, pero tambien exige una postura protagonista.");
+        }
+        if (career.currentWeek >= 4 && abs(team.points - opponent->points) <= 3) {
+            pushUniqueLine(lines,
+                           "Partido bisagra en la tabla: " + team.name + " y " + opponent->name +
+                               " llegan separados por " + to_string(abs(team.points - opponent->points)) + " punto(s).");
+        }
     }
     if (rank > 0 && rank <= max(2, fieldSize / 4)) {
         pushUniqueLine(lines, team.name + " esta en la pelea alta y cada punto empieza a pesar mas.");

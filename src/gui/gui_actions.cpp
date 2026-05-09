@@ -134,6 +134,12 @@ void finalizeAction(AppState& state,
     }
 }
 
+bool dashboardShowsPostWeekDigest(const AppState& state) {
+    return state.currentPage == GuiPage::Dashboard &&
+           (state.currentModel.summary.content.find("Cierre post-semana") != std::string::npos ||
+            state.currentModel.detail.content.find("Cierre post-semana") != std::string::npos);
+}
+
 void pulseFrontendTiming(AppState& state) {
     const int delay = game_settings::pageTransitionDelayMs(state.settings);
     if (delay <= 0) return;
@@ -730,11 +736,19 @@ void runPlanAction(AppState& state) {
 
 void runInstructionAction(AppState& state) {
     if (state.currentPage == GuiPage::Dashboard) {
+        if (dashboardShowsPostWeekDigest(state)) {
+            ServiceResult result = applyWeeklyDecisionService(state.career, WeeklyDecision::Auto);
+            if (result.ok) consumeLatestWeeklyDigestService(state.career);
+            finalizeAction(state, result, "Decision semanal", true);
+            return;
+        }
         finalizeAction(state, holdTeamMeetingService(state.career), "Reunion");
         return;
     }
     if (state.currentPage == GuiPage::News) {
-        finalizeAction(state, applyWeeklyDecisionService(state.career, WeeklyDecision::Auto), "Decision semanal", true);
+        ServiceResult result = applyWeeklyDecisionService(state.career, WeeklyDecision::Auto);
+        if (result.ok) consumeLatestWeeklyDigestService(state.career);
+        finalizeAction(state, result, "Decision semanal", true);
         return;
     }
     if (state.currentPage == GuiPage::Board) {

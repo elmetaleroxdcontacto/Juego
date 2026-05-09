@@ -99,6 +99,7 @@ ServiceResult loadCareerService(Career& career);
 ServiceResult saveCareerService(Career& career);
 SeasonStepResult simulateSeasonStepService(Career& career, IdleCallback idleCallback = nullptr);
 ServiceResult simulateCareerWeekService(Career& career, IdleCallback idleCallback = nullptr);
+bool consumeLatestWeeklyDigestService(Career& career);
 ScoutingSessionResult runScoutingSessionService(Career& career,
                                                 const std::string& region = "Todas",
                                                 const std::string& focusPos = "");

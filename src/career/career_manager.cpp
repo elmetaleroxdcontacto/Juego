@@ -44,12 +44,7 @@ SeasonStepResult CareerManager::simulateSeasonStep(IdleCallback idleCallback) {
 }
 
 ServiceResult CareerManager::simulateWeek(IdleCallback idleCallback) {
-    SeasonStepResult step = seasonManager_.simulateWeek(idleCallback);
-    ServiceResult result;
-    result.ok = step.ok;
-    result.messages = step.week.messages;
-    if (result.messages.empty()) result.messages.push_back(step.ok ? "Semana simulada." : "No se pudo simular la semana.");
-    return result;
+    return simulateCareerWeekService(career_, idleCallback);
 }
 
 TeamRepository& CareerManager::teams() {

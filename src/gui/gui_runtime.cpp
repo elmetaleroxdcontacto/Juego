@@ -42,6 +42,12 @@ std::vector<HWND> pageRefreshTargets(const AppState& state) {
     };
 }
 
+bool dashboardShowsPostWeekDigest(const AppState& state) {
+    return state.currentPage == GuiPage::Dashboard &&
+           (state.currentModel.summary.content.find("Cierre post-semana") != std::string::npos ||
+            state.currentModel.detail.content.find("Cierre post-semana") != std::string::npos);
+}
+
 std::string pageCacheKey(const AppState& state, GuiPage page) {
     std::ostringstream out;
     out << static_cast<int>(page) << "|" << state.currentFilter;
@@ -381,6 +387,10 @@ GuiPage dashboardActionDestinationPage(const std::string& destination) {
     return GuiPage::Dashboard;
 }
 
+bool isApplyDecisionCommand(const std::string& action) {
+    return toLower(trim(action)) == "aplicar decision";
+}
+
 void syncSaveBrowserSelection(AppState& state) {
     if (state.currentPage != GuiPage::Saves || !state.newsList) return;
     int selectedIndex = -1;
@@ -632,7 +642,9 @@ void refreshCurrentPage(AppState& state) {
     updateDynamicStaticText(state, state.newsLabel, friendlyPanelTitle(state.currentModel.feed.title));
     if (state.instructionButton) {
         std::string actionLabel = "Instruccion";
-        if (state.currentPage == GuiPage::Dashboard) actionLabel = "Reunion";
+        if (state.currentPage == GuiPage::Dashboard) {
+            actionLabel = dashboardShowsPostWeekDigest(state) ? "Decidir" : "Reunion";
+        }
         else if (state.currentPage == GuiPage::Squad || state.currentPage == GuiPage::Youth) actionLabel = "Hablar";
         else if (state.currentPage == GuiPage::Board) actionLabel = "Staff";
         else if (state.currentPage == GuiPage::News) actionLabel = "Decidir";
@@ -766,6 +778,22 @@ void activateListAction(AppState& state, int controlId) {
     if (isDashboardActionCueList(state, controlId)) {
         const std::string destination = listViewText(state.transferList, row, 1);
         const std::string action = listViewText(state.transferList, row, 2);
+        if (isApplyDecisionCommand(action)) {
+            if (state.actionInProgress) {
+                setStatus(state, "Accion bloqueada: espera a que termine la simulacion semanal.");
+                return;
+            }
+            ServiceResult result = applyWeeklyDecisionService(state.career, WeeklyDecision::Auto);
+            if (result.ok) {
+                consumeLatestWeeklyDigestService(state.career);
+                syncCombosFromCareer(state);
+                refreshAll(state);
+            }
+            setStatus(state, result.messages.empty()
+                                 ? (result.ok ? "Decision semanal aplicada." : "No se pudo aplicar la decision semanal.")
+                                 : result.messages.back());
+            return;
+        }
         const GuiPage targetPage = dashboardActionDestinationPage(destination);
         if (targetPage == GuiPage::Dashboard && toLower(trim(action)) == "simular") {
             if (state.actionInProgress) {

@@ -5416,6 +5416,79 @@ Fecha: 2026-04-04
 - `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
 
+## Avance gameplay - resolver cierre semanal desde Noticias e inbox (2026-05-08)
+
+### Cambios aplicados
+- `Noticias -> Instruccion` ahora aplica la decision semanal automatica y consume el ultimo aviso `[Centro semanal]` si la accion fue exitosa.
+- `resolveInboxDecisionService` ahora detecta primero el ultimo `[Centro semanal]` real del inbox del manager antes de tomar recomendaciones generadas por staff/agenda.
+- Los cierres semanales pendientes se resuelven como recomendacion semanal automatica, no como reunion de directiva/vestuario ni como accion generica.
+- Se agrego `latestWeeklyDigestInboxEntry` como helper interno para localizar el cierre semanal pendiente mas reciente.
+- Se agrego el test `inbox_weekly_digest_decision`, que protege que resolver el inbox aplica el plan semanal correcto, reutiliza el contexto del ultimo partido y elimina el aviso pendiente.
+
+### Archivos modificados
+- `src/career/app_services.cpp`
+- `src/gui/gui_actions.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance gameplay - consumir cierre semanal aplicado (2026-05-08)
+
+### Cambios aplicados
+- Se agrego `consumeLatestWeeklyDigestService` para retirar del inbox el ultimo aviso `[Centro semanal]` cuando la decision sugerida ya fue aplicada.
+- El boton contextual `Decidir` del Dashboard ahora aplica la decision semanal automatica y limpia el cierre post-semana si el resultado fue correcto.
+- La accion `Aplicar decision` del panel de proximas acciones tambien consume el aviso post-semana antes de refrescar la pantalla.
+- El test `post_week_action_digest` ahora verifica que el digest se puede consumir y que no queda pendiente despues de aplicar la decision.
+
+### Archivos modificados
+- `include/career/app_services.h`
+- `src/career/app_services.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_runtime.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance gameplay - cierre semanal accionable y narrativa de rival (2026-05-08)
+
+### Cambios aplicados
+- La simulacion semanal ahora agrega un digest post-semana al resultado del servicio, con headline del cockpit, prioridad principal, ajuste del ultimo partido, decision sugerida y siguiente accion.
+- El digest post-semana tambien queda registrado en el Centro del manager mediante inbox `[Centro semanal]`, para que la recomendacion no se pierda despues de cerrar el estado de simulacion.
+- `CareerManager::simulateWeek` ahora usa `simulateCareerWeekService`, unificando el cierre accionable para GUI y consola.
+- La decision semanal automatica ahora lee el `MatchCenterSnapshot` del ultimo partido antes de caer por defecto en preparar rival.
+- Si el ultimo partido mostro ataque plano, el staff automatico recomienda `Entrenar fuerte` con foco `Ataque`.
+- Si el rival genero demasiado peligro, el staff automatico orienta el microciclo hacia `Defensa`.
+- Si el equipo sostuvo resultado/control y hay carga fisica acumulada, la decision automatica puede priorizar `Recuperacion`.
+- La narrativa semanal de `manager_advice` ahora incorpora contexto del proximo partido: clasico/rivalidad, visita con viaje regional, localia fuerte y partido bisagra por cercania de puntos.
+
+### Tests agregados
+- `post_week_action_digest`: protege que la simulacion cierre con resumen accionable y lo deje en inbox.
+- `auto_weekly_decision_match_context`: protege que el staff automatico use el ultimo partido para elegir ataque o defensa.
+- `career_storylines_fixture_context`: protege que las storylines detecten clasico, viaje y partido bisagra.
+
+### Archivos modificados
+- `src/career/app_services.cpp`
+- `src/career/career_manager.cpp`
+- `src/career/manager_advice.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake -S . -B build-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DBUILD_TESTING=ON` -> configuracion de tests activada.
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
 ## Avance GUI - controles coherentes durante simulacion semanal (2026-05-07)
 
 ### Cambios aplicados

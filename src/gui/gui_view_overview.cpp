@@ -12,6 +12,7 @@
 #include "career/career_support.h"
 #include "utils/utils.h"
 
+#include <algorithm>
 #include <map>
 #include <sstream>
 
@@ -115,6 +116,39 @@ void pushDashboardActionRow(gui_win32::ListPanelModel& model,
     });
 }
 
+std::vector<std::string> latestPostWeekDigestLines(const Career& career) {
+    std::vector<std::string> lines;
+    for (auto it = career.managerInbox.rbegin(); it != career.managerInbox.rend(); ++it) {
+        if (it->find("[Centro semanal]") == std::string::npos) continue;
+
+        std::string entry = *it;
+        const std::string prefix = "[Centro semanal]";
+        const size_t prefixPos = entry.find(prefix);
+        if (prefixPos != std::string::npos) {
+            entry = trim(entry.substr(prefixPos + prefix.size()));
+        }
+
+        const std::vector<std::string> parts = splitByDelimiter(entry, '|');
+        for (const std::string& raw : parts) {
+            const std::string part = trim(raw);
+            if (!part.empty() && std::find(lines.begin(), lines.end(), part) == lines.end()) {
+                lines.push_back(part);
+            }
+            if (lines.size() >= 4) break;
+        }
+        if (lines.empty() && !trim(entry).empty()) lines.push_back(trim(entry));
+        break;
+    }
+    return lines;
+}
+
+std::string postWeekDecisionLine(const std::vector<std::string>& digest) {
+    for (const std::string& line : digest) {
+        if (toLower(line).find("decision:") != std::string::npos) return line;
+    }
+    return digest.empty() ? std::string() : digest.front();
+}
+
 }  // namespace
 
 namespace gui_win32 {
@@ -207,6 +241,7 @@ GuiPageModel buildDashboardModel(AppState& state) {
     const DressingRoomSnapshot dressing = dressing_room_service::buildSnapshot(team, state.career.currentWeek);
     const bool congestedWeek = isCongestedWeek(state.career);
     const auto hubLines = inbox_service::buildPriorityInboxLines(state.career, 5);
+    const auto postWeekDigest = latestPostWeekDigestLines(state.career);
     int injured = 0;
     int lowMorale = 0;
     int suspended = 0;
@@ -239,6 +274,14 @@ GuiPageModel buildDashboardModel(AppState& state) {
 
     model.footer.title = "ActionCuePanel";
     model.footer.columns = {{L"Prioridad", 90}, {L"Destino", 110}, {L"Accion", 150}, {L"Motivo", 420}};
+    model.footer.rows.clear();
+    if (!postWeekDigest.empty()) {
+        pushDashboardActionRow(model.footer,
+                               "Alta",
+                               "Cierre post-semana: " + postWeekDecisionLine(postWeekDigest),
+                               "Inicio",
+                               "Aplicar decision");
+    }
     if (availablePlayers < 18) {
         pushDashboardActionRow(model.footer,
                                "Alta",
@@ -317,6 +360,11 @@ GuiPageModel buildDashboardModel(AppState& state) {
     out << "Moral " << team.morale << " | Lesionados " << injured << " | Tension " << dressing.socialTension << "\r\n";
     out << "Plan semanal: " << team.trainingFocus << (congestedWeek ? " | semana congestionada" : " | semana regular") << "\r\n";
     out << "Objetivo: " << (state.career.boardMonthlyObjective.empty() ? "Sin objetivo mensual activo" : state.career.boardMonthlyObjective) << "\r\n\r\n";
+    if (!postWeekDigest.empty()) {
+        out << "Cierre post-semana\r\n";
+        for (const auto& line : postWeekDigest) out << "- " << line << "\r\n";
+        out << "\r\n";
+    }
     out << "KPIs del club\r\n";
     out << "- Plantel " << playerCount << " | Disponibles " << availablePlayers << "/" << playerCount
         << " | Edad media " << avgAge << "\r\n";
@@ -382,6 +430,11 @@ GuiPageModel buildDashboardModel(AppState& state) {
 
     const auto analyticsLines = analytics_service::buildTeamAnalyticsLines(state.career, team);
     std::ostringstream detail;
+    if (!postWeekDigest.empty()) {
+        detail << "Cierre post-semana\r\n";
+        for (const auto& line : postWeekDigest) detail << "- " << line << "\r\n";
+        detail << "\r\n";
+    }
     detail << "Ultimo resultado\r\n";
     detail << lastMatchPanelText(state.career, 6, 6) << "\r\n\r\n";
     detail << "Impacto inmediato\r\n";

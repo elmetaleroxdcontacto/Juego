@@ -1521,6 +1521,38 @@ void testInboxDecisionPrioritizesRecovery() {
     expect(player.individualInstruction == "Descanso medico", "El jugador en riesgo debe recibir proteccion individual.");
 }
 
+void testInboxDecisionConsumesWeeklyDigest() {
+    Career career;
+    career.currentSeason = 1;
+    career.currentWeek = 4;
+    career.allTeams.push_back(makeTeam("Inbox Semanal", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
+    career.allTeams.push_back(makeTeam("Rival Semanal", "primera division", 66, 2, 2, "Defensive", "Bloque bajo", 620000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Inbox Semanal");
+    expect(career.myTeam != nullptr, "La prueba de cierre semanal necesita club usuario.");
+
+    career.lastMatchCenter.opponentName = "Rival Semanal";
+    career.lastMatchCenter.myGoals = 0;
+    career.lastMatchCenter.oppGoals = 1;
+    career.lastMatchCenter.myShots = 5;
+    career.lastMatchCenter.oppShots = 9;
+    career.lastMatchCenter.myShotsOnTarget = 1;
+    career.lastMatchCenter.oppShotsOnTarget = 3;
+    career.lastMatchCenter.myExpectedGoalsTenths = 7;
+    career.lastMatchCenter.oppExpectedGoalsTenths = 11;
+    career.addInboxItem("Urgente | Cockpit semanal: ataque plano | Decision: Entrenar fuerte", "Centro semanal");
+
+    const ServiceResult result = resolveInboxDecisionService(career);
+    expect(result.ok, "El inbox debe poder resolver un cierre semanal pendiente.");
+    expect(!result.messages.empty() &&
+               result.messages.front().find("cierre semanal") != string::npos,
+           "El cierre semanal debe resolverse como recomendacion semanal, no como alerta generica.");
+    expect(career.myTeam->trainingFocus == "Ataque",
+           "La decision del cierre semanal debe reutilizar el contexto del ultimo partido.");
+    expect(joinLines(career.managerInbox).find("[Centro semanal]") == string::npos,
+           "El cierre semanal resuelto desde inbox debe desaparecer como pendiente.");
+}
+
 void testStaffReviewImprovesWeakestArea() {
     Career career;
     career.currentSeason = 1;
@@ -1877,6 +1909,35 @@ void testManagerAdviceHighlightsUrgentActions() {
            "Las recomendaciones deben detectar gestion emocional urgente.");
     expect(dump.find("Directiva") != string::npos,
            "Las recomendaciones deben detectar presion de directiva.");
+}
+
+void testCareerStorylinesAddChileanFixtureContext() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 6;
+    career.allTeams.push_back(makeTeam("Historia Local", "primera division", 69, 3, 3, "Balanced", "Equilibrado", 720000));
+    career.allTeams.push_back(makeTeam("Historia Rival", "primera division", 68, 4, 4, "Pressing", "Presion alta", 680000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Historia Local");
+    Team* rival = career.findTeamByName("Historia Rival");
+    expect(career.myTeam != nullptr && rival != nullptr,
+           "La narrativa semanal necesita club controlado y rival.");
+
+    career.myTeam->primaryRival = rival->name;
+    career.myTeam->youthRegion = "Metropolitana";
+    rival->youthRegion = "Sur";
+    career.myTeam->points = 12;
+    rival->points = 14;
+    career.schedule = {{}, {}, {}, {}, {}, {{1, 0}}};
+
+    const auto storylines = manager_advice::buildCareerStorylines(career, 8);
+    const string dump = joinLines(storylines);
+    expect(dump.find("Semana de clasico") != string::npos,
+           "La narrativa debe elevar partidos de rivalidad como semana de clasico.");
+    expect(dump.find("Semana de viaje") != string::npos,
+           "La narrativa debe detectar visitas fuera de la zona del club.");
+    expect(dump.find("Partido bisagra") != string::npos,
+           "La narrativa debe marcar duelos cercanos por puntos en la tabla.");
 }
 
 void testTransferBriefingBuildsActionableMarketView() {
@@ -2473,10 +2534,18 @@ void testDashboardActionCueHighlightsHardRisks() {
     team.players[4].fitness = 58;
     team.players[5].contractWeeks = 5;
     team.players[5].wage = 15000;
+    state.career.addInboxItem(
+        "Cockpit semanal: Directiva al frente | Directiva | Confianza 38/100 | Decision: Entrenar fuerte",
+        "Centro semanal");
 
     const gui_win32::GuiPageModel model = gui_win32::buildDashboardModel(state);
     expect(model.footer.title == "ActionCuePanel",
            "El dashboard debe usar el panel de proximas acciones.");
+    expect(!model.footer.rows.empty() &&
+               model.footer.rows.front().size() >= 4 &&
+               model.footer.rows.front()[2] == "Aplicar decision" &&
+               model.footer.rows.front()[3].find("Cierre post-semana") != string::npos,
+           "El cierre post-semana debe aparecer como primera accion ejecutable del dashboard.");
 
     string dump;
     for (const auto& row : model.footer.rows) {
@@ -2493,6 +2562,11 @@ void testDashboardActionCueHighlightsHardRisks() {
 
     expect(model.summary.content.find("Riesgos inmediatos") != string::npos,
            "El resumen de Inicio debe explicar los riesgos fuertes de la semana.");
+    expect(model.summary.content.find("Cierre post-semana") != string::npos &&
+               model.summary.content.find("Decision: Entrenar fuerte") != string::npos,
+           "El dashboard debe mostrar el ultimo cierre semanal accionable en el resumen.");
+    expect(model.detail.content.find("Cierre post-semana") != string::npos,
+           "El panel de detalle debe repetir el cierre semanal junto al ultimo partido.");
 }
 #endif
 
@@ -2734,6 +2808,48 @@ void testSeasonServiceForwardsRuntimeMessages() {
            "SeasonService debe reenviar los mensajes al callback runtime activo.");
 }
 
+void testPostWeekSimulationAddsActionableDigest() {
+    Career career;
+    career.allTeams.push_back(makeTeam("Digest FC", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 700000));
+    career.allTeams.push_back(makeTeam("Digest Rival", "primera division", 68, 4, 3, "Pressing", "Presion alta", 620000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Digest FC");
+    career.managerName = "Manager Digest";
+    career.currentSeason = 1;
+    career.currentWeek = 1;
+    career.boardConfidence = 36;
+    career.boardMonthlyObjective = "Entrar al top 3";
+    career.boardMonthlyTarget = 3;
+    career.boardMonthlyProgress = 5;
+    expect(career.myTeam != nullptr, "El digest post-semana necesita club usuario.");
+    expect(!career.schedule.empty(), "El digest post-semana necesita calendario.");
+
+    CareerRuntimeContext runtime = currentCareerRuntimeContext();
+    runtime.presentation = WeekSimulationPresentation::Compact;
+
+    ServiceResult result;
+    {
+        ScopedCareerRuntimeContext runtimeScope(runtime);
+        result = simulateCareerWeekService(career, idleRuntimeProbe);
+    }
+
+    const string messages = joinLines(result.messages);
+    const string inbox = joinLines(career.managerInbox);
+    expect(result.ok, "La simulacion semanal con digest debe completarse.");
+    expect(messages.find("Post-semana: Cockpit semanal:") != string::npos,
+           "La simulacion debe cerrar con un resumen post-semana accionable.");
+    expect(messages.find("Decision sugerida:") != string::npos,
+           "El digest debe incluir una decision semanal sugerida.");
+    expect(messages.find("Siguiente accion:") != string::npos,
+           "El digest debe indicar el siguiente paso dentro del juego.");
+    expect(inbox.find("[Centro semanal]") != string::npos,
+           "El digest debe quedar tambien en el centro del manager.");
+    expect(consumeLatestWeeklyDigestService(career),
+           "El digest post-semana debe poder consumirse al aplicar la decision sugerida.");
+    expect(joinLines(career.managerInbox).find("[Centro semanal]") == string::npos,
+           "El digest post-semana consumido no debe seguir apareciendo como pendiente.");
+}
+
 void testHumanManagerProfilesPersistAcrossSaveSerialization() {
     Career career;
     career.allTeams.push_back(makeTeam("Control Uno", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 800000));
@@ -2971,6 +3087,52 @@ void testMatchCenterRecommendationsFeedWeeklyDecisionLoop() {
            "El match center debe cerrar el feedback post-partido con una decision semanal sugerida.");
 }
 
+void testAutoWeeklyDecisionUsesMatchCenterContext() {
+    Career career;
+    career.allTeams.push_back(makeTeam("Auto Match FC", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 900000));
+    career.allTeams.push_back(makeTeam("Auto Match Rival", "primera division", 68, 4, 3, "Pressing", "Presion alta", 700000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Auto Match FC");
+    expect(career.myTeam != nullptr, "La decision automatica necesita un club controlado.");
+    career.managerStress = initializeManagerStress();
+    career.managerStress.stressLevel = 20;
+    career.managerStress.energy = 82;
+    career.schedule = {{{0, 1}}};
+
+    career.lastMatchCenter.opponentName = "Auto Match Rival";
+    career.lastMatchCenter.myGoals = 0;
+    career.lastMatchCenter.oppGoals = 1;
+    career.lastMatchCenter.myShots = 5;
+    career.lastMatchCenter.oppShots = 9;
+    career.lastMatchCenter.myShotsOnTarget = 1;
+    career.lastMatchCenter.oppShotsOnTarget = 3;
+    career.lastMatchCenter.myExpectedGoalsTenths = 7;
+    career.lastMatchCenter.oppExpectedGoalsTenths = 11;
+
+    const vector<string> attackOptions = buildWeeklyDecisionOptions(career);
+    expect(!attackOptions.empty() && attackOptions.front().find("Entrenar fuerte") != string::npos,
+           "Si el ultimo partido tuvo ataque plano, el staff automatico debe pedir entrenamiento fuerte.");
+    ServiceResult attackPlan = applyWeeklyDecisionService(career, WeeklyDecision::Auto);
+    expect(attackPlan.ok, "La decision automatica basada en match center debe aplicarse.");
+    expect(career.myTeam->trainingFocus == "Ataque",
+           "Un partido con poca produccion debe orientar el microciclo hacia Ataque.");
+
+    career.lastMatchCenter.myGoals = 1;
+    career.lastMatchCenter.oppGoals = 1;
+    career.lastMatchCenter.myShots = 11;
+    career.lastMatchCenter.oppShots = 18;
+    career.lastMatchCenter.myShotsOnTarget = 4;
+    career.lastMatchCenter.oppShotsOnTarget = 8;
+    career.lastMatchCenter.myExpectedGoalsTenths = 15;
+    career.lastMatchCenter.oppExpectedGoalsTenths = 19;
+    career.managerStress.energy = 82;
+
+    ServiceResult defensivePlan = applyWeeklyDecisionService(career, WeeklyDecision::Auto);
+    expect(defensivePlan.ok, "La decision automatica defensiva debe aplicarse.");
+    expect(career.myTeam->trainingFocus == "Defensa",
+           "Si el rival genero demasiado peligro, el auto-staff debe orientar el trabajo hacia Defensa.");
+}
+
 void testLocalizationSupportsMultipleLanguages() {
     Localization& loc = Localization::getInstance();
     loc.setLanguage(Localization::Language::Spanish);
@@ -3022,6 +3184,7 @@ int main() {
         {"team_meeting", testTeamMeetingImprovesMorale},
         {"player_instruction_service", testPlayerInstructionServiceCyclesInstruction},
         {"inbox_medical_decision", testInboxDecisionPrioritizesRecovery},
+        {"inbox_weekly_digest_decision", testInboxDecisionConsumesWeeklyDigest},
         {"staff_review", testStaffReviewImprovesWeakestArea},
         {"scouting_assignments", testScoutingAssignmentShowsInReport},
         {"role_duty_snapshot", testRoleDutyShapesMatchSnapshot},
@@ -3034,18 +3197,21 @@ int main() {
         {"analytics_inbox_blocks", testAnalyticsAndInboxServicesProduceUsefulBlocks},
         {"manager_hub_digest", testManagerHubDigestCombinesStaffAndAgenda},
         {"manager_advice", testManagerAdviceHighlightsUrgentActions},
+        {"career_storylines_fixture_context", testCareerStorylinesAddChileanFixtureContext},
         {"transfer_briefing", testTransferBriefingBuildsActionableMarketView},
         {"scouting_briefing_uncertainty", testScoutingBriefingMasksUncertainAttributes},
         {"transfer_window_rules", testTransferWindowBlocksImmediateDeals},
         {"market_pulse_window", testMarketPulseReflectsClosedWindow},
         {"career_runtime_scope", testCareerRuntimeScopeRestoresContext},
         {"season_service_runtime_forwarding", testSeasonServiceForwardsRuntimeMessages},
+        {"post_week_action_digest", testPostWeekSimulationAddsActionableDigest},
         {"human_manager_persistence", testHumanManagerProfilesPersistAcrossSaveSerialization},
         {"weekly_dashboard_report", testWeeklyDashboardReportHighlightsHumanManagersAndAgenda},
         {"weekly_focus_snapshot", testWeeklyFocusSnapshotPrioritizesUrgentClubState},
         {"weekly_decision_service", testWeeklyDecisionServiceAppliesActionableConsequences},
         {"debt_infrastructure_consequences", testDebtAndInfrastructureConsequencesAreEnforced},
         {"match_center_weekly_decision_loop", testMatchCenterRecommendationsFeedWeeklyDecisionLoop},
+        {"auto_weekly_decision_match_context", testAutoWeeklyDecisionUsesMatchCenterContext},
         {"personality_cpu_tactics", testTeamPersonalityProfileShapesCpuTactics},
         {"personality_transfer_eval", testTransferEvaluationReflectsClubPersonality},
         {"opponent_personality_report", testOpponentReportIncludesCompetitivePersonality},
