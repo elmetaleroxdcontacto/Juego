@@ -300,6 +300,23 @@ void Career::syncActiveTeamIds() {
     }
 }
 
+void Career::rebuildActiveLeagueTable() {
+    leagueTable.clear();
+    leagueTable.title = divisionDisplay(activeDivision);
+    leagueTable.ruleId = activeDivision;
+    for (int i = 0; i < getActiveTeamCount(); ++i) {
+        if (Team* team = getActiveTeamAt(i)) leagueTable.addTeam(team);
+    }
+    leagueTable.sortTable();
+}
+
+void Career::refreshActiveDivisionTeamLinks() {
+    activeDivision = canonicalDivisionId(activeDivision);
+    activeTeams = activeDivision.empty() ? vector<Team*>() : getDivisionTeams(activeDivision);
+    syncActiveTeamIds();
+    rebuildActiveLeagueTable();
+}
+
 void Career::buildSchedule() {
     schedule.clear();
     int n = getActiveTeamCount();
@@ -332,13 +349,7 @@ void Career::buildSchedule() {
 
 void Career::setActiveDivision(const string& id) {
     activeDivision = canonicalDivisionId(id);
-    activeTeams = getDivisionTeams(activeDivision);
-    syncActiveTeamIds();
-    leagueTable.clear();
-    leagueTable.title = divisionDisplay(activeDivision);
-    leagueTable.ruleId = activeDivision;
-    for (Team* team : activeTeams) leagueTable.addTeam(team);
-    leagueTable.sortTable();
+    refreshActiveDivisionTeamLinks();
     groupNorthIdx.clear();
     groupSouthIdx.clear();
     buildRegionalGroups();

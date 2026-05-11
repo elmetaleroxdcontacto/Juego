@@ -492,9 +492,10 @@ void testTeamRepositoryResolvesStableIds() {
     career.allTeams.back().division = "primera division";
     career.activeTeams.push_back(&career.allTeams[0]);
     career.activeTeams.push_back(&career.allTeams[1]);
-    career.syncActiveTeamIds();
-    career.myTeam = &career.allTeams[1];
     career.activeDivision = "primera division";
+    career.syncActiveTeamIds();
+    career.rebuildActiveLeagueTable();
+    career.myTeam = &career.allTeams[1];
     career.currentSeason = 2;
     career.currentWeek = 7;
 
@@ -510,6 +511,8 @@ void testTeamRepositoryResolvesStableIds() {
     expect(career.activeTeamIds.size() == career.activeTeams.size(),
            "Career debe mantener una lista paralela de IDs activos.");
     expect(career.activeTeamIds[1] == managedId, "La lista de IDs activos debe conservar el orden competitivo.");
+    expect(career.leagueTable.teams.size() == 2 && career.leagueTable.teams[1] == career.myTeam,
+           "La tabla activa debe reconstruirse desde el acceso seguro de equipos activos.");
 
     CareerState snapshot = CareerState::fromCareer(career);
     expect(snapshot.currentSeason == 2 && snapshot.currentWeek == 7,
@@ -527,6 +530,11 @@ void testTeamRepositoryResolvesStableIds() {
            "El acceso activo debe resolver el equipo agregado aunque falte sincronizar IDs.");
     expect(career.getActiveTeamIdAt(2) == career.getTeamIdFor(&career.allTeams[2]),
            "El acceso por ID debe caer al puntero legacy cuando la lista paralela esta desfasada.");
+    career.refreshActiveDivisionTeamLinks();
+    expect(career.activeTeamIds.size() == 3 && career.leagueTable.teams.size() == 3,
+           "Career debe poder relinkear la division activa y reconstruir IDs/tabla sin rehacer calendario.");
+    expect(find(career.leagueTable.teams.begin(), career.leagueTable.teams.end(), &career.allTeams[2]) != career.leagueTable.teams.end(),
+           "El relink activo debe mantener al equipo agregado dentro de la tabla reconstruida.");
 }
 
 void testCareerServiceWrapperProducesGameplayOutputs() {

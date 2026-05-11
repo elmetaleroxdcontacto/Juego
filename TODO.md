@@ -5457,6 +5457,52 @@ Fecha: 2026-04-04
 - `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
 
+## Avance tecnico - relink activo encapsulado en Career (2026-05-11)
+
+### Cambios aplicados
+- Se agrego `Career::refreshActiveDivisionTeamLinks()` para relinkear `activeTeams`, sincronizar `activeTeamIds` y reconstruir `leagueTable` sin rehacer el calendario.
+- `Career::setActiveDivision(...)` reutiliza el nuevo helper antes de reconstruir grupos y fixture.
+- El relink de carrera de la GUI dejo de asignar `career.activeTeams` directamente y delega en `Career`.
+- El test `team_id_repository` cubre el relink completo despues de desincronizar la lista activa.
+- Se ajusto la expectativa del test para validar pertenencia en tabla, no posicion fija, porque `LeagueTable` ordena competitivamente.
+
+### Archivos modificados
+- `include/engine/models.h`
+- `src/engine/career_state.cpp`
+- `src/gui/gui_actions.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `cmake --build build-cmake --config Release --target FootballManagerTests` -> recompilado de test correctamente tras ajustar la expectativa.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance tecnico - reconstruccion centralizada de tabla activa (2026-05-11)
+
+### Cambios aplicados
+- Se agrego `Career::rebuildActiveLeagueTable()` para reconstruir la tabla de liga activa desde `getActiveTeamCount()` y `getActiveTeamAt(...)`.
+- `Career::setActiveDivision(...)` usa el nuevo helper y deja de armar `leagueTable` iterando `activeTeams` directamente.
+- El relink de carrera en GUI reutiliza `rebuildActiveLeagueTable()` despues de sincronizar `activeTeamIds`.
+- El test `team_id_repository` cubre que la tabla activa se reconstruye con el orden competitivo esperado.
+- Se reconfiguro el build local con `BUILD_TESTING=ON` porque el target `FootballManagerTests` no estaba disponible en `build-cmake`.
+
+### Archivos modificados
+- `include/engine/models.h`
+- `src/engine/career_state.cpp`
+- `src/gui/gui_actions.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake -S . -B build-cmake -DBUILD_TESTING=ON` -> configuracion regenerada correctamente.
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
 ## Avance tecnico - servicios comunes con acceso activo seguro (2026-05-11)
 
 ### Cambios aplicados

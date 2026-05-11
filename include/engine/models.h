@@ -375,6 +375,8 @@ struct Career {
     void initializeLeague(bool forceReload = false);
     std::vector<Team*> getDivisionTeams(const std::string& id);
     void syncActiveTeamIds();
+    void rebuildActiveLeagueTable();
+    void refreshActiveDivisionTeamLinks();
     void buildSchedule();
     void setActiveDivision(const std::string& id);
     void resetSeason();

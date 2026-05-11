@@ -250,16 +250,7 @@ void relinkCareerPointers(Career& career, const std::string& teamName) {
     }
 
     career.activeDivision = divisionId;
-    career.activeTeams = divisionId.empty() ? std::vector<Team*>() : career.getDivisionTeams(divisionId);
-    career.syncActiveTeamIds();
-    career.leagueTable.clear();
-    career.leagueTable.title = divisionDisplay(divisionId);
-    career.leagueTable.ruleId = divisionId;
-    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
-        Team* team = career.getActiveTeamAt(i);
-        if (team) career.leagueTable.addTeam(team);
-    }
-    career.leagueTable.sortTable();
+    career.refreshActiveDivisionTeamLinks();
     career.myTeam = teamName.empty() ? nullptr : career.findTeamByName(teamName);
 }
 
