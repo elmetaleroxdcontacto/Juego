@@ -481,7 +481,7 @@ static ValidationResult validateRosterStructure(Career& career) {
 static ValidationResult validateSchedules(Career& career) {
     for (const auto& div : career.divisions) {
         career.setActiveDivision(div.id);
-        if (career.activeTeams.size() < 2) continue;
+        if (career.getActiveTeamCount() < 2) continue;
         if (career.schedule.empty()) {
             return {"Calendarios", false, "Calendario vacio en " + div.id};
         }
@@ -491,16 +491,14 @@ static ValidationResult validateSchedules(Career& career) {
         for (const auto& round : career.schedule) {
             set<int> used;
             for (const auto& match : round) {
-                if (match.first < 0 || match.second < 0 ||
-                    match.first >= static_cast<int>(career.activeTeams.size()) ||
-                    match.second >= static_cast<int>(career.activeTeams.size())) {
+                Team* home = career.getActiveTeamAt(match.first);
+                Team* away = career.getActiveTeamAt(match.second);
+                if (!home || !away) {
                     return {"Calendarios", false, "Indice fuera de rango en " + div.id};
                 }
                 if (!used.insert(match.first).second || !used.insert(match.second).second) {
                     return {"Calendarios", false, "Equipo repetido en una misma fecha de " + div.id};
                 }
-                Team* home = career.activeTeams[match.first];
-                Team* away = career.activeTeams[match.second];
                 if (career.usesGroupFormat()) {
                     bool homeNorth = find(career.groupNorthIdx.begin(), career.groupNorthIdx.end(), match.first) != career.groupNorthIdx.end();
                     bool awayNorth = find(career.groupNorthIdx.begin(), career.groupNorthIdx.end(), match.second) != career.groupNorthIdx.end();
@@ -535,10 +533,10 @@ static ValidationResult validateSaveLoad() {
         return makeFailure("No hay divisiones para validar.");
     }
     career.setActiveDivision(career.divisions.front().id);
-    if (career.activeTeams.empty()) {
+    if (career.getActiveTeamCount() == 0) {
         return makeFailure("No hay equipos en la division inicial.");
     }
-    career.myTeam = career.activeTeams.front();
+    career.myTeam = career.getActiveTeamAt(0);
     career.saveFile = runtimeValidationSavePath();
     const string resolvedValidationSave = resolveProjectPath(career.saveFile);
     auto cleanupValidationSave = [&]() {

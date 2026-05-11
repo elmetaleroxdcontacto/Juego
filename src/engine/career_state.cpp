@@ -61,27 +61,43 @@ LeagueTable buildBoardTable(const vector<Team*>& teams, const string& ruleId) {
     return table;
 }
 
+Team* activeTeamForLegacyTable(const Career& career, int index) {
+    return const_cast<Team*>(career.getActiveTeamAt(index));
+}
+
+bool hasSyncedActiveTeamIds(const Career& career) {
+    if (career.activeTeamIds.empty()) return false;
+    if (career.activeTeamIds.size() != career.activeTeams.size()) return false;
+    for (size_t i = 0; i < career.activeTeamIds.size(); ++i) {
+        const TeamId id = career.activeTeamIds[i];
+        if (id == kInvalidTeamId) return false;
+        if (career.getTeamById(id) != career.activeTeams[i]) return false;
+    }
+    return true;
+}
+
 vector<Team*> boardRelevantTeams(const Career& career) {
     vector<Team*> teams;
     if (!career.myTeam) return teams;
     if (career.usesGroupFormat()) {
         const auto& idx = [&career]() -> const vector<int>& {
             for (int i : career.groupNorthIdx) {
-                if (i >= 0 && i < static_cast<int>(career.activeTeams.size()) &&
-                    career.activeTeams[static_cast<size_t>(i)] == career.myTeam) {
+                if (activeTeamForLegacyTable(career, i) == career.myTeam) {
                     return career.groupNorthIdx;
                 }
             }
             return career.groupSouthIdx;
         }();
         for (int i : idx) {
-            if (i >= 0 && i < static_cast<int>(career.activeTeams.size())) {
-                teams.push_back(career.activeTeams[static_cast<size_t>(i)]);
-            }
+            if (Team* team = activeTeamForLegacyTable(career, i)) teams.push_back(team);
         }
         if (!teams.empty()) return teams;
     }
-    return career.activeTeams;
+    teams.reserve(static_cast<size_t>(career.getActiveTeamCount()));
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        if (Team* team = activeTeamForLegacyTable(career, i)) teams.push_back(team);
+    }
+    return teams;
 }
 
 int youthPlayersUsed(const Team& team) {
@@ -163,7 +179,7 @@ const Team* Career::getTeamAtIndexSafe(int index) const {
 }
 
 int Career::getActiveTeamsCount() const {
-    return static_cast<int>(activeTeams.size());
+    return getActiveTeamCount();
 }
 
 bool Career::isValidTeamIndex(int index) const {
@@ -181,17 +197,17 @@ std::vector<Team*>& Career::getActiveDivisionTeamsRef() {
 bool Career::usesSegundaFormat() const {
     const CompetitionConfig& config = getCompetitionConfig(activeDivision);
     return config.seasonHandler == CompetitionSeasonHandler::SegundaGroups &&
-           (config.expectedTeamCount <= 0 || static_cast<int>(activeTeams.size()) == config.expectedTeamCount);
+           (config.expectedTeamCount <= 0 || getActiveTeamCount() == config.expectedTeamCount);
 }
 
 bool Career::usesTerceraBFormat() const {
     const CompetitionConfig& config = getCompetitionConfig(activeDivision);
     return config.seasonHandler == CompetitionSeasonHandler::TerceraB &&
-           (config.expectedTeamCount <= 0 || static_cast<int>(activeTeams.size()) == config.expectedTeamCount);
+           (config.expectedTeamCount <= 0 || getActiveTeamCount() == config.expectedTeamCount);
 }
 
 bool Career::usesGroupFormat() const {
-    return competitionUsesGroupStage(activeDivision, static_cast<int>(activeTeams.size()));
+    return competitionUsesGroupStage(activeDivision, getActiveTeamCount());
 }
 
 void Career::buildSegundaGroups() {
@@ -205,7 +221,7 @@ void Career::buildRegionalGroups() {
     const CompetitionConfig& config = getCompetitionConfig(activeDivision);
     int split = config.groups.groupSize;
     if (split <= 0) return;
-    for (int i = 0; i < static_cast<int>(activeTeams.size()); ++i) {
+    for (int i = 0; i < getActiveTeamCount(); ++i) {
         if (i < split) groupNorthIdx.push_back(i);
         else groupSouthIdx.push_back(i);
     }
@@ -216,6 +232,7 @@ void Career::initializeLeague(bool forceReload) {
     myTeam = nullptr;
     allTeams.clear();
     activeTeams.clear();
+    activeTeamIds.clear();
     schedule.clear();
     leagueTable.clear();
     groupNorthIdx.clear();
@@ -275,9 +292,17 @@ vector<Team*> Career::getDivisionTeams(const string& id) {
     return out;
 }
 
+void Career::syncActiveTeamIds() {
+    activeTeamIds.clear();
+    activeTeamIds.reserve(activeTeams.size());
+    for (const Team* team : activeTeams) {
+        activeTeamIds.push_back(getTeamIdFor(team));
+    }
+}
+
 void Career::buildSchedule() {
     schedule.clear();
-    int n = static_cast<int>(activeTeams.size());
+    int n = getActiveTeamCount();
     if (n < 2) return;
 
     if (usesGroupFormat()) {
@@ -308,6 +333,7 @@ void Career::buildSchedule() {
 void Career::setActiveDivision(const string& id) {
     activeDivision = canonicalDivisionId(id);
     activeTeams = getDivisionTeams(activeDivision);
+    syncActiveTeamIds();
     leagueTable.clear();
     leagueTable.title = divisionDisplay(activeDivision);
     leagueTable.ruleId = activeDivision;
@@ -418,20 +444,31 @@ const Team* Career::getTeamById(TeamId id) const {
 }
 
 TeamId Career::getActiveTeamIdAt(int index) const {
-    const Team* team = getActiveTeamAt(index);
-    return getTeamIdFor(team);
+    if (index < 0) return kInvalidTeamId;
+    const size_t activeIndex = static_cast<size_t>(index);
+    if (hasSyncedActiveTeamIds(*this) && activeIndex < activeTeamIds.size()) {
+        const TeamId id = activeTeamIds[activeIndex];
+        if (getTeamById(id)) return id;
+    }
+    if (activeIndex >= activeTeams.size()) return kInvalidTeamId;
+    return getTeamIdFor(activeTeams[activeIndex]);
 }
 
 int Career::getActiveTeamCount() const {
+    if (hasSyncedActiveTeamIds(*this)) return static_cast<int>(activeTeamIds.size());
     return static_cast<int>(activeTeams.size());
 }
 
 Team* Career::getActiveTeamAt(int index) {
+    const TeamId id = getActiveTeamIdAt(index);
+    if (Team* team = getTeamById(id)) return team;
     if (index < 0 || index >= static_cast<int>(activeTeams.size())) return nullptr;
     return activeTeams[static_cast<size_t>(index)];
 }
 
 const Team* Career::getActiveTeamAt(int index) const {
+    const TeamId id = getActiveTeamIdAt(index);
+    if (const Team* team = getTeamById(id)) return team;
     if (index < 0 || index >= static_cast<int>(activeTeams.size())) return nullptr;
     return activeTeams[static_cast<size_t>(index)];
 }
@@ -529,9 +566,10 @@ void Career::initializeSeasonCup() {
     cupRemainingTeams.clear();
     cupChampion.clear();
     cupRound = 0;
-    cupActive = activeTeams.size() >= 4;
+    cupActive = getActiveTeamCount() >= 4;
     if (!cupActive) return;
-    for (Team* team : activeTeams) {
+    for (int i = 0; i < getActiveTeamCount(); ++i) {
+        Team* team = getActiveTeamAt(i);
         if (team) cupRemainingTeams.push_back(team->name);
     }
 }

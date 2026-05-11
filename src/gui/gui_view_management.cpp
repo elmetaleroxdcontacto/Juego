@@ -113,12 +113,13 @@ GuiPageModel buildTransfersModel(AppState& state) {
         model.secondary.rows.push_back({"Sin objetivos", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"});
     }
 
+    const Team* myTeam = state.career.myTeam;
     const Team* seller = state.career.findTeamByName(state.selectedTransferClub);
     const Player* player = seller ? findPlayerByName(*seller, state.selectedTransferPlayer) : nullptr;
     auto selectedPreview = std::find_if(targets.begin(), targets.end(), [&](const TransferPreviewItem& item) {
         return item.player == state.selectedTransferPlayer && item.club == state.selectedTransferClub;
     });
-    if (!player) {
+    if (!myTeam || !seller || !player) {
         model.detail.content = "Selecciona un objetivo para ver detalle.";
     } else {
         std::ostringstream detail;
@@ -143,7 +144,7 @@ GuiPageModel buildTransfersModel(AppState& state) {
         }
         detail << "Interes jugador " << playerInterestLabel(state.career, *seller, *player)
                << " | Interes vendedor " << sellerInterestLabel(*seller, *player) << "\r\n";
-        detail << "Rol esperado " << expectedRoleLabel(*state.career.myTeam, *player) << "\r\n";
+        detail << "Rol esperado " << expectedRoleLabel(*myTeam, *player) << "\r\n";
         detail << "Disponibilidad " << (player->contractWeeks <= 12 ? "Contrato corto" : (player->wantsToLeave ? "Abierto a salir" : "Negociacion dura"))
                << " | Agente " << (agentDifficulty(*player) >= 72 ? "duro" : (agentDifficulty(*player) >= 58 ? "exigente" : "manejable")) << "\r\n";
         detail << "Rasgos: " << (player->traits.empty() ? "-" : joinStringValues(player->traits, ", "));

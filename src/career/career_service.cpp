@@ -4,11 +4,30 @@
 #include "career/staff_service.h"
 #include "career/week_simulation.h"
 #include "transfers/transfer_market.h"
-#include "utils/safe_references.h"
 
 #include <algorithm>
 #include <cstddef>
 #include <stdexcept>
+
+namespace {
+
+bool hasValidActiveTeamAccess(const Career& career) {
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        if (!career.getActiveTeamAt(i)) return false;
+    }
+    return true;
+}
+
+bool containsActiveTeam(const Career& career, const Team* target) {
+    const TeamId targetId = career.getTeamIdFor(target);
+    if (targetId == kInvalidTeamId) return false;
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        if (career.getActiveTeamIdAt(i) == targetId) return true;
+    }
+    return false;
+}
+
+}  // namespace
 
 // ============================================================================
 // CareerService Implementation
@@ -21,7 +40,7 @@ void CareerService::simulateWeekMatches() {
         throw std::runtime_error("Career myTeam is null");
     }
     
-    if (!SafeReferences::PointerValidator<Team>::validateContainer(career_.activeTeams)) {
+    if (!hasValidActiveTeamAccess(career_)) {
         throw std::runtime_error("Invalid team pointers in activeTeams");
     }
 
@@ -46,9 +65,8 @@ void CareerService::updatePlayerPhysicalState() {
 void CareerService::processWeeklyFinances() {
     if (!career_.myTeam) return;
     
-    // Validate team pointer is in active teams
-    auto idx = SafeReferences::PointerValidator<Team>::getIndex(career_.myTeam, career_.activeTeams);
-    if (!idx.hasValue()) {
+    // Validate team identity is in the active division.
+    if (!containsActiveTeam(career_, career_.myTeam)) {
         throw std::runtime_error("MyTeam pointer is invalid or not in activeTeams");
     }
     
@@ -233,11 +251,10 @@ bool CareerService::validateCareerState() {
     // Validate all critical pointers
     if (!career_.myTeam) return false;
     
-    auto myTeamIdx = SafeReferences::PointerValidator<Team>::getIndex(career_.myTeam, career_.activeTeams);
-    if (!myTeamIdx.hasValue()) return false;
+    if (!containsActiveTeam(career_, career_.myTeam)) return false;
     
     // Validate all active teams
-    if (!SafeReferences::PointerValidator<Team>::validateContainer(career_.activeTeams)) {
+    if (!hasValidActiveTeamAccess(career_)) {
         return false;
     }
     

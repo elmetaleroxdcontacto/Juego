@@ -5300,6 +5300,28 @@ Fecha: 2026-04-04
 - `cmake --build build-cmake --config Release --target FootballManagerTests`
 - `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
+
+## Avance tecnico - CI con tests y fixtures por TeamId (2026-05-11)
+
+### Cambios aplicados
+- El workflow de Windows ahora configura CMake con `BUILD_TESTING=ON`.
+- CI compila `FootballManager`, `FootballManagerCLI` y `FootballManagerTests`.
+- CI ejecuta `ctest --test-dir build-ci --output-on-failure` antes de la validacion de datos.
+- La vista de fichajes agrega guardas defensivas para no dereferenciar `myTeam`, vendedor o jugador cuando falta contexto.
+- La simulacion semanal ahora resuelve equipos programados mediante `TeamId` antes de obtener el puntero `Team*`, preparando la migracion gradual del calendario y del estado activo hacia IDs estables.
+- Se agregaron helpers locales `safeActiveTeamIdAt`, `ScheduledTeamRef` y `ScheduledMatchRef` para centralizar el acceso seguro a fixtures.
+
+### Archivos modificados
+- `.github/workflows/windows-build.yml`
+- `src/career/week_simulation.cpp`
+- `src/gui/gui_view_management.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
 - `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI` -> compilado correctamente fuera del sandbox tras bloqueo temporal de MinGW con `objects.a`.
 
 ## GUI, ajustes y simulacion semanal no bloqueante (2026-05-07)
@@ -5416,6 +5438,94 @@ Fecha: 2026-04-04
 - `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
 
+## Avance tecnico - snapshots semanales por TeamId (2026-05-11)
+
+### Cambios aplicados
+- `WeekSimulationSnapshots` ahora conserva `activeTeamIds`, suspensiones y puntos previos usando `TeamId`.
+- El calculo del delta de puntos del club controlado busca por `managedTeamId` en vez de depender del indice de `activeTeams`.
+- La restauracion de suspensiones semanales usa IDs capturados al inicio de la semana.
+- Las finanzas semanales cuentan partidos de local con `unordered_map<TeamId, int>` en vez de `unordered_map<Team*, int>`.
+- Se eliminaron helpers internos de acceso por puntero que quedaron obsoletos en `week_simulation.cpp`.
+
+### Archivos modificados
+- `src/career/week_simulation.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance tecnico - servicios comunes con acceso activo seguro (2026-05-11)
+
+### Cambios aplicados
+- `CareerService` valida equipos activos mediante `getActiveTeamCount()`, `getActiveTeamAt(...)` y `getActiveTeamIdAt(...)`, dejando de depender de `SafeReferences` sobre `activeTeams`.
+- `processWeeklyFinances()` y `validateCareerState()` verifican que `myTeam` pertenezca a la division activa por identidad estable de equipo.
+- `career_safety::forEachDivisionTeam(...)` y su variante const recorren la division activa con los helpers seguros de `Career`.
+- `initializeSeasonCup()` carga participantes de copa desde `getActiveTeamAt(...)`.
+
+### Archivos modificados
+- `src/career/career_service.cpp`
+- `src/utils/career_safety.cpp`
+- `src/engine/career_state.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance tecnico - consumidores de calendario con acceso seguro (2026-05-11)
+
+### Cambios aplicados
+- Las vistas comunes de GUI resuelven proximos partidos con `Career::getActiveTeamAt(...)` en vez de indexar `activeTeams` directamente.
+- Los reportes de carrera y tablas de grupos usan un helper local sobre `getActiveTeamAt(...)` para mantener compatibilidad con `LeagueTable`.
+- `nextOpponent(...)` y la lectura de sede del proximo rival ahora usan acceso seguro por indice de calendario.
+- La validacion de calendarios resuelve local/visita con `getActiveTeamAt(...)`, manteniendo los chequeos de equipos repetidos por indice.
+- `career_safety::getTeamOrNull(...)` delega en `Career::getActiveTeamAt(...)`, quedando alineado con `activeTeamIds`.
+- Se eliminaron accesos directos de calendario a `career.activeTeams[...]` en GUI comun, reportes, soporte, consejos del manager, validadores y helpers de seguridad.
+
+### Archivos modificados
+- `src/gui/gui_view_common.cpp`
+- `src/career/career_reports.cpp`
+- `src/career/career_support.cpp`
+- `src/career/manager_advice.cpp`
+- `src/validators/validators.cpp`
+- `src/utils/career_safety.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance tecnico - lista activa paralela por TeamId (2026-05-11)
+
+### Cambios aplicados
+- `Career` ahora conserva `activeTeamIds` como lista paralela a `activeTeams` para migrar gradualmente lejos de punteros crudos.
+- Se agrego `syncActiveTeamIds()` para reconstruir IDs activos desde los punteros existentes mientras dura la transicion.
+- `setActiveDivision(...)` sincroniza `activeTeamIds` despues de cargar equipos activos.
+- El relink de carrera de la GUI sincroniza `activeTeamIds` cuando reconstruye `activeTeams`.
+- `getActiveTeamIdAt(...)` usa `activeTeamIds` como fuente primaria y mantiene fallback a `activeTeams` para flujos legacy/tests.
+- `getActiveTeamAt(...)` resuelve primero por ID estable y cae al puntero legacy si hace falta.
+- El test `team_id_repository` ahora verifica que la lista paralela de IDs activos mantiene tamaño y orden competitivo.
+
+### Archivos modificados
+- `include/engine/models.h`
+- `src/engine/career_state.cpp`
+- `src/gui/gui_actions.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
 ## Avance gameplay - resolver cierre semanal desde Noticias e inbox (2026-05-08)
 
 ### Cambios aplicados
@@ -5528,3 +5638,73 @@ Fecha: 2026-04-04
 - `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
 - `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas.
+
+## Avance tecnico - fallback robusto de activeTeamIds (2026-05-11)
+
+### Cambios aplicados
+- Se agrego verificacion interna para usar `activeTeamIds` solo cuando esta sincronizado con `activeTeams`.
+- Si `activeTeamIds` queda desfasado en tamano o contenido, `getActiveTeamCount`, `getActiveTeamAt` y `getActiveTeamIdAt` caen al vector legacy.
+- El test `team_id_repository` ahora cubre el caso de mutar `activeTeams` despues de sincronizar IDs.
+- La cobertura verifica que el acceso activo y el acceso por ID siguen resolviendo equipos aunque falte llamar a `syncActiveTeamIds()`.
+
+### Archivos modificados
+- `src/engine/career_state.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance tecnico - bucles activos con acceso seguro (2026-05-11)
+
+### Cambios aplicados
+- `startCareerService(...)` selecciona e itera equipos con `getActiveTeamCount()` y `getActiveTeamAt(...)`.
+- La inicializacion de IA rival y rivalidades usa acceso activo seguro.
+- Los reportes de gameplay recorren rivales activos con `getActiveTeamAt(...)`.
+- La transicion de temporada agrega juveniles y reinicia estadisticas mediante acceso activo seguro.
+- El mercado CLI arma destinos de cesion con `getActiveTeamAt(...)`.
+- El relink de GUI arma la tabla de liga desde `getActiveTeamAt(...)`.
+- La carga de saves, validadores y simulacion semanal usan `getActiveTeamCount()` en vez de `activeTeams.empty()/size()`.
+- La busqueda de accesos directos a `career.activeTeams[...]` en codigo de produccion queda reducida a fallbacks legacy internos de `Career`.
+
+### Archivos modificados
+- `src/career/app_services.cpp`
+- `src/career/gameplay_reports.cpp`
+- `src/career/season_transition.cpp`
+- `src/career/week_simulation.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/io/save_serialization.cpp`
+- `src/ui/market_ui.cpp`
+- `src/validators/validators.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance tecnico - grupos y tablas con acceso activo seguro (2026-05-11)
+
+### Cambios aplicados
+- `boardRelevantTeams(...)` ahora resuelve equipos de grupo mediante `Career::getActiveTeamAt(...)`.
+- `Career::usesSegundaFormat`, `usesTerceraBFormat`, `usesGroupFormat`, `buildRegionalGroups` y `buildSchedule` usan `getActiveTeamCount()` como fuente central.
+- `getActiveTeamsCount()` delega en `getActiveTeamCount()`.
+- `initializeSeasonCup()` usa `getActiveTeamCount()` para decidir si hay suficientes equipos.
+- La simulacion semanal usa `getActiveTeamCount()` para snapshots y finanzas, manteniendo IDs como fuente intermedia.
+- La UI de consola arma tablas de grupo con `getActiveTeamAt(...)` en vez de indexar `activeTeams`.
+
+### Archivos modificados
+- `src/engine/career_state.cpp`
+- `src/career/week_simulation.cpp`
+- `src/ui/ui.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.

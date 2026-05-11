@@ -501,12 +501,13 @@ ServiceResult startCareerService(Career& career,
         return result;
     }
     career.setActiveDivision(divisionId);
-    if (career.activeTeams.empty()) {
+    if (career.getActiveTeamCount() == 0) {
         result.messages.push_back("La division seleccionada no tiene equipos.");
         return result;
     }
-    Team* selectedTeam = career.activeTeams.front();
-    for (Team* team : career.activeTeams) {
+    Team* selectedTeam = career.getActiveTeamAt(0);
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        Team* team = career.getActiveTeamAt(i);
         if (team && team->name == teamName) {
             selectedTeam = team;
             break;
@@ -539,7 +540,8 @@ ServiceResult startCareerService(Career& career,
     career.dressingRoomDynamics = initializeDressingRoom(playerNames);
     
     // Inicializar IA rival para todos los equipos
-    for (auto team : career.activeTeams) {
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        Team* team = career.getActiveTeamAt(i);
         if (team != career.myTeam && team) {
             career.rivalAIMap[team->name] = createRivalAI(*team);
         }
@@ -547,7 +549,8 @@ ServiceResult startCareerService(Career& career,
     
     // Inicializar rivalidades
     vector<string> teamNames;
-    for (auto team : career.activeTeams) {
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        Team* team = career.getActiveTeamAt(i);
         if (team) teamNames.push_back(team->name);
     }
     initializeRivalries(teamNames, career.rivalryDynamics);

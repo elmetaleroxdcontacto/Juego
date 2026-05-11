@@ -134,8 +134,10 @@ void advanceToNextSeason(Career& career, SeasonTransitionSummary& summary) {
         career.setActiveDivision(career.activeDivision);
     }
     career.resetSeason();
-    for (Team* team : career.activeTeams) {
-        player_dev::addYouthPlayers(*team, 1);
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        if (Team* team = career.getActiveTeamAt(i)) {
+            player_dev::addYouthPlayers(*team, 1);
+        }
     }
     world_state_service::seedSeasonPromises(career);
     addLine(summary, "Nueva temporada: " + to_string(career.currentSeason) +
@@ -610,8 +612,10 @@ SeasonTransitionSummary endSeasonSegundaDivision(Career& career) {
         playoffSeeds = seedTable.teams;
     }
 
-    for (Team* team : career.activeTeams) {
-        team->resetSeasonStats();
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        if (Team* team = career.getActiveTeamAt(i)) {
+            team->resetSeasonStats();
+        }
     }
 
     Team* champion = simulateSegundaPlayoff(playoffSeeds, summary);

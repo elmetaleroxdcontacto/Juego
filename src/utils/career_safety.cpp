@@ -5,17 +5,11 @@
 namespace career_safety {
 
 Team* getTeamOrNull(Career& career, int index) {
-    if (index < 0 || index >= static_cast<int>(career.activeTeams.size())) {
-        return nullptr;
-    }
-    return career.activeTeams[index];
+    return career.getActiveTeamAt(index);
 }
 
 const Team* getTeamOrNull(const Career& career, int index) {
-    if (index < 0 || index >= static_cast<int>(career.activeTeams.size())) {
-        return nullptr;
-    }
-    return career.activeTeams[index];
+    return career.getActiveTeamAt(index);
 }
 
 Player* findPlayerInTeam(Team& team, const std::string& playerName) {
@@ -38,19 +32,15 @@ const Player* findPlayerInTeam(const Team& team, const std::string& playerName) 
 
 void forEachDivisionTeam(Career& career, 
                         std::function<void(Team&)> callback) {
-    for (auto* teamPtr : career.activeTeams) {
-        if (teamPtr) {
-            callback(*teamPtr);
-        }
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        if (Team* team = career.getActiveTeamAt(i)) callback(*team);
     }
 }
 
 void forEachDivisionTeamConst(const Career& career, 
                              std::function<void(const Team&)> callback) {
-    for (const auto* teamPtr : career.activeTeams) {
-        if (teamPtr) {
-            callback(*teamPtr);
-        }
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        if (const Team* team = career.getActiveTeamAt(i)) callback(*team);
     }
 }
 

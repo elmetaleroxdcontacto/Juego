@@ -30,6 +30,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <limits>
 #include <sstream>
 #include <unordered_map>
 #include <utility>
@@ -45,19 +46,38 @@ void pushUniqueLimited(vector<string>& lines, const string& line, size_t limit =
     lines.push_back(line);
 }
 
-// Safety helpers for vector access
-Team* safeActiveTeamAt(Career& career, size_t index) {
-    if (index >= career.activeTeams.size()) return nullptr;
-    return career.activeTeams[index];
+TeamId safeActiveTeamIdAt(const Career& career, size_t index) {
+    if (index > static_cast<size_t>(numeric_limits<int>::max())) return kInvalidTeamId;
+    return career.getActiveTeamIdAt(static_cast<int>(index));
 }
 
+// Safety helpers for vector access
 bool isValidWeekIndex(const Career& career, int week) {
     return week >= 1 && week <= static_cast<int>(career.schedule.size());
 }
 
-Team* scheduledTeam(Career& career, int index) {
+struct ScheduledTeamRef {
+    TeamId id = kInvalidTeamId;
+    Team* team = nullptr;
+};
+
+struct ScheduledMatchRef {
+    ScheduledTeamRef home;
+    ScheduledTeamRef away;
+
+    bool valid() const {
+        return home.team && away.team;
+    }
+};
+
+ScheduledTeamRef scheduledTeamRef(Career& career, int index) {
     TeamRepository teams(career);
-    return teams.getActiveTeamByScheduleIndex(index);
+    const TeamId id = teams.getActiveTeamIdAt(index);
+    return {id, teams.getTeamById(id)};
+}
+
+ScheduledMatchRef scheduledMatchRef(Career& career, const pair<int, int>& match) {
+    return {scheduledTeamRef(career, match.first), scheduledTeamRef(career, match.second)};
 }
 
 FacilityLevel facilityLevelsForTeam(const Team& team) {
@@ -166,24 +186,27 @@ long long weeklyWage(const Team& team) {
     return total * divisionWageFactor(team.division) / 100;
 }
 
-void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore) {
-    unordered_map<Team*, int> homeGames;
+void applyWeeklyFinances(Career& career, const unordered_map<TeamId, int>& pointsBefore) {
+    unordered_map<TeamId, int> homeGames;
     if (isValidWeekIndex(career, career.currentWeek)) {
         for (const auto& match : career.schedule[static_cast<size_t>(career.currentWeek - 1)]) {
-            if (Team* home = scheduledTeam(career, match.first)) {
-                homeGames[home]++;
+            const ScheduledTeamRef home = scheduledTeamRef(career, match.first);
+            if (home.id != kInvalidTeamId && home.team) {
+                homeGames[home.id]++;
             }
         }
     }
 
-    for (size_t i = 0; i < career.activeTeams.size(); ++i) {
-        Team* team = safeActiveTeamAt(career, i);
-        if (!team || i >= pointsBefore.size()) continue;
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        const TeamId teamId = safeActiveTeamIdAt(career, i);
+        Team* team = career.getTeamById(teamId);
+        const auto pointsIt = pointsBefore.find(teamId);
+        if (!team || pointsIt == pointsBefore.end()) continue;
         const FacilityLevel levels = (team == career.myTeam)
                                          ? career.infrastructure.levels
                                          : facilityLevelsForTeam(*team);
         const InfrastructureModifiers infraMods = getModifiersFromFacilities(levels);
-        int pointsDelta = team->points - pointsBefore[i];
+        int pointsDelta = team->points - pointsIt->second;
         if (pointsDelta >= 3) {
             team->fanBase = clampInt(team->fanBase + 1, 10, 99);
         } else if (pointsDelta == 0 && team->fanBase > 12 && randInt(1, 100) <= 30) {
@@ -191,7 +214,7 @@ void applyWeeklyFinances(Career& career, const vector<int>& pointsBefore) {
         }
 
         long long baseTicketIncome =
-            static_cast<long long>(homeGames[team]) * (team->fanBase * 2500LL + team->stadiumLevel * 7000LL);
+            static_cast<long long>(homeGames[teamId]) * (team->fanBase * 2500LL + team->stadiumLevel * 7000LL);
         long long ticketIncome = static_cast<long long>(baseTicketIncome * infraMods.ticketRevenue);
         long long seasonTickets = (career.currentWeek % 4 == 1) ? team->fanBase * 900LL : 0LL;
         long long merchandising = static_cast<long long>(team->fanBase) * 350LL +
@@ -540,7 +563,9 @@ void updateSquadDynamics(Career& career, int pointsDelta) {
 
 void runMonthlyDevelopment(Career& career) {
     if (career.currentWeek <= 0 || career.currentWeek % 4 != 0) return;
-    for (auto* team : career.activeTeams) {
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        Team* team = career.getActiveTeamAt(i);
+        if (!team) continue;
         const development::MonthlyDevelopmentSummary summary =
             development::runMonthlyDevelopmentCycle(*team, career.currentWeek);
         if (team == career.myTeam && summary.improvedPlayers > 0) {
@@ -1149,7 +1174,8 @@ namespace {
 
 // Process all matches scheduled for this week and return points delta for player team
 void processWeekMatches(Career& career, const vector<pair<int, int>>& matches,
-                       const vector<int>& pointsBefore, int& outMyTeamPointsDelta) {
+                        const unordered_map<TeamId, int>& pointsBefore,
+                        int& outMyTeamPointsDelta) {
     LeagueTable northTable;
     LeagueTable southTable;
     bool useGroups = career.usesGroupFormat();
@@ -1158,15 +1184,18 @@ void processWeekMatches(Career& career, const vector<pair<int, int>>& matches,
         southTable = buildCompetitionGroupTable(career, false);
     }
 
+    const TeamId managedTeamId = career.getTeamIdFor(career.myTeam);
     for (const auto& match : matches) {
         maybeInvokeIdle();
-        Team* home = scheduledTeam(career, match.first);
-        Team* away = scheduledTeam(career, match.second);
-        if (!home || !away) {
+        const ScheduledMatchRef fixture = scheduledMatchRef(career, match);
+        Team* home = fixture.home.team;
+        Team* away = fixture.away.team;
+        if (!fixture.valid()) {
             emitUiMessage("[Calendario] Partido omitido por indice de equipo invalido.");
             continue;
         }
-        const bool userControlledMatch = (home == career.myTeam || away == career.myTeam);
+        const bool userControlledMatch =
+            fixture.home.id == managedTeamId || fixture.away.id == managedTeamId;
         const bool verbose =
             userControlledMatch && weekSimulationPresentation() == WeekSimulationPresentation::Detailed;
         team_ai::adjustCpuTactics(*home, *away, career.myTeam);
@@ -1205,26 +1234,27 @@ void processWeekMatches(Career& career, const vector<pair<int, int>>& matches,
     }
 
     // Calculate points delta for player team
-    if (career.myTeam) {
-        for (size_t i = 0; i < career.activeTeams.size(); ++i) {
-            if (i >= pointsBefore.size()) break;  // Bounds check
-            Team* team = safeActiveTeamAt(career, i);
-            if (team == career.myTeam) {
-                outMyTeamPointsDelta = career.myTeam->points - pointsBefore[i];
-                break;
-            }
+    if (managedTeamId != kInvalidTeamId) {
+        Team* managedTeam = career.getTeamById(managedTeamId);
+        const auto pointsIt = pointsBefore.find(managedTeamId);
+        if (managedTeam && pointsIt != pointsBefore.end()) {
+            outMyTeamPointsDelta = managedTeam->points - pointsIt->second;
         }
     }
 }
 
 // Update suspensions, injuries, fitness and training for all teams
-void updateTeamPhysicalStates(Career& career, const vector<vector<int>>& suspensionsBefore, bool cupWeek) {
+void updateTeamPhysicalStates(Career& career,
+                              const vector<TeamId>& activeTeamIds,
+                              const unordered_map<TeamId, vector<int>>& suspensionsBefore,
+                              bool cupWeek) {
     maybeInvokeIdle();
-    for (size_t i = 0; i < career.activeTeams.size(); ++i) {
-        if (i >= suspensionsBefore.size()) break;  // Bounds check
-        Team* team = safeActiveTeamAt(career, i);
+    for (const TeamId teamId : activeTeamIds) {
+        const auto snapshotIt = suspensionsBefore.find(teamId);
+        if (snapshotIt == suspensionsBefore.end()) continue;
+        Team* team = career.getTeamById(teamId);
         if (!team) continue;  // Safety check
-        const auto& snapshot = suspensionsBefore[i];
+        const auto& snapshot = snapshotIt->second;
         size_t limit = min(snapshot.size(), team->players.size());
         for (size_t j = 0; j < limit; ++j) {
             if (snapshot[j] > 0 && team->players[j].matchesSuspended > 0) {
@@ -1276,7 +1306,7 @@ void processTransfersPhase(Career& career) {
     transfer_market::processLoanReturns(career);
 }
 
-void applyFinancesPhase(Career& career, const vector<int>& pointsBefore) {
+void applyFinancesPhase(Career& career, const unordered_map<TeamId, int>& pointsBefore) {
     maybeInvokeIdle();
     applyWeeklyFinances(career, pointsBefore);
     maybeInvokeIdle();
@@ -1331,27 +1361,31 @@ void generateWeeklyNarrative(Career& career, int myTeamPointsDelta) {
 }
 
 struct WeekSimulationSnapshots {
-    vector<vector<int>> suspensionsBefore;
-    vector<int> pointsBefore;
+    vector<TeamId> activeTeamIds;
+    unordered_map<TeamId, vector<int>> suspensionsBefore;
+    unordered_map<TeamId, int> pointsBefore;
 };
 
 WeekSimulationSnapshots captureWeekSnapshots(const Career& career) {
     WeekSimulationSnapshots snapshots;
-    snapshots.suspensionsBefore.reserve(career.activeTeams.size());
-    snapshots.pointsBefore.reserve(career.activeTeams.size());
+    const int activeTeamCount = career.getActiveTeamCount();
+    snapshots.activeTeamIds.reserve(static_cast<size_t>(activeTeamCount));
+    snapshots.suspensionsBefore.reserve(static_cast<size_t>(activeTeamCount));
+    snapshots.pointsBefore.reserve(static_cast<size_t>(activeTeamCount));
 
-    for (const Team* team : career.activeTeams) {
+    for (int i = 0; i < activeTeamCount; ++i) {
+        const TeamId teamId = safeActiveTeamIdAt(career, i);
+        const Team* team = career.getTeamById(teamId);
         if (!team) {
-            snapshots.suspensionsBefore.push_back({});
-            snapshots.pointsBefore.push_back(0);
             continue;
         }
 
+        snapshots.activeTeamIds.push_back(teamId);
         vector<int> suspensions;
         suspensions.reserve(team->players.size());
         for (const auto& player : team->players) suspensions.push_back(player.matchesSuspended);
-        snapshots.suspensionsBefore.push_back(std::move(suspensions));
-        snapshots.pointsBefore.push_back(team->points);
+        snapshots.suspensionsBefore.emplace(teamId, std::move(suspensions));
+        snapshots.pointsBefore.emplace(teamId, team->points);
     }
 
     return snapshots;
@@ -1359,7 +1393,7 @@ WeekSimulationSnapshots captureWeekSnapshots(const Career& career) {
 
 void simulateMatchesPhase(Career& career,
                           const vector<pair<int, int>>& matches,
-                          const vector<int>& pointsBefore,
+                          const unordered_map<TeamId, int>& pointsBefore,
                           int& myTeamPointsDelta,
                           bool& cupWeek) {
     processWeekMatches(career, matches, pointsBefore, myTeamPointsDelta);
@@ -1379,8 +1413,11 @@ void simulateMatchesPhase(Career& career,
     }
 }
 
-void updateFitnessPhase(Career& career, const vector<vector<int>>& suspensionsBefore, bool cupWeek) {
-    updateTeamPhysicalStates(career, suspensionsBefore, cupWeek);
+void updateFitnessPhase(Career& career,
+                        const vector<TeamId>& activeTeamIds,
+                        const unordered_map<TeamId, vector<int>>& suspensionsBefore,
+                        bool cupWeek) {
+    updateTeamPhysicalStates(career, activeTeamIds, suspensionsBefore, cupWeek);
     maybeInvokeIdle();
 }
 
@@ -1413,19 +1450,21 @@ void updateGameplaySystemsPhase(Career& career, const vector<pair<int, int>>& ma
         max(1LL, career.myTeam->sponsorWeekly + static_cast<long long>(career.myTeam->fanBase) * 2500LL));
     applyFinancialSanctions(career.debtStatus);
 
+    const TeamId managedTeamId = career.getTeamIdFor(career.myTeam);
     for (const auto& match : matches) {
-        Team* home = scheduledTeam(career, match.first);
-        Team* away = scheduledTeam(career, match.second);
-        if (!home || !away) continue;
+        const ScheduledMatchRef fixture = scheduledMatchRef(career, match);
+        Team* home = fixture.home.team;
+        Team* away = fixture.away.team;
+        if (!fixture.valid()) continue;
 
-        if (home == career.myTeam) {
+        if (fixture.home.id == managedTeamId) {
             RivalryRecord* rivalryRec = getRivalryRecord(career.rivalryDynamics, home->name, away->name);
             if (rivalryRec) rivalryRec->lastMeetingWeek = career.currentWeek;
             const int intensity = getRivalryIntensity(career.rivalryDynamics, home->name, away->name);
             if (intensity > 70) {
                 career.managerStress.pressureIntensity = min(100, career.managerStress.pressureIntensity + 3);
             }
-        } else if (away == career.myTeam) {
+        } else if (fixture.away.id == managedTeamId) {
             RivalryRecord* rivalryRec = getRivalryRecord(career.rivalryDynamics, away->name, home->name);
             if (rivalryRec) rivalryRec->lastMeetingWeek = career.currentWeek;
         }
@@ -1485,7 +1524,7 @@ void advanceCalendarPhase(Career& career) {
 //
 // Esto es una mejora de claridad; no altera la lógica de simulacion ya existente.
 void simulateCareerWeek(Career& career) {
-    if (career.activeTeams.empty() || career.schedule.empty()) {
+    if (career.getActiveTeamCount() == 0 || career.schedule.empty()) {
         emitUiMessage("No hay calendario disponible.");
         return;
     }
@@ -1510,7 +1549,7 @@ void simulateCareerWeek(Career& career) {
                     career.currentWeek == static_cast<int>(career.schedule.size()));
 
     simulateMatchesPhase(career, matches, snapshots.pointsBefore, myTeamPointsDelta, cupWeek);
-    updateFitnessPhase(career, snapshots.suspensionsBefore, cupWeek);
+    updateFitnessPhase(career, snapshots.activeTeamIds, snapshots.suspensionsBefore, cupWeek);
     processTransfersPhase(career);
     applyFinancesPhase(career, snapshots.pointsBefore);
     generateNewsPhase(career, matches, myTeamPointsDelta);

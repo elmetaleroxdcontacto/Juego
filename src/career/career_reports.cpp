@@ -39,16 +39,18 @@ LeagueTable buildTableFromTeams(const vector<Team*>& teams, const string& title,
     return table;
 }
 
+Team* activeTeamForReport(const Career& career, int index) {
+    return const_cast<Team*>(career.getActiveTeamAt(index));
+}
+
 int competitionGroupForTeamInternal(const Career& career, const Team* team) {
     for (int index : career.groupNorthIdx) {
-        if (index >= 0 && index < static_cast<int>(career.activeTeams.size()) &&
-            career.activeTeams[static_cast<size_t>(index)] == team) {
+        if (activeTeamForReport(career, index) == team) {
             return 0;
         }
     }
     for (int index : career.groupSouthIdx) {
-        if (index >= 0 && index < static_cast<int>(career.activeTeams.size()) &&
-            career.activeTeams[static_cast<size_t>(index)] == team) {
+        if (activeTeamForReport(career, index) == team) {
             return 1;
         }
     }
@@ -178,9 +180,7 @@ LeagueTable buildCompetitionGroupTable(const Career& career, bool north) {
     const vector<int>& indices = north ? career.groupNorthIdx : career.groupSouthIdx;
     vector<Team*> teams;
     for (int index : indices) {
-        if (index >= 0 && index < static_cast<int>(career.activeTeams.size())) {
-            teams.push_back(career.activeTeams[static_cast<size_t>(index)]);
-        }
+        if (Team* team = activeTeamForReport(career, index)) teams.push_back(team);
     }
     return buildTableFromTeams(teams, competitionGroupTitle(career.activeDivision, north), career.activeDivision);
 }
@@ -209,9 +209,7 @@ LeagueTable buildRelevantCompetitionTable(const Career& career) {
     }
 
     for (int index : *indices) {
-        if (index >= 0 && index < static_cast<int>(career.activeTeams.size())) {
-            teams.push_back(career.activeTeams[static_cast<size_t>(index)]);
-        }
+        if (Team* team = activeTeamForReport(career, index)) teams.push_back(team);
     }
     string title = competitionGroupTitle(career.activeDivision, group == 0);
     return buildTableFromTeams(teams, title, career.activeDivision);
@@ -259,13 +257,9 @@ CareerReport buildCompetitionReport(const Career& career) {
     if (career.currentWeek >= 1 && career.currentWeek <= static_cast<int>(career.schedule.size())) {
         vector<string> fixtures;
         for (const auto& match : career.schedule[static_cast<size_t>(career.currentWeek - 1)]) {
-            if (match.first < 0 || match.second < 0 ||
-                match.first >= static_cast<int>(career.activeTeams.size()) ||
-                match.second >= static_cast<int>(career.activeTeams.size())) {
-                continue;
-            }
-            Team* home = career.activeTeams[static_cast<size_t>(match.first)];
-            Team* away = career.activeTeams[static_cast<size_t>(match.second)];
+            Team* home = activeTeamForReport(career, match.first);
+            Team* away = activeTeamForReport(career, match.second);
+            if (!home || !away) continue;
             string line = home->name + " vs " + away->name;
             if (home == career.myTeam || away == career.myTeam) line += " <- tu partido";
             fixtures.push_back(line);

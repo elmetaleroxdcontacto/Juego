@@ -31,11 +31,15 @@ jobs:
           -G "MinGW Makefiles"
           -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_CXX_COMPILER=g++
-          -DBUILD_TESTING=OFF
+          -DBUILD_TESTING=ON
 
-      - name: Build GUI and CLI
+      - name: Build GUI, CLI and tests
         shell: msys2 {0}
-        run: cmake --build build-ci --config Release --target FootballManager FootballManagerCLI
+        run: cmake --build build-ci --config Release --target FootballManager FootballManagerCLI FootballManagerTests
+
+      - name: Run tests
+        shell: msys2 {0}
+        run: ctest --test-dir build-ci --output-on-failure
 
       - name: Validate data
         shell: msys2 {0}

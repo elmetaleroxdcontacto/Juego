@@ -11,11 +11,12 @@ GameplaySystemsSnapshot captureGameplaySnapshot(const Career& career) {
     snapshot.managerStateReport = getManagerStatusReport(career.managerStress);
     
     // Rivalidades - mostrar rivalidades vs próximo rival si es posible
-    if (!career.activeTeams.empty() && career.myTeam) {
+    if (career.getActiveTeamCount() > 0 && career.myTeam) {
         snapshot.rivalriesReport = "\n=== RIVALIDADES ===\n";
         snapshot.rivalriesReport += "Tu equipo: " + career.myTeam->name + "\n";
         int rivalCount = 0;
-        for (auto team : career.activeTeams) {
+        for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+            const Team* team = career.getActiveTeamAt(i);
             if (team && team != career.myTeam && rivalCount < 3) {
                 int intensity = getRivalryIntensity(career.rivalryDynamics, career.myTeam->name, team->name);
                 snapshot.rivalriesReport += "- " + team->name + ": intensidad " + std::to_string(intensity) + "/100\n";

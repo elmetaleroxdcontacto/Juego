@@ -68,13 +68,9 @@ string nextFixtureVenueLabel(const Career& career) {
 
     const vector<pair<int, int>>& matches = career.schedule[static_cast<size_t>(career.currentWeek - 1)];
     for (const auto& match : matches) {
-        if (match.first < 0 || match.second < 0 ||
-            match.first >= static_cast<int>(career.activeTeams.size()) ||
-            match.second >= static_cast<int>(career.activeTeams.size())) {
-            continue;
-        }
-        const Team* home = career.activeTeams[static_cast<size_t>(match.first)];
-        const Team* away = career.activeTeams[static_cast<size_t>(match.second)];
+        const Team* home = career.getActiveTeamAt(match.first);
+        const Team* away = career.getActiveTeamAt(match.second);
+        if (!home || !away) continue;
         if (home == career.myTeam) return "Local";
         if (away == career.myTeam) return "Visita";
     }

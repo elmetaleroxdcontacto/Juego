@@ -154,15 +154,11 @@ std::string findNextMatchLine(const Career& career) {
     }
     const auto& fixtures = career.schedule[static_cast<size_t>(career.currentWeek - 1)];
     for (const auto& match : fixtures) {
-        if (match.first < 0 || match.second < 0 ||
-            match.first >= static_cast<int>(career.activeTeams.size()) ||
-            match.second >= static_cast<int>(career.activeTeams.size())) {
-            continue;
-        }
-        Team* home = career.activeTeams[static_cast<size_t>(match.first)];
-        Team* away = career.activeTeams[static_cast<size_t>(match.second)];
+        const Team* home = career.getActiveTeamAt(match.first);
+        const Team* away = career.getActiveTeamAt(match.second);
+        if (!home || !away) continue;
         if (home != career.myTeam && away != career.myTeam) continue;
-        Team* opponent = home == career.myTeam ? away : home;
+        const Team* opponent = home == career.myTeam ? away : home;
         return std::string(home == career.myTeam ? "Local vs " : "Visita vs ") + opponent->name +
                " | " + divisionDisplay(career.activeDivision);
     }
@@ -175,13 +171,9 @@ std::vector<std::vector<std::string> > buildFixtureRows(const Career& career, in
     int added = 0;
     for (int week = std::max(1, career.currentWeek); week <= static_cast<int>(career.schedule.size()) && added < limit; ++week) {
         for (const auto& match : career.schedule[static_cast<size_t>(week - 1)]) {
-            if (match.first < 0 || match.second < 0 ||
-                match.first >= static_cast<int>(career.activeTeams.size()) ||
-                match.second >= static_cast<int>(career.activeTeams.size())) {
-                continue;
-            }
-            Team* home = career.activeTeams[static_cast<size_t>(match.first)];
-            Team* away = career.activeTeams[static_cast<size_t>(match.second)];
+            const Team* home = career.getActiveTeamAt(match.first);
+            const Team* away = career.getActiveTeamAt(match.second);
+            if (!home || !away) continue;
             if (home != career.myTeam && away != career.myTeam) continue;
             rows.push_back({
                 std::to_string(week),

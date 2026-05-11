@@ -492,6 +492,7 @@ void testTeamRepositoryResolvesStableIds() {
     career.allTeams.back().division = "primera division";
     career.activeTeams.push_back(&career.allTeams[0]);
     career.activeTeams.push_back(&career.allTeams[1]);
+    career.syncActiveTeamIds();
     career.myTeam = &career.allTeams[1];
     career.activeDivision = "primera division";
     career.currentSeason = 2;
@@ -506,12 +507,26 @@ void testTeamRepositoryResolvesStableIds() {
     expect(repository.getActiveTeamByScheduleIndex(1) == career.myTeam,
            "El acceso por indice de calendario debe validar y devolver el equipo activo.");
     expect(managedId == career.getActiveTeamIdAt(1), "Career debe exponer IDs seguros para equipos activos.");
+    expect(career.activeTeamIds.size() == career.activeTeams.size(),
+           "Career debe mantener una lista paralela de IDs activos.");
+    expect(career.activeTeamIds[1] == managedId, "La lista de IDs activos debe conservar el orden competitivo.");
 
     CareerState snapshot = CareerState::fromCareer(career);
     expect(snapshot.currentSeason == 2 && snapshot.currentWeek == 7,
            "CareerState debe capturar temporada y semana desde Career.");
     expect(snapshot.activeDivision == "primera division", "CareerState debe capturar la division activa.");
     expect(snapshot.activeTeamCount == 2, "CareerState debe capturar el conteo de equipos activos.");
+
+    career.allTeams.emplace_back("Repo Reserva");
+    career.allTeams.back().division = "primera division";
+    career.activeTeams.push_back(&career.allTeams[2]);
+    expect(career.activeTeamIds.size() == 2, "El test conserva IDs desactualizados para cubrir fallback legacy.");
+    expect(career.getActiveTeamCount() == 3,
+           "Career debe caer a activeTeams si activeTeamIds queda desincronizado.");
+    expect(career.getActiveTeamAt(2) == &career.allTeams[2],
+           "El acceso activo debe resolver el equipo agregado aunque falte sincronizar IDs.");
+    expect(career.getActiveTeamIdAt(2) == career.getTeamIdFor(&career.allTeams[2]),
+           "El acceso por ID debe caer al puntero legacy cuando la lista paralela esta desfasada.");
 }
 
 void testCareerServiceWrapperProducesGameplayOutputs() {

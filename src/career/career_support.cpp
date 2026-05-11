@@ -59,13 +59,9 @@ const Team* nextOpponent(const Career& career) {
     if (!career.myTeam) return nullptr;
     if (career.currentWeek < 1 || career.currentWeek > static_cast<int>(career.schedule.size())) return nullptr;
     for (const auto& match : career.schedule[static_cast<size_t>(career.currentWeek - 1)]) {
-        if (match.first < 0 || match.second < 0 ||
-            match.first >= static_cast<int>(career.activeTeams.size()) ||
-            match.second >= static_cast<int>(career.activeTeams.size())) {
-            continue;
-        }
-        Team* home = career.activeTeams[static_cast<size_t>(match.first)];
-        Team* away = career.activeTeams[static_cast<size_t>(match.second)];
+        const Team* home = career.getActiveTeamAt(match.first);
+        const Team* away = career.getActiveTeamAt(match.second);
+        if (!home || !away) continue;
         if (home == career.myTeam) return away;
         if (away == career.myTeam) return home;
     }

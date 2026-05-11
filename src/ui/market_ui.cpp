@@ -205,7 +205,8 @@ void loanOutPlayerUi(Career& career) {
     if (playerChoice - 1 >= static_cast<int>(candidates.size())) return;
 
     vector<Team*> destinations;
-    for (auto* team : career.activeTeams) {
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        Team* team = career.getActiveTeamAt(i);
         if (!team || team == career.myTeam) continue;
         int maxSquad = getCompetitionConfig(team->division).maxSquadSize;
         if (maxSquad <= 0 || static_cast<int>(team->players.size()) < maxSquad) destinations.push_back(team);

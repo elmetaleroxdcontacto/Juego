@@ -83,9 +83,7 @@ static LeagueTable buildTableFromTeams(const vector<Team*>& teams, const string&
 static LeagueTable buildGroupTable(const Career& career, const vector<int>& idx, const string& title) {
     vector<Team*> teams;
     for (int i : idx) {
-        if (i >= 0 && i < static_cast<int>(career.activeTeams.size())) {
-            teams.push_back(career.activeTeams[i]);
-        }
+        if (Team* team = const_cast<Team*>(career.getActiveTeamAt(i))) teams.push_back(team);
     }
     return buildTableFromTeams(teams, title, career.activeDivision);
 }

@@ -1440,7 +1440,7 @@ bool deserializeCareer(istream& file, Career& career) {
         career.syncActiveHumanManager();
         if (boardExpectedFinish <= 0) career.initializeBoardObjectives();
         if (boardMonthlyObjective.empty()) career.initializeDynamicObjective();
-        if (!cupActive && !career.activeTeams.empty()) career.initializeSeasonCup();
+        if (!cupActive && career.getActiveTeamCount() > 0) career.initializeSeasonCup();
         if (hasIntegrity && !validateLoadedIntegrity(career, expectedIntegrity)) return false;
         if (!validateLoadedCareerBasics(career)) return false;
         return true;
