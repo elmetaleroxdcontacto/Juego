@@ -530,9 +530,11 @@ void testTeamRepositoryResolvesStableIds() {
            "El acceso activo debe resolver el equipo agregado aunque falte sincronizar IDs.");
     expect(career.getActiveTeamIdAt(2) == career.getTeamIdFor(&career.allTeams[2]),
            "El acceso por ID debe caer al puntero legacy cuando la lista paralela esta desfasada.");
-    career.refreshActiveDivisionTeamLinks();
+    career.refreshActiveDivisionTeamLinks("primera division");
     expect(career.activeTeamIds.size() == 3 && career.leagueTable.teams.size() == 3,
            "Career debe poder relinkear la division activa y reconstruir IDs/tabla sin rehacer calendario.");
+    expect(career.activeDivision == "primera division",
+           "El relink activo debe fijar la division canonica desde el parametro recibido.");
     expect(find(career.leagueTable.teams.begin(), career.leagueTable.teams.end(), &career.allTeams[2]) != career.leagueTable.teams.end(),
            "El relink activo debe mantener al equipo agregado dentro de la tabla reconstruida.");
 }

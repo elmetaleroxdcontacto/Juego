@@ -249,8 +249,7 @@ void relinkCareerPointers(Career& career, const std::string& teamName) {
         }
     }
 
-    career.activeDivision = divisionId;
-    career.refreshActiveDivisionTeamLinks();
+    career.refreshActiveDivisionTeamLinks(divisionId);
     career.myTeam = teamName.empty() ? nullptr : career.findTeamByName(teamName);
 }
 

@@ -5457,6 +5457,28 @@ Fecha: 2026-04-04
 - `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
 
+## Avance tecnico - relink activo parametrizado (2026-05-11)
+
+### Cambios aplicados
+- `Career::refreshActiveDivisionTeamLinks(...)` ahora acepta una division destino y la canoniza internamente.
+- La variante sin parametros delega en la variante parametrizada para mantener compatibilidad con llamadas existentes.
+- `Career::setActiveDivision(...)` evita duplicar la asignacion/canonizacion de division activa.
+- El relink de GUI ya no asigna `career.activeDivision` directamente antes de refrescar equipos activos.
+- El test `team_id_repository` verifica que el relink parametrizado fija la division canonica y reconstruye IDs/tabla.
+
+### Archivos modificados
+- `include/engine/models.h`
+- `src/engine/career_state.cpp`
+- `src/gui/gui_actions.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
 ## Avance tecnico - relink activo encapsulado en Career (2026-05-11)
 
 ### Cambios aplicados

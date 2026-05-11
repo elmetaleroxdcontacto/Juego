@@ -377,6 +377,7 @@ struct Career {
     void syncActiveTeamIds();
     void rebuildActiveLeagueTable();
     void refreshActiveDivisionTeamLinks();
+    void refreshActiveDivisionTeamLinks(const std::string& id);
     void buildSchedule();
     void setActiveDivision(const std::string& id);
     void resetSeason();

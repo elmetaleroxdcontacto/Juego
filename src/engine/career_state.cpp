@@ -311,7 +311,11 @@ void Career::rebuildActiveLeagueTable() {
 }
 
 void Career::refreshActiveDivisionTeamLinks() {
-    activeDivision = canonicalDivisionId(activeDivision);
+    refreshActiveDivisionTeamLinks(activeDivision);
+}
+
+void Career::refreshActiveDivisionTeamLinks(const string& id) {
+    activeDivision = canonicalDivisionId(id);
     activeTeams = activeDivision.empty() ? vector<Team*>() : getDivisionTeams(activeDivision);
     syncActiveTeamIds();
     rebuildActiveLeagueTable();
@@ -348,8 +352,7 @@ void Career::buildSchedule() {
 }
 
 void Career::setActiveDivision(const string& id) {
-    activeDivision = canonicalDivisionId(id);
-    refreshActiveDivisionTeamLinks();
+    refreshActiveDivisionTeamLinks(id);
     groupNorthIdx.clear();
     groupSouthIdx.clear();
     buildRegionalGroups();
