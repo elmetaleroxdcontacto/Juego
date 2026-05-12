@@ -101,6 +101,68 @@ int countLinesStartingWith(const vector<string>& lines, const string& prefix) {
     return count;
 }
 
+string testProcessSuffix() {
+#ifdef _WIN32
+    return to_string(static_cast<unsigned long>(GetCurrentProcessId()));
+#else
+    return to_string(static_cast<long long>(getpid()));
+#endif
+}
+
+string processScopedTestPath(const string& path) {
+    const string suffix = "_" + testProcessSuffix();
+    const size_t slash = path.find_last_of("/\\");
+    const size_t dot = path.find_last_of('.');
+    if (dot != string::npos && (slash == string::npos || dot > slash)) {
+        return path.substr(0, dot) + suffix + path.substr(dot);
+    }
+    return path + suffix;
+}
+
+struct ScopedNamedTestLock {
+#ifdef _WIN32
+    HANDLE handle = nullptr;
+
+    explicit ScopedNamedTestLock(const string& name) {
+        handle = CreateMutexA(nullptr, FALSE, name.c_str());
+        if (handle) WaitForSingleObject(handle, INFINITE);
+    }
+
+    ~ScopedNamedTestLock() {
+        if (handle) {
+            ReleaseMutex(handle);
+            CloseHandle(handle);
+        }
+    }
+#else
+    explicit ScopedNamedTestLock(const string&) {}
+#endif
+};
+
+struct ScopedFileRestore {
+    string path;
+    string originalContent;
+    bool existed = false;
+
+    explicit ScopedFileRestore(string p) : path(std::move(p)) {
+        ifstream input(path, ios::binary);
+        if (!input.is_open()) return;
+        existed = true;
+        ostringstream buffer;
+        buffer << input.rdbuf();
+        originalContent = buffer.str();
+    }
+
+    ~ScopedFileRestore() {
+        if (existed) {
+            ofstream output(path, ios::binary | ios::trunc);
+            if (output.is_open()) output << originalContent;
+        } else {
+            std::remove(path.c_str());
+        }
+    }
+};
+
 Player makePlayer(const string& name,
                   const string& position,
                   int skill,
@@ -1031,7 +1093,7 @@ void testSeasonTransitionResolvesCarryoverPromises() {
 }
 
 void testSaveLoadRoundTripPreservesCareerState() {
-    const string savePath = "saves/test_roundtrip_save.txt";
+    const string savePath = processScopedTestPath("saves/test_roundtrip_save.txt");
 
     Career original;
     original.currentSeason = 8;
@@ -1271,13 +1333,14 @@ void testSaveSchemaAndIntegrityRejectCorruptPayload() {
 }
 
 void testExternalJsonLoaderAddsModLeagueAndAdvancedPlayers() {
+    ScopedNamedTestLock modsLock("FootballManagerTests.ExternalJsonMods");
     expect(ensureDirectory("mods"), "La prueba de mods necesita crear la carpeta mods.");
     const string leaguesPath = "mods/leagues.json";
     const string teamsPath = "mods/teams.json";
     const string playersPath = "mods/players.json";
-    std::remove(leaguesPath.c_str());
-    std::remove(teamsPath.c_str());
-    std::remove(playersPath.c_str());
+    ScopedFileRestore restoreLeagues(leaguesPath);
+    ScopedFileRestore restoreTeams(teamsPath);
+    ScopedFileRestore restorePlayers(playersPath);
 
     {
         ofstream leagues(leaguesPath);
@@ -1316,14 +1379,10 @@ void testExternalJsonLoaderAddsModLeagueAndAdvancedPlayers() {
     expect(prospect->potential >= 82 && prospect->personality == "Adaptable" &&
                prospect->discipline == 74 && prospect->injuryProneness == 16 && prospect->adaptation == 86,
            "El loader JSON debe respetar atributos avanzados y tolerar campos faltantes.");
-
-    std::remove(leaguesPath.c_str());
-    std::remove(teamsPath.c_str());
-    std::remove(playersPath.c_str());
 }
 
 void testLoadTeamFromDirectoryFallsBackAndResolvesRawPositions() {
-    const string folderPath = "saves/test_loader_team";
+    const string folderPath = processScopedTestPath("saves/test_loader_team");
     const string playersPath = joinPath(folderPath, "players.txt");
 
     expect(ensureDirectory(folderPath), "No se pudo crear la carpeta temporal del loader.");
@@ -1768,7 +1827,7 @@ void testGameSettingsCycleAndDifficultyImpact() {
 }
 
 void testGameSettingsPersistenceAndFrontendScope() {
-    const string settingsDir = "saves/test_settings_runtime";
+    const string settingsDir = processScopedTestPath("saves/test_settings_runtime");
     const string settingsPath = settingsDir + "/game_settings.cfg";
     std::remove(settingsPath.c_str());
 
@@ -2542,6 +2601,109 @@ void testManagementViewFiltersChangeVisibleContent() {
     const gui_win32::GuiPageModel blockModel = gui_win32::buildTacticsModel(state);
     expect(pressModel.infoLine != blockModel.infoLine,
            "Los filtros tacticos deben cambiar el enfoque visible de la pagina.");
+    string tacticalRows;
+    for (const auto& row : pressModel.primary.rows) {
+        for (const auto& cell : row) tacticalRows += cell + "\n";
+    }
+    string tacticalXi;
+    for (const auto& row : pressModel.secondary.rows) {
+        for (const auto& cell : row) tacticalXi += cell + "\n";
+    }
+    expect(pressModel.summary.content.find("Familiaridad tactica") != string::npos,
+           "La vista de tacticas debe exponer familiaridad tactica en el resumen.");
+    expect(tacticalRows.find("Riesgo plan") != string::npos &&
+               tacticalRows.find("Balance roles") != string::npos,
+           "El tablero tactico debe mostrar riesgo del plan y balance de roles.");
+    expect(pressModel.secondary.columns.size() >= 7 &&
+               (tacticalXi.find("Encaje") != string::npos ||
+                tacticalXi.find("Ajuste") != string::npos ||
+                tacticalXi.find("Riesgo de rol") != string::npos),
+           "El once inicial debe mostrar rol y encaje tactico por jugador.");
+    expect(pressModel.detail.content.find("Lectura de familiaridad") != string::npos,
+           "El detalle tactico debe explicar familiaridad, riesgo y recomendacion.");
+}
+
+void testCalendarModelShowsMatchPreparationPreview() {
+    gui_win32::AppState state;
+    state.currentPage = gui_win32::GuiPage::Calendar;
+    state.currentFilter = "Proximos 5";
+    state.career.allTeams.push_back(makeTeam("Calendario Club", "primera division", 68, 3, 3, "Balanced", "Equilibrado", 850000));
+    state.career.allTeams.push_back(makeTeam("Calendario Rival", "primera division", 73, 5, 4, "Pressing", "Contra-presion", 900000));
+    state.career.setActiveDivision("primera division");
+    state.career.myTeam = state.career.findTeamByName("Calendario Club");
+    expect(state.career.myTeam != nullptr, "La prueba de calendario necesita club usuario.");
+    state.career.currentWeek = 1;
+    state.career.schedule = {{{1, 0}}, {{0, 1}}, {{0, 1}}};
+    state.career.myTeam->players[0].fitness = 55;
+    state.career.myTeam->players[1].fatigueLoad = 65;
+    state.career.myTeam->players[2].fatigueLoad = 68;
+
+    const gui_win32::GuiPageModel model = gui_win32::buildCalendarModel(state);
+    string rows;
+    for (const auto& row : model.secondary.rows) {
+        for (const auto& cell : row) rows += cell + "\n";
+    }
+
+    expect(model.primary.title == "FixtureListView",
+           "Calendario debe conservar la lista de partidos como panel principal.");
+    expect(model.secondary.title == "MatchPrepPanel",
+           "Calendario debe priorizar la preparacion del proximo partido.");
+    expect(model.summary.content.find("Previa:") != string::npos &&
+               model.summary.content.find("Foco sugerido") != string::npos,
+           "El resumen de calendario debe mostrar previa y foco sugerido.");
+    expect(rows.find("Riesgo de fecha") != string::npos &&
+               rows.find("Foco semanal") != string::npos &&
+               rows.find("Calendario Rival") != string::npos,
+           "El panel de preparacion debe mostrar rival, riesgo y foco semanal.");
+    expect(model.detail.content.find("Previa del partido") != string::npos &&
+               model.detail.content.find("Informe rival") != string::npos &&
+               model.detail.content.find("Checklist previo") != string::npos,
+           "El detalle del calendario debe incluir informe rival y checklist previo.");
+}
+
+void testBoardModelShowsInstitutionalPressurePanel() {
+    gui_win32::AppState state;
+    state.currentPage = gui_win32::GuiPage::Board;
+    state.currentFilter = "Objetivos";
+    state.career.allTeams.push_back(makeTeam("Directiva Club", "primera division", 67, 3, 3, "Balanced", "Equilibrado", 90000));
+    state.career.allTeams.push_back(makeTeam("Directiva Rival", "primera division", 72, 4, 4, "Pressing", "Contra-presion", 800000));
+    state.career.setActiveDivision("primera division");
+    state.career.myTeam = state.career.findTeamByName("Directiva Club");
+    expect(state.career.myTeam != nullptr, "La prueba de directiva necesita club usuario.");
+    state.career.currentWeek = 7;
+    state.career.boardConfidence = 28;
+    state.career.boardWarningWeeks = 4;
+    state.career.boardMonthlyObjective = "Entrar al top 3";
+    state.career.boardMonthlyTarget = 3;
+    state.career.boardMonthlyProgress = 6;
+    state.career.boardMonthlyDeadlineWeek = 8;
+    state.career.myTeam->jobSecurity = 31;
+    state.career.myTeam->debt = 400000;
+    for (Player& player : state.career.myTeam->players) player.wage = 30000;
+
+    const gui_win32::GuiPageModel model = gui_win32::buildBoardModel(state);
+    string rows;
+    for (const auto& row : model.primary.rows) {
+        for (const auto& cell : row) rows += cell + "\n";
+    }
+    string profile;
+    for (const auto& row : model.secondary.rows) {
+        for (const auto& cell : row) profile += cell + "\n";
+    }
+
+    expect(model.summary.content.find("Mandato:") != string::npos &&
+               model.summary.content.find("Presion institucional") != string::npos,
+           "Directiva debe resumir mandato y presion institucional.");
+    expect(rows.find("Presion directiva") != string::npos &&
+               rows.find("Mandato") != string::npos &&
+               rows.find("Estado objetivo") != string::npos,
+           "La tabla de objetivos debe incluir presion, mandato y estado del objetivo.");
+    expect(profile.find("Riesgo cargo") != string::npos &&
+               profile.find("Riesgo caja") != string::npos,
+           "El perfil institucional debe mostrar riesgo del cargo y riesgo financiero.");
+    expect(model.detail.content.find("Panel de presion institucional") != string::npos &&
+               model.detail.content.find("Recomendacion") != string::npos,
+           "El detalle de directiva debe explicar la recomendacion institucional.");
 }
 
 void testFinancesModelShowsFairPlayPressure() {
@@ -2572,6 +2734,60 @@ void testFinancesModelShowsFairPlayPressure() {
            "El detalle financiero debe explicar las alertas de fair play.");
 }
 
+void testPlayerProfileShowsFmStyleStaffReport() {
+    Team team = makeTeam("Ficha Club", "primera division", 68, 3, 3, "Balanced", "Equilibrado", 850000);
+    Player& player = team.players.front();
+    player.name = "Volante Informe";
+    player.position = "MED";
+    player.secondaryPositions = {"DEF", "DEL"};
+    player.skill = 74;
+    player.potential = 86;
+    player.attack = 76;
+    player.defense = 64;
+    player.setPieceSkill = 73;
+    player.stamina = 71;
+    player.fitness = 58;
+    player.fatigueLoad = 66;
+    player.leadership = 72;
+    player.professionalism = 81;
+    player.ambition = 75;
+    player.consistency = 48;
+    player.bigMatches = 70;
+    player.tacticalDiscipline = 53;
+    player.discipline = 52;
+    player.adaptation = 78;
+    player.injuryProneness = 72;
+    player.contractWeeks = 10;
+    player.value = 510000;
+    player.wage = 18000;
+    player.releaseClause = 900000;
+    player.currentForm = 73;
+    player.happiness = 44;
+    player.developmentPlan = "Creatividad";
+    player.role = "Organizador";
+    player.roleDuty = "Apoyo";
+    player.individualInstruction = "Pase vertical";
+    player.traits = {"Competidor", "Pase riesgoso"};
+
+    const string profile = gui_win32::buildPlayerProfile(team, &player);
+    expect(profile.find("Atributos tecnicos") != string::npos,
+           "La ficha debe separar atributos tecnicos.");
+    expect(profile.find("Atributos mentales") != string::npos,
+           "La ficha debe separar atributos mentales.");
+    expect(profile.find("Atributos fisicos") != string::npos,
+           "La ficha debe separar atributos fisicos.");
+    expect(profile.find("Contrato y mercado") != string::npos &&
+               profile.find("Valor") != string::npos,
+           "La ficha debe mostrar lectura de contrato y mercado.");
+    expect(profile.find("Informe del staff") != string::npos &&
+               profile.find("Fortalezas") != string::npos &&
+               profile.find("Debilidades") != string::npos &&
+               profile.find("Recomendacion") != string::npos,
+           "La ficha debe incluir informe del staff con fortalezas, debilidades y recomendacion.");
+    expect(profile.find("Contrato corto") != string::npos || profile.find("contrato") != string::npos,
+           "La recomendacion debe detectar riesgo contractual.");
+}
+
 void testTransferFeedStaysMarketFocusedAcrossFilters() {
     gui_win32::AppState state;
     state.currentPage = gui_win32::GuiPage::Transfers;
@@ -2595,6 +2811,39 @@ void testTransferFeedStaysMarketFocusedAcrossFilters() {
            "La vista de mercado debe seguir mostrando noticias de fichajes con el filtro general.");
     expect(allFeed.find("Resultado de copa") == string::npos && defFeed.find("Resultado de copa") == string::npos,
            "El feed de Transfers no debe abrirse a noticias generales por cambiar el filtro de jugadores.");
+}
+
+void testTransferTargetsUseSelectablePrimaryList() {
+    gui_win32::AppState state;
+    state.currentPage = gui_win32::GuiPage::Transfers;
+    state.currentFilter = "Todos";
+    state.career.currentSeason = 2;
+    state.career.currentWeek = 1;
+    state.career.managerReputation = 80;
+    state.career.allTeams.push_back(makeTeam("Seleccion Local", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 1800000));
+    state.career.allTeams.push_back(makeTeam("Seleccion Mercado", "primera division", 68, 3, 3, "Balanced", "Equilibrado", 720000));
+    state.career.allTeams.back().addPlayer(makePlayer("Seleccion Mercado_Extra", "MED", 66, 74, 22, 74, 76));
+    state.career.setActiveDivision("primera division");
+    state.career.myTeam = state.career.findTeamByName("Seleccion Local");
+    expect(state.career.myTeam != nullptr, "La prueba de seleccion de mercado necesita club usuario.");
+    state.career.myTeam->scoutingChief = 20;
+
+    const gui_win32::GuiPageModel model = gui_win32::buildTransfersModel(state);
+    expect(model.primary.title == "TransferMarketView",
+           "Los objetivos comprables/cedibles deben renderizarse en el panel primario conectado a tableList.");
+    expect(model.secondary.title == "TransferSearchPanel",
+           "El panel secundario de Fichajes debe quedar para lectura/filtros, no para acciones de compra.");
+    expect(!model.primary.rows.empty() && model.primary.rows.front().size() > 10,
+           "La tabla de mercado debe exponer Jugador y Club para que Comprar/Pedir cesion identifiquen el objetivo.");
+    expect(state.selectedTransferPlayer == model.primary.rows.front()[0] &&
+               state.selectedTransferClub == model.primary.rows.front()[10],
+           "La seleccion cacheada debe apuntar al mismo jugador/club que la fila seleccionable del mercado.");
+    expect(model.primary.rows.front()[3].find("-") != string::npos &&
+               model.primary.rows.front()[5].find("-") != string::npos,
+           "Con bajo scouting, media y coste deben mostrarse como rangos y no como datos exactos.");
+    expect(model.detail.content.find("Riesgo informe") != string::npos &&
+               model.detail.content.find("Siguiente paso") != string::npos,
+           "El detalle del objetivo debe explicar riesgo de scouting y siguiente accion.");
 }
 
 void testDashboardActionCueHighlightsHardRisks() {
@@ -2674,7 +2923,7 @@ void testTeamsTxtFolderAliasesDoNotTriggerOrphanWarnings() {
 }
 
 void testSaveCareerCreatesBackup() {
-    const string savePath = "saves/test_backup_save.txt";
+    const string savePath = processScopedTestPath("saves/test_backup_save.txt");
     Career career;
     career.currentSeason = 3;
     career.currentWeek = 4;
@@ -2696,7 +2945,7 @@ void testSaveCareerCreatesBackup() {
 }
 
 void testSaveCareerCreatesNestedDirectory() {
-    const string saveDir = "saves/runtime_nested";
+    const string saveDir = processScopedTestPath("saves/runtime_nested");
     const string savePath = saveDir + "/test_nested_save.txt";
     std::remove(savePath.c_str());
     std::remove((savePath + ".bak").c_str());
@@ -2725,7 +2974,7 @@ void testSaveCareerCreatesNestedDirectory() {
 }
 
 void testSaveCareerOverwriteDoesNotKeepTrailingBlocks() {
-    const string savePath = "saves/test_overwrite_structure_save.txt";
+    const string savePath = processScopedTestPath("saves/test_overwrite_structure_save.txt");
     const string resolvedSavePath = resolveProjectPath(savePath);
     std::remove(resolvedSavePath.c_str());
     std::remove((resolvedSavePath + ".bak").c_str());
@@ -2776,10 +3025,11 @@ void testSaveCareerOverwriteDoesNotKeepTrailingBlocks() {
 }
 
 void testProjectPathsResolveFromNestedWorkingDirectory() {
-    const string probeDir = resolveProjectPath("saves/runtime_cwd_probe/nested");
+    const string probeRoot = processScopedTestPath("saves/runtime_cwd_probe");
+    const string probeDir = resolveProjectPath(joinPath(probeRoot, "nested"));
     expect(ensureDirectory(probeDir), "La prueba de cwd necesita crear un directorio de trabajo anidado.");
 
-    const string probeSettingsPath = "saves/runtime_cwd_probe/settings_probe.cfg";
+    const string probeSettingsPath = joinPath(probeRoot, "settings_probe.cfg");
     const string resolvedProbeSettingsPath = resolveProjectPath(probeSettingsPath);
     std::remove(resolvedProbeSettingsPath.c_str());
 
@@ -3323,8 +3573,12 @@ int main() {
         {"loader_fallback", testLoadTeamFromDirectoryFallsBackAndResolvesRawPositions},
 #ifdef _WIN32
         {"management_view_filters", testManagementViewFiltersChangeVisibleContent},
+        {"calendar_match_preview", testCalendarModelShowsMatchPreparationPreview},
+        {"board_pressure_panel", testBoardModelShowsInstitutionalPressurePanel},
         {"finance_fair_play", testFinancesModelShowsFairPlayPressure},
+        {"player_profile_staff_report", testPlayerProfileShowsFmStyleStaffReport},
         {"transfer_feed_focus", testTransferFeedStaysMarketFocusedAcrossFilters},
+        {"transfer_selection_source", testTransferTargetsUseSelectablePrimaryList},
         {"dashboard_action_cue", testDashboardActionCueHighlightsHardRisks},
 #endif
     };

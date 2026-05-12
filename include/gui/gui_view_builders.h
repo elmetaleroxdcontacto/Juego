@@ -22,6 +22,9 @@ struct TransferPreviewItem {
     long long expectedFee = 0;
     long long expectedWage = 0;
     long long expectedAgentFee = 0;
+    std::string expectedFeeLabel;
+    std::string expectedWageLabel;
+    std::string expectedAgentFeeLabel;
     std::string club;
     std::string scoutingLabel;
     std::string marketLabel;
@@ -63,6 +66,8 @@ std::string playerInterestLabel(const Career& career, const Team& seller, const 
 std::string sellerInterestLabel(const Team& seller, const Player& player);
 std::string transferRadarLabel(const TransferTarget& target);
 std::string transferMarketLabel(const TransferTarget& target);
+std::string scoutingRiskLabel(int confidence);
+std::string scoutingNextStepLabel(const TransferPreviewItem& target);
 const Player* findPlayerByName(const Team& team, const std::string& name);
 std::string buildPlayerProfile(const Team& team, const Player* player);
 ListPanelModel buildTeamStatusModel(const Career& career);

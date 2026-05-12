@@ -42,6 +42,135 @@ std::vector<std::string> selectFeedLines(const std::vector<std::string>& source,
     return out;
 }
 
+struct BoardPressureSnapshot {
+    int objectivePercent = 0;
+    int weeksRemaining = 0;
+    int pressureScore = 0;
+    int jobRiskScore = 0;
+    int budgetRiskScore = 0;
+    std::string objectiveState;
+    std::string pressureLabel;
+    std::string mandate;
+    std::string nextMilestone;
+    std::string riskReason;
+    std::string recommendation;
+};
+
+bool isRankingObjective(const std::string& objective) {
+    const std::string lower = toLower(objective);
+    return lower.find("puesto") != std::string::npos ||
+           lower.find("posicion") != std::string::npos ||
+           lower.find("top") != std::string::npos ||
+           lower.find("entrar") != std::string::npos;
+}
+
+std::string boardPressureLabel(int score) {
+    if (score >= 78) return "Critica";
+    if (score >= 58) return "Alta";
+    if (score >= 36) return "Media";
+    return "Controlada";
+}
+
+std::string boardMandateLabel(const Career& career) {
+    if (!career.myTeam) return "Sin mandato activo";
+    if (career.boardConfidence < 25 || career.boardWarningWeeks >= 4) return "Ultimatum deportivo";
+    if (career.boardConfidence < 42 || career.boardWarningWeeks > 0) return "Reaccion inmediata";
+    if (career.boardConfidence >= 72 && career.myTeam->jobSecurity >= 65) return "Proyecto respaldado";
+    if (career.myTeam->transferPolicy.find("Cantera") != std::string::npos) return "Construir valor joven";
+    if (career.myTeam->debt > career.myTeam->budget * 2) return "Orden financiero";
+    return "Cumplir objetivos";
+}
+
+BoardPressureSnapshot buildBoardPressureSnapshot(const Career& career) {
+    BoardPressureSnapshot snapshot;
+    snapshot.weeksRemaining = std::max(0, career.boardMonthlyDeadlineWeek - career.currentWeek);
+    snapshot.mandate = boardMandateLabel(career);
+
+    if (!career.myTeam) {
+        snapshot.objectiveState = "Sin club";
+        snapshot.pressureLabel = "Sin datos";
+        snapshot.nextMilestone = "Inicia una carrera";
+        snapshot.riskReason = "No hay directiva activa.";
+        snapshot.recommendation = "Crear o cargar carrera.";
+        return snapshot;
+    }
+
+    const Team& team = *career.myTeam;
+    const bool hasObjective = !career.boardMonthlyObjective.empty() && career.boardMonthlyTarget > 0;
+    const bool rankingObjective = isRankingObjective(career.boardMonthlyObjective);
+    bool objectiveMet = true;
+    if (hasObjective) {
+        objectiveMet = rankingObjective
+            ? career.boardMonthlyProgress <= career.boardMonthlyTarget
+            : career.boardMonthlyProgress >= career.boardMonthlyTarget;
+        if (rankingObjective) {
+            snapshot.objectivePercent = objectiveMet
+                ? 100
+                : clampInt(100 - (career.boardMonthlyProgress - career.boardMonthlyTarget) * 18, 0, 100);
+        } else {
+            snapshot.objectivePercent = clampInt(career.boardMonthlyProgress * 100 / std::max(1, career.boardMonthlyTarget), 0, 140);
+        }
+    } else {
+        snapshot.objectivePercent = career.boardConfidence;
+    }
+
+    if (!hasObjective) {
+        snapshot.objectiveState = "Sin objetivo mensual";
+        snapshot.nextMilestone = "Mantener confianza " + std::to_string(career.boardConfidence) + "/100";
+    } else if (objectiveMet) {
+        snapshot.objectiveState = "En camino";
+        snapshot.nextMilestone = "Sostener objetivo: " + std::to_string(career.boardMonthlyProgress) +
+                                 "/" + std::to_string(career.boardMonthlyTarget);
+    } else if (snapshot.weeksRemaining <= 1) {
+        snapshot.objectiveState = "Urgente";
+        snapshot.nextMilestone = "Resolver en " + std::to_string(snapshot.weeksRemaining) + " semana(s)";
+    } else {
+        snapshot.objectiveState = "En riesgo";
+        snapshot.nextMilestone = "Cerrar brecha: " + std::to_string(career.boardMonthlyProgress) +
+                                 "/" + std::to_string(career.boardMonthlyTarget);
+    }
+
+    long long weeklyWages = 0;
+    for (const Player& player : team.players) weeklyWages += player.wage;
+    snapshot.budgetRiskScore = team.budget < weeklyWages * 5 ? 26 : (team.debt > team.budget * 2 ? 18 : 0);
+    snapshot.jobRiskScore = clampInt((100 - team.jobSecurity) * 2 / 3 + std::max(0, 45 - career.boardConfidence), 0, 100);
+
+    int pressure = 100 - career.boardConfidence;
+    pressure += career.boardWarningWeeks * 9;
+    pressure += snapshot.jobRiskScore / 3;
+    pressure += snapshot.budgetRiskScore;
+    if (hasObjective && !objectiveMet) pressure += snapshot.weeksRemaining <= 1 ? 24 : 14;
+    if (team.morale < 45) pressure += 8;
+    if (team.points < std::max(0, career.currentWeek - 1)) pressure += 6;
+    snapshot.pressureScore = clampInt(pressure, 0, 100);
+    snapshot.pressureLabel = boardPressureLabel(snapshot.pressureScore);
+
+    if (career.boardConfidence < 35) {
+        snapshot.riskReason = "La confianza de directiva esta por debajo del umbral seguro.";
+    } else if (career.boardWarningWeeks > 0) {
+        snapshot.riskReason = "Hay semanas de advertencia acumuladas.";
+    } else if (hasObjective && !objectiveMet) {
+        snapshot.riskReason = "El objetivo mensual todavia no esta resuelto.";
+    } else if (snapshot.budgetRiskScore > 0) {
+        snapshot.riskReason = "La caja o deuda reduce margen de maniobra.";
+    } else {
+        snapshot.riskReason = "La directiva no ve una amenaza inmediata.";
+    }
+
+    if (snapshot.pressureScore >= 70) {
+        snapshot.recommendation = "Prioriza resultado inmediato y comunica progreso visible a la directiva.";
+    } else if (hasObjective && !objectiveMet) {
+        snapshot.recommendation = "Alinea XI, microciclo y mercado con el objetivo mensual.";
+    } else if (snapshot.budgetRiskScore > 0) {
+        snapshot.recommendation = "Controla salarios y evita compras sin salida previa.";
+    } else if (team.jobSecurity < 45) {
+        snapshot.recommendation = "Mejora estabilidad: staff, vestuario y puntos en la proxima fecha.";
+    } else {
+        snapshot.recommendation = "Mantener proyecto y revisar staff cuando haya margen.";
+    }
+    return snapshot;
+}
+
 }  // namespace
 
 namespace gui_win32 {
@@ -101,8 +230,8 @@ GuiPageModel buildTransfersModel(AppState& state) {
             std::to_string(target.age),
             target.skillLabel.empty() ? std::to_string(target.skill) : target.skillLabel,
             target.potentialLabel.empty() ? std::to_string(target.potential) : target.potentialLabel,
-            formatMoneyValue(target.expectedFee),
-            formatMoneyValue(target.expectedWage),
+            target.expectedFeeLabel.empty() ? formatMoneyValue(target.expectedFee) : target.expectedFeeLabel,
+            target.expectedWageLabel.empty() ? formatMoneyValue(target.expectedWage) : target.expectedWageLabel,
             target.scoutingLabel,
             target.marketLabel,
             target.expectedRole,
@@ -129,11 +258,19 @@ GuiPageModel buildTransfersModel(AppState& state) {
                    << " | Potencial " << selectedPreview->potentialLabel
                    << " | Confianza informe " << selectedPreview->scoutingConfidence << "%"
                    << " | Edad " << player->age << "\r\n";
-            detail << "Costo estimado " << formatMoneyValue(selectedPreview->expectedFee)
-                   << " | Agente " << formatMoneyValue(selectedPreview->expectedAgentFee)
-                   << " | Salario esperado " << formatMoneyValue(selectedPreview->expectedWage) << "\r\n";
+            detail << "Costo estimado "
+                   << (selectedPreview->expectedFeeLabel.empty() ? formatMoneyValue(selectedPreview->expectedFee) : selectedPreview->expectedFeeLabel)
+                   << " | Agente "
+                   << (selectedPreview->expectedAgentFeeLabel.empty() ? formatMoneyValue(selectedPreview->expectedAgentFee)
+                                                                      : selectedPreview->expectedAgentFeeLabel)
+                   << " | Salario esperado "
+                   << (selectedPreview->expectedWageLabel.empty() ? formatMoneyValue(selectedPreview->expectedWage)
+                                                                  : selectedPreview->expectedWageLabel)
+                   << "\r\n";
             detail << "Radar " << selectedPreview->scoutingLabel
                    << " | Mercado " << selectedPreview->marketLabel << "\r\n";
+            detail << "Riesgo informe: " << scoutingRiskLabel(selectedPreview->scoutingConfidence) << "\r\n";
+            detail << "Siguiente paso: " << scoutingNextStepLabel(*selectedPreview) << "\r\n";
             detail << "Competencia " << selectedPreview->competitionLabel
                    << " | Recomendacion " << selectedPreview->actionLabel << "\r\n";
             detail << "Plan economico: " << selectedPreview->packageLabel << "\r\n";
@@ -329,7 +466,14 @@ GuiPageModel buildBoardModel(AppState& state) {
     model.feed.title = "AlertPanel / NewsFeedPanel";
     model.feed.lines = alerts;
 
+    const BoardPressureSnapshot boardPressure = buildBoardPressureSnapshot(state.career);
     model.summary.content = buildBoardSummaryService(state.career);
+    model.summary.content += "\r\nMandato: " + boardPressure.mandate +
+                             "\r\nPresion institucional: " + boardPressure.pressureLabel +
+                             " " + std::to_string(boardPressure.pressureScore) + "/100" +
+                             "\r\nObjetivo mensual: " + boardPressure.objectiveState +
+                             " (" + std::to_string(boardPressure.objectivePercent) + "%)" +
+                             "\r\nSiguiente hito: " + boardPressure.nextMilestone;
     model.detail.content = buildBoardSummaryService(state.career);
     if (!actionLines.empty()) {
         model.detail.content += "\r\n\r\nAcciones sugeridas";
@@ -348,7 +492,12 @@ GuiPageModel buildBoardModel(AppState& state) {
         objectiveRows.push_back({"Puesto esperado", std::to_string(state.career.boardExpectedFinish), "Meta de temporada"});
         objectiveRows.push_back({"Objetivo mensual", state.career.boardMonthlyObjective.empty() ? "Sin objetivo" : state.career.boardMonthlyObjective,
                                  std::to_string(state.career.boardMonthlyProgress) + "/" + std::to_string(state.career.boardMonthlyTarget)});
+        objectiveRows.push_back({"Estado objetivo", boardPressure.objectiveState,
+                                 std::to_string(boardPressure.objectivePercent) + "% | " + boardPressure.nextMilestone});
         objectiveRows.push_back({"Confianza", std::to_string(state.career.boardConfidence) + "/100", boardStatusLabel(state.career.boardConfidence)});
+        objectiveRows.push_back({"Presion directiva", boardPressure.pressureLabel + " " + std::to_string(boardPressure.pressureScore) + "/100",
+                                 boardPressure.riskReason});
+        objectiveRows.push_back({"Mandato", boardPressure.mandate, boardPressure.recommendation});
         objectiveRows.push_back({"Advertencias", std::to_string(state.career.boardWarningWeeks), "Semanas bajo revision"});
 
         Team& team = *state.career.myTeam;
@@ -357,6 +506,10 @@ GuiPageModel buildBoardModel(AppState& state) {
         profileRows.push_back({"DT del club", team.headCoachName, team.headCoachStyle});
         profileRows.push_back({"Antiguedad DT", std::to_string(team.headCoachTenureWeeks) + " sem", "Tiempo del proyecto actual"});
         profileRows.push_back({"Seguridad", std::to_string(team.jobSecurity), "Estabilidad del banquillo"});
+        profileRows.push_back({"Riesgo cargo", std::to_string(boardPressure.jobRiskScore) + "/100",
+                               boardPressure.jobRiskScore >= 60 ? "El banquillo necesita resultados" : "Margen de trabajo razonable"});
+        profileRows.push_back({"Riesgo caja", std::to_string(boardPressure.budgetRiskScore) + "/100",
+                               boardPressure.budgetRiskScore > 0 ? "La directiva vigila la caja" : "Sin presion financiera inmediata"});
         profileRows.push_back({"Politica", team.transferPolicy, "Mercado del club"});
         profileRows.push_back({"Perfil competitivo", teamPersonalityHeadline(team), "Como se refleja la identidad en decisiones CPU"});
         profileRows.push_back({"Red scouting", team.scoutingRegions.empty() ? std::string("-") : joinStringValues(team.scoutingRegions, ", "), "Cobertura activa"});
@@ -384,7 +537,16 @@ GuiPageModel buildBoardModel(AppState& state) {
         model.secondary.rows = profileRows;
         model.footer.rows = historyRows;
         model.feed.lines = objectiveFeed;
-        model.detail.content = buildBoardSummaryService(state.career) + "\r\n\r\nVista priorizada: objetivos y riesgo de directiva.";
+        model.detail.content = buildBoardSummaryService(state.career) +
+                               "\r\n\r\nPanel de presion institucional" +
+                               "\r\n- Mandato: " + boardPressure.mandate +
+                               "\r\n- Presion: " + boardPressure.pressureLabel + " " +
+                               std::to_string(boardPressure.pressureScore) + "/100" +
+                               "\r\n- Objetivo: " + boardPressure.objectiveState + " (" +
+                               std::to_string(boardPressure.objectivePercent) + "%)" +
+                               "\r\n- Motivo: " + boardPressure.riskReason +
+                               "\r\n- Recomendacion: " + boardPressure.recommendation +
+                               "\r\n\r\nVista priorizada: objetivos y riesgo de directiva.";
     } else if (state.currentFilter == "Historial") {
         model.infoLine = "Memoria del proyecto: temporadas previas y contexto institucional.";
         model.primary.title = "CoachHistory";
@@ -404,6 +566,16 @@ GuiPageModel buildBoardModel(AppState& state) {
         model.footer.rows = historyRows;
     }
 
+    if (state.currentFilter != "Objetivos") {
+        model.detail.content += "\r\n\r\nPanel de presion institucional" +
+                                std::string("\r\n- Mandato: ") + boardPressure.mandate +
+                                "\r\n- Presion: " + boardPressure.pressureLabel + " " +
+                                std::to_string(boardPressure.pressureScore) + "/100" +
+                                "\r\n- Objetivo: " + boardPressure.objectiveState + " (" +
+                                std::to_string(boardPressure.objectivePercent) + "%)" +
+                                "\r\n- Motivo: " + boardPressure.riskReason +
+                                "\r\n- Recomendacion: " + boardPressure.recommendation;
+    }
     model.summary.content += "\r\nFiltro actual: " + state.currentFilter;
     return model;
 }

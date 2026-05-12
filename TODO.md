@@ -5983,3 +5983,170 @@ Fecha: 2026-04-04
 - `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron, incluido `transfer_buy_and_loans`.
 - `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Correccion gameplay - seleccion real para comprar y pedir cesion (2026-05-12)
+
+### Cambios aplicados
+- Se comprobo que la lista visible de objetivos en `Fichajes` vive en `tableList`, mientras que los botones de mercado estaban leyendo `squadList`.
+- `Comprar`, `Precontrato` y `Pedir cesion` ahora toman `Jugador` y `Club` desde la fila seleccionada en `tableList`.
+- Si Windows pierde la seleccion al refrescar el panel, las acciones usan la seleccion cacheada `selectedTransferPlayer` / `selectedTransferClub`.
+- Al renderizar listas, la GUI restaura la seleccion visible del objetivo de mercado y del jugador de plantilla/cantera.
+- La seleccion de Fichajes/Plantilla evita refrescar toda la pagina si el click repite el mismo jugador, reduciendo bloqueos o sensacion de quedarse pegado.
+- Se agrego el test `transfer_selection_source` para confirmar que los objetivos comprables/cedibles se renderizan en el panel conectado a `tableList`.
+
+### Archivos modificados
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_runtime.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake -S . -B build-cmake -DBUILD_TESTING=ON` -> configuracion con tests activados.
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron, incluido `transfer_selection_source`.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Mejora gameplay - ficha de jugador estilo manager (2026-05-12)
+
+### Cambios aplicados
+- La ficha del jugador separa atributos tecnicos, mentales y fisicos con lectura resumida del staff.
+- Se agrego lectura de contrato y mercado con valor, clausula, semanas restantes y estado de cesion.
+- El rendimiento muestra titularidades deseadas, forma, moral, momento y quimica.
+- El plan de desarrollo muestra rasgos, grupo social y posiciones secundarias.
+- La disponibilidad cruza historial disciplinario, lesiones y diagnostico medico.
+- Se agrego `Informe del staff` con fortalezas, debilidades y recomendacion accionable.
+- Se agrego el test `player_profile_staff_report` para cubrir la nueva ficha.
+
+### Archivos modificados
+- `src/gui/gui_view_common.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron, incluido `player_profile_staff_report`.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+- `build.bat --verify` -> verificacion completa exitosa.
+
+## Correccion tecnica - aislamiento de tests y proteccion de mods (2026-05-12)
+
+### Cambios aplicados
+- Se reviso el proyecto con compilacion, suite de tests, validacion CLI y busqueda de patrones propensos a errores.
+- Se detecto que varios tests usaban rutas fijas en `saves/`, provocando fallas intermitentes si dos suites se ejecutaban en paralelo.
+- Los archivos temporales de tests ahora agregan un sufijo por proceso para no pisar saves, settings ni carpetas runtime de otra ejecucion.
+- La prueba de loader JSON en `mods/` ahora usa un bloqueo interproceso y restaura los archivos originales si existian.
+- Esto evita borrar mods reales del usuario y reduce falsos negativos en CI o al lanzar verificaciones simultaneas.
+- Se comprobo la correccion ejecutando dos procesos de `FootballManagerTests.exe` al mismo tiempo.
+
+### Archivos modificados
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- Dos procesos paralelos de `.\build-cmake\bin\FootballManagerTests.exe` -> ambos pasaron completos.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+- `build.bat --verify` -> verificacion completa exitosa.
+
+## Mejora GUI - directiva con presion institucional (2026-05-12)
+
+### Cambios aplicados
+- La pantalla `Directiva` ahora resume mandato actual, presion institucional, estado del objetivo mensual y siguiente hito.
+- Se calcula presion directiva usando confianza, advertencias, seguridad del cargo, objetivo mensual, caja/deuda, moral y rendimiento competitivo.
+- La tabla de objetivos agrega `Estado objetivo`, `Presion directiva` y `Mandato` con recomendacion accionable.
+- El perfil institucional agrega `Riesgo cargo` y `Riesgo caja` para explicar estabilidad del banquillo y margen financiero.
+- El detalle agrega `Panel de presion institucional` con motivo de riesgo y recomendacion.
+- Se agrego el test `board_pressure_panel` para proteger la lectura de mandato, presion, objetivo y recomendacion.
+
+### Archivos modificados
+- `src/gui/gui_view_management.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- Pendiente de ejecutar tras este cambio.
+
+### Validacion ejecutada posteriormente
+- `cmake -S . -B build-cmake -DBUILD_TESTING=ON` -> configuracion de tests activada.
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron, incluido `board_pressure_panel`.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+- `build.bat --verify` -> verificacion completa exitosa.
+
+## Mejora GUI - calendario con previa de partido (2026-05-12)
+
+### Cambios aplicados
+- La pantalla `Calendario` ahora muestra una previa del proximo partido con rival, local/visita, riesgo de fecha y foco sugerido.
+- Se calcula riesgo competitivo usando media del rival, moral, visita/localia, clasico, carga de calendario, jugadores cargados y presion de directiva.
+- El panel secundario pasa a `MatchPrepPanel`, con rival, riesgo, foco semanal, carga de calendario, copa y transicion de temporada.
+- El detalle agrega `Previa del partido`, `Informe rival`, `Checklist previo` y microciclo semanal para preparar antes de simular.
+- Se agrego el test `calendar_match_preview` para proteger que Calendario muestre preparacion, informe rival y checklist.
+
+### Archivos modificados
+- `src/gui/gui_view_competition.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- Pendiente de ejecutar tras este cambio.
+
+### Validacion ejecutada posteriormente
+- `cmake -S . -B build-cmake -DBUILD_TESTING=ON` -> configuracion de tests activada.
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron, incluido `calendar_match_preview`.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+- `build.bat --verify` -> verificacion completa exitosa.
+
+## Mejora gameplay - scouting de mercado con incertidumbre (2026-05-12)
+
+### Cambios aplicados
+- La tabla de `Fichajes` muestra coste y salario como rangos cuando la confianza de scouting es baja o media.
+- Los informes fuertes mantienen cifras mas exactas, acercando la lectura al comportamiento de Football Manager.
+- El radar de mercado distingue informes verdes, parciales, fiables y exactos junto al porcentaje de confianza.
+- El detalle del objetivo agrega `Riesgo informe` y `Siguiente paso` para orientar si conviene scout, shortlist, cesion u oferta.
+- El test `transfer_selection_source` ahora verifica que media y coste se muestren como rangos con bajo scouting.
+
+### Archivos modificados
+- `include/gui/gui_view_builders.h`
+- `src/gui/gui_view_common.cpp`
+- `src/gui/gui_view_management.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+- `build.bat --verify` -> verificacion completa exitosa.
+
+## Mejora gameplay - tacticas con familiaridad y encaje de roles (2026-05-12)
+
+### Cambios aplicados
+- La pantalla `Tacticas` ahora calcula familiaridad tactica del XI con disciplina, quimica, forma, fisico, moral y foco semanal.
+- Se agrega riesgo del plan segun presion, ritmo, linea defensiva, congestion de calendario, carga fisica y encaje de roles.
+- El once inicial muestra rol/deber y una lectura de encaje por jugador para detectar piezas fuera de su papel natural.
+- El resumen y el panel de impacto muestran balance de deberes: ataque, apoyo y defensa.
+- El detalle tactico agrega `Lectura de familiaridad` con recomendacion accionable antes de simular.
+- El test `management_view_filters` ahora verifica que Tacticas exponga familiaridad, riesgo, balance de roles y encaje del XI.
+
+### Archivos modificados
+- `src/gui/gui_view_overview.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- Pendiente de ejecutar tras este cambio.
+
+### Validacion ejecutada posteriormente
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron, incluido `management_view_filters`.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+- `build.bat --verify` -> verificacion completa exitosa.

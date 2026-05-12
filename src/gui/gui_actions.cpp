@@ -295,6 +295,28 @@ std::string recommendedLoanDestination(const Career& career, const Player& playe
     return bestTeam ? bestTeam->name : std::string();
 }
 
+bool selectedTransferTarget(AppState& state, std::string& sellerTeamName, std::string& playerName) {
+    int row = selectedListViewRow(state.tableList);
+    if (row >= 0) {
+        playerName = listViewText(state.tableList, row, 0);
+        sellerTeamName = listViewText(state.tableList, row, 10);
+        return !playerName.empty() && !sellerTeamName.empty();
+    }
+    playerName = state.selectedTransferPlayer;
+    sellerTeamName = state.selectedTransferClub;
+    return !playerName.empty() && !sellerTeamName.empty();
+}
+
+bool selectedManagedPlayerName(AppState& state, std::string& playerName) {
+    int row = selectedListViewRow(state.squadList);
+    if (row >= 0) {
+        playerName = listViewText(state.squadList, row, 0);
+        return !playerName.empty();
+    }
+    playerName = state.selectedPlayerName;
+    return !playerName.empty();
+}
+
 void relinkCareerPointers(Career& career, const std::string& teamName) {
     std::string divisionId = career.activeDivision;
     if (divisionId.empty() && !teamName.empty()) {
@@ -724,53 +746,48 @@ void runScoutingAction(AppState& state) {
 
 void runBuyAction(AppState& state) {
     if (state.currentPage != GuiPage::Transfers) return;
-    int row = selectedListViewRow(state.squadList);
-    if (row < 0) {
+    std::string sellerTeamName;
+    std::string playerName;
+    if (!selectedTransferTarget(state, sellerTeamName, playerName)) {
         MessageBoxW(state.window, L"Selecciona un objetivo del mercado.", L"Mercado", MB_OK | MB_ICONINFORMATION);
         return;
     }
-    ServiceResult result = buyTransferTargetService(state.career,
-                                                    listViewText(state.squadList, row, 10),
-                                                    listViewText(state.squadList, row, 0));
+    ServiceResult result = buyTransferTargetService(state.career, sellerTeamName, playerName);
     finalizeAction(state, result, "Fichaje");
 }
 
 void runPreContractAction(AppState& state) {
     if (state.currentPage != GuiPage::Transfers) return;
-    int row = selectedListViewRow(state.squadList);
-    if (row < 0) {
+    std::string sellerTeamName;
+    std::string playerName;
+    if (!selectedTransferTarget(state, sellerTeamName, playerName)) {
         MessageBoxW(state.window, L"Selecciona un objetivo del mercado.", L"Precontrato", MB_OK | MB_ICONINFORMATION);
         return;
     }
-    ServiceResult result = signPreContractService(state.career,
-                                                  listViewText(state.squadList, row, 10),
-                                                  listViewText(state.squadList, row, 0));
+    ServiceResult result = signPreContractService(state.career, sellerTeamName, playerName);
     finalizeAction(state, result, "Precontrato");
 }
 
 void runLoanAction(AppState& state) {
     constexpr int kDefaultLoanWeeks = 26;
     if (state.currentPage == GuiPage::Transfers) {
-        int row = selectedListViewRow(state.squadList);
-        if (row < 0) {
+        std::string sellerTeamName;
+        std::string playerName;
+        if (!selectedTransferTarget(state, sellerTeamName, playerName)) {
             MessageBoxW(state.window, L"Selecciona un objetivo del mercado.", L"Cesion", MB_OK | MB_ICONINFORMATION);
             return;
         }
-        ServiceResult result = loanInPlayerService(state.career,
-                                                   listViewText(state.squadList, row, 10),
-                                                   listViewText(state.squadList, row, 0),
-                                                   kDefaultLoanWeeks);
+        ServiceResult result = loanInPlayerService(state.career, sellerTeamName, playerName, kDefaultLoanWeeks);
         finalizeAction(state, result, "Cesion entrante");
         return;
     }
 
     if (state.currentPage == GuiPage::Squad || state.currentPage == GuiPage::Youth) {
-        int row = selectedListViewRow(state.squadList);
-        if (row < 0) {
+        std::string playerName;
+        if (!selectedManagedPlayerName(state, playerName)) {
             MessageBoxW(state.window, L"Selecciona un jugador de tu plantilla.", L"Ceder jugador", MB_OK | MB_ICONINFORMATION);
             return;
         }
-        const std::string playerName = listViewText(state.squadList, row, 0);
         const Player* player = findManagedPlayer(state.career, playerName);
         if (!player) {
             MessageBoxW(state.window, L"No se encontro el jugador seleccionado.", L"Ceder jugador", MB_OK | MB_ICONWARNING);

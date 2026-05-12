@@ -149,6 +149,197 @@ std::string postWeekDecisionLine(const std::vector<std::string>& digest) {
     return digest.empty() ? std::string() : digest.front();
 }
 
+struct TacticalRead {
+    int familiarity = 50;
+    int risk = 35;
+    int attackDuties = 0;
+    int supportDuties = 0;
+    int defendDuties = 0;
+    int lowFitnessPlayers = 0;
+    int roleWarnings = 0;
+    int averageDiscipline = 0;
+    int averageChemistry = 0;
+};
+
+std::string activeDutyFor(const Player& player) {
+    return player.roleDuty.empty() ? defaultDutyForPosition(player.position) : player.roleDuty;
+}
+
+bool tacticTextContains(const Team& team, const std::string& needle) {
+    const std::string text = toLower(team.tactics + " " + team.matchInstruction + " " + team.trainingFocus);
+    return text.find(needle) != std::string::npos;
+}
+
+bool usesHighPressPlan(const Team& team) {
+    return team.pressingIntensity >= 4 ||
+           tacticTextContains(team, "press") ||
+           tacticTextContains(team, "presion");
+}
+
+bool usesLowBlockPlan(const Team& team) {
+    return team.defensiveLine <= 2 ||
+           tacticTextContains(team, "bloque bajo") ||
+           tacticTextContains(team, "defensive");
+}
+
+int roleFitScore(const Team& team, const Player& player) {
+    const std::string pos = normalizePosition(player.position);
+    const std::string duty = toLower(activeDutyFor(player));
+    int score = 58;
+
+    score += (player.tacticalDiscipline - 55) / 3;
+    score += (player.chemistry - 55) / 5;
+    score += (player.currentForm - 55) / 6;
+    score += (player.fitness - 65) / 7;
+
+    if (pos == "ARQ") {
+        score += duty.find("defensa") != std::string::npos ? 8 : -6;
+    } else if (pos == "DEF") {
+        score += duty.find("defensa") != std::string::npos ? 9 : -5;
+    } else if (pos == "MED") {
+        score += duty.find("apoyo") != std::string::npos ? 8 : 1;
+    } else if (pos == "DEL") {
+        score += duty.find("ataque") != std::string::npos ? 8 : -2;
+    }
+
+    if (usesHighPressPlan(team)) {
+        score += player.stamina >= 72 ? 7 : (player.stamina < 60 ? -11 : 0);
+        score += player.fitness >= 72 ? 5 : (player.fitness < 62 ? -9 : 0);
+        if (pos == "DEL" && duty.find("apoyo") != std::string::npos) score += 3;
+        if (pos == "DEF" && duty.find("ataque") != std::string::npos) score -= 6;
+    }
+
+    if (usesLowBlockPlan(team)) {
+        score += player.defense >= player.attack ? 5 : -3;
+        if (pos == "DEF" && duty.find("defensa") != std::string::npos) score += 5;
+        if (pos != "DEL" && duty.find("ataque") != std::string::npos) score -= 4;
+    }
+
+    if (team.tempo >= 4) {
+        score += player.skill >= 68 ? 4 : -3;
+        score += player.currentForm >= 62 ? 3 : -4;
+    }
+    if (team.width >= 4 && player.versatility >= 62) score += 3;
+    if (player.injured || player.matchesSuspended > 0) score -= 25;
+
+    return clampInt(score, 1, 99);
+}
+
+std::string roleFitLabel(const Team& team, const Player& player) {
+    const int score = roleFitScore(team, player);
+    if (score >= 78) return "Encaje alto " + std::to_string(score);
+    if (score >= 62) return "Encaje medio " + std::to_string(score);
+    if (score >= 48) return "Ajuste delicado " + std::to_string(score);
+    return "Riesgo de rol " + std::to_string(score);
+}
+
+std::string tacticalFamiliarityLabel(int score) {
+    if (score >= 82) return "Fluida";
+    if (score >= 68) return "Fuerte";
+    if (score >= 52) return "Mixta";
+    return "Fragil";
+}
+
+std::string tacticalRiskLabel(int risk) {
+    if (risk >= 72) return "Alto";
+    if (risk >= 50) return "Medio";
+    if (risk >= 30) return "Controlado";
+    return "Bajo";
+}
+
+TacticalRead buildTacticalRead(const Team& team, const std::vector<int>& startingXi, bool congestedWeek) {
+    TacticalRead read;
+    int totalDiscipline = 0;
+    int totalChemistry = 0;
+    int totalForm = 0;
+    int totalFitness = 0;
+    int count = 0;
+
+    for (int index : startingXi) {
+        if (index < 0 || index >= static_cast<int>(team.players.size())) continue;
+        const Player& player = team.players[static_cast<size_t>(index)];
+        const std::string duty = toLower(activeDutyFor(player));
+        if (duty.find("ataque") != std::string::npos) {
+            ++read.attackDuties;
+        } else if (duty.find("defensa") != std::string::npos) {
+            ++read.defendDuties;
+        } else {
+            ++read.supportDuties;
+        }
+
+        totalDiscipline += player.tacticalDiscipline;
+        totalChemistry += player.chemistry;
+        totalForm += player.currentForm;
+        totalFitness += player.fitness;
+        if (player.fitness < 64 || player.fatigueLoad >= 58) ++read.lowFitnessPlayers;
+        if (roleFitScore(team, player) < 58) ++read.roleWarnings;
+        ++count;
+    }
+
+    count = std::max(1, count);
+    read.averageDiscipline = totalDiscipline / count;
+    read.averageChemistry = totalChemistry / count;
+    const int averageForm = totalForm / count;
+    const int averageFitness = totalFitness / count;
+
+    int familiarity = (read.averageDiscipline * 3 + read.averageChemistry * 2 +
+                       averageForm + averageFitness + team.morale) / 8;
+    if (toLower(team.trainingFocus).find("tact") != std::string::npos) familiarity += 5;
+    if (toLower(team.trainingFocus).find("balance") != std::string::npos) familiarity += 2;
+    if (usesHighPressPlan(team) && read.averageDiscipline < 60) familiarity -= 5;
+    if (usesLowBlockPlan(team) && read.defendDuties < 4) familiarity -= 4;
+    familiarity -= read.roleWarnings * 3;
+    familiarity -= std::max(0, read.lowFitnessPlayers - 2) * 2;
+    read.familiarity = clampInt(familiarity, 1, 99);
+
+    int risk = 18;
+    risk += std::max(0, team.pressingIntensity - 3) * 13;
+    risk += std::max(0, team.tempo - 3) * 10;
+    risk += std::max(0, team.defensiveLine - 3) * 7;
+    risk += std::max(0, team.width - 4) * 3;
+    risk += read.lowFitnessPlayers * 4;
+    risk += read.roleWarnings * 3;
+    if (congestedWeek) risk += 12;
+    const std::string focus = toLower(team.trainingFocus);
+    if (focus.find("recuper") != std::string::npos) risk -= 10;
+    if (focus.find("fisico") != std::string::npos) risk += 8;
+    const std::string rotation = toLower(team.rotationPolicy);
+    if (rotation.find("rot") != std::string::npos || rotation.find("reserv") != std::string::npos) risk -= 5;
+    read.risk = clampInt(risk, 0, 100);
+
+    return read;
+}
+
+std::string tacticalRoleBalanceLine(const TacticalRead& read) {
+    std::ostringstream out;
+    out << "Ataque " << read.attackDuties
+        << " | Apoyo " << read.supportDuties
+        << " | Defensa " << read.defendDuties;
+    return out.str();
+}
+
+std::string tacticalRecommendation(const Team& team, const TacticalRead& read) {
+    if (read.familiarity < 50 && read.risk >= 60) {
+        return "Baja presion/ritmo o dedica el microciclo a tactica antes del partido.";
+    }
+    if (read.roleWarnings >= 3) {
+        return "Revisa roles del XI: hay varios jugadores fuera de encaje natural.";
+    }
+    if (read.lowFitnessPlayers >= 3) {
+        return "Rota piezas o usa Recuperacion para sostener el plan sin romper fisico.";
+    }
+    if (usesHighPressPlan(team) && read.risk >= 55) {
+        return "Presion viable, pero prepara cambios temprano y laterales frescos.";
+    }
+    if (usesLowBlockPlan(team) && read.defendDuties < 4) {
+        return "El bloque pide mas deberes defensivos para cerrar area y segundas jugadas.";
+    }
+    if (read.familiarity >= 75 && read.risk <= 45) {
+        return "Plan estable: conviene mantener roles y ajustar solo por rival.";
+    }
+    return "Plan util, revisar rival y forma antes de simular.";
+}
+
 }  // namespace
 
 namespace gui_win32 {
@@ -546,7 +737,7 @@ GuiPageModel buildTacticsModel(AppState& state) {
                : "Lee el plan tactico, el once inicial y el impacto esperado de cada ajuste.");
     model.summary.title = "TacticalSummary";
     model.primary.title = "TacticsBoard";
-    model.primary.columns = {{L"Variable", 120}, {L"Valor", 90}, {L"Efecto estimado", 260}};
+    model.primary.columns = {{L"Variable", 130}, {L"Valor", 135}, {L"Efecto estimado", 360}};
     model.secondary.title = "FormationSelector";
     model.secondary.columns = {{L"Linea", 90}, {L"Jugador", 200}, {L"Pos", 60}, {L"Hab", 50}, {L"Fisico", 60}, {L"Estado", 120}};
     model.footer.title = "TacticalImpactSummary";
@@ -564,12 +755,20 @@ GuiPageModel buildTacticsModel(AppState& state) {
 
     Team& team = *state.career.myTeam;
     const bool congestedWeek = isCongestedWeek(state.career);
+    const std::vector<int> startingXi = team.getStartingXIIndices();
+    const TacticalRead tacticalRead = buildTacticalRead(team, startingXi, congestedWeek);
+    const std::string familiarityLabel = tacticalFamiliarityLabel(tacticalRead.familiarity);
+    const std::string riskLabel = tacticalRiskLabel(tacticalRead.risk);
     model.summary.content =
         "Formacion " + team.formation + " | Mentalidad " + team.tactics +
         "\r\nPresion " + std::to_string(team.pressingIntensity) +
         " | Ritmo " + std::to_string(team.tempo) +
         " | Anchura " + std::to_string(team.width) +
         " | Linea " + std::to_string(team.defensiveLine) +
+        "\r\nFamiliaridad tactica: " + familiarityLabel + " " + std::to_string(tacticalRead.familiarity) + "/100" +
+        " | Riesgo del plan: " + riskLabel + " " + std::to_string(tacticalRead.risk) + "/100" +
+        "\r\nRoles XI: " + tacticalRoleBalanceLine(tacticalRead) +
+        " | Alertas de encaje: " + std::to_string(tacticalRead.roleWarnings) +
         "\r\nInstruccion actual: " + team.matchInstruction +
         " | Plan semanal: " + team.trainingFocus +
         "\r\nFiltro tactico: " + state.currentFilter;
@@ -586,20 +785,28 @@ GuiPageModel buildTacticsModel(AppState& state) {
                                   team.matchInstruction == "Juego directo" ? "Acelera llegada a ultimo tercio" : "Ajuste situacional"});
     model.primary.rows.push_back({"Plan semanal", team.trainingFocus,
                                   congestedWeek ? "Microciclo corto y conservador" : "Carga completa de preparacion"});
+    model.primary.rows.push_back({"Familiaridad", familiarityLabel + " " + std::to_string(tacticalRead.familiarity) + "/100",
+                                  tacticalRecommendation(team, tacticalRead)});
+    model.primary.rows.push_back({"Riesgo plan", riskLabel + " " + std::to_string(tacticalRead.risk) + "/100",
+                                  tacticalRead.risk >= 60 ? "Gestiona minutos y cambios antes de simular" : "Carga asumible para el XI"});
+    model.primary.rows.push_back({"Balance roles", tacticalRoleBalanceLine(tacticalRead),
+                                  tacticalRead.roleWarnings > 0 ? "Hay roles que conviene ajustar" : "XI coherente con el plan"});
 
     std::map<std::string, std::vector<const Player*> > byLine;
-    for (int index : team.getStartingXIIndices()) {
+    for (int index : startingXi) {
         if (index < 0 || index >= static_cast<int>(team.players.size())) continue;
         const Player& player = team.players[static_cast<size_t>(index)];
         byLine[normalizePosition(player.position)].push_back(&player);
     }
+    model.secondary.columns = {{L"Linea", 75}, {L"Jugador", 170}, {L"Pos", 50}, {L"Rol", 130}, {L"Encaje", 130}, {L"Fisico", 60}, {L"Estado", 110}};
     for (const auto& entry : byLine) {
         for (const Player* player : entry.second) {
             model.secondary.rows.push_back({
                 entry.first,
                 player->name,
                 normalizePosition(player->position),
-                std::to_string(player->skill),
+                player->role.empty() ? activeDutyFor(*player) : player->role + "/" + activeDutyFor(*player),
+                roleFitLabel(team, *player),
                 std::to_string(player->fitness),
                 playerStatus(*player)
             });
@@ -611,6 +818,12 @@ GuiPageModel buildTacticsModel(AppState& state) {
                                  highPressFocus ? "Sube robos y desgaste"
                                                 : (lowBlockFocus ? "Protege espalda y concede centros"
                                                                  : "Vista transversal del plan")});
+    model.footer.rows.push_back({"Familiaridad",
+                                 familiarityLabel + " " + std::to_string(tacticalRead.familiarity) + "/100",
+                                 tacticalRecommendation(team, tacticalRead)});
+    model.footer.rows.push_back({"Roles XI",
+                                 tacticalRoleBalanceLine(tacticalRead),
+                                 tacticalRead.roleWarnings > 0 ? std::to_string(tacticalRead.roleWarnings) + " encajes delicados" : "Sin alertas fuertes"});
     model.footer.rows.push_back({"Posesion", team.tempo >= 4 ? "Vertical" : "Controlada", team.pressingIntensity >= 4 ? "Transiciones largas" : "Menor recuperacion alta"});
     model.footer.rows.push_back({"Ocasiones", team.width >= 4 ? "Ataque por fuera" : "Juego interior", team.tempo >= 4 ? "Mas error tecnico" : "Menos volumen"});
     model.footer.rows.push_back({"Defensa", team.defensiveLine >= 4 ? "Bloque adelantado" : "Bloque medio/bajo", team.defensiveLine >= 4 ? "Espalda expuesta" : "Mayor asedio rival"});
@@ -630,6 +843,15 @@ GuiPageModel buildTacticsModel(AppState& state) {
     detail << "Presion alta aumenta recuperaciones, pero castiga a jugadores con fisico bajo.\r\n";
     detail << "Ritmo alto acelera la llegada, aunque empeora la precision en equipos con forma baja.\r\n";
     detail << "Bloque bajo reduce espacio interior y aumenta probabilidad de centros rivales.\r\n\r\n";
+    detail << "Lectura de familiaridad\r\n";
+    detail << "- Familiaridad tactica: " << familiarityLabel << " " << tacticalRead.familiarity << "/100"
+           << " | disciplina media " << tacticalRead.averageDiscipline
+           << " | quimica media " << tacticalRead.averageChemistry << "\r\n";
+    detail << "- Riesgo del plan: " << riskLabel << " " << tacticalRead.risk << "/100"
+           << " | jugadores con carga " << tacticalRead.lowFitnessPlayers
+           << " | encajes delicados " << tacticalRead.roleWarnings << "\r\n";
+    detail << "- Balance de roles: " << tacticalRoleBalanceLine(tacticalRead) << "\r\n";
+    detail << "- Recomendacion: " << tacticalRecommendation(team, tacticalRead) << "\r\n\r\n";
     detail << "Microciclo semanal\r\n" << trainingSchedulePreview(team, congestedWeek, 6) << "\r\n\r\n";
     detail << "Informe rival: " << buildOpponentReport(state.career) << "\r\n\r\n";
     detail << dressingRoomPanelText(state.career, 4) << "\r\n";

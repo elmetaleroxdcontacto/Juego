@@ -20,6 +20,7 @@
 #include "utils/utils.h"
 
 #include <algorithm>
+#include <initializer_list>
 #include <map>
 #include <sstream>
 
@@ -370,6 +371,10 @@ std::string sellerInterestLabel(const Team& seller, const Player& player) {
 
 std::string transferRadarLabel(const TransferTarget& target) {
     std::string prefix = target.onShortlist ? "Shortlist" : (target.urgentNeed ? "Prioridad" : "Seguimiento");
+    if (target.scoutingConfidence >= 82) prefix += " exacto";
+    else if (target.scoutingConfidence >= 68) prefix += " fiable";
+    else if (target.scoutingConfidence >= 52) prefix += " parcial";
+    else prefix += " verde";
     return prefix + " " + std::to_string(target.scoutingConfidence) + "%";
 }
 
@@ -381,6 +386,22 @@ std::string transferMarketLabel(const TransferTarget& target) {
     return "Coste alto";
 }
 
+std::string scoutingRiskLabel(int confidence) {
+    if (confidence >= 82) return "Bajo: atributos y cifras casi cerradas.";
+    if (confidence >= 68) return "Medio: quedan pequenos margenes de error.";
+    if (confidence >= 52) return "Alto: conviene ampliar informe antes de ofertar.";
+    return "Muy alto: informe verde, datos demasiado abiertos.";
+}
+
+std::string scoutingNextStepLabel(const TransferPreviewItem& target) {
+    if (target.scoutingConfidence < 60) return "Asignar scouting antes de negociar.";
+    if (!target.onShortlist) return "Agregar a shortlist y seguir una semana.";
+    if (target.scoutingConfidence < 82) return "Actualizar shortlist para cerrar rangos.";
+    if (target.marketLabel == "Cesion viable") return "Listo para intentar cesion.";
+    if (target.affordabilityScore < 8) return "Negociar solo si liberas salario o vendes.";
+    return "Listo para oferta con perfil prudente.";
+}
+
 const Player* findPlayerByName(const Team& team, const std::string& name) {
     for (const auto& player : team.players) {
         if (player.name == name) return &player;
@@ -388,9 +409,99 @@ const Player* findPlayerByName(const Team& team, const std::string& name) {
     return nullptr;
 }
 
+int averageInt(std::initializer_list<int> values) {
+    int total = 0;
+    int count = 0;
+    for (int value : values) {
+        total += value;
+        ++count;
+    }
+    return count == 0 ? 0 : total / count;
+}
+
+std::string ratingLabel(int value) {
+    if (value >= 82) return "Elite";
+    if (value >= 72) return "Muy alto";
+    if (value >= 62) return "Competitivo";
+    if (value >= 52) return "Correcto";
+    return "Riesgo";
+}
+
+std::string minutesProfileLabel(const Team& team, const Player& player) {
+    if (player.injured) return "Baja medica";
+    if (player.matchesSuspended > 0) return "Suspendido";
+    const int avg = team.getAverageSkill();
+    if (player.skill >= avg + 7) return "Titular clave";
+    if (player.skill >= avg + 2) return "Titular/rotacion alta";
+    if (player.potential >= player.skill + 10 && player.age <= 22) return "Proyecto con minutos";
+    return "Rotacion";
+}
+
+void addUniqueLimited(std::vector<std::string>& values, const std::string& value, size_t limit = 4) {
+    if (value.empty() || values.size() >= limit) return;
+    if (std::find(values.begin(), values.end(), value) == values.end()) values.push_back(value);
+}
+
+std::vector<std::string> playerStrengthLines(const Team& team, const Player& player) {
+    std::vector<std::string> lines;
+    const std::string role = normalizePosition(player.position);
+    const int avg = team.getAverageSkill();
+    if (player.skill >= avg + 6) addUniqueLimited(lines, "Nivel actual por encima de la media del plantel.");
+    if (player.potential >= player.skill + 9) addUniqueLimited(lines, "Margen de crecimiento alto para plan individual.");
+    if (role == "DEL" && player.attack >= 72) addUniqueLimited(lines, "Amenaza ofensiva fiable para el ultimo tercio.");
+    if ((role == "DEF" || role == "ARQ") && player.defense >= 72) addUniqueLimited(lines, "Base defensiva fuerte para sostener el bloque.");
+    if (role == "MED" && player.attack + player.defense >= 135) addUniqueLimited(lines, "Perfil mixto util para conectar fases.");
+    if (player.professionalism >= 74) addUniqueLimited(lines, "Profesionalismo alto; responde bien al entrenamiento.");
+    if (player.consistency >= 72) addUniqueLimited(lines, "Consistencia alta en semanas competitivas.");
+    if (player.leadership >= 72) addUniqueLimited(lines, "Puede sostener liderazgo interno.");
+    if (player.versatility >= 72 || !player.secondaryPositions.empty()) addUniqueLimited(lines, "Versatilidad para cubrir mas de una posicion.");
+    if (player.currentForm >= 70) addUniqueLimited(lines, "Llega en buena forma reciente.");
+    if (player.setPieceSkill >= 72) addUniqueLimited(lines, "Aporta valor en balon parado.");
+    if (lines.empty()) lines.push_back("Perfil equilibrado sin fortaleza dominante clara.");
+    return lines;
+}
+
+std::vector<std::string> playerWeaknessLines(const Player& player) {
+    std::vector<std::string> lines;
+    if (player.contractWeeks <= 12) addUniqueLimited(lines, "Contrato corto: resolver renovacion o venta.");
+    if (player.happiness < 45 || player.unhappinessWeeks >= 2) addUniqueLimited(lines, "Moral baja: conviene charla individual.");
+    if (player.wantsToLeave) addUniqueLimited(lines, "Quiere salir; riesgo de vestuario y mercado.");
+    if (player.injured) addUniqueLimited(lines, "No disponible por lesion actual.");
+    if (player.matchesSuspended > 0) addUniqueLimited(lines, "Suspendido para los proximos partidos.");
+    if (player.fitness < 62 || player.fatigueLoad >= 60) addUniqueLimited(lines, "Carga fisica alta o condicion baja.");
+    if (player.injuryProneness >= 70 || player.injuryHistory >= 3) addUniqueLimited(lines, "Riesgo medico elevado.");
+    if (player.consistency < 50) addUniqueLimited(lines, "Consistencia irregular.");
+    if (player.tacticalDiscipline < 55 || player.discipline < 55) addUniqueLimited(lines, "Disciplina tactica por mejorar.");
+    if (player.adaptation < 50) addUniqueLimited(lines, "Adaptacion baja a contextos nuevos.");
+    if (lines.empty()) lines.push_back("Sin debilidades urgentes detectadas por el staff.");
+    return lines;
+}
+
+std::string playerStaffRecommendation(const Team& team, const Player& player) {
+    if (player.injured) return "Priorizar recuperacion y bajar carga hasta alta medica.";
+    if (player.contractWeeks <= 12) return "Resolver contrato antes de aumentar minutos o rechazar ofertas.";
+    if (player.wantsToLeave || player.happiness < 45) return "Abrir charla individual y revisar promesas/minutos.";
+    if (player.age <= 21 && player.potential >= player.skill + 10) {
+        return player.skill >= team.getAverageSkill() - 2
+                   ? "Dar minutos controlados y mantener plan de desarrollo."
+                   : "Buscar cesion con minutos si no entra en la rotacion.";
+    }
+    if (player.fitness < 62 || player.fatigueLoad >= 60) return "Rotar una semana y ajustar entrenamiento fisico.";
+    if (player.skill >= team.getAverageSkill() + 5) return "Usarlo como pieza central del rol actual.";
+    return "Mantener seguimiento mensual y ajustar rol segun rendimiento.";
+}
+
 std::string buildPlayerProfile(const Team& team, const Player* player) {
     if (!player) return "Selecciona un jugador para abrir su ficha completa.";
     std::ostringstream out;
+    const int technicalScore = averageInt({player->attack, player->defense, player->setPieceSkill, player->versatility, player->skill});
+    const int mentalScore = averageInt({player->leadership, player->professionalism, player->ambition, player->consistency,
+                                        player->bigMatches, player->tacticalDiscipline, player->discipline, player->adaptation});
+    const int physicalScore = averageInt({player->stamina, player->fitness, std::max(1, 100 - player->fatigueLoad),
+                                          std::max(1, 100 - player->injuryProneness)});
+    const std::vector<std::string> strengths = playerStrengthLines(team, *player);
+    const std::vector<std::string> weaknesses = playerWeaknessLines(*player);
+
     out << "Resumen\r\n";
     out << player->name << " | " << normalizePosition(player->position)
         << " | " << player->age << " anos"
@@ -401,46 +512,69 @@ std::string buildPlayerProfile(const Team& team, const Player* player) {
         << " | Promesa " << player->promisedRole
         << " | Posicion prometida " << player->promisedPosition
         << " | Pie " << player->preferredFoot << "\r\n\r\n";
-    out << "Atributos\r\n";
+    out << "Perfil staff: " << minutesProfileLabel(team, *player)
+        << " | Fiabilidad " << playerReliabilityLabel(*player)
+        << " | Forma " << playerFormLabel(*player) << "\r\n\r\n";
+
+    out << "Atributos tecnicos\r\n";
     out << "Ataque " << player->attack
         << " | Defensa " << player->defense
-        << " | Resistencia " << player->stamina
-        << " | Disciplina " << player->tacticalDiscipline
-        << " | Versatilidad " << player->versatility << "\r\n";
+        << " | Balon parado " << player->setPieceSkill
+        << " | Versatilidad " << player->versatility
+        << " | Lectura " << ratingLabel(technicalScore) << " (" << technicalScore << "/100)\r\n";
+    out << "Atributos mentales\r\n";
     out << "Liderazgo " << player->leadership
         << " | Profesionalismo " << player->professionalism
         << " | Ambicion " << player->ambition
-        << " | Consistencia " << player->consistency << "\r\n";
+        << " | Consistencia " << player->consistency
+        << " | Grandes citas " << player->bigMatches << "\r\n";
     out << "Personalidad " << (player->personality.empty() ? "Equilibrado" : player->personality)
+        << " | Disc. tactica " << player->tacticalDiscipline
         << " | Disciplina " << player->discipline
         << " | Adaptacion " << player->adaptation
-        << " | Prop. lesiones " << player->injuryProneness << "\r\n\r\n";
-    out << "Contrato\r\n";
+        << " | Lectura " << ratingLabel(mentalScore) << " (" << mentalScore << "/100)\r\n";
+    out << "Atributos fisicos\r\n";
+    out << "Resistencia " << player->stamina
+        << " | Fisico " << player->fitness
+        << " | Carga " << player->fatigueLoad
+        << " | Prop. lesiones " << player->injuryProneness
+        << " | Lectura " << ratingLabel(physicalScore) << " (" << physicalScore << "/100)\r\n\r\n";
+
+    out << "Contrato y mercado\r\n";
     out << "Salario " << formatMoneyValue(player->wage)
         << " | Clausula " << formatMoneyValue(player->releaseClause)
+        << " | Valor " << formatMoneyValue(player->value)
         << " | Semanas restantes " << player->contractWeeks << "\r\n";
     out << "Estado " << playerStatus(*player)
-        << " | Desea salir: " << (player->wantsToLeave ? "Si" : "No") << "\r\n\r\n";
-    out << "Estadisticas\r\n";
+        << " | Desea salir: " << (player->wantsToLeave ? "Si" : "No");
+    if (player->onLoan) {
+        out << " | Cedido por " << (player->parentClub.empty() ? "-" : player->parentClub)
+            << " | Restan " << player->loanWeeksRemaining << " sem";
+    }
+    out << "\r\n\r\n";
+
+    out << "Rendimiento temporada\r\n";
     out << "PJ " << player->matchesPlayed
         << " | Titularidades " << player->startsThisSeason
+        << " / deseadas " << player->desiredStarts
         << " | Goles " << player->goals
         << " | Asistencias " << player->assists << "\r\n";
     out << "Forma " << player->currentForm
         << " (" << playerFormLabel(*player) << ")"
         << " | Moral " << player->happiness
         << " | Momento " << player->moraleMomentum
-        << " | Quimica " << player->chemistry
-        << " | Fisico " << player->fitness
-        << " | Carga " << player->fatigueLoad << "\r\n\r\n";
-    out << "Desarrollo\r\n";
+        << " | Quimica " << player->chemistry << "\r\n\r\n";
+
+    out << "Plan de desarrollo\r\n";
     out << "Plan " << player->developmentPlan
         << " | Grupo " << player->socialGroup
         << " | Posiciones secundarias " << (player->secondaryPositions.empty() ? "-" : joinStringValues(player->secondaryPositions, ", ")) << "\r\n";
     out << "Rasgos " << (player->traits.empty() ? "-" : joinStringValues(player->traits, ", ")) << "\r\n\r\n";
-    out << "Historial\r\n";
+
+    out << "Disponibilidad e historial\r\n";
     out << "Lesiones previas " << player->injuryHistory
         << " | Amarillas " << player->seasonYellowCards
+        << " | Acumulacion " << player->yellowAccumulation
         << " | Rojas " << player->seasonRedCards << "\r\n";
     const auto medicalStatuses = medical_service::buildMedicalStatuses(team);
     auto medical = std::find_if(medicalStatuses.begin(), medicalStatuses.end(), [&](const medical_service::MedicalStatus& status) {
@@ -457,6 +591,13 @@ std::string buildPlayerProfile(const Team& team, const Player* player) {
     } else {
         out << "Sin alertas medicas relevantes";
     }
+    out << "\r\n\r\nInforme del staff\r\n";
+    out << "Fortalezas\r\n";
+    for (const std::string& line : strengths) out << "- " << line << "\r\n";
+    out << "Debilidades\r\n";
+    for (const std::string& line : weaknesses) out << "- " << line << "\r\n";
+    out << "Recomendacion\r\n";
+    out << playerStaffRecommendation(team, *player);
     return out.str();
 }
 
@@ -743,6 +884,9 @@ std::vector<TransferPreviewItem> buildTransferTargets(const Career& career, cons
                 target.expectedFee,
                 target.expectedWage,
                 target.expectedAgentFee,
+                transfer_briefing::scoutingMoneyLabel(target.expectedFee, target.scoutingConfidence),
+                transfer_briefing::scoutingMoneyLabel(target.expectedWage, target.scoutingConfidence),
+                transfer_briefing::scoutingMoneyLabel(target.expectedAgentFee, target.scoutingConfidence),
                 seller.name,
                 transferRadarLabel(target),
                 transferMarketLabel(target),

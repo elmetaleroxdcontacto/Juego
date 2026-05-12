@@ -276,6 +276,28 @@ void renderListPanel(AppState& state, HWND label, HWND list, const ListPanelMode
     for (const auto& row : model.rows) {
         addListViewRow(list, row);
     }
+    int selectedRow = -1;
+    if (state.currentPage == GuiPage::Transfers && list == state.tableList) {
+        for (size_t i = 0; i < model.rows.size(); ++i) {
+            const auto& row = model.rows[i];
+            if (row.size() > 10 && row[0] == state.selectedTransferPlayer && row[10] == state.selectedTransferClub) {
+                selectedRow = static_cast<int>(i);
+                break;
+            }
+        }
+    } else if ((state.currentPage == GuiPage::Squad || state.currentPage == GuiPage::Youth) && list == state.squadList) {
+        for (size_t i = 0; i < model.rows.size(); ++i) {
+            const auto& row = model.rows[i];
+            if (!row.empty() && row[0] == state.selectedPlayerName) {
+                selectedRow = static_cast<int>(i);
+                break;
+            }
+        }
+    }
+    if (selectedRow >= 0) {
+        ListView_SetItemState(list, selectedRow, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+        ListView_EnsureVisible(list, selectedRow, FALSE);
+    }
     applyTeamLogosToList(state, list, model);
 }
 
@@ -746,13 +768,19 @@ void handleListSelectionChange(AppState& state, int controlId) {
     }
 
     if ((state.currentPage == GuiPage::Squad || state.currentPage == GuiPage::Youth) && controlId == IDC_SQUAD_LIST) {
-        state.selectedPlayerName = listViewText(state.squadList, row, 0);
+        const std::string playerName = listViewText(state.squadList, row, 0);
+        if (playerName.empty() || playerName == state.selectedPlayerName) return;
+        state.selectedPlayerName = playerName;
         refreshCurrentPage(state);
         return;
     }
     if (state.currentPage == GuiPage::Transfers && controlId == IDC_TABLE_LIST) {
-        state.selectedTransferPlayer = listViewText(state.tableList, row, 0);
-        state.selectedTransferClub = listViewText(state.tableList, row, 10);
+        const std::string playerName = listViewText(state.tableList, row, 0);
+        const std::string clubName = listViewText(state.tableList, row, 10);
+        if (playerName.empty() || clubName.empty()) return;
+        if (playerName == state.selectedTransferPlayer && clubName == state.selectedTransferClub) return;
+        state.selectedTransferPlayer = playerName;
+        state.selectedTransferClub = clubName;
         refreshCurrentPage(state);
         return;
     }
