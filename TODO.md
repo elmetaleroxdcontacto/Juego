@@ -5457,6 +5457,24 @@ Fecha: 2026-04-04
 - `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
 
+## Avance tecnico - parseo de division activa sin alias mutable (2026-05-11)
+
+### Cambios aplicados
+- `save_serialization::deserializeCareer(...)` ahora parsea la division activa en una variable local.
+- Se elimino el alias mutable directo a `career.activeDivision` durante la deserializacion.
+- La escritura final de la division activa sigue pasando por `Career::setActiveDivision(...)`.
+- Los saves modernos y legacy conservan sus rutas de normalizacion antes de reconstruir equipos activos.
+
+### Archivos modificados
+- `src/io/save_serialization.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
 ## Avance tecnico - relink activo parametrizado (2026-05-11)
 
 ### Cambios aplicados
@@ -5471,6 +5489,79 @@ Fecha: 2026-04-04
 - `src/engine/career_state.cpp`
 - `src/gui/gui_actions.cpp`
 - `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance tecnico - deserializacion con division resuelta localmente (2026-05-11)
+
+### Cambios aplicados
+- `save_serialization::deserializeCareer(...)` resuelve la division parseada en `parsedDivision` antes de llamar a `setActiveDivision(...)`.
+- El relink final del save moderno usa `resolvedDivision` local desde `myTeam` o la division ya cargada.
+- La carga legacy usa `legacyDivision` local para relinkear sin escribir `activeDivision` manualmente.
+- Se mantiene el formato de guardado intacto; el cambio solo ordena el flujo interno de relink.
+
+### Archivos modificados
+- `src/io/save_serialization.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance tecnico - manager activo con relink seguro de division (2026-05-11)
+
+### Cambios aplicados
+- `Career::applyActiveHumanManager()` ya no asigna `activeDivision` directamente cuando resuelve `myTeam`.
+- El manager activo ahora llama `refreshActiveDivisionTeamLinks(myTeam->division)` para sincronizar equipos activos, IDs y tabla.
+- `switchActiveHumanManager(...)` conserva la llamada posterior a `setActiveDivision(...)` para regenerar grupos y calendario cuando cambia el club controlado.
+- El flujo de carga de saves queda alineado con el relink seguro aunque `applyActiveHumanManager()` se ejecute antes del relink final.
+
+### Archivos modificados
+- `src/engine/career_state.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance tecnico - carga de saves sin asignacion directa de division (2026-05-11)
+
+### Cambios aplicados
+- `save_manager::loadCareer(...)` ya no asigna `career.activeDivision` directamente como fallback.
+- La carga conserva una `fallbackDivision` local cuando el save no trae division activa.
+- El relink posterior usa `career.setActiveDivision(...)` con la division resuelta para reconstruir equipos activos, IDs, tabla y calendario.
+- El flujo mantiene compatibilidad con `applyActiveHumanManager()`, que puede resolver la division desde el manager activo.
+
+### Archivos modificados
+- `src/io/save_manager.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance tecnico - cierre de accessor legacy de equipos activos (2026-05-11)
+
+### Cambios aplicados
+- Se elimino `Career::getActiveDivisionTeamsRef()` porque ya no tenia consumidores internos.
+- Se retiro la sobrecarga mutable que exponia `activeTeams` como referencia publica.
+- La API de carrera queda mas alineada con `getActiveTeamCount()`, `getActiveTeamAt(...)` y `getActiveTeamIdAt(...)`.
+- La busqueda de `getActiveDivisionTeamsRef` queda sin resultados en codigo fuente y tests.
+
+### Archivos modificados
+- `include/engine/models.h`
+- `src/engine/career_state.cpp`
 - `TODO.md`
 
 ### Validacion
@@ -5774,5 +5865,121 @@ Fecha: 2026-04-04
 ### Validacion
 - `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
 - `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance tecnico - fixtures de tests con helpers de division activa (2026-05-11)
+
+### Cambios aplicados
+- `testCompetitionGroupTableScopesActiveGroup()` usa `Career::setActiveDivision(...)` para preparar equipos activos, grupos y calendario.
+- `testTeamRepositoryResolvesStableIds()` usa `Career::refreshActiveDivisionTeamLinks(...)` para sincronizar equipos activos, IDs y tabla.
+- `testCareerServiceWrapperProducesGameplayOutputs()` deja de poblar `activeTeams` a mano y reutiliza el relink seguro.
+- Las asignaciones directas a `career.activeDivision` fueron eliminadas de los tests.
+
+### Archivos modificados
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance tecnico - fixtures sin indexacion directa de equipos activos (2026-05-11)
+
+### Cambios aplicados
+- Los fixtures de transicion de temporada usan `Career::getActiveTeamCount()` para validar el bloque activo.
+- La carga de puntos, goles y victorias de prueba usa `Career::getActiveTeamAt(...)`.
+- `testTeamRepositoryResolvesStableIds()` compara `activeTeamIds` contra el conteo seguro de equipos activos.
+- La unica escritura directa restante a `activeTeams` en tests queda como escenario legacy intencional para probar fallback con IDs desactualizados.
+
+### Archivos modificados
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Avance tecnico - consulta publica de sincronizacion activa (2026-05-11)
+
+### Cambios aplicados
+- `Career` expone `hasSyncedActiveTeamIds()` para consultar si IDs y punteros activos estan alineados.
+- `getActiveTeamIdAt(...)` y `getActiveTeamCount()` reutilizan la consulta publica.
+- El helper interno fue renombrado a `activeTeamIdsAreSynced(...)` para separar implementacion y API.
+- `testTeamRepositoryResolvesStableIds()` deja de inspeccionar `activeTeamIds` directamente y valida la sincronizacion mediante el nuevo helper.
+
+### Archivos modificados
+- `include/engine/models.h`
+- `src/engine/career_state.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+- `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Correccion visual - inicio sin metricas superpuestas (2026-05-11)
+
+### Cambios aplicados
+- `paintWindowChrome(...)` deja de dibujar las metricas superiores globales cuando esta activo el dashboard especial de carrera.
+- Se evita que las tarjetas de `Forma`, `Fisico`, `Reputacion` y similares queden pintadas debajo de los botones de Inicio.
+- El dashboard mantiene su barra de estado y el overlay de simulacion semanal.
+
+### Archivos modificados
+- `src/gui/gui_layout.cpp`
+- `TODO.md`
+
+### Validacion
+- `src/gui/gui_layout.cpp` compilo correctamente durante `cmake --build build-cmake --config Release --target FootballManager`.
+- El enlace de `FootballManager.exe` quedo bloqueado por Windows porque el ejecutable estaba abierto (`Permission denied`).
+- `cmake --build build-cmake --config Release --target FootballManagerCLI` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+- Pendiente cerrar la ventana del juego y recompilar `FootballManager` para actualizar el ejecutable final.
+
+## Correccion visual - overlay de simulacion sin paneles encima (2026-05-11)
+
+### Cambios aplicados
+- El overlay de progreso de simulacion oculta temporalmente los paneles `ListView`, `Edit`, filtros y acciones del contenido mientras esta activo.
+- `setSimulationProgress(...)` fuerza un relayout al activar el overlay para retirar controles hijos que Windows pinta por encima del `WM_PAINT` principal.
+- `clearSimulationProgress(...)` fuerza un relayout al cerrar el overlay para restaurar la pagina actual.
+- Se corrige el efecto donde Liga, tablas y textos quedaban superpuestos sobre el panel de "Simulando semana".
+
+### Archivos modificados
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_layout.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager` -> compilado y enlazado correctamente.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+
+## Mejora gameplay - compras y cesiones de jugadores (2026-05-11)
+
+### Cambios aplicados
+- Se agrego el boton `Cesion` a la GUI y se registro como accion clickeable.
+- En `Fichajes`, el boton cambia a `Pedir cesion` y usa `loanInPlayerService(...)` para traer jugadores cedidos.
+- En `Plantilla` y `Cantera`, el boton cambia a `Ceder` y usa `loanOutPlayerService(...)` para enviar al jugador seleccionado a un club recomendado con cupo.
+- La recomendacion de destino evita duplicados, respeta limite de plantel y prioriza clubes donde el jugador tiene mejor espacio por posicion.
+- La compra inmediata con `Comprar` queda cubierta por una prueba de regresion junto a cesion entrante y cesion saliente.
+
+### Archivos modificados
+- `include/gui/gui_internal.h`
+- `src/gui/gui.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_layout.cpp`
+- `src/gui/gui_runtime.cpp`
+- `src/gui/gui_shared.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron, incluido `transfer_buy_and_loans`.
 - `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.

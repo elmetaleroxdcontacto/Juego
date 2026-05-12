@@ -48,6 +48,7 @@ enum ControlId {
     IDC_FOLLOW_SHORTLIST_BUTTON,
     IDC_BUY_BUTTON,
     IDC_PRECONTRACT_BUTTON,
+    IDC_LOAN_BUTTON,
     IDC_RENEW_BUTTON,
     IDC_SELL_BUTTON,
     IDC_PLAN_BUTTON,
@@ -347,6 +348,7 @@ struct AppState {
     HWND followShortlistButton = nullptr;
     HWND buyButton = nullptr;
     HWND preContractButton = nullptr;
+    HWND loanButton = nullptr;
     HWND renewButton = nullptr;
     HWND sellButton = nullptr;
     HWND planButton = nullptr;
@@ -488,6 +490,7 @@ void validateSystem(AppState& state);
 void runScoutingAction(AppState& state);
 void runBuyAction(AppState& state);
 void runPreContractAction(AppState& state);
+void runLoanAction(AppState& state);
 void runRenewAction(AppState& state);
 void runSellAction(AppState& state);
 void runPlanAction(AppState& state);

@@ -823,7 +823,7 @@ bool isUpgradeButtonId(int id) {
 
 bool isActionButtonId(int id) {
     return id == IDC_SCOUT_BUTTON || id == IDC_SHORTLIST_BUTTON || id == IDC_FOLLOW_SHORTLIST_BUTTON ||
-           id == IDC_BUY_BUTTON || id == IDC_PRECONTRACT_BUTTON || id == IDC_RENEW_BUTTON ||
+           id == IDC_BUY_BUTTON || id == IDC_PRECONTRACT_BUTTON || id == IDC_LOAN_BUTTON || id == IDC_RENEW_BUTTON ||
            id == IDC_SELL_BUTTON || id == IDC_PLAN_BUTTON || id == IDC_INSTRUCTION_BUTTON ||
            id == IDC_YOUTH_UPGRADE_BUTTON || id == IDC_TRAINING_UPGRADE_BUTTON ||
            id == IDC_SCOUTING_UPGRADE_BUTTON || id == IDC_STADIUM_UPGRADE_BUTTON;

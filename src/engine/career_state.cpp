@@ -65,7 +65,7 @@ Team* activeTeamForLegacyTable(const Career& career, int index) {
     return const_cast<Team*>(career.getActiveTeamAt(index));
 }
 
-bool hasSyncedActiveTeamIds(const Career& career) {
+bool activeTeamIdsAreSynced(const Career& career) {
     if (career.activeTeamIds.empty()) return false;
     if (career.activeTeamIds.size() != career.activeTeams.size()) return false;
     for (size_t i = 0; i < career.activeTeamIds.size(); ++i) {
@@ -186,14 +186,6 @@ bool Career::isValidTeamIndex(int index) const {
     return index >= 0 && index < static_cast<int>(allTeams.size());
 }
 
-const std::vector<Team*>& Career::getActiveDivisionTeamsRef() const {
-    return activeTeams;
-}
-
-std::vector<Team*>& Career::getActiveDivisionTeamsRef() {
-    return activeTeams;
-}
-
 bool Career::usesSegundaFormat() const {
     const CompetitionConfig& config = getCompetitionConfig(activeDivision);
     return config.seasonHandler == CompetitionSeasonHandler::SegundaGroups &&
@@ -298,6 +290,10 @@ void Career::syncActiveTeamIds() {
     for (const Team* team : activeTeams) {
         activeTeamIds.push_back(getTeamIdFor(team));
     }
+}
+
+bool Career::hasSyncedActiveTeamIds() const {
+    return activeTeamIdsAreSynced(*this);
 }
 
 void Career::rebuildActiveLeagueTable() {
@@ -460,7 +456,7 @@ const Team* Career::getTeamById(TeamId id) const {
 TeamId Career::getActiveTeamIdAt(int index) const {
     if (index < 0) return kInvalidTeamId;
     const size_t activeIndex = static_cast<size_t>(index);
-    if (hasSyncedActiveTeamIds(*this) && activeIndex < activeTeamIds.size()) {
+    if (hasSyncedActiveTeamIds() && activeIndex < activeTeamIds.size()) {
         const TeamId id = activeTeamIds[activeIndex];
         if (getTeamById(id)) return id;
     }
@@ -469,7 +465,7 @@ TeamId Career::getActiveTeamIdAt(int index) const {
 }
 
 int Career::getActiveTeamCount() const {
-    if (hasSyncedActiveTeamIds(*this)) return static_cast<int>(activeTeamIds.size());
+    if (hasSyncedActiveTeamIds()) return static_cast<int>(activeTeamIds.size());
     return static_cast<int>(activeTeams.size());
 }
 
@@ -779,7 +775,7 @@ void Career::applyActiveHumanManager() {
     }
 
     if (myTeam) {
-        activeDivision = canonicalDivisionId(myTeam->division);
+        refreshActiveDivisionTeamLinks(myTeam->division);
         humanManagers[static_cast<size_t>(activeHumanManagerIndex)].teamName = myTeam->name;
     }
 }

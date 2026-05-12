@@ -55,13 +55,13 @@ GuiPageModel buildTransfersModel(AppState& state) {
     model.metrics = buildMetrics(state, alerts);
     model.infoLine = "Mercado de fichajes con filtros, lectura del plantel y objetivos prioritarios.";
     model.summary.title = "TransferSearchPanel";
-    model.primary.title = "TransferSearchPanel";
-    model.primary.columns = {{L"Area", 120}, {L"Valor", 120}, {L"Lectura", 280}};
-    model.secondary.title = "TransferMarketView";
-    model.secondary.columns = {
+    model.primary.title = "TransferMarketView";
+    model.primary.columns = {
         {L"Jugador", 190}, {L"Pos", 54}, {L"Edad", 54}, {L"Media", 58}, {L"Pot", 58},
         {L"Costo", 92}, {L"Salario", 92}, {L"Radar", 92}, {L"Mercado", 100}, {L"Rol", 120}, {L"Club", 180}
     };
+    model.secondary.title = "TransferSearchPanel";
+    model.secondary.columns = {{L"Area", 120}, {L"Valor", 120}, {L"Lectura", 280}};
     model.footer = buildTransferPipelineModel(state.career);
     model.detail.title = "TransferTargetCard";
     model.feed.title = "NewsFeedPanel";
@@ -81,13 +81,13 @@ GuiPageModel buildTransfersModel(AppState& state) {
                             "Shortlist " + std::to_string(state.career.scoutingShortlist.size()) + "\r\n"
                             "Red scouting " + (team.scoutingRegions.empty() ? std::string("-") : joinStringValues(team.scoutingRegions, ", ")) +
                             (actionLines.empty() ? std::string() : "\r\nPlan corto: " + actionLines.front());
-    model.primary.rows.push_back({"Necesidad", detectScoutingNeed(team), "Lectura del plantel actual"});
-    model.primary.rows.push_back({"Presupuesto", formatMoneyValue(team.budget), "Define agresividad de mercado"});
-    model.primary.rows.push_back({"Contratos cortos", std::to_string(std::count_if(team.players.begin(), team.players.end(), [](const Player& p) { return p.contractWeeks <= 12; })),
-                                  "Renovar antes de fichar profundidad"});
-    model.primary.rows.push_back({"Scouting", std::to_string(team.scoutingChief), "Mejora precision de objetivos"});
-    model.primary.rows.push_back({"Politica", team.transferPolicy, "Define si el club compra valor, cantera o urgencia"});
-    model.primary.rows.push_back({"Venta IA", std::to_string(strategy.salePressure), "Presion para liberar suplentes marginales"});
+    model.secondary.rows.push_back({"Necesidad", detectScoutingNeed(team), "Lectura del plantel actual"});
+    model.secondary.rows.push_back({"Presupuesto", formatMoneyValue(team.budget), "Define agresividad de mercado"});
+    model.secondary.rows.push_back({"Contratos cortos", std::to_string(std::count_if(team.players.begin(), team.players.end(), [](const Player& p) { return p.contractWeeks <= 12; })),
+                                    "Renovar antes de fichar profundidad"});
+    model.secondary.rows.push_back({"Scouting", std::to_string(team.scoutingChief), "Mejora precision de objetivos"});
+    model.secondary.rows.push_back({"Politica", team.transferPolicy, "Define si el club compra valor, cantera o urgencia"});
+    model.secondary.rows.push_back({"Venta IA", std::to_string(strategy.salePressure), "Presion para liberar suplentes marginales"});
 
     std::vector<TransferPreviewItem> targets = buildTransferTargets(state.career, state.currentFilter);
     if (state.selectedTransferPlayer.empty() && !targets.empty()) {
@@ -95,7 +95,7 @@ GuiPageModel buildTransfersModel(AppState& state) {
         state.selectedTransferClub = targets.front().club;
     }
     for (const auto& target : targets) {
-        model.secondary.rows.push_back({
+        model.primary.rows.push_back({
             target.player,
             target.position,
             std::to_string(target.age),
@@ -109,8 +109,8 @@ GuiPageModel buildTransfersModel(AppState& state) {
             target.club
         });
     }
-    if (model.secondary.rows.empty()) {
-        model.secondary.rows.push_back({"Sin objetivos", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"});
+    if (model.primary.rows.empty()) {
+        model.primary.rows.push_back({"Sin objetivos", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"});
     }
 
     const Team* myTeam = state.career.myTeam;

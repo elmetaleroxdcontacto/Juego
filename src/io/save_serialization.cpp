@@ -935,7 +935,7 @@ bool serializeCareer(ostream& file, const Career& career) {
 bool deserializeCareer(istream& file, Career& career) {
     auto& currentSeason = career.currentSeason;
     auto& currentWeek = career.currentWeek;
-    auto& activeDivision = career.activeDivision;
+    string activeDivision;
     auto& myTeam = career.myTeam;
     auto& managerName = career.managerName;
     auto& managerReputation = career.managerReputation;
@@ -1413,10 +1413,11 @@ bool deserializeCareer(istream& file, Career& career) {
         rebuildCareerDivisions(career);
 
         initialized = true;
-        if (activeDivision.empty() && !allTeams.empty()) activeDivision = canonicalizeDivisionValue(allTeams.front().division);
-        if (!activeDivision.empty()) {
-            activeDivision = canonicalizeDivisionValue(activeDivision);
-            career.setActiveDivision(activeDivision);
+        const string parsedDivision = activeDivision.empty() && !allTeams.empty()
+                                          ? canonicalizeDivisionValue(allTeams.front().division)
+                                          : canonicalizeDivisionValue(activeDivision);
+        if (!parsedDivision.empty()) {
+            career.setActiveDivision(parsedDivision);
         }
 
         if (humanManagers.empty() && !myTeamName.empty()) {
@@ -1435,8 +1436,8 @@ bool deserializeCareer(istream& file, Career& career) {
                 }
             }
         }
-        if (myTeam) activeDivision = canonicalizeDivisionValue(myTeam->division);
-        if (!activeDivision.empty()) career.setActiveDivision(activeDivision);
+        const string resolvedDivision = myTeam ? canonicalizeDivisionValue(myTeam->division) : activeDivision;
+        if (!resolvedDivision.empty()) career.setActiveDivision(resolvedDivision);
         career.syncActiveHumanManager();
         if (boardExpectedFinish <= 0) career.initializeBoardObjectives();
         if (boardMonthlyObjective.empty()) career.initializeDynamicObjective();
@@ -1551,9 +1552,9 @@ bool deserializeCareer(istream& file, Career& career) {
         team.division = canonicalizeDivisionValue(team.division);
     }
     rebuildCareerDivisions(career);
-    if (myTeam) activeDivision = canonicalizeDivisionValue(myTeam->division);
-    else if (!divisions.empty()) activeDivision = canonicalizeDivisionValue(divisions.front().id);
-    if (!activeDivision.empty()) career.setActiveDivision(activeDivision);
+    const string legacyDivision = myTeam ? canonicalizeDivisionValue(myTeam->division)
+                                         : (divisions.empty() ? string() : canonicalizeDivisionValue(divisions.front().id));
+    if (!legacyDivision.empty()) career.setActiveDivision(legacyDivision);
     career.syncActiveHumanManager();
     career.initializeBoardObjectives();
     career.initializeSeasonCup();

@@ -172,12 +172,13 @@ bool loadCareer(Career& career) {
     const string controlledTeam = loadedCareer.myTeam ? loadedCareer.myTeam->name : "";
     career = std::move(loadedCareer);
     career.saveFile = requestedSave;
-    if (career.activeDivision.empty() && !career.allTeams.empty()) {
-        career.activeDivision = career.allTeams.front().division;
-    }
+    const string fallbackDivision = career.activeDivision.empty() && !career.allTeams.empty()
+                                        ? career.allTeams.front().division
+                                        : career.activeDivision;
     career.applyActiveHumanManager();
-    if (!career.activeDivision.empty()) {
-        career.setActiveDivision(career.activeDivision);
+    const string relinkDivision = career.activeDivision.empty() ? fallbackDivision : career.activeDivision;
+    if (!relinkDivision.empty()) {
+        career.setActiveDivision(relinkDivision);
     }
     career.myTeam = controlledTeam.empty() ? nullptr : career.findTeamByName(controlledTeam);
     career.syncActiveHumanManager();

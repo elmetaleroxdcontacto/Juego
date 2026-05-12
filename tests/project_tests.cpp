@@ -448,7 +448,6 @@ void testStartupValidationSummaryExposesExternalAudit() {
 
 void testCompetitionGroupTableScopesActiveGroup() {
     Career career;
-    career.activeDivision = "segunda division";
     static const vector<string> names = {
         "Norte Azul", "Norte Rojo", "Norte Blanco", "Norte Negro", "Norte Plata", "Norte Cobre", "Norte Mar",
         "Sur Verde", "Sur Oro", "Sur Celeste", "Sur Vino", "Sur Gris", "Sur Arena", "Sur Austral"
@@ -459,12 +458,8 @@ void testCompetitionGroupTableScopesActiveGroup() {
         career.allTeams.back().points = points[i];
     }
 
-    for (size_t i = 0; i < career.allTeams.size(); ++i) {
-        career.activeTeams.push_back(&career.allTeams[i]);
-        if (i < 7) career.groupNorthIdx.push_back(static_cast<int>(i));
-        else career.groupSouthIdx.push_back(static_cast<int>(i));
-    }
-    career.myTeam = career.activeTeams[0];
+    career.setActiveDivision("segunda division");
+    career.myTeam = career.getActiveTeamAt(0);
 
     const LeagueTable northTable = buildCompetitionGroupTable(career, true);
     expect(northTable.title == "Grupo Norte", "La tabla del grupo norte debe usar el titulo correcto.");
@@ -484,18 +479,13 @@ void testCompetitionGroupTableScopesActiveGroup() {
 void testTeamRepositoryResolvesStableIds() {
     Career career;
     career.allTeams.clear();
-    career.activeTeams.clear();
 
     career.allTeams.emplace_back("Repo Norte");
     career.allTeams.back().division = "primera division";
     career.allTeams.emplace_back("Repo Sur");
     career.allTeams.back().division = "primera division";
-    career.activeTeams.push_back(&career.allTeams[0]);
-    career.activeTeams.push_back(&career.allTeams[1]);
-    career.activeDivision = "primera division";
-    career.syncActiveTeamIds();
-    career.rebuildActiveLeagueTable();
-    career.myTeam = &career.allTeams[1];
+    career.refreshActiveDivisionTeamLinks("primera division");
+    career.myTeam = career.findTeamByName("Repo Sur");
     career.currentSeason = 2;
     career.currentWeek = 7;
 
@@ -508,9 +498,8 @@ void testTeamRepositoryResolvesStableIds() {
     expect(repository.getActiveTeamByScheduleIndex(1) == career.myTeam,
            "El acceso por indice de calendario debe validar y devolver el equipo activo.");
     expect(managedId == career.getActiveTeamIdAt(1), "Career debe exponer IDs seguros para equipos activos.");
-    expect(career.activeTeamIds.size() == career.activeTeams.size(),
+    expect(career.hasSyncedActiveTeamIds(),
            "Career debe mantener una lista paralela de IDs activos.");
-    expect(career.activeTeamIds[1] == managedId, "La lista de IDs activos debe conservar el orden competitivo.");
     expect(career.leagueTable.teams.size() == 2 && career.leagueTable.teams[1] == career.myTeam,
            "La tabla activa debe reconstruirse desde el acceso seguro de equipos activos.");
 
@@ -523,7 +512,7 @@ void testTeamRepositoryResolvesStableIds() {
     career.allTeams.emplace_back("Repo Reserva");
     career.allTeams.back().division = "primera division";
     career.activeTeams.push_back(&career.allTeams[2]);
-    expect(career.activeTeamIds.size() == 2, "El test conserva IDs desactualizados para cubrir fallback legacy.");
+    expect(!career.hasSyncedActiveTeamIds(), "El test conserva IDs desactualizados para cubrir fallback legacy.");
     expect(career.getActiveTeamCount() == 3,
            "Career debe caer a activeTeams si activeTeamIds queda desincronizado.");
     expect(career.getActiveTeamAt(2) == &career.allTeams[2],
@@ -531,7 +520,7 @@ void testTeamRepositoryResolvesStableIds() {
     expect(career.getActiveTeamIdAt(2) == career.getTeamIdFor(&career.allTeams[2]),
            "El acceso por ID debe caer al puntero legacy cuando la lista paralela esta desfasada.");
     career.refreshActiveDivisionTeamLinks("primera division");
-    expect(career.activeTeamIds.size() == 3 && career.leagueTable.teams.size() == 3,
+    expect(career.hasSyncedActiveTeamIds() && career.leagueTable.teams.size() == 3,
            "Career debe poder relinkear la division activa y reconstruir IDs/tabla sin rehacer calendario.");
     expect(career.activeDivision == "primera division",
            "El relink activo debe fijar la division canonica desde el parametro recibido.");
@@ -545,10 +534,8 @@ void testCareerServiceWrapperProducesGameplayOutputs() {
     career.currentWeek = 5;
     career.allTeams.push_back(makeTeam("Servicio FC", "primera division", 66, 3, 3, "Balanced", "Equilibrado"));
     career.allTeams.push_back(makeTeam("Servicio Rival", "primera division", 64, 2, 3, "Defensive", "Pausar juego"));
-    career.activeTeams.push_back(&career.allTeams[0]);
-    career.activeTeams.push_back(&career.allTeams[1]);
-    career.myTeam = career.activeTeams[0];
-    career.activeDivision = "primera division";
+    career.refreshActiveDivisionTeamLinks("primera division");
+    career.myTeam = career.getActiveTeamAt(0);
     career.boardConfidence = 42;
     career.myTeam->assistantCoach = 42;
     career.myTeam->fitnessCoach = 39;
@@ -734,17 +721,20 @@ void testSeasonTransitionAdvancesCareerWithoutUiDependencies() {
     career.allTeams.push_back(makeTeam("Primera B Costa", "primera b", 63, 2, 2, "Balanced", "Equilibrado", 330000));
 
     career.setActiveDivision("primera division");
-    expect(career.activeTeams.size() == 4, "La division activa debe cargar el bloque de equipos principal.");
+    expect(career.getActiveTeamCount() == 4, "La division activa debe cargar el bloque de equipos principal.");
 
     career.myTeam = career.findTeamByName("Campeon Capital");
     expect(career.myTeam != nullptr, "El equipo del usuario debe existir en el fixture.");
 
     const vector<int> points = {68, 61, 29, 23};
-    for (size_t i = 0; i < career.activeTeams.size(); ++i) {
-        career.activeTeams[i]->points = points[i];
-        career.activeTeams[i]->goalsFor = 30 - static_cast<int>(i) * 3;
-        career.activeTeams[i]->goalsAgainst = 12 + static_cast<int>(i) * 4;
-        career.activeTeams[i]->wins = points[i] / 3;
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        Team* activeTeam = career.getActiveTeamAt(i);
+        expect(activeTeam != nullptr, "La prueba necesita equipos activos validos.");
+        if (!activeTeam) continue;
+        activeTeam->points = points[static_cast<size_t>(i)];
+        activeTeam->goalsFor = 30 - i * 3;
+        activeTeam->goalsAgainst = 12 + i * 4;
+        activeTeam->wins = points[static_cast<size_t>(i)] / 3;
     }
     career.leagueTable.sortTable();
 
@@ -1021,11 +1011,14 @@ void testSeasonTransitionResolvesCarryoverPromises() {
     career.activePromises.push_back({"Promesa Tardia", "Minutos", "Titular", 30, 40, 1, false, false});
 
     const vector<int> points = {70, 61, 29, 24};
-    for (size_t i = 0; i < career.activeTeams.size(); ++i) {
-        career.activeTeams[i]->points = points[i];
-        career.activeTeams[i]->goalsFor = 31 - static_cast<int>(i) * 3;
-        career.activeTeams[i]->goalsAgainst = 12 + static_cast<int>(i) * 4;
-        career.activeTeams[i]->wins = points[i] / 3;
+    for (int i = 0; i < career.getActiveTeamCount(); ++i) {
+        Team* activeTeam = career.getActiveTeamAt(i);
+        expect(activeTeam != nullptr, "La prueba necesita equipos activos validos.");
+        if (!activeTeam) continue;
+        activeTeam->points = points[static_cast<size_t>(i)];
+        activeTeam->goalsFor = 31 - i * 3;
+        activeTeam->goalsAgainst = 12 + i * 4;
+        activeTeam->wins = points[static_cast<size_t>(i)] / 3;
     }
     career.leagueTable.sortTable();
 
@@ -2081,6 +2074,73 @@ void testTransferWindowBlocksImmediateDeals() {
     career.currentWeek = 10;
     expect(transfer_market::isTransferWindowOpen(career),
            "La semana media debe abrir una segunda ventana de mercado.");
+}
+
+void testTransferServicesMoveBoughtAndLoanedPlayers() {
+    Career career;
+    career.currentSeason = 2;
+    career.currentWeek = 1;
+    career.managerReputation = 95;
+
+    career.allTeams.push_back(makeTeam("Mercado Local", "primera division", 72, 3, 3, "Balanced", "Equilibrado", 8000000));
+    career.allTeams.push_back(makeTeam("Mercado Vendedor", "primera b", 68, 3, 3, "Balanced", "Equilibrado", 900000));
+    career.allTeams.push_back(makeTeam("Mercado Destino", "primera b", 64, 2, 3, "Balanced", "Equilibrado", 800000));
+    career.allTeams[0].sponsorWeekly = 140000;
+    career.allTeams[0].fanBase = 80;
+    career.allTeams[0].trainingFacilityLevel = 5;
+    career.allTeams[0].youthFacilityLevel = 5;
+    career.allTeams[0].assistantCoach = 84;
+    career.allTeams[0].performanceAnalyst = 84;
+    career.allTeams[1].fanBase = 12;
+    career.allTeams[1].trainingFacilityLevel = 1;
+    career.allTeams[1].youthFacilityLevel = 1;
+    career.allTeams[1].sponsorWeekly = 35000;
+    career.allTeams[1].players[0].wantsToLeave = true;
+    career.allTeams[1].players[0].ambition = 35;
+    career.allTeams[1].players[0].professionalism = 80;
+    career.allTeams[1].players[0].adaptation = 80;
+    ensureTeamIdentity(career.allTeams[0]);
+    ensureTeamIdentity(career.allTeams[1]);
+    career.allTeams[1].addPlayer(makePlayer("Mercado Vendedor_Extra1", "MED", 66, 74, 22, 74, 76));
+    career.allTeams[1].addPlayer(makePlayer("Mercado Vendedor_Extra2", "DEL", 65, 73, 23, 72, 75));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Mercado Local");
+    expect(career.myTeam != nullptr, "La prueba de mercado necesita club usuario.");
+
+    auto hasPlayer = [](const Team* team, const string& playerName) {
+        return team && any_of(team->players.begin(), team->players.end(), [&](const Player& player) {
+            return player.name == playerName;
+        });
+    };
+
+    Team* seller = career.findTeamByName("Mercado Vendedor");
+    Team* receiver = career.findTeamByName("Mercado Destino");
+    expect(seller != nullptr && receiver != nullptr, "La prueba de mercado necesita clubes destino.");
+
+    ServiceResult buyResult =
+        buyTransferTargetService(career,
+                                 "Mercado Vendedor",
+                                 "Mercado Vendedor_P1",
+                                 NegotiationProfile::Safe,
+                                 NegotiationPromise::Starter);
+    expect(buyResult.ok,
+           string("El servicio debe permitir comprar jugadores en ventana abierta. ") + joinLines(buyResult.messages));
+    expect(hasPlayer(career.myTeam, "Mercado Vendedor_P1"), "El jugador comprado debe entrar al plantel usuario.");
+    expect(!hasPlayer(seller, "Mercado Vendedor_P1"), "El jugador comprado debe salir del club vendedor.");
+
+    ServiceResult loanInResult = loanInPlayerService(career, "Mercado Vendedor", "Mercado Vendedor_P2", 26);
+    expect(loanInResult.ok, "El servicio debe permitir pedir un jugador cedido en ventana abierta.");
+    expect(hasPlayer(career.myTeam, "Mercado Vendedor_P2"), "El jugador cedido debe entrar al plantel usuario.");
+    auto loanedIn = find_if(career.myTeam->players.begin(), career.myTeam->players.end(), [](const Player& player) {
+        return player.name == "Mercado Vendedor_P2";
+    });
+    expect(loanedIn != career.myTeam->players.end() && loanedIn->onLoan && loanedIn->parentClub == "Mercado Vendedor",
+           "El prestamo entrante debe conservar club propietario y estado de cesion.");
+
+    ServiceResult loanOutResult = loanOutPlayerService(career, "Mercado Local_P3", "Mercado Destino", 20);
+    expect(loanOutResult.ok, "El servicio debe permitir ceder jugadores propios en ventana abierta.");
+    expect(!hasPlayer(career.myTeam, "Mercado Local_P3"), "El jugador cedido debe salir temporalmente del plantel usuario.");
+    expect(hasPlayer(receiver, "Mercado Local_P3"), "El jugador cedido debe llegar al club destino.");
 }
 
 void testMarketPulseReflectsClosedWindow() {
@@ -3226,6 +3286,7 @@ int main() {
         {"transfer_briefing", testTransferBriefingBuildsActionableMarketView},
         {"scouting_briefing_uncertainty", testScoutingBriefingMasksUncertainAttributes},
         {"transfer_window_rules", testTransferWindowBlocksImmediateDeals},
+        {"transfer_buy_and_loans", testTransferServicesMoveBoughtAndLoanedPlayers},
         {"market_pulse_window", testMarketPulseReflectsClosedWindow},
         {"career_runtime_scope", testCareerRuntimeScopeRestoresContext},
         {"season_service_runtime_forwarding", testSeasonServiceForwardsRuntimeMessages},

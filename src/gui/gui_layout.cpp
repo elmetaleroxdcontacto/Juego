@@ -794,6 +794,7 @@ void showActionButtonsForPage(AppState& state) {
         {state.followShortlistButton, {GuiPage::Transfers, GuiPage::News}},
         {state.buyButton, {GuiPage::Transfers}},
         {state.preContractButton, {GuiPage::Transfers}},
+        {state.loanButton, {GuiPage::Transfers, GuiPage::Squad, GuiPage::Youth}},
         {state.renewButton, {GuiPage::Squad, GuiPage::Finances}},
         {state.sellButton, {GuiPage::Squad, GuiPage::Transfers}},
         {state.planButton, {GuiPage::Squad, GuiPage::Youth}},
@@ -1069,14 +1070,14 @@ void layoutCareerDashboard(AppState& state, const RECT& client) {
     const int gridCols = contentWidth < s(620) ? 2 : (contentWidth < s(1040) ? 3 : 4);
     const int buttonWidth = std::max(s(140), (contentWidth - buttonGap * (gridCols - 1)) / gridCols);
 
-    const std::array<HWND, 36> hiddenControls = {
+    const std::array<HWND, 37> hiddenControls = {
         state.divisionLabel, state.teamLabel, state.managerLabel, state.managerHelpLabel,
         state.divisionCombo, state.teamCombo, state.managerEdit,
         state.filterLabel, state.filterCombo,
         state.newCareerButton, state.loadButton, state.validateButton, state.displayModeButton,
         state.breadcrumbLabel, state.newsLabel, state.newsList,
         state.scoutActionButton, state.shortlistButton, state.followShortlistButton, state.buyButton,
-        state.preContractButton, state.renewButton, state.sellButton, state.planButton,
+        state.preContractButton, state.loanButton, state.renewButton, state.sellButton, state.planButton,
         state.instructionButton, state.youthUpgradeButton, state.trainingUpgradeButton,
         state.scoutingUpgradeButton, state.stadiumUpgradeButton,
         state.menuContinueButton, state.menuPlayButton, state.menuLoadButton, state.menuBackButton,
@@ -1303,9 +1304,9 @@ void applyInterfaceFonts(AppState& state) {
     };
     for (HWND hwnd : buttons) setControlFont(hwnd, state.font);
 
-    const std::array<HWND, 13> actionButtons = {
+    const std::array<HWND, 14> actionButtons = {
         state.scoutActionButton, state.shortlistButton, state.followShortlistButton, state.buyButton,
-        state.preContractButton, state.renewButton, state.sellButton, state.planButton, state.instructionButton,
+        state.preContractButton, state.loanButton, state.renewButton, state.sellButton, state.planButton, state.instructionButton,
         state.youthUpgradeButton, state.trainingUpgradeButton, state.scoutingUpgradeButton, state.stadiumUpgradeButton
     };
     for (HWND hwnd : actionButtons) setControlFont(hwnd, state.font);
@@ -1321,6 +1322,29 @@ void applyInterfaceFonts(AppState& state) {
 
     if (state.newsList) {
         SendMessageW(state.newsList, LB_SETITEMHEIGHT, 0, scaleByDpi(state, 24));
+    }
+}
+
+void hideSimulationProgressCoveredControls(AppState& state) {
+    // The progress overlay is painted by the parent window, so child HWNDs must be hidden while it is active.
+    const HWND coveredControls[] = {
+        state.breadcrumbLabel, state.pageTitleLabel, state.infoLabel,
+        state.filterLabel, state.filterCombo,
+        state.summaryLabel, state.summaryEdit,
+        state.tableLabel, state.tableList,
+        state.squadLabel, state.squadList,
+        state.transferLabel, state.transferList,
+        state.detailLabel, state.detailEdit,
+        state.newsLabel, state.newsList,
+        state.emptyNewButton, state.emptyLoadButton, state.emptyValidateButton,
+        state.scoutActionButton, state.shortlistButton, state.followShortlistButton,
+        state.buyButton, state.preContractButton, state.loanButton, state.renewButton,
+        state.sellButton, state.planButton, state.instructionButton,
+        state.youthUpgradeButton, state.trainingUpgradeButton,
+        state.scoutingUpgradeButton, state.stadiumUpgradeButton
+    };
+    for (HWND hwnd : coveredControls) {
+        setControlVisibility(state, hwnd, false, 16, 16);
     }
 }
 
@@ -1582,6 +1606,7 @@ void layoutWindow(AppState& state) {
         layoutCareerDashboard(state, client);
         applyEditInteriorPadding(state, state.summaryEdit, 10, 8);
         applyEditInteriorPadding(state, state.detailEdit, 10, 8);
+        if (state.simulationProgressActive) hideSimulationProgressCoveredControls(state);
         if (syncScrollState()) return;
         return;
     }
@@ -1795,7 +1820,7 @@ void layoutWindow(AppState& state) {
     showActionButtonsForPage(state);
     std::vector<ActionButtonRef> visibleButtons = {
         {state.scoutActionButton, 92}, {state.shortlistButton, 92}, {state.followShortlistButton, 98},
-        {state.buyButton, 92}, {state.preContractButton, 102}, {state.renewButton, 92},
+        {state.buyButton, 92}, {state.preContractButton, 102}, {state.loanButton, 96}, {state.renewButton, 92},
         {state.sellButton, 92}, {state.planButton, 92}, {state.instructionButton, 112},
         {state.youthUpgradeButton, 94}, {state.trainingUpgradeButton, 96},
         {state.scoutingUpgradeButton, 94}, {state.stadiumUpgradeButton, 96}
@@ -1932,6 +1957,7 @@ void layoutWindow(AppState& state) {
                          s(20));
         applyEditInteriorPadding(state, state.summaryEdit, 10, 8);
         applyEditInteriorPadding(state, state.detailEdit, 10, 8);
+        if (state.simulationProgressActive) hideSimulationProgressCoveredControls(state);
         if (syncScrollState()) return;
         return;
     }
@@ -2009,6 +2035,7 @@ void layoutWindow(AppState& state) {
                      s(20));
     applyEditInteriorPadding(state, state.summaryEdit, 10, 8);
     applyEditInteriorPadding(state, state.detailEdit, 10, 8);
+    if (state.simulationProgressActive) hideSimulationProgressCoveredControls(state);
     if (syncScrollState()) return;
 }
 
@@ -2110,8 +2137,9 @@ void initializeInterface(AppState& state) {
     state.scoutActionButton = createControl(state, 0, L"BUTTON", L"Otear", buttonStyle, 0, 0, 92, 26, state.window, IDC_SCOUT_BUTTON);
     state.shortlistButton = createControl(state, 0, L"BUTTON", L"Shortlist", buttonStyle, 0, 0, 92, 26, state.window, IDC_SHORTLIST_BUTTON);
     state.followShortlistButton = createControl(state, 0, L"BUTTON", L"Actualizar", buttonStyle, 0, 0, 98, 26, state.window, IDC_FOLLOW_SHORTLIST_BUTTON);
-    state.buyButton = createControl(state, 0, L"BUTTON", L"Fichar", buttonStyle, 0, 0, 92, 26, state.window, IDC_BUY_BUTTON);
+    state.buyButton = createControl(state, 0, L"BUTTON", L"Comprar", buttonStyle, 0, 0, 92, 26, state.window, IDC_BUY_BUTTON);
     state.preContractButton = createControl(state, 0, L"BUTTON", L"Precontrato", buttonStyle, 0, 0, 102, 26, state.window, IDC_PRECONTRACT_BUTTON);
+    state.loanButton = createControl(state, 0, L"BUTTON", L"Cesion", buttonStyle, 0, 0, 96, 26, state.window, IDC_LOAN_BUTTON);
     state.renewButton = createControl(state, 0, L"BUTTON", L"Renovar", buttonStyle, 0, 0, 92, 26, state.window, IDC_RENEW_BUTTON);
     state.sellButton = createControl(state, 0, L"BUTTON", L"Vender", buttonStyle, 0, 0, 92, 26, state.window, IDC_SELL_BUTTON);
     state.planButton = createControl(state, 0, L"BUTTON", L"Plan", buttonStyle, 0, 0, 92, 26, state.window, IDC_PLAN_BUTTON);
@@ -2362,6 +2390,14 @@ void paintWindowChrome(AppState& state, HDC hdc) {
         if (IsWindowVisible(state.newsList)) drawRoundedPanel(hdc, newsCard, RGB(15, 27, 37), RGB(44, 72, 90), s(18));
         drawRoundedPanel(hdc, statusCard, RGB(11, 23, 31), RGB(39, 65, 79), s(12));
         SelectObject(hdc, oldFont);
+        drawSimulationProgressOverlay(state, hdc, client);
+        return;
+    }
+
+    if (state.layout.dashboardPage && !state.layout.dashboardEmptyState) {
+        if (rectHasArea(state.layout.statusBar)) {
+            drawRoundedPanel(hdc, state.layout.statusBar, RGB(11, 23, 31), RGB(39, 65, 79), s(12));
+        }
         drawSimulationProgressOverlay(state, hdc, client);
         return;
     }

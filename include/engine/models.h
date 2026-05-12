@@ -375,6 +375,7 @@ struct Career {
     void initializeLeague(bool forceReload = false);
     std::vector<Team*> getDivisionTeams(const std::string& id);
     void syncActiveTeamIds();
+    bool hasSyncedActiveTeamIds() const;
     void rebuildActiveLeagueTable();
     void refreshActiveDivisionTeamLinks();
     void refreshActiveDivisionTeamLinks(const std::string& id);
@@ -431,11 +432,6 @@ struct Career {
     bool isValidTeamIndex(int index) const;
     // === END SAFE ACCESS METHODS ===
 
-    // === PHASE 3: CONST CORRECTNESS & CONST REFERENCES ===
-    // Provide non-const access to mutable division reference but const access to read
-    const std::vector<Team*>& getActiveDivisionTeamsRef() const;
-    std::vector<Team*>& getActiveDivisionTeamsRef();
-    // === END PHASE 3 ===
 };
 
 struct MatchResult {

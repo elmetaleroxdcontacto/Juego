@@ -944,6 +944,9 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
                 case IDC_PRECONTRACT_BUTTON:
                     runPreContractAction(*state);
                     return 0;
+                case IDC_LOAN_BUTTON:
+                    runLoanAction(*state);
+                    return 0;
                 case IDC_RENEW_BUTTON:
                     runRenewAction(*state);
                     return 0;

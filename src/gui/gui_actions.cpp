@@ -3,6 +3,7 @@
 
 #ifdef _WIN32
 
+#include "competition/competition.h"
 #include "career/career_runtime.h"
 #include "engine/game_settings.h"
 #include "utils/utils.h"
@@ -215,6 +216,7 @@ void setSimulationProgress(AppState& state,
                            const std::string& detail,
                            int percent,
                            const std::vector<std::string>& events = {}) {
+    const bool wasActive = state.simulationProgressActive;
     state.simulationProgressActive = true;
     state.simulationProgressPhase = phase;
     state.simulationProgressDetail = detail;
@@ -222,23 +224,75 @@ void setSimulationProgress(AppState& state,
     state.simulationProgressEvents = events;
     setStatus(state, progressStatusLine(phase, detail, state.simulationProgressPercent));
     if (state.window && IsWindow(state.window)) {
+        if (!wasActive) layoutWindow(state);
         InvalidateRect(state.window, nullptr, TRUE);
     }
 }
 
 void clearSimulationProgress(AppState& state) {
+    const bool wasActive = state.simulationProgressActive;
     state.simulationProgressActive = false;
     state.simulationProgressPhase.clear();
     state.simulationProgressDetail.clear();
     state.simulationProgressEvents.clear();
     state.simulationProgressPercent = 0;
     if (state.window && IsWindow(state.window)) {
+        if (wasActive) layoutWindow(state);
         InvalidateRect(state.window, nullptr, TRUE);
     }
 }
 
 std::string managedTeamName(const Career& career) {
     return career.myTeam ? career.myTeam->name : std::string();
+}
+
+const Player* findManagedPlayer(const Career& career, const std::string& playerName) {
+    if (!career.myTeam) return nullptr;
+    for (const Player& player : career.myTeam->players) {
+        if (player.name == playerName) return &player;
+    }
+    return nullptr;
+}
+
+std::string recommendedLoanDestination(const Career& career, const Player& player) {
+    if (!career.myTeam) return "";
+    const std::string role = normalizePosition(player.position);
+    const Team* bestTeam = nullptr;
+    int bestScore = -100000;
+    for (const Team& candidate : career.allTeams) {
+        if (&candidate == career.myTeam) continue;
+        if (candidate.name == player.parentClub) continue;
+        const int maxSquadSize = getCompetitionConfig(candidate.division).maxSquadSize;
+        if (maxSquadSize > 0 && static_cast<int>(candidate.players.size()) >= maxSquadSize) continue;
+
+        bool duplicateName = false;
+        int sameRoleCount = 0;
+        int sameRoleSkill = 0;
+        for (const Player& squadPlayer : candidate.players) {
+            if (squadPlayer.name == player.name) {
+                duplicateName = true;
+                break;
+            }
+            if (normalizePosition(squadPlayer.position) == role) {
+                sameRoleCount++;
+                sameRoleSkill += squadPlayer.skill;
+            }
+        }
+        if (duplicateName) continue;
+
+        const int averageRoleSkill = sameRoleCount == 0 ? 45 : sameRoleSkill / sameRoleCount;
+        int score = 0;
+        score += candidate.division == career.myTeam->division ? 10 : 0;
+        score += std::max(0, player.skill - averageRoleSkill);
+        score += std::max(0, 3 - sameRoleCount) * 8;
+        score += std::max(0, 24 - static_cast<int>(candidate.players.size()));
+        score += candidate.trainingFacilityLevel + candidate.youthFacilityLevel;
+        if (!bestTeam || score > bestScore || (score == bestScore && candidate.name < bestTeam->name)) {
+            bestTeam = &candidate;
+            bestScore = score;
+        }
+    }
+    return bestTeam ? bestTeam->name : std::string();
 }
 
 void relinkCareerPointers(Career& career, const std::string& teamName) {
@@ -692,6 +746,50 @@ void runPreContractAction(AppState& state) {
                                                   listViewText(state.squadList, row, 10),
                                                   listViewText(state.squadList, row, 0));
     finalizeAction(state, result, "Precontrato");
+}
+
+void runLoanAction(AppState& state) {
+    constexpr int kDefaultLoanWeeks = 26;
+    if (state.currentPage == GuiPage::Transfers) {
+        int row = selectedListViewRow(state.squadList);
+        if (row < 0) {
+            MessageBoxW(state.window, L"Selecciona un objetivo del mercado.", L"Cesion", MB_OK | MB_ICONINFORMATION);
+            return;
+        }
+        ServiceResult result = loanInPlayerService(state.career,
+                                                   listViewText(state.squadList, row, 10),
+                                                   listViewText(state.squadList, row, 0),
+                                                   kDefaultLoanWeeks);
+        finalizeAction(state, result, "Cesion entrante");
+        return;
+    }
+
+    if (state.currentPage == GuiPage::Squad || state.currentPage == GuiPage::Youth) {
+        int row = selectedListViewRow(state.squadList);
+        if (row < 0) {
+            MessageBoxW(state.window, L"Selecciona un jugador de tu plantilla.", L"Ceder jugador", MB_OK | MB_ICONINFORMATION);
+            return;
+        }
+        const std::string playerName = listViewText(state.squadList, row, 0);
+        const Player* player = findManagedPlayer(state.career, playerName);
+        if (!player) {
+            MessageBoxW(state.window, L"No se encontro el jugador seleccionado.", L"Ceder jugador", MB_OK | MB_ICONWARNING);
+            return;
+        }
+        const std::string destination = recommendedLoanDestination(state.career, *player);
+        if (destination.empty()) {
+            MessageBoxW(state.window,
+                        L"No hay un club destino con cupo para recibir la cesion.",
+                        L"Ceder jugador",
+                        MB_OK | MB_ICONINFORMATION);
+            return;
+        }
+        ServiceResult result = loanOutPlayerService(state.career, playerName, destination, kDefaultLoanWeeks);
+        finalizeAction(state, result, "Cesion saliente");
+        return;
+    }
+
+    MessageBoxW(state.window, L"Abre Fichajes para pedir cesiones o Plantilla para ceder jugadores.", L"Cesion", MB_OK | MB_ICONINFORMATION);
 }
 
 void runRenewAction(AppState& state) {

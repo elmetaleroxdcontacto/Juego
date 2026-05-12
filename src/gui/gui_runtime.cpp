@@ -30,7 +30,7 @@ std::vector<HWND> pageRefreshTargets(const AppState& state) {
         state.squadLabel, state.squadList, state.transferLabel, state.transferList,
         state.detailLabel, state.detailEdit, state.newsLabel, state.newsList, state.statusLabel,
         state.scoutActionButton, state.shortlistButton, state.followShortlistButton, state.buyButton,
-        state.preContractButton, state.renewButton, state.sellButton, state.planButton, state.instructionButton,
+        state.preContractButton, state.loanButton, state.renewButton, state.sellButton, state.planButton, state.instructionButton,
         state.youthUpgradeButton, state.trainingUpgradeButton, state.scoutingUpgradeButton, state.stadiumUpgradeButton,
         state.menuContinueButton, state.menuPlayButton, state.menuSettingsButton, state.menuLoadButton,
         state.menuDeleteSaveButton,
@@ -658,6 +658,9 @@ void refreshCurrentPage(AppState& state) {
     if (state.scoutActionButton) {
         setWindowTextUtf8(state.scoutActionButton, state.currentPage == GuiPage::News ? "Asignar" : "Otear");
     }
+    if (state.loanButton) {
+        setWindowTextUtf8(state.loanButton, state.currentPage == GuiPage::Transfers ? "Pedir cesion" : "Ceder");
+    }
 
     renderListPanel(state, state.tableLabel, state.tableList, state.currentModel.primary);
     renderListPanel(state, state.squadLabel, state.squadList, state.currentModel.secondary);
@@ -747,9 +750,9 @@ void handleListSelectionChange(AppState& state, int controlId) {
         refreshCurrentPage(state);
         return;
     }
-    if (state.currentPage == GuiPage::Transfers && controlId == IDC_SQUAD_LIST) {
-        state.selectedTransferPlayer = listViewText(state.squadList, row, 0);
-        state.selectedTransferClub = listViewText(state.squadList, row, 10);
+    if (state.currentPage == GuiPage::Transfers && controlId == IDC_TABLE_LIST) {
+        state.selectedTransferPlayer = listViewText(state.tableList, row, 0);
+        state.selectedTransferClub = listViewText(state.tableList, row, 10);
         refreshCurrentPage(state);
         return;
     }
