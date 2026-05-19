@@ -44,6 +44,33 @@ TacticalProfile buildTacticalProfile(const Team& team) {
     profile.setPieceThreat = (team.matchInstruction == "Balon parado" ? 0.34 : 0.0) +
                              max(0, team.width - 3) * 0.04;
 
+    if (team.clubStyle == "Presion vertical") {
+        profile.pressing += 0.08;
+        profile.risk += 0.07;
+    } else if (team.clubStyle == "Transicion directa") {
+        profile.transitionThreat += 0.12;
+        profile.directness += 0.08;
+    } else if (team.clubStyle == "Ataque por bandas") {
+        profile.width += 0.10;
+        profile.mentality += 0.05;
+    } else if (team.clubStyle == "Bloque ordenado") {
+        profile.defensiveBlock += 0.12;
+        profile.mentality -= 0.06;
+    } else if (team.clubStyle == "Control de posesion") {
+        profile.mentality += 0.08;
+        profile.width += 0.06;
+        profile.directness -= 0.05;
+    }
+
+    if (team.headCoachStyle == "Intensidad") {
+        profile.pressing += 0.06;
+        profile.risk += 0.06;
+    } else if (team.headCoachStyle == "Presion") {
+        profile.pressing += 0.04;
+    } else if (team.headCoachStyle == "Defensivo") {
+        profile.defensiveBlock += 0.08;
+    }
+
     if (team.matchInstruction == "Bloque bajo") {
         profile.defensiveBlock += 0.18;
         profile.tempo = max(0.20, profile.tempo - 0.08);

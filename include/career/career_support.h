@@ -8,6 +8,7 @@
 
 std::string boardStatusLabel(int confidence);
 std::string managerStyleLabel(const Team& team);
+int clubPhilosophyAlignmentScore(const Career& career, const Team& team);
 
 std::vector<Team*> buildJobMarket(const Career& career, bool emergency = false);
 void takeManagerJob(Career& career, Team* newClub, const std::string& reason);

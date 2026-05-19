@@ -23,6 +23,44 @@ string managerStyleLabel(const Team& team) {
     return "equilibrado";
 }
 
+int clubPhilosophyAlignmentScore(const Career& career, const Team& team) {
+    int score = 50;
+    if (!team.clubStyle.empty()) {
+        if (team.clubStyle == "Control de posesion") {
+            score += (team.matchInstruction != "Juego directo") ? 10 : -8;
+        } else if (team.clubStyle == "Presion vertical") {
+            score += (team.matchInstruction != "Bloque bajo") ? 10 : -6;
+        } else if (team.clubStyle == "Ataque por bandas") {
+            score += (team.matchInstruction == "Por bandas") ? 12 : -6;
+        } else if (team.clubStyle == "Bloque ordenado") {
+            score += (team.matchInstruction == "Bloque bajo") ? 12 : -6;
+        } else if (team.clubStyle == "Transicion directa") {
+            score += (team.matchInstruction == "Juego directo") ? 10 : 4;
+        }
+    }
+
+    if (!team.youthIdentity.empty()) {
+        if (team.youthIdentity.find("Cantera") != string::npos) score += 10;
+        else if (team.youthIdentity.find("Desarrollo") != string::npos) score += 6;
+    }
+
+    if (!career.boardMonthlyObjective.empty()) {
+        const string& objective = career.boardMonthlyObjective;
+        if (objective.find("titularidades") != string::npos) {
+            if (team.youthIdentity.find("Cantera") != string::npos) score += 20;
+            else score -= 10;
+        } else if (objective.find("presupuesto") != string::npos) {
+            if (team.clubStyle == "Bloque ordenado" || team.clubStyle == "Presion vertical") score += 15;
+            else score -= 4;
+        } else if (objective.find("posicion") != string::npos) {
+            score += 8;
+        } else if (objective.find("puntos") != string::npos) {
+            score += 8;
+        }
+    }
+    return clampInt(score, 10, 100);
+}
+
 vector<Team*> buildJobMarket(const Career& career, bool emergency) {
     vector<Team*> jobs;
     if (!career.myTeam) return jobs;
@@ -192,6 +230,13 @@ vector<string> buildNextOpponentPlanLines(const Career& career, size_t limit) {
     push("Vulnerabilidad | " + vulnerability + ".");
     push("Plan sugerido | instruccion " + suggestedInstruction +
          " | entrenamiento " + (myHeavyLegs >= 4 ? string("Recuperacion") : string("Preparacion partido")) + ".");
+
+    if (!team.clubStyle.empty()) {
+        push("Sello del club | " + team.clubStyle + " | alinea el plan con la identidad del equipo.");
+    }
+    if (!team.youthIdentity.empty()) {
+        push("Cantera | " + team.youthIdentity + " | gestiona minutos juveniles segun la politica del club.");
+    }
 
     if (areRivalClubs(team, *opponent)) {
         push("Riesgo emocional | clasico: cuida disciplina, promesas y liderazgo del vestuario.");

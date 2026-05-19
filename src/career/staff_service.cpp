@@ -188,15 +188,25 @@ vector<StaffRecommendation> buildStaffRecommendations(const Career& career, size
         youthCount >= 2 ? "Dar minutos selectivos y proteger el desarrollo."
                         : "Invertir en cantera o revisar la region de captacion.");
 
+    string analystSummary = career.lastMatchCenter.opponentName.empty()
+                                ? "Todavia no hay un ultimo rival claro cargado para lectura fina."
+                                : "Resume rival y ultimo partido: " + buildOpponentReport(career);
+    string analystAction = career.lastMatchCenter.opponentName.empty()
+                                ? "Preparar contexto rival y patrones de partido."
+                                : "Ajustar instruccion segun lectura rival.";
+    if (!team.clubStyle.empty() && team.clubStyle == "Control de posesion" && team.matchInstruction == "Juego directo") {
+        analystSummary += " El club busca posesion pero el planteo actual es directo.";
+        analystAction = "Alinear instruccion y plan al sello del club.";
+    } else if (!team.clubStyle.empty() && team.clubStyle == "Presion vertical" && team.matchInstruction == "Bloque bajo") {
+        analystSummary += " El sello del club es presionar, pero la instruccion actual es demasiado conservadora.";
+        analystAction = "Ajustar presion o cambiar el plan para mantener el estilo de identidad.";
+    }
     pushRecommendation(
         recommendations,
         "Analista",
         max(0, 55 - team.performanceAnalyst) + max(0, 40 - career.boardConfidence) / 2,
-        career.lastMatchCenter.opponentName.empty()
-            ? "Todavia no hay un ultimo rival claro cargado para lectura fina."
-            : "Resume rival y ultimo partido: " + buildOpponentReport(career),
-        career.lastMatchCenter.opponentName.empty() ? "Preparar contexto rival y patrones de partido."
-                                                    : "Ajustar instruccion segun lectura rival.");
+        analystSummary,
+        analystAction);
 
     pushRecommendation(
         recommendations,

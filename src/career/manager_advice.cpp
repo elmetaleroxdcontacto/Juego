@@ -95,6 +95,7 @@ vector<string> buildManagerActionLines(const Career& career, size_t limit) {
     const int shortContracts = shortContractCount(team);
     const int injured = injuredCount(team);
     const int heavyLoad = heavyLoadCount(team);
+    const int philosophyScore = clubPhilosophyAlignmentScore(career, team);
 
     if (heavyLoad >= 4 || dressing.fatigueRiskCount >= 3) {
         pushUniqueLine(lines,
@@ -123,6 +124,13 @@ vector<string> buildManagerActionLines(const Career& career, size_t limit) {
     if (career.boardConfidence <= 42 || monthlyObjectiveUnderPressure(career)) {
         pushUniqueLine(lines,
                        "Directiva en alerta: toca sumar progreso visible en el objetivo mensual o en la tabla.");
+    }
+    if (philosophyScore < 45) {
+        pushUniqueLine(lines,
+                       "Revisar coherencia de club: estilo, cantera y objetivo mensual no estan alineados.");
+    } else if (philosophyScore >= 78) {
+        pushUniqueLine(lines,
+                       "La filosofia del club, los objetivos y el plan tactico muestran buena coherencia.");
     }
     if (team.debt > team.sponsorWeekly * 10 || team.budget < max(150000LL, team.sponsorWeekly * 3)) {
         pushUniqueLine(lines,
@@ -209,6 +217,19 @@ vector<string> buildCareerStorylines(const Career& career, size_t limit) {
     }
     if (!team.youthIdentity.empty()) {
         pushUniqueLine(lines, "La politica formativa del club se lee como " + team.youthIdentity + ".");
+    }
+    if (!team.clubStyle.empty() && !team.matchInstruction.empty()) {
+        bool mismatch =
+            (team.clubStyle == "Control de posesion" && team.matchInstruction == "Juego directo") ||
+            (team.clubStyle == "Presion vertical" && team.matchInstruction == "Bloque bajo") ||
+            (team.clubStyle == "Ataque por bandas" && team.matchInstruction == "Pausar juego");
+        if (mismatch) {
+            pushUniqueLine(lines,
+                           "Alerta de coherencia: la instruccion actual no refleja el estilo de club.");
+        } else {
+            pushUniqueLine(lines,
+                           "Coherencia tactica: la instruccion actual acompana el sello del club.");
+        }
     }
     if (!career.history.empty()) {
         const SeasonHistoryEntry& last = career.history.back();

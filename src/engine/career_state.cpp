@@ -584,6 +584,41 @@ void Career::initializeSeasonCup() {
     }
 }
 
+int choosePhilosophyAwareObjectiveType(const Team& team) {
+    int chance = randInt(1, 100);
+    if (team.youthIdentity.find("Cantera") != string::npos) {
+        if (chance <= 55) return 2;
+        if (chance <= 85) return 1;
+        return 3;
+    }
+    if (team.clubStyle == "Control de posesion") {
+        if (chance <= 45) return 1;
+        if (chance <= 80) return 3;
+        return 2;
+    }
+    if (team.clubStyle == "Bloque ordenado") {
+        if (chance <= 35) return 4;
+        if (chance <= 70) return 3;
+        return 1;
+    }
+    if (team.clubStyle == "Presion vertical") {
+        if (chance <= 45) return 1;
+        if (chance <= 80) return 3;
+        return 4;
+    }
+    if (team.clubStyle == "Ataque por bandas") {
+        if (chance <= 45) return 1;
+        if (chance <= 80) return 3;
+        return 2;
+    }
+    if (team.clubStyle == "Transicion directa") {
+        if (chance <= 45) return 1;
+        if (chance <= 80) return 3;
+        return 2;
+    }
+    return randInt(1, 4);
+}
+
 void Career::initializeDynamicObjective() {
     if (!myTeam) return;
     int rank = currentCompetitiveRank();
@@ -593,7 +628,7 @@ void Career::initializeDynamicObjective() {
     boardMonthlyDeadlineWeek = min(static_cast<int>(schedule.size()), currentWeek + 3);
     if (boardMonthlyDeadlineWeek < currentWeek) boardMonthlyDeadlineWeek = currentWeek;
 
-    int objectiveType = randInt(1, 4);
+    int objectiveType = choosePhilosophyAwareObjectiveType(*myTeam);
     if (objectiveType == 1) {
         boardMonthlyTarget = 6;
         boardMonthlyObjective = "Sumar al menos 6 puntos en 4 semanas";

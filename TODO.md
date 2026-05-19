@@ -188,6 +188,9 @@ Nota: valores monetarios usan enteros de 64 bits; entrada manual hasta 1e12.
 - [x] Roles por jugador, salarios/contratos, historial de lesiones y plan de entrenamiento semanal.
 - [x] Scouting con incertidumbre, desarrollo juvenil, eventos de club y dashboard semanal.
 - [x] IA tactica adaptativa, partidos clave y modo Copa (eliminacion directa).
+- [x] Añadido impacto de identidad de club y estilo del entrenador a la generación del perfil tactico en simulacion de partido.
+- [x] Enriquecida la orientacion de pre-match plan y staff recommendations con sugerencias sobre sello de club y politica de cantera.
+- [x] Agregada advertencia de coherencia entre estilo del club y la instruccion de partido en el asesor del manager.
 
 ## Cambios recientes (2026-03-11) - Validacion, carga de planteles y saves
 - La suite de validacion ahora falla correctamente si la auditoria de plantillas detecta errores de datos.
@@ -6226,3 +6229,6 @@ Fecha: 2026-04-04
 
 - Se deja constancia final de la mejora `applyMatchPreparationPlanService`: el informe del proximo rival ahora se puede aplicar desde `Tacticas` y `Calendario` con el boton `Plan rival`.
 - Validacion ya ejecutada: compilacion de GUI/CLI/tests, `FootballManagerCLI.exe --validate` y `FootballManagerTests.exe`, todo sin fallas.
+- Agregado soporte de filosofia de club y coherencia entre estilo, juventud y objetivos de directiva en el motor de carrera.
+- Se introdujo un score de coherencia tactica en analisis de equipo y asesoramiento al manager.
+- El objetivo mensual ahora se genera priorizando el estilo del club o la identidad juvenil del equipo.

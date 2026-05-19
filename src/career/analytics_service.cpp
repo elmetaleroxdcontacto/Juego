@@ -1,5 +1,6 @@
 #include "career/analytics_service.h"
 
+#include "career/career_support.h"
 #include "simulation/player_condition.h"
 #include "utils/utils.h"
 
@@ -87,7 +88,8 @@ TeamAnalyticsSnapshot buildTeamAnalyticsSnapshot(const Career& career, const Tea
 
 vector<string> buildTeamAnalyticsLines(const Career& career, const Team& team) {
     const TeamAnalyticsSnapshot snapshot = buildTeamAnalyticsSnapshot(career, team);
-    return {
+    const int philosophyScore = clubPhilosophyAlignmentScore(career, team);
+    vector<string> lines = {
         "Indice ofensivo: " + to_string(snapshot.attackIndex),
         "Indice de control: " + to_string(snapshot.controlIndex),
         "Indice defensivo: " + to_string(snapshot.defenseIndex),
@@ -98,6 +100,8 @@ vector<string> buildTeamAnalyticsLines(const Career& career, const Team& team) {
         "Pipeline juvenil: " + to_string(snapshot.youthUpside),
         "Ventana actual: " + snapshot.pressureWindow
     };
+    lines.push_back("Coherencia de filosofia: " + to_string(philosophyScore) + "/100");
+    return lines;
 }
 
 vector<string> buildMatchTrendLines(const Career& career) {
