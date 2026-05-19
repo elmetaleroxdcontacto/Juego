@@ -340,6 +340,57 @@ std::string tacticalRecommendation(const Team& team, const TacticalRead& read) {
     return "Plan util, revisar rival y forma antes de simular.";
 }
 
+std::string compactTacticalToken(const Team& team, const Player& player) {
+    std::ostringstream out;
+    out << player.name << " [" << player.role << "/" << activeDutyFor(player)
+        << " | " << roleFitLabel(team, player) << "]";
+    return out.str();
+}
+
+std::string tacticalPitchLine(const Team& team,
+                              const std::string& label,
+                              const std::vector<const Player*>& players) {
+    std::ostringstream out;
+    out << label << ": ";
+    if (players.empty()) {
+        out << "-";
+        return out.str();
+    }
+    for (size_t i = 0; i < players.size(); ++i) {
+        if (i) out << "  /  ";
+        out << compactTacticalToken(team, *players[i]);
+    }
+    return out.str();
+}
+
+std::string buildTacticalPitchText(const Team& team, const std::vector<int>& startingXi) {
+    std::vector<const Player*> goalkeepers;
+    std::vector<const Player*> defenders;
+    std::vector<const Player*> midfielders;
+    std::vector<const Player*> forwards;
+
+    for (int index : startingXi) {
+        if (index < 0 || index >= static_cast<int>(team.players.size())) continue;
+        const Player& player = team.players[static_cast<size_t>(index)];
+        const std::string position = normalizePosition(player.position);
+        if (position == "ARQ") goalkeepers.push_back(&player);
+        else if (position == "DEF") defenders.push_back(&player);
+        else if (position == "MED") midfielders.push_back(&player);
+        else if (position == "DEL") forwards.push_back(&player);
+    }
+
+    std::ostringstream out;
+    out << "Mapa tactico\r\n";
+    out << "Sistema " << team.formation
+        << " | mentalidad " << team.tactics
+        << " | instruccion " << team.matchInstruction << "\r\n";
+    out << tacticalPitchLine(team, "DEL", forwards) << "\r\n";
+    out << tacticalPitchLine(team, "MED", midfielders) << "\r\n";
+    out << tacticalPitchLine(team, "DEF", defenders) << "\r\n";
+    out << tacticalPitchLine(team, "ARQ", goalkeepers);
+    return out.str();
+}
+
 }  // namespace
 
 namespace gui_win32 {
@@ -852,6 +903,7 @@ GuiPageModel buildTacticsModel(AppState& state) {
            << " | encajes delicados " << tacticalRead.roleWarnings << "\r\n";
     detail << "- Balance de roles: " << tacticalRoleBalanceLine(tacticalRead) << "\r\n";
     detail << "- Recomendacion: " << tacticalRecommendation(team, tacticalRead) << "\r\n\r\n";
+    detail << buildTacticalPitchText(team, startingXi) << "\r\n\r\n";
     detail << "Microciclo semanal\r\n" << trainingSchedulePreview(team, congestedWeek, 6) << "\r\n\r\n";
     detail << "Informe rival: " << buildOpponentReport(state.career) << "\r\n\r\n";
     detail << dressingRoomPanelText(state.career, 4) << "\r\n";

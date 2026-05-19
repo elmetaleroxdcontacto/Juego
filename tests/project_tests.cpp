@@ -2472,6 +2472,33 @@ void testNextOpponentPlanBuildsActionableLines() {
     expect(text.find("Plan sugerido") != string::npos, "El plan rival debe recomendar una instruccion o microciclo.");
 }
 
+void testMatchPreparationPlanServiceAppliesOpponentInstruction() {
+    Career career;
+    career.allTeams.push_back(makeTeam("Plan Aplicado", "primera division", 70, 3, 3, "Balanced", "Equilibrado", 920000));
+    career.allTeams.push_back(makeTeam("Rival Alto", "primera division", 72, 4, 4, "Pressing", "Contra-presion", 880000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Plan Aplicado");
+    Team* rival = career.findTeamByName("Rival Alto");
+    expect(career.myTeam != nullptr && rival != nullptr, "La prueba de plan aplicado necesita dos clubes.");
+
+    rival->defensiveLine = 5;
+    rival->width = 4;
+    rival->pressingIntensity = 3;
+    career.currentWeek = 1;
+    career.schedule = {{{0, 1}}};
+
+    const ServiceResult result = applyMatchPreparationPlanService(career);
+    const string messages = joinLines(result.messages);
+    expect(result.ok, "El plan de partido contextual debe aplicarse.");
+    expect(career.myTeam->trainingFocus == "Preparacion partido",
+           "El plan aplicado debe orientar el entrenamiento a preparacion de partido.");
+    expect(career.myTeam->matchInstruction == "Juego directo",
+           "Ante linea defensiva alta, el plan aplicado debe sugerir juego directo.");
+    expect(messages.find("Plan de partido aplicado") != string::npos &&
+               messages.find("Checklist del asistente") != string::npos,
+           "El servicio debe explicar el plan aplicado y anexar checklist del asistente.");
+}
+
 void testMonthlyDevelopmentCycleImprovesStableProspects() {
     Team team = makeTeam("Cantera Pro", "primera division", 67, 3, 3, "Balanced", "Equilibrado", 860000);
     team.youthCoach = 82;
@@ -2621,6 +2648,10 @@ void testManagementViewFiltersChangeVisibleContent() {
            "El once inicial debe mostrar rol y encaje tactico por jugador.");
     expect(pressModel.detail.content.find("Lectura de familiaridad") != string::npos,
            "El detalle tactico debe explicar familiaridad, riesgo y recomendacion.");
+    expect(pressModel.detail.content.find("Mapa tactico") != string::npos &&
+               pressModel.detail.content.find("DEL:") != string::npos &&
+               pressModel.detail.content.find("ARQ:") != string::npos,
+           "El detalle tactico debe incluir una cancha textual con lineas del XI.");
 }
 
 void testCalendarModelShowsMatchPreparationPreview() {
@@ -2772,6 +2803,10 @@ void testPlayerProfileShowsFmStyleStaffReport() {
     const string profile = gui_win32::buildPlayerProfile(team, &player);
     expect(profile.find("Atributos tecnicos") != string::npos,
            "La ficha debe separar atributos tecnicos.");
+    expect(profile.find("Radar FM") != string::npos &&
+               profile.find("Decision manager") != string::npos &&
+               profile.find("Plan 30 dias") != string::npos,
+           "La ficha debe sumar radar, decision del manager y plan de corto plazo.");
     expect(profile.find("Atributos mentales") != string::npos,
            "La ficha debe separar atributos mentales.");
     expect(profile.find("Atributos fisicos") != string::npos,
@@ -2786,6 +2821,21 @@ void testPlayerProfileShowsFmStyleStaffReport() {
            "La ficha debe incluir informe del staff con fortalezas, debilidades y recomendacion.");
     expect(profile.find("Contrato corto") != string::npos || profile.find("contrato") != string::npos,
            "La recomendacion debe detectar riesgo contractual.");
+
+    gui_win32::AppState state;
+    state.currentPage = gui_win32::GuiPage::Squad;
+    state.currentFilter = "Todos";
+    state.career.allTeams.push_back(team);
+    state.career.myTeam = &state.career.allTeams.front();
+    const gui_win32::ListPanelModel table = gui_win32::buildPlayerTableModel(state, false);
+    string tableDump;
+    for (const auto& column : table.columns) tableDump += std::string(column.first.begin(), column.first.end()) + "\n";
+    for (const auto& row : table.rows) {
+        for (const auto& cell : row) tableDump += cell + "\n";
+    }
+    expect(tableDump.find("Decision") != string::npos &&
+               (tableDump.find("Renovar") != string::npos || tableDump.find("Rotar") != string::npos),
+           "La tabla de plantilla debe mostrar una decision manager accionable por jugador.");
 }
 
 void testTransferFeedStaysMarketFocusedAcrossFilters() {
@@ -2844,6 +2894,10 @@ void testTransferTargetsUseSelectablePrimaryList() {
     expect(model.detail.content.find("Riesgo informe") != string::npos &&
                model.detail.content.find("Siguiente paso") != string::npos,
            "El detalle del objetivo debe explicar riesgo de scouting y siguiente accion.");
+    expect(model.detail.content.find("Mesa de negociacion") != string::npos &&
+               model.detail.content.find("Perfil Segura") != string::npos &&
+               model.detail.content.find("Perfil Agresiva") != string::npos,
+           "El detalle de mercado debe mostrar una mesa de negociacion con perfiles de oferta.");
 }
 
 void testDashboardActionCueHighlightsHardRisks() {
@@ -3552,6 +3606,7 @@ int main() {
         {"personality_transfer_eval", testTransferEvaluationReflectsClubPersonality},
         {"opponent_personality_report", testOpponentReportIncludesCompetitivePersonality},
         {"next_opponent_plan", testNextOpponentPlanBuildsActionableLines},
+        {"match_preparation_plan_service", testMatchPreparationPlanServiceAppliesOpponentInstruction},
         {"late_match_urgency", testLateDeficitRaisesUrgencyInMatchPhase},
         {"instruction_chance_profiles", testMatchInstructionsShapeChanceProfiles},
         {"injury_replacement", testMatchInjuryTriggersRealReplacement},

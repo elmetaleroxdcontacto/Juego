@@ -6150,3 +6150,79 @@ Fecha: 2026-04-04
 - `ctest --test-dir build-cmake --output-on-failure` -> 100% tests pasados.
 - `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
 - `build.bat --verify` -> verificacion completa exitosa.
+
+## Mejora gameplay - primera tanda para acercar la GUI a Football Manager (2026-05-14)
+
+### Cambios aplicados
+- La ficha de jugador ahora agrega `Radar FM` con lectura tecnica, mental, fisica y riesgo de contrato.
+- La ficha de jugador agrega `Decision manager` y `Plan 30 dias` para orientar si conviene renovar, rotar, ceder, vender, recuperar o sostener rol.
+- La pantalla `Tacticas` agrega `Mapa tactico`, una cancha textual por lineas DEL/MED/DEF/ARQ con rol, deber y encaje de cada titular.
+- La pantalla `Fichajes` agrega `Mesa de negociacion` en el detalle del objetivo, comparando perfiles seguro, balanceado y agresivo con fee, salario, paquete y estado probable.
+- La pantalla `Noticias` refuerza el centro del manager con `Tablero de decisiones` y filas de decision semanal junto a las alertas.
+- Se ampliaron tests GUI para proteger radar de jugador, mapa tactico y mesa de negociacion.
+
+### Archivos modificados
+- `src/gui/gui_view_common.cpp`
+- `src/gui/gui_view_overview.cpp`
+- `src/gui/gui_view_management.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+
+## Registro final agregado - plan de partido contextual (2026-05-15)
+
+- Se deja constancia final de la mejora `applyMatchPreparationPlanService`: el informe del proximo rival ahora se puede aplicar desde `Tacticas` y `Calendario` con el boton `Plan rival`.
+- Validacion ya ejecutada: compilacion de GUI/CLI/tests, `FootballManagerCLI.exe --validate` y `FootballManagerTests.exe`, todo sin fallas.
+
+## Mejora gameplay - plan de partido contextual aplicable (2026-05-15)
+
+### Cambios aplicados
+- Se agrego `applyMatchPreparationPlanService`, un servicio directo para convertir el informe del proximo rival en un plan aplicado.
+- El plan aplicado usa la decision `Preparar rival`, ajusta el microciclo a `Preparacion partido` y selecciona instruccion de partido segun el rival.
+- El resultado del servicio ahora incluye `Plan de partido aplicado` y un `Checklist del asistente` con las lineas del plan rival.
+- En la GUI, el boton de instruccion en `Tacticas` y `Calendario` ahora aplica el plan de rival en vez de solo ciclar instrucciones manualmente.
+- El texto del boton cambia a `Plan rival` en esas pantallas para que la accion sea clara.
+- Se agrego el test `match_preparation_plan_service`, que verifica que una defensa rival adelantada active `Juego directo` y deje checklist.
+
+### Archivos modificados
+- `include/career/app_services.h`
+- `src/career/app_services.cpp`
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_runtime.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron, incluido `match_preparation_plan_service`.
+
+## Mejora gameplay - acciones contextuales de manager y negociacion (2026-05-15)
+
+### Cambios aplicados
+- Los botones de `Comprar`, `Precontrato` y `Renovar` en la GUI ahora calculan perfil de negociacion contextual en vez de usar siempre los valores por defecto.
+- La compra contextual elige perfil seguro, balanceado o agresivo segun presupuesto, valor del paquete, contrato del jugador, rivalidad y si el jugador mejora claramente el plantel.
+- Las renovaciones ahora eligen perfil segun importancia del jugador, contrato corto, felicidad, deseo de salida y margen presupuestario.
+- Las operaciones agregan al resultado `Plan de negociacion GUI` con perfil y promesa elegidos para que el usuario vea que estrategia se uso.
+- La tabla de `Plantilla` y `Cantera` agrega la columna `Decision`, mostrando si conviene renovar, rotar, ceder, vender, recuperar, titularizar o gestionar rol.
+- El test `player_profile_staff_report` ahora verifica que la tabla de plantilla muestre decisiones accionables por jugador.
+
+### Archivos modificados
+- `src/gui/gui_actions.cpp`
+- `src/gui/gui_view_common.cpp`
+- `tests/project_tests.cpp`
+- `TODO.md`
+
+### Validacion
+- `cmake --build build-cmake --config Release --target FootballManager FootballManagerCLI FootballManagerTests` -> compilado correctamente.
+- `.\build-cmake\bin\FootballManagerCLI.exe --validate` -> resultado sin fallas, 0 errores y 0 advertencias.
+- `.\build-cmake\bin\FootballManagerTests.exe` -> todos los tests pasaron.
+
+## Registro final agregado - plan de partido contextual (2026-05-15)
+
+- Se deja constancia final de la mejora `applyMatchPreparationPlanService`: el informe del proximo rival ahora se puede aplicar desde `Tacticas` y `Calendario` con el boton `Plan rival`.
+- Validacion ya ejecutada: compilacion de GUI/CLI/tests, `FootballManagerCLI.exe --validate` y `FootballManagerTests.exe`, todo sin fallas.

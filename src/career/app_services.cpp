@@ -1586,6 +1586,34 @@ ServiceResult applyWeeklyDecisionService(Career& career, WeeklyDecision decision
     return result;
 }
 
+ServiceResult applyMatchPreparationPlanService(Career& career) {
+    if (!career.myTeam) return failure("No hay una carrera activa.");
+    const Team* opponent = nextOpponent(career);
+    const vector<string> planLines = buildNextOpponentPlanLines(career, 5);
+
+    ServiceResult result = applyWeeklyDecisionService(career, WeeklyDecision::MatchPreparation);
+    if (!result.ok) return result;
+
+    Team& team = *career.myTeam;
+    string headline = "Plan de partido aplicado: " +
+                      string(opponent ? opponent->name : "sin rival confirmado") +
+                      " | entrenamiento " + team.trainingFocus +
+                      " | instruccion " + team.matchInstruction + ".";
+    result.messages.insert(result.messages.begin() + min<size_t>(1, result.messages.size()), headline);
+
+    if (!planLines.empty()) {
+        result.messages.push_back("Checklist del asistente:");
+        for (const string& line : planLines) {
+            result.messages.push_back("- " + line);
+        }
+    }
+
+    career.addNews("Plan de partido preparado para " +
+                   string(opponent ? opponent->name : "la proxima fecha") +
+                   ": " + team.matchInstruction + ".");
+    return result;
+}
+
 vector<string> buildWeeklyDecisionOptions(const Career& career) {
     vector<string> lines;
     const WeeklyDecision autoDecision = chooseAutomaticWeeklyDecision(career);

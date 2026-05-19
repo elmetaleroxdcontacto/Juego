@@ -670,6 +670,7 @@ void refreshCurrentPage(AppState& state) {
         else if (state.currentPage == GuiPage::Squad || state.currentPage == GuiPage::Youth) actionLabel = "Hablar";
         else if (state.currentPage == GuiPage::Board) actionLabel = "Staff";
         else if (state.currentPage == GuiPage::News) actionLabel = "Decidir";
+        else if (state.currentPage == GuiPage::Tactics || state.currentPage == GuiPage::Calendar) actionLabel = "Plan rival";
         setWindowTextUtf8(state.instructionButton, actionLabel);
     }
     if (state.planButton) {

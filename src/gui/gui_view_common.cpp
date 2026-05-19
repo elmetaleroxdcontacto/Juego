@@ -491,6 +491,62 @@ std::string playerStaffRecommendation(const Team& team, const Player& player) {
     return "Mantener seguimiento mensual y ajustar rol segun rendimiento.";
 }
 
+int playerContractRiskScore(const Player& player) {
+    int risk = 0;
+    if (player.contractWeeks <= 4) risk += 42;
+    else if (player.contractWeeks <= 12) risk += 30;
+    else if (player.contractWeeks <= 26) risk += 14;
+    if (player.wantsToLeave) risk += 24;
+    if (player.happiness < 45) risk += 14;
+    if (player.promisedRole != "Sin promesa" && player.startsThisSeason < player.desiredStarts) risk += 8;
+    if (player.age <= 22 && player.potential >= player.skill + 10) risk += 6;
+    return clampInt(risk, 0, 100);
+}
+
+std::string playerContractRiskLabel(int risk) {
+    if (risk >= 72) return "Critico";
+    if (risk >= 50) return "Alto";
+    if (risk >= 28) return "Medio";
+    return "Controlado";
+}
+
+std::string playerManagerDecision(const Team& team, const Player& player) {
+    if (player.injured) return "Recuperar";
+    if (player.contractWeeks <= 12 && (player.skill >= team.getAverageSkill() - 2 || player.potential >= 75)) return "Renovar";
+    if (player.wantsToLeave && player.skill < team.getAverageSkill() + 4) return "Vender";
+    if (player.age <= 21 && player.potential >= player.skill + 10 && player.skill < team.getAverageSkill() - 3) return "Ceder";
+    if (player.fitness < 62 || player.fatigueLoad >= 60) return "Rotar";
+    if (player.skill >= team.getAverageSkill() + 5 && player.happiness >= 45) return "Titular";
+    return "Gestionar rol";
+}
+
+std::vector<std::string> playerNextMonthPlan(const Team& team, const Player& player) {
+    std::vector<std::string> plan;
+    const std::string decision = playerManagerDecision(team, player);
+    if (decision == "Recuperar") {
+        plan.push_back("Semana 1: carga baja y revision medica.");
+        plan.push_back("Semana 2: reintroducir minutos solo si mejora la condicion.");
+    } else if (decision == "Renovar") {
+        plan.push_back("Semana 1: abrir renovacion antes de simular otra fecha.");
+        plan.push_back("Semana 2: revisar promesa de rol y clausula.");
+    } else if (decision == "Ceder") {
+        plan.push_back("Semana 1: buscar destino con minutos reales.");
+        plan.push_back("Semana 2: mantener entrenamiento individual si no sale cedido.");
+    } else if (decision == "Vender") {
+        plan.push_back("Semana 1: escuchar ofertas y proteger el clima del vestuario.");
+        plan.push_back("Semana 2: preparar reemplazo antes de aceptar salida.");
+    } else if (decision == "Rotar") {
+        plan.push_back("Semana 1: bajar carga y usarlo desde el banco.");
+        plan.push_back("Semana 2: volver al XI si fisico supera 68.");
+    } else {
+        plan.push_back("Semana 1: mantener rol actual y medir rendimiento.");
+        plan.push_back("Semana 2: ajustar plan individual segun forma y rival.");
+    }
+    if (player.potential >= player.skill + 8) plan.push_back("Mes: priorizar desarrollo sin romper la moral por falta de minutos.");
+    if (player.contractWeeks <= 26) plan.push_back("Mes: no dejar que el contrato llegue a zona de salida libre.");
+    return plan;
+}
+
 std::string buildPlayerProfile(const Team& team, const Player* player) {
     if (!player) return "Selecciona un jugador para abrir su ficha completa.";
     std::ostringstream out;
@@ -499,8 +555,10 @@ std::string buildPlayerProfile(const Team& team, const Player* player) {
                                         player->bigMatches, player->tacticalDiscipline, player->discipline, player->adaptation});
     const int physicalScore = averageInt({player->stamina, player->fitness, std::max(1, 100 - player->fatigueLoad),
                                           std::max(1, 100 - player->injuryProneness)});
+    const int contractRisk = playerContractRiskScore(*player);
     const std::vector<std::string> strengths = playerStrengthLines(team, *player);
     const std::vector<std::string> weaknesses = playerWeaknessLines(*player);
+    const std::vector<std::string> nextMonthPlan = playerNextMonthPlan(team, *player);
 
     out << "Resumen\r\n";
     out << player->name << " | " << normalizePosition(player->position)
@@ -515,6 +573,14 @@ std::string buildPlayerProfile(const Team& team, const Player* player) {
     out << "Perfil staff: " << minutesProfileLabel(team, *player)
         << " | Fiabilidad " << playerReliabilityLabel(*player)
         << " | Forma " << playerFormLabel(*player) << "\r\n\r\n";
+    out << "Radar FM\r\n";
+    out << "Tecnico " << ratingLabel(technicalScore) << " " << technicalScore << "/100"
+        << " | Mental " << ratingLabel(mentalScore) << " " << mentalScore << "/100"
+        << " | Fisico " << ratingLabel(physicalScore) << " " << physicalScore << "/100"
+        << " | Riesgo contrato " << playerContractRiskLabel(contractRisk) << " " << contractRisk << "/100\r\n";
+    out << "Decision manager: " << playerManagerDecision(team, *player)
+        << " | Encaje plantilla: " << expectedRoleLabel(team, *player)
+        << " | Proximo paso: " << playerStaffRecommendation(team, *player) << "\r\n\r\n";
 
     out << "Atributos tecnicos\r\n";
     out << "Ataque " << player->attack
@@ -570,6 +636,9 @@ std::string buildPlayerProfile(const Team& team, const Player* player) {
         << " | Grupo " << player->socialGroup
         << " | Posiciones secundarias " << (player->secondaryPositions.empty() ? "-" : joinStringValues(player->secondaryPositions, ", ")) << "\r\n";
     out << "Rasgos " << (player->traits.empty() ? "-" : joinStringValues(player->traits, ", ")) << "\r\n\r\n";
+    out << "Plan 30 dias\r\n";
+    for (const std::string& line : nextMonthPlan) out << "- " << line << "\r\n";
+    out << "\r\n";
 
     out << "Disponibilidad e historial\r\n";
     out << "Lesiones previas " << player->injuryHistory
@@ -743,7 +812,8 @@ ListPanelModel buildPlayerTableModel(AppState& state, bool youthOnly) {
     model.title = youthOnly ? "YouthPlayerTableView" : "PlayerTableView";
     model.columns = {
         {L"Nombre", 208}, {L"Edad", 54}, {L"Pos", 54}, {L"Media", 58}, {L"Pot", 58},
-        {L"Moral", 60}, {L"Forma", 60}, {L"Fisico", 60}, {L"Salario", 92}, {L"Contrato", 66}, {L"Estado", 120}
+        {L"Moral", 60}, {L"Forma", 60}, {L"Fisico", 60}, {L"Salario", 92}, {L"Contrato", 66},
+        {L"Decision", 98}, {L"Estado", 120}
     };
     if (!state.career.myTeam) return model;
 
@@ -785,11 +855,12 @@ ListPanelModel buildPlayerTableModel(AppState& state, bool youthOnly) {
             std::to_string(player->fitness),
             formatMoneyValue(player->wage),
             std::to_string(player->contractWeeks),
+            playerManagerDecision(team, *player),
             playerStatus(*player)
         });
     }
     if (model.rows.empty()) {
-        model.rows.push_back({"Sin jugadores", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"});
+        model.rows.push_back({"Sin jugadores", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"});
     }
     return model;
 }

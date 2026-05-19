@@ -6,6 +6,7 @@
 #include "competition/competition.h"
 #include "career/career_runtime.h"
 #include "engine/game_settings.h"
+#include "transfers/negotiation_system.h"
 #include "utils/utils.h"
 
 #include <algorithm>
@@ -315,6 +316,62 @@ bool selectedManagedPlayerName(AppState& state, std::string& playerName) {
     }
     playerName = state.selectedPlayerName;
     return !playerName.empty();
+}
+
+Player* findMutablePlayer(Team& team, const std::string& playerName) {
+    for (Player& player : team.players) {
+        if (player.name == playerName) return &player;
+    }
+    return nullptr;
+}
+
+const Player* findPlayerInTeam(const Team& team, const std::string& playerName) {
+    for (const Player& player : team.players) {
+        if (player.name == playerName) return &player;
+    }
+    return nullptr;
+}
+
+NegotiationPromise guiPromiseForTarget(const Team& buyer, const Player& player) {
+    const int avgSkill = buyer.getAverageSkill();
+    if (player.skill >= avgSkill + 6) return NegotiationPromise::Starter;
+    if (player.age <= 21 && player.potential >= player.skill + 9) return NegotiationPromise::Prospect;
+    if (player.skill >= avgSkill - 2) return NegotiationPromise::Rotation;
+    return NegotiationPromise::None;
+}
+
+NegotiationProfile guiTransferProfileForTarget(const Career& career, const Team& seller, const Player& player) {
+    if (!career.myTeam) return NegotiationProfile::Balanced;
+    const Team& buyer = *career.myTeam;
+    const long long estimatedPackage = player.value + estimatedAgentFee(player, std::max(1LL, player.value)) +
+                                       std::max(player.wage, wageDemandFor(player)) * 26;
+    const bool keyUpgrade = player.skill >= buyer.getAverageSkill() + 6;
+    const bool openMarket = player.contractWeeks <= 16 || player.wantsToLeave;
+    const bool rivalryDeal = areRivalClubs(buyer, seller);
+    if (keyUpgrade && buyer.budget >= estimatedPackage * 3 / 2) return NegotiationProfile::Safe;
+    if (rivalryDeal && buyer.budget >= estimatedPackage * 2) return NegotiationProfile::Safe;
+    if (openMarket || buyer.budget < estimatedPackage) return NegotiationProfile::Aggressive;
+    return NegotiationProfile::Balanced;
+}
+
+NegotiationProfile guiRenewalProfileForPlayer(const Team& team, const Player& player) {
+    const bool keyPlayer = player.skill >= team.getAverageSkill() + 4 || player.potential >= 78;
+    if (player.contractWeeks <= 4 || player.wantsToLeave || (keyPlayer && player.happiness < 50)) {
+        return NegotiationProfile::Safe;
+    }
+    const long long projectedCost = std::max(player.wage, wageDemandFor(player)) * 12;
+    if (!keyPlayer && team.budget < projectedCost) return NegotiationProfile::Aggressive;
+    return NegotiationProfile::Balanced;
+}
+
+void prependNegotiationPlan(ServiceResult& result,
+                            NegotiationProfile profile,
+                            NegotiationPromise promise,
+                            const std::string& context) {
+    std::string line = "Plan de negociacion GUI: perfil " + negotiationLabel(profile) +
+                       " | promesa " + promiseLabel(promise);
+    if (!context.empty()) line += " | " + context;
+    result.messages.insert(result.messages.begin(), line + ".");
 }
 
 void relinkCareerPointers(Career& career, const std::string& teamName) {
@@ -752,7 +809,16 @@ void runBuyAction(AppState& state) {
         MessageBoxW(state.window, L"Selecciona un objetivo del mercado.", L"Mercado", MB_OK | MB_ICONINFORMATION);
         return;
     }
-    ServiceResult result = buyTransferTargetService(state.career, sellerTeamName, playerName);
+    Team* seller = state.career.findTeamByName(sellerTeamName);
+    const Player* player = seller ? findPlayerInTeam(*seller, playerName) : nullptr;
+    if (!state.career.myTeam || !seller || !player) {
+        MessageBoxW(state.window, L"No se pudo leer el objetivo seleccionado.", L"Mercado", MB_OK | MB_ICONWARNING);
+        return;
+    }
+    const NegotiationProfile profile = guiTransferProfileForTarget(state.career, *seller, *player);
+    const NegotiationPromise promise = guiPromiseForTarget(*state.career.myTeam, *player);
+    ServiceResult result = buyTransferTargetService(state.career, sellerTeamName, playerName, profile, promise);
+    prependNegotiationPlan(result, profile, promise, "compra contextual");
     finalizeAction(state, result, "Fichaje");
 }
 
@@ -764,7 +830,18 @@ void runPreContractAction(AppState& state) {
         MessageBoxW(state.window, L"Selecciona un objetivo del mercado.", L"Precontrato", MB_OK | MB_ICONINFORMATION);
         return;
     }
-    ServiceResult result = signPreContractService(state.career, sellerTeamName, playerName);
+    Team* seller = state.career.findTeamByName(sellerTeamName);
+    const Player* player = seller ? findPlayerInTeam(*seller, playerName) : nullptr;
+    if (!state.career.myTeam || !seller || !player) {
+        MessageBoxW(state.window, L"No se pudo leer el objetivo seleccionado.", L"Precontrato", MB_OK | MB_ICONWARNING);
+        return;
+    }
+    const NegotiationPromise promise = guiPromiseForTarget(*state.career.myTeam, *player);
+    const NegotiationProfile profile =
+        (player->skill >= state.career.myTeam->getAverageSkill() + 5) ? NegotiationProfile::Safe
+                                                                      : NegotiationProfile::Balanced;
+    ServiceResult result = signPreContractService(state.career, sellerTeamName, playerName, profile, promise);
+    prependNegotiationPlan(result, profile, promise, "precontrato contextual");
     finalizeAction(state, result, "Precontrato");
 }
 
@@ -815,7 +892,17 @@ void runRenewAction(AppState& state) {
         MessageBoxW(state.window, L"Selecciona un jugador.", L"Renovar", MB_OK | MB_ICONINFORMATION);
         return;
     }
-    ServiceResult result = renewPlayerContractService(state.career, listViewText(state.squadList, row, 0));
+    const std::string playerName = listViewText(state.squadList, row, 0);
+    Team* team = state.career.myTeam;
+    Player* player = team ? findMutablePlayer(*team, playerName) : nullptr;
+    if (!team || !player) {
+        MessageBoxW(state.window, L"No se pudo leer el jugador seleccionado.", L"Renovar", MB_OK | MB_ICONWARNING);
+        return;
+    }
+    const NegotiationProfile profile = guiRenewalProfileForPlayer(*team, *player);
+    const NegotiationPromise promise = guiPromiseForTarget(*team, *player);
+    ServiceResult result = renewPlayerContractService(state.career, playerName, profile, promise);
+    prependNegotiationPlan(result, profile, promise, "renovacion contextual");
     finalizeAction(state, result, "Renovacion");
 }
 
@@ -869,6 +956,10 @@ void runInstructionAction(AppState& state) {
             return;
         }
         finalizeAction(state, talkToPlayerService(state.career, listViewText(state.squadList, row, 0)), "Charla");
+        return;
+    }
+    if (state.currentPage == GuiPage::Tactics || state.currentPage == GuiPage::Calendar) {
+        finalizeAction(state, applyMatchPreparationPlanService(state.career), "Plan de partido", true);
         return;
     }
     finalizeAction(state, cycleMatchInstructionService(state.career), "Instruccion");

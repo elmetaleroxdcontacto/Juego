@@ -175,6 +175,70 @@ BoardPressureSnapshot buildBoardPressureSnapshot(const Career& career) {
 
 namespace gui_win32 {
 
+namespace {
+
+NegotiationPromise suggestedTransferPromise(const std::string& expectedRole, const Player& player) {
+    const std::string lower = toLower(expectedRole);
+    if (lower.find("titular") != std::string::npos) return NegotiationPromise::Starter;
+    if (lower.find("proyecto") != std::string::npos || (player.age <= 21 && player.potential >= player.skill + 10)) {
+        return NegotiationPromise::Prospect;
+    }
+    if (lower.find("rotacion") != std::string::npos) return NegotiationPromise::Rotation;
+    return NegotiationPromise::None;
+}
+
+std::string negotiationStateLabel(const NegotiationState& state) {
+    if (state.clubAccepted && state.playerAccepted) return "Acuerdo posible";
+    if (state.clubAccepted) return "Falta jugador";
+    if (state.playerAccepted) return "Falta club";
+    return "Riesgo alto";
+}
+
+std::string buildNegotiationRoomText(const Career& career,
+                                     const Team& buyer,
+                                     const Team& seller,
+                                     const Player& player,
+                                     const TransferPreviewItem* preview) {
+    const std::string expectedRole = preview ? preview->expectedRole : expectedRoleLabel(buyer, player);
+    const NegotiationPromise promise = suggestedTransferPromise(expectedRole, player);
+    std::ostringstream out;
+    out << "Mesa de negociacion\r\n";
+    out << "Rol sugerido " << promiseLabel(promise)
+        << " | perfil jugador " << personalityLabel(player)
+        << " | agente " << agentDifficulty(player) << "/100"
+        << " | competencia en puesto " << squadCompetitionAtRole(buyer, player) << "\r\n";
+    out << "Vendedor " << seller.name
+        << " | interes " << sellerInterestLabel(seller, player)
+        << " | jugador " << playerInterestLabel(career, seller, player) << "\r\n";
+    if (preview) {
+        out << "Radar " << preview->scoutingLabel
+            << " | mercado " << preview->marketLabel
+            << " | accion sugerida " << preview->actionLabel << "\r\n";
+    }
+
+    const std::vector<NegotiationProfile> profiles = {
+        NegotiationProfile::Safe,
+        NegotiationProfile::Balanced,
+        NegotiationProfile::Aggressive
+    };
+    for (NegotiationProfile profile : profiles) {
+        const NegotiationState state = runTransferNegotiation(career, buyer, seller, player, profile, promise);
+        const long long firstSeasonPackage =
+            state.agreedFee + state.agreedBonus + state.agreedAgentFee + state.agreedLoyaltyBonus +
+            state.agreedAppearanceBonus + state.agreedWage * 52;
+        out << "- Perfil " << negotiationLabel(profile)
+            << ": " << negotiationStateLabel(state)
+            << " | fee " << formatMoneyValue(state.agreedFee > 0 ? state.agreedFee : state.latestCounter)
+            << " | salario " << formatMoneyValue(state.agreedWage > 0 ? state.agreedWage : state.playerDemand)
+            << " | paquete 1a temp " << formatMoneyValue(firstSeasonPackage)
+            << " | estado " << state.status << "\r\n";
+    }
+    out << "Lectura: usa perfil seguro si el jugador es prioridad; agresivo solo si puedes perder la operacion.";
+    return out.str();
+}
+
+}  // namespace
+
 GuiPageModel buildTransfersModel(AppState& state) {
     GuiPageModel model;
     std::vector<std::string> alerts = buildAlertLines(state.career);
@@ -284,7 +348,12 @@ GuiPageModel buildTransfersModel(AppState& state) {
         detail << "Rol esperado " << expectedRoleLabel(*myTeam, *player) << "\r\n";
         detail << "Disponibilidad " << (player->contractWeeks <= 12 ? "Contrato corto" : (player->wantsToLeave ? "Abierto a salir" : "Negociacion dura"))
                << " | Agente " << (agentDifficulty(*player) >= 72 ? "duro" : (agentDifficulty(*player) >= 58 ? "exigente" : "manejable")) << "\r\n";
-        detail << "Rasgos: " << (player->traits.empty() ? "-" : joinStringValues(player->traits, ", "));
+        detail << "Rasgos: " << (player->traits.empty() ? "-" : joinStringValues(player->traits, ", ")) << "\r\n\r\n";
+        detail << buildNegotiationRoomText(state.career,
+                                           *myTeam,
+                                           *seller,
+                                           *player,
+                                           selectedPreview != targets.end() ? &(*selectedPreview) : nullptr);
         model.detail.content = detail.str();
     }
     return model;
@@ -625,6 +694,9 @@ GuiPageModel buildNewsModel(AppState& state) {
     for (const auto& alert : alerts) {
         model.footer.rows.push_back({"Alerta", alert});
     }
+    for (size_t i = 0; i < weeklyDecisionOptions.size() && i < 4; ++i) {
+        model.footer.rows.push_back({"Decision", weeklyDecisionOptions[i]});
+    }
     model.summary.content = "Entradas visibles: " + std::to_string(model.feed.lines.size()) +
                             "\r\nInbox manager: " + std::to_string(state.career.managerInbox.size()) +
                             "\r\nScouting: " + std::to_string(state.career.scoutInbox.size()) +
@@ -643,6 +715,8 @@ GuiPageModel buildNewsModel(AppState& state) {
     model.detail.content = inbox_service::buildManagerHubDigest(state.career, 8) + "\r\n" +
                            lastMatchPanelText(state.career, 5, 8) + "\r\n" + dressingRoomPanelText(state.career, 4);
     if (!weeklyDecisionOptions.empty()) {
+        model.detail.content += "\r\n\r\nTablero de decisiones";
+        model.detail.content += "\r\nBoton Decidir aplica la primera opcion viable y consume el digest semanal.";
         model.detail.content += "\r\n\r\nCentro semanal";
         for (size_t i = 0; i < weeklyDecisionOptions.size() && i < 6; ++i) {
             model.detail.content += "\r\n- " + weeklyDecisionOptions[i];

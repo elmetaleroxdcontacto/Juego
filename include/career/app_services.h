@@ -145,6 +145,7 @@ ServiceResult holdTeamMeetingService(Career& career);
 ServiceResult talkToPlayerService(Career& career, const std::string& playerName);
 ServiceResult cycleTrainingFocusService(Career& career);
 ServiceResult cycleMatchInstructionService(Career& career);
+ServiceResult applyMatchPreparationPlanService(Career& career);
 ServiceResult applyWeeklyDecisionService(Career& career, WeeklyDecision decision = WeeklyDecision::Auto);
 std::vector<std::string> buildWeeklyDecisionOptions(const Career& career);
 ServiceResult createScoutingAssignmentService(Career& career,
