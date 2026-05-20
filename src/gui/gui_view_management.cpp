@@ -6,6 +6,7 @@
 #include "engine/team_personality.h"
 #include "career/inbox_service.h"
 #include "career/manager_advice.h"
+#include "career/career_support.h"
 #include "finance/finance_system.h"
 #include "transfers/negotiation_system.h"
 #include "ui/economy_fairplay.h"
@@ -561,6 +562,7 @@ GuiPageModel buildBoardModel(AppState& state) {
         objectiveRows.push_back({"Puesto esperado", std::to_string(state.career.boardExpectedFinish), "Meta de temporada"});
         objectiveRows.push_back({"Objetivo mensual", state.career.boardMonthlyObjective.empty() ? "Sin objetivo" : state.career.boardMonthlyObjective,
                                  std::to_string(state.career.boardMonthlyProgress) + "/" + std::to_string(state.career.boardMonthlyTarget)});
+        objectiveRows.push_back({"Objetivo sugerido", manager_advice::buildSuggestedBoardObjective(state.career), "Propuesta coherente con club"});
         objectiveRows.push_back({"Estado objetivo", boardPressure.objectiveState,
                                  std::to_string(boardPressure.objectivePercent) + "% | " + boardPressure.nextMilestone});
         objectiveRows.push_back({"Confianza", std::to_string(state.career.boardConfidence) + "/100", boardStatusLabel(state.career.boardConfidence)});
@@ -584,6 +586,7 @@ GuiPageModel buildBoardModel(AppState& state) {
         profileRows.push_back({"Red scouting", team.scoutingRegions.empty() ? std::string("-") : joinStringValues(team.scoutingRegions, ", "), "Cobertura activa"});
         profileRows.push_back({"Identidad cantera", team.youthIdentity, "Condiciona objetivos"});
         profileRows.push_back({"Estilo", team.clubStyle, "Contexto institucional"});
+        profileRows.push_back(std::vector<std::string>{"Coherencia filos", std::to_string(clubPhilosophyAlignmentScore(state.career, team)) + "/100", "Alineacion estrategia, cantera y objetivo"});
     }
     for (auto it = state.career.history.rbegin(); it != state.career.history.rend() && historyRows.size() < 8; ++it) {
         historyRows.push_back({

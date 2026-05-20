@@ -327,6 +327,7 @@ CareerReport buildBoardReport(const Career& career) {
     addFact(report, "Tension social", to_string(dressing.socialTension));
     addFact(report, "Apoyo de lideres", to_string(dressing.leadershipSupport));
     addFact(report, "Expectativa del club", teamExpectationLabel(*career.myTeam));
+    addFact(report, "Coherencia filosofica", to_string(clubPhilosophyAlignmentScore(career, *career.myTeam)) + "/100");
     addFact(report, "Prestigio", to_string(teamPrestigeScore(*career.myTeam)));
 
     addBlock(report,
@@ -345,6 +346,10 @@ CareerReport buildBoardReport(const Career& career) {
                      "Progreso " + to_string(career.boardMonthlyProgress) + "/" + to_string(career.boardMonthlyTarget),
                      "Semanas restantes: " + to_string(max(0, career.boardMonthlyDeadlineWeek - career.currentWeek)),
                  });
+        addFact(report,
+                "Alineacion del objetivo",
+                (clubPhilosophyAlignmentScore(career, *career.myTeam) >= 60 ? string("El objetivo apoya la identidad del club")
+                                                                             : string("El objetivo esta desconectado de la filosofia")));
     }
 
     if (career.boardConfidence < 20) addBlock(report, "Estado", {"La directiva considera un ultimatum deportivo."});
@@ -410,6 +415,7 @@ CareerReport buildClubReport(const Career& career) {
     addFact(report, "Tension social", to_string(dressing.socialTension));
     addFact(report, "Apoyo de lideres", to_string(dressing.leadershipSupport));
     addFact(report, "Instruccion", team.matchInstruction);
+    addFact(report, "Coherencia filosofica", to_string(clubPhilosophyAlignmentScore(career, team)) + "/100");
     addFact(report, "Proyectos juveniles", to_string(youthProjects));
     addFact(report, "Carga acumulada", to_string(avgFatigueLoad) + "/100");
     addFact(report, "Plan semanal", team.trainingFocus);

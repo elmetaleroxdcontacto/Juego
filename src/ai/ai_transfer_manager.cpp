@@ -55,6 +55,15 @@ ClubTransferStrategy buildClubTransferStrategy(const Career& career, const Team&
     strategy.surplusPosition = squad.surplusPosition;
     strategy.needsLiquidity = team.budget < 120000 || team.debt > team.sponsorWeekly * 18;
     strategy.youthFocus = team.youthFacilityLevel >= 3 || team.youthCoach >= 75 || profile.youthTrust >= 68;
+    if (team.youthIdentity.find("Cantera") != string::npos) {
+        strategy.youthFocus = true;
+    }
+    if (team.clubStyle == "Bloque ordenado" || team.clubStyle == "Control de posesion") {
+        strategy.maxWageBudget += strategy.maxWageBudget / 12;
+    }
+    if (team.clubStyle == "Presion vertical" && profile.riskAppetite >= 60) {
+        strategy.maxTargets = max(strategy.maxTargets, 6);
+    }
     strategy.promotionPush = teamPrestigeScore(team) >= 58 || career.currentSeason <= 2 ||
                              profile.riskAppetite >= 72 || profile.starterBias >= 70;
     strategy.needsStarter = squad.rotationRisk >= 5 || !squad.thinPositions.empty() || profile.starterBias >= 78;
@@ -117,6 +126,18 @@ TransferTarget evaluateTarget(const Career& career,
     const int assignmentBoost = assignmentKnowledgeBoost(career, seller, player);
     const int styleFit = projectStyleFit(buyer, player);
     if (strategy.youthFocus) target.fitScore += max(0, 24 - player.age) * 3 + max(0, player.potential - player.skill) * 2;
+    if (buyer.youthIdentity.find("Cantera") != string::npos && player.age <= 21) {
+        target.fitScore += 8;
+        target.scoutingNote += " | foco juvenil";
+    } else if (buyer.youthIdentity.find("Desarrollo") != string::npos && player.potential >= player.skill + 8) {
+        target.fitScore += 6;
+        target.scoutingNote += " | desarrollo a largo plazo";
+    }
+    if (buyer.clubStyle == "Control de posesion" && normalizePosition(player.position) == "MED") target.fitScore += 8;
+    if (buyer.clubStyle == "Presion vertical" && player.discipline >= 70) target.fitScore += 6;
+    if (buyer.clubStyle == "Ataque por bandas" && normalizePosition(player.position) == "DEL") target.fitScore += 6;
+    if (buyer.clubStyle == "Bloque ordenado" && normalizePosition(player.position) == "DEF") target.fitScore += 8;
+    if (buyer.clubStyle == "Transicion directa" && player.currentForm >= 68) target.fitScore += 5;
     if (strategy.promotionPush) target.fitScore += player.skill * 2 + max(0, player.currentForm - 55);
     if (strategy.needsStarter && player.skill >= strategy.averageStarterSkill) target.fitScore += 12;
     if (strategy.trustYouthCover && player.age <= 21) target.fitScore += 8;

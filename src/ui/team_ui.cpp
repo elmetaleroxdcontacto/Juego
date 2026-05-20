@@ -313,6 +313,8 @@ void changeTactics(Team& team) {
     cout << "Tacticas cambiadas a " << team.tactics << endl;
 }
 
+void setTransferPolicy(Team& team);
+
 void manageLineup(Career& career) {
     if (!career.myTeam) {
         cout << "No hay una carrera activa." << endl;
@@ -444,6 +446,8 @@ void manageLineup(Career& career) {
             for (const auto& message : result.messages) {
                 cout << message << endl;
             }
+        } else if (choice == 7) {
+            setTransferPolicy(team);
         } else if (choice == 11) {
             auto xi = team.getStartingXIIndices();
             cout << "XI actual:" << endl;
@@ -492,6 +496,58 @@ void setTrainingPlan(Team& team) {
     cout << "Plan actualizado a " << team.trainingFocus << endl;
 }
 
+void setClubIdentity(Team& team) {
+    cout << "\nIdentidad de club actual: " << (team.clubStyle.empty() ? "No definida" : team.clubStyle) << endl;
+    cout << "1. Control de posesion" << endl;
+    cout << "2. Presion vertical" << endl;
+    cout << "3. Ataque por bandas" << endl;
+    cout << "4. Bloque ordenado" << endl;
+    cout << "5. Transicion directa" << endl;
+    cout << "6. Sin estilo concreto" << endl;
+    int choice = readInt("Elige identidad de club: ", 1, 6);
+    switch (choice) {
+        case 1: team.clubStyle = "Control de posesion"; break;
+        case 2: team.clubStyle = "Presion vertical"; break;
+        case 3: team.clubStyle = "Ataque por bandas"; break;
+        case 4: team.clubStyle = "Bloque ordenado"; break;
+        case 5: team.clubStyle = "Transicion directa"; break;
+        default: team.clubStyle.clear(); break;
+    }
+    cout << "Identidad de club actualizada a " << (team.clubStyle.empty() ? "sin estilo definido" : team.clubStyle) << endl;
+}
+
+void setYouthIdentity(Team& team) {
+    cout << "\nPolitica juvenil actual: " << (team.youthIdentity.empty() ? "No definida" : team.youthIdentity) << endl;
+    cout << "1. Cantera estructurada" << endl;
+    cout << "2. Desarrollo mixto" << endl;
+    cout << "3. Talento local" << endl;
+    cout << "4. Sin politica especifica" << endl;
+    int choice = readInt("Elige politica juvenil: ", 1, 4);
+    switch (choice) {
+        case 1: team.youthIdentity = "Cantera estructurada"; break;
+        case 2: team.youthIdentity = "Desarrollo mixto"; break;
+        case 3: team.youthIdentity = "Talento local"; break;
+        default: team.youthIdentity.clear(); break;
+    }
+    cout << "Politica juvenil actualizada a " << (team.youthIdentity.empty() ? "sin politica definida" : team.youthIdentity) << endl;
+}
+
+void setTransferPolicy(Team& team) {
+    cout << "\nPolitica de mercado actual: " << (team.transferPolicy.empty() ? "Mixta" : team.transferPolicy) << endl;
+    cout << "1. Cantera y valor futuro" << endl;
+    cout << "2. Vender antes de comprar" << endl;
+    cout << "3. Mixta" << endl;
+    cout << "4. Sin politica concreta" << endl;
+    int choice = readInt("Elige politica de mercado: ", 1, 4);
+    switch (choice) {
+        case 1: team.transferPolicy = "Cantera y valor futuro"; break;
+        case 2: team.transferPolicy = "Vender antes de comprar"; break;
+        case 3: team.transferPolicy = "Mixta"; break;
+        default: team.transferPolicy.clear(); break;
+    }
+    cout << "Politica de mercado actualizada a " << (team.transferPolicy.empty() ? "sin politica definida" : team.transferPolicy) << endl;
+}
+
 void editTeam(Team& team) {
     while (true) {
         cout << "\n=== Editor Rapido de Equipo ===" << endl;
@@ -499,9 +555,12 @@ void editTeam(Team& team) {
         cout << "2. Cambiar formacion" << endl;
         cout << "3. Editar jugador" << endl;
         cout << "4. Eliminar jugador" << endl;
-        cout << "5. Volver" << endl;
-        int choice = readInt("Elige una opcion: ", 1, 5);
-        if (choice == 5) break;
+        cout << "5. Ajustar identidad de club" << endl;
+        cout << "6. Ajustar politica juvenil" << endl;
+        cout << "7. Ajustar politica de mercado" << endl;
+        cout << "8. Volver" << endl;
+        int choice = readInt("Elige una opcion: ", 1, 8);
+        if (choice == 8) break;
 
         if (choice == 1) {
             string name = readLine("Nuevo nombre del equipo: ");
@@ -605,6 +664,12 @@ void editTeam(Team& team) {
             int idx = readInt("Jugador: ", 1, static_cast<int>(team.players.size())) - 1;
             cout << team.players[idx].name << " eliminado." << endl;
             team.players.erase(team.players.begin() + idx);
+        } else if (choice == 5) {
+            setClubIdentity(team);
+        } else if (choice == 6) {
+            setYouthIdentity(team);
+        } else if (choice == 7) {
+            setTransferPolicy(team);
         }
     }
 }

@@ -36,6 +36,51 @@ void printSection(const string& title, const vector<string>& lines) {
     }
 }
 
+void setBoardObjective(Career& career) {
+    if (!career.myTeam) return;
+    cout << "\nObjetivo mensual actual: " << (career.boardMonthlyObjective.empty() ? "Sin objetivo definido" : career.boardMonthlyObjective) << endl;
+    cout << "1. Sumar al menos 6 puntos en 4 semanas" << endl;
+    cout << "2. Dar 2 titularidades a sub-20 en 4 semanas" << endl;
+    cout << "3. Mejorar la posicion liguera antes de 4 semanas" << endl;
+    cout << "4. Mantener presupuesto por sobre el 80% del presupuesto actual" << endl;
+    cout << "5. Limpiar objetivo" << endl;
+    cout << "6. Volver" << endl;
+    int choice = readInt("Elige objetivo: ", 1, 6);
+    if (choice == 6) return;
+
+    career.boardMonthlyDeadlineWeek = min(static_cast<int>(career.schedule.size()), career.currentWeek + 4);
+    career.boardMonthlyProgress = 0;
+    career.boardMonthlyTarget = 0;
+
+    if (choice == 1) {
+        career.boardMonthlyTarget = 6;
+        career.boardMonthlyObjective = "Sumar al menos 6 puntos en 4 semanas";
+    } else if (choice == 2) {
+        career.boardMonthlyTarget = 2;
+        career.boardMonthlyObjective = "Dar 2 titularidades a sub-20 en 4 semanas";
+    } else if (choice == 3) {
+        int rank = max(1, career.currentCompetitiveRank());
+        career.boardMonthlyTarget = max(1, rank - 1);
+        career.boardMonthlyProgress = rank;
+        career.boardMonthlyObjective = "Mejorar la posicion liguera antes de 4 semanas";
+    } else if (choice == 4) {
+        long long target = max(100000LL, career.myTeam->budget * 80 / 100);
+        career.boardMonthlyTarget = static_cast<int>(min<long long>(target, 2000000000LL));
+        career.boardMonthlyProgress = static_cast<int>(min<long long>(career.myTeam->budget, 2000000000LL));
+        career.boardMonthlyObjective = "Mantener presupuesto por sobre $" + to_string(career.boardMonthlyTarget) + " en 4 semanas";
+    } else if (choice == 5) {
+        career.boardMonthlyObjective.clear();
+        career.boardMonthlyTarget = 0;
+        career.boardMonthlyProgress = 0;
+        career.boardMonthlyDeadlineWeek = 0;
+        cout << "Objetivo mensual borrado." << endl;
+        return;
+    }
+
+    cout << "Nuevo objetivo: " << career.boardMonthlyObjective << endl;
+    cout << "Fecha limite semana: " << career.boardMonthlyDeadlineWeek << endl;
+}
+
 void printActiveScoutingAssignments(const Career& career) {
     if (career.scoutingAssignments.empty()) {
         cout << "No hay asignaciones activas." << endl;
@@ -49,6 +94,108 @@ void printActiveScoutingAssignments(const Career& career) {
              << " | conocimiento " << assignment.knowledgeLevel << "%"
              << " | resta " << assignment.weeksRemaining << " sem" << endl;
     }
+}
+
+void editClubPhilosophy(Career& career) {
+    if (!career.myTeam) return;
+    Team& team = *career.myTeam;
+
+    cout << "\n=== Editor de filosofia de club ===" << endl;
+    cout << "1. Cambiar identidad de club" << endl;
+    cout << "2. Cambiar politica juvenil" << endl;
+    cout << "3. Cambiar politica de mercado" << endl;
+    cout << "4. Volver" << endl;
+    int choice = readInt("Elige una opcion: ", 1, 4);
+    if (choice == 4) return;
+
+    if (choice == 1) {
+        cout << "Identidad de club actual: " << (team.clubStyle.empty() ? "No definida" : team.clubStyle) << endl;
+        cout << "1. Control de posesion" << endl;
+        cout << "2. Presion vertical" << endl;
+        cout << "3. Ataque por bandas" << endl;
+        cout << "4. Bloque ordenado" << endl;
+        cout << "5. Transicion directa" << endl;
+        cout << "6. Sin estilo concreto" << endl;
+        int identityChoice = readInt("Elige identidad: ", 1, 6);
+        switch (identityChoice) {
+            case 1: team.clubStyle = "Control de posesion"; break;
+            case 2: team.clubStyle = "Presion vertical"; break;
+            case 3: team.clubStyle = "Ataque por bandas"; break;
+            case 4: team.clubStyle = "Bloque ordenado"; break;
+            case 5: team.clubStyle = "Transicion directa"; break;
+            default: team.clubStyle.clear(); break;
+        }
+        cout << "Identidad de club actualizada a " << (team.clubStyle.empty() ? "sin estilo definido" : team.clubStyle) << endl;
+        return;
+    }
+
+    if (choice == 2) {
+        cout << "Politica juvenil actual: " << (team.youthIdentity.empty() ? "No definida" : team.youthIdentity) << endl;
+        cout << "1. Cantera estructurada" << endl;
+        cout << "2. Desarrollo mixto" << endl;
+        cout << "3. Talento local" << endl;
+        cout << "4. Sin politica especifica" << endl;
+        int youthChoice = readInt("Elige politica juvenil: ", 1, 4);
+        switch (youthChoice) {
+            case 1: team.youthIdentity = "Cantera estructurada"; break;
+            case 2: team.youthIdentity = "Desarrollo mixto"; break;
+            case 3: team.youthIdentity = "Talento local"; break;
+            default: team.youthIdentity.clear(); break;
+        }
+        cout << "Politica juvenil actualizada a " << (team.youthIdentity.empty() ? "sin politica definida" : team.youthIdentity) << endl;
+        return;
+    }
+
+    if (choice == 3) {
+        cout << "Politica de mercado actual: " << (team.transferPolicy.empty() ? "Mixta" : team.transferPolicy) << endl;
+        cout << "1. Cantera y valor futuro" << endl;
+        cout << "2. Vender antes de comprar" << endl;
+        cout << "3. Mixta" << endl;
+        cout << "4. Sin politica concreta" << endl;
+        int marketChoice = readInt("Elige politica de mercado: ", 1, 4);
+        switch (marketChoice) {
+            case 1: team.transferPolicy = "Cantera y valor futuro"; break;
+            case 2: team.transferPolicy = "Vender antes de comprar"; break;
+            case 3: team.transferPolicy = "Mixta"; break;
+            default: team.transferPolicy.clear(); break;
+        }
+        cout << "Politica de mercado actualizada a " << (team.transferPolicy.empty() ? "sin politica definida" : team.transferPolicy) << endl;
+        return;
+    }
+}
+
+void applySuggestedBoardObjective(Career& career) {
+    if (!career.myTeam) return;
+    const string objective = manager_advice::buildSuggestedBoardObjective(career);
+    if (objective.empty()) {
+        cout << "No hay sugerencia disponible." << endl;
+        return;
+    }
+
+    career.boardMonthlyDeadlineWeek = min(static_cast<int>(career.schedule.size()), career.currentWeek + 4);
+    career.boardMonthlyProgress = 0;
+    career.boardMonthlyTarget = 0;
+    career.boardMonthlyObjective = objective;
+
+    if (objective.find("titularidades") != string::npos) {
+        career.boardMonthlyTarget = 2;
+    } else if (objective.find("presupuesto") != string::npos) {
+        career.boardMonthlyTarget = static_cast<int>(min<long long>(max(100000LL, career.myTeam->budget * 80 / 100), 2000000000LL));
+        career.boardMonthlyProgress = static_cast<int>(min<long long>(career.myTeam->budget, 2000000000LL));
+    } else if (objective.find("descender") != string::npos) {
+        career.boardMonthlyTarget = max(1, career.currentCompetitiveRank() - 1);
+        career.boardMonthlyProgress = career.currentCompetitiveRank();
+    } else if (objective.find("puntos") != string::npos) {
+        career.boardMonthlyTarget = 6;
+    } else if (objective.find("posicion") != string::npos) {
+        career.boardMonthlyTarget = max(1, career.currentCompetitiveRank() - 1);
+        career.boardMonthlyProgress = career.currentCompetitiveRank();
+    } else {
+        career.boardMonthlyTarget = 1;
+    }
+
+    career.addNews("Directiva: objetivo mensual actualizado a \"" + career.boardMonthlyObjective + "\".");
+    cout << "Objetivo sugerido aplicado: " << career.boardMonthlyObjective << endl;
 }
 
 vector<string> latestMatchDigest(const Career& career) {
@@ -77,9 +224,14 @@ void displayBoardStatus(Career& career) {
 
     printReport(buildBoardReport(career));
     cout << "\n1. Buscar ofertas de club" << endl;
-    cout << "2. Volver" << endl;
-    int action = readInt("Elige opcion: ", 1, 2);
-    if (action != 1) return;
+    cout << "2. Cambiar objetivo mensual" << endl;
+    cout << "3. Volver" << endl;
+    int action = readInt("Elige opcion: ", 1, 3);
+    if (action == 3) return;
+    if (action == 2) {
+        setBoardObjective(career);
+        return;
+    }
 
     vector<Team*> jobs = buildJobMarket(career, false);
     if (jobs.empty()) {
@@ -208,6 +360,8 @@ void displayClubOperations(Career& career) {
     if (!career.myTeam) return;
 
     printReport(buildClubReport(career));
+    cout << "\nSugerencia de objetivo: " << manager_advice::buildSuggestedBoardObjective(career) << endl;
+    cout << "Coherencia de filosofia: " << clubPhilosophyAlignmentScore(career, *career.myTeam) << "/100" << endl;
     cout << "\n1. Mejorar estadio" << endl;
     cout << "2. Mejorar cantera" << endl;
     cout << "3. Mejorar centro de entrenamiento" << endl;
@@ -220,9 +374,12 @@ void displayClubOperations(Career& career) {
     cout << "10. Contratar analista de rendimiento" << endl;
     cout << "11. Revisar estructura de staff" << endl;
     cout << "12. Cambiar region juvenil" << endl;
-    cout << "13. Volver" << endl;
-    int choice = readInt("Elige opcion: ", 1, 13);
-    if (choice == 13) return;
+    cout << "13. Editar filosofia de club" << endl;
+    cout << "14. Aplicar objetivo sugerido" << endl;
+    cout << "15. Cambiar objetivo mensual" << endl;
+    cout << "16. Volver" << endl;
+    int choice = readInt("Elige opcion: ", 1, 16);
+    if (choice == 16) return;
 
     ServiceResult result;
     switch (choice) {
@@ -246,6 +403,15 @@ void displayClubOperations(Career& career) {
             result = changeYouthRegionService(career, regions[static_cast<size_t>(regionChoice - 1)]);
             break;
         }
+        case 13:
+            editClubPhilosophy(career);
+            return;
+        case 14:
+            applySuggestedBoardObjective(career);
+            return;
+        case 15:
+            setBoardObjective(career);
+            return;
     }
     printMessages(result);
 }

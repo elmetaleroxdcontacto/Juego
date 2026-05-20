@@ -80,6 +80,7 @@ Resumen: La GUI ahora acepta Ctrl+S para guardar, Ctrl+F para abrir el radar de 
 Resumen: Finanzas ahora muestra maximo salarial recomendado, uso de masa salarial y alertas de fair play economico; se agrego cobertura automatizada para detectar presion salarial excesiva y el target de tests enlaza el modulo fair play.
 
 - Actualizar las plantillas de todos los equipos de la Primera División con los jugadores reales actuales de la temporada 2024/2025, obtenidos de transfermarkt.com.
+- [x] 2026-05-19: Añadida sugerencia dinámica de objetivo mensual en menú de operaciones, opción de aplicar objetivo sugerido y fila de objetivo propuesto en GUI de gestión.
 
 
 ## Mejoras Generales Aplicadas (2026-05-05)

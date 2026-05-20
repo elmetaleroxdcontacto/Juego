@@ -186,6 +186,15 @@ vector<string> buildMarketPulseLines(const Career& career, size_t limit) {
                            ", asi que puedes concentrar gasto fuera de esas zonas.");
     }
 
+    if (!team.clubStyle.empty()) {
+        pushUniqueLine(lines,
+                       "El estilo de club " + team.clubStyle + " reparte responsabilidades de mercado.");
+    }
+    if (team.youthIdentity.find("Cantera") != string::npos) {
+        pushUniqueLine(lines,
+                       "La politica juvenil prioriza fichajes sub-21 y reduce el riesgo de operaciones cortas.");
+    }
+
     if (!career.scoutingShortlist.empty()) {
         pushUniqueLine(lines,
                        "Shortlist activa: " + to_string(career.scoutingShortlist.size()) +

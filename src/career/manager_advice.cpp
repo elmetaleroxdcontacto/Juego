@@ -81,9 +81,43 @@ string regionLabel(const Team& team) {
     return team.youthRegion.empty() ? "zona sin definir" : team.youthRegion;
 }
 
+string buildSuggestedBoardObjectiveInternal(const Career& career) {
+    if (!career.myTeam) return "";
+    const Team& team = *career.myTeam;
+    const int rank = career.currentCompetitiveRank();
+    const int fieldSize = max(1, career.currentCompetitiveFieldSize());
+    const bool hasYouth = team.youthIdentity.find("Cantera") != string::npos;
+    const bool lowBudget = team.budget < max(150000LL, team.sponsorWeekly * 3) || team.debt > team.sponsorWeekly * 10;
+    const bool relegationRisk = rank > max(1, fieldSize * 3 / 4);
+    const bool promotionPush = rank <= max(1, fieldSize / 4);
+    const int injuries = injuredCount(team);
+    const int philosophyScore = clubPhilosophyAlignmentScore(career, team);
+
+    if (lowBudget) {
+        return "Mantener presupuesto por sobre el 80% del presupuesto actual";
+    }
+    if (hasYouth && philosophyScore >= 40) {
+        return "Dar 2 titularidades a sub-20 en 4 semanas";
+    }
+    if (injuries >= 3) {
+        return "Rotar jugadores y cuidar cargas en 4 semanas";
+    }
+    if (relegationRisk) {
+        return "No descender en las proximas 4 semanas";
+    }
+    if (promotionPush) {
+        return "Sumar al menos 6 puntos en 4 semanas";
+    }
+    return "Mejorar la posicion liguera antes de 4 semanas";
+}
+
 }  // namespace
 
 namespace manager_advice {
+
+string buildSuggestedBoardObjective(const Career& career) {
+    return buildSuggestedBoardObjectiveInternal(career);
+}
 
 vector<string> buildManagerActionLines(const Career& career, size_t limit) {
     vector<string> lines;
@@ -124,6 +158,18 @@ vector<string> buildManagerActionLines(const Career& career, size_t limit) {
     if (career.boardConfidence <= 42 || monthlyObjectiveUnderPressure(career)) {
         pushUniqueLine(lines,
                        "Directiva en alerta: toca sumar progreso visible en el objetivo mensual o en la tabla.");
+    }
+    if (team.youthIdentity.find("Cantera") != string::npos && career.boardMonthlyObjective.find("titularidades") != string::npos) {
+        pushUniqueLine(lines,
+                       "Activar proyecto juvenil: comienza a dar minutos a los sub-20 para cumplir el objetivo mensual.");
+    }
+    if (career.scoutingAssignments.empty() && team.scoutingChief >= 50) {
+        pushUniqueLine(lines,
+                       "Refuerza scouting: asigna cobertura a regiones clave y cierra la diferencia entre informe y necesidad actual.");
+    }
+    if (!team.clubStyle.empty() && team.matchInstruction.empty()) {
+        pushUniqueLine(lines,
+                       "Completa tu identidad: define una instruccion de partido que acompañe el estilo del club.");
     }
     if (philosophyScore < 45) {
         pushUniqueLine(lines,

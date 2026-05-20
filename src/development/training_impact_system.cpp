@@ -115,6 +115,12 @@ string formatWeeklyTrainingSchedule(const Team& team, bool congestedWeek) {
     ostringstream out;
     out << "Microciclo " << (congestedWeek ? "congestionado" : "regular")
         << " | plan " << (team.trainingFocus.empty() ? "Balanceado" : team.trainingFocus);
+    if (!team.clubStyle.empty()) {
+        out << " | estilo " << team.clubStyle;
+    }
+    if (!team.youthIdentity.empty()) {
+        out << " | cantera " << team.youthIdentity;
+    }
     for (const auto& session : schedule) {
         out << "\r\n\r\n- " << session.day << ": " << session.focus << " | " << session.note;
     }
@@ -139,6 +145,12 @@ void applyWeeklyTrainingImpact(Team& team, bool congestedWeek) {
     const int tacticalSessions = countSessions(schedule, {"Tactico", "Preparacion partido"});
     const int technicalSessions = countSessions(schedule, {"Tecnico"});
     const int setPieceSessions = countSessions(schedule, {"Balon parado"});
+    const bool styleAligned =
+        (team.clubStyle == "Control de posesion" && (focus == "Tactico" || focus == "Preparacion partido")) ||
+        (team.clubStyle == "Presion vertical" && (focus == "Defensa" || focus == "Tactico")) ||
+        (team.clubStyle == "Ataque por bandas" && (focus == "Ataque" || focus == "Tecnico")) ||
+        (team.clubStyle == "Bloque ordenado" && (focus == "Defensa" || focus == "Recuperacion")) ||
+        (team.clubStyle == "Transicion directa" && (focus == "Ataque" || focus == "Tactico"));
     const int scheduleLoad = averageLoad(schedule);
 
     for (auto& player : team.players) {
@@ -193,12 +205,20 @@ void applyWeeklyTrainingImpact(Team& team, bool congestedWeek) {
                          max(0, player.professionalism - 55) / 10 + max(0, player.happiness - 50) / 12 +
                          facilityBonus * 2 + assistantBonus + youthBonus;
         baseGrowth += attackSessions * 3 + defenseSessions * 3 + technicalSessions * 2 + tacticalSessions * 2 + analystBonus;
-        if (normalizePosition(player.position) == "ARQ") baseGrowth += goalkeepingBonus;
+        const string normalized = normalizePosition(player.position);
+        if (normalized == "ARQ") baseGrowth += goalkeepingBonus;
+        if (styleAligned) {
+            baseGrowth += 3;
+            player.tacticalDiscipline = clampInt(player.tacticalDiscipline + 1, 1, 99);
+        }
+        if (team.youthIdentity.find("Cantera") != string::npos && player.age <= 21) {
+            baseGrowth += 2;
+            if (normalized == "DEL" && focus == "Ataque") baseGrowth += 1;
+        }
         baseGrowth += setPieceSessions;
         baseGrowth += stability / 10;
         baseGrowth -= scheduleLoad + workload / 16 + relapse / 20;
         if (congestedWeek) baseGrowth -= 2;
-        const string normalized = normalizePosition(player.position);
         if (player.developmentPlan == "Finalizacion" && normalized == "DEL") baseGrowth += 4;
         else if (player.developmentPlan == "Defensa" && (normalized == "DEF" || normalized == "ARQ")) baseGrowth += 4;
         else if (player.developmentPlan == "Creatividad" && normalized == "MED") baseGrowth += 4;
