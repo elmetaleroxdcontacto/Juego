@@ -1988,6 +1988,39 @@ void testManagerAdviceHighlightsUrgentActions() {
            "Las recomendaciones deben detectar presion de directiva.");
 }
 
+void testSuggestedBoardObjectiveReasonMatchesSituation() {
+    Career career;
+    career.currentSeason = 1;
+    career.currentWeek = 2;
+    career.allTeams.push_back(makeTeam("Prueba FC", "primera division", 68, 3, 3, "Balanced", "Equilibrado", 50000));
+    career.setActiveDivision("primera division");
+    career.myTeam = career.findTeamByName("Prueba FC");
+    expect(career.myTeam != nullptr, "La prueba del objetivo sugerido necesita club usuario.");
+
+    career.myTeam->sponsorWeekly = 20000;
+    career.myTeam->budget = 45000;
+    career.myTeam->debt = 0;
+    const string objective = manager_advice::buildSuggestedBoardObjective(career);
+    const string reason = manager_advice::buildSuggestedBoardObjectiveReason(career);
+
+    expect(objective.find("presupuesto") != string::npos,
+           "El objetivo sugerido debe priorizar presupuesto cuando el club es de caja ajustada.");
+    expect(reason.find("finanzas") != string::npos || reason.find("deuda") != string::npos,
+           "La razon debe mencionar finanzas o deuda en escenarios de presupuesto ajustado.");
+
+    career.myTeam->budget = 300000;
+    career.myTeam->debt = 0;
+    career.myTeam->players[0].injured = true;
+    career.myTeam->players[1].injured = true;
+    career.myTeam->players[2].injured = true;
+    const string injuryObjective = manager_advice::buildSuggestedBoardObjective(career);
+    const string injuryReason = manager_advice::buildSuggestedBoardObjectiveReason(career);
+    expect(injuryObjective.find("Rotar") != string::npos || injuryObjective.find("cuidar") != string::npos,
+           "El objetivo sugerido debe recomendar rotacion cuando hay varias lesiones.");
+    expect(injuryReason.find("lesionados") != string::npos,
+           "La razon debe mencionar lesionados cuando hay un riesgo de bajas.");
+}
+
 void testCareerStorylinesAddChileanFixtureContext() {
     Career career;
     career.currentSeason = 2;
@@ -3586,6 +3619,7 @@ int main() {
         {"analytics_inbox_blocks", testAnalyticsAndInboxServicesProduceUsefulBlocks},
         {"manager_hub_digest", testManagerHubDigestCombinesStaffAndAgenda},
         {"manager_advice", testManagerAdviceHighlightsUrgentActions},
+        {"suggested_board_objective", testSuggestedBoardObjectiveReasonMatchesSituation},
         {"career_storylines_fixture_context", testCareerStorylinesAddChileanFixtureContext},
         {"transfer_briefing", testTransferBriefingBuildsActionableMarketView},
         {"scouting_briefing_uncertainty", testScoutingBriefingMasksUncertainAttributes},

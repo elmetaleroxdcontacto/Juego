@@ -111,12 +111,49 @@ string buildSuggestedBoardObjectiveInternal(const Career& career) {
     return "Mejorar la posicion liguera antes de 4 semanas";
 }
 
+string buildSuggestedBoardObjectiveReasonInternal(const Career& career) {
+    if (!career.myTeam) return "Sin razon disponible.";
+    const Team& team = *career.myTeam;
+    const int rank = career.currentCompetitiveRank();
+    const int fieldSize = max(1, career.currentCompetitiveFieldSize());
+    const bool hasYouth = team.youthIdentity.find("Cantera") != string::npos;
+    const bool lowBudget = team.budget < max(150000LL, team.sponsorWeekly * 3) || team.debt > team.sponsorWeekly * 10;
+    const bool relegationRisk = rank > max(1, fieldSize * 3 / 4);
+    const bool promotionPush = rank <= max(1, fieldSize / 4);
+    const int injuries = injuredCount(team);
+    const int philosophyScore = clubPhilosophyAlignmentScore(career, team);
+
+    if (lowBudget) {
+        return "El club tiene caja ajustada o deuda alta; la prioridad es proteger las finanzas.";
+    }
+    if (hasYouth && philosophyScore >= 40) {
+        return "La politica de cantera y la filosofia de club respaldan un objetivo enfocado en juveniles.";
+    }
+    if (injuries >= 3) {
+        return "Hay varios lesionados; conviene cuidar cargas y evitar mas bajas.";
+    }
+    if (relegationRisk) {
+        return "El equipo esta en zona de riesgo de descenso y necesita un objetivo defensivo.";
+    }
+    if (promotionPush) {
+        return "El equipo esta en la pelea alta de la tabla, por lo que un objetivo agresivo es adecuado.";
+    }
+    if (!team.clubStyle.empty()) {
+        return "El objetivo busca alinear la posicion liguera con el estilo actual del club.";
+    }
+    return "Objetivo general para mejorar el rendimiento competitivo en las proximas semanas.";
+}
+
 }  // namespace
 
 namespace manager_advice {
 
 string buildSuggestedBoardObjective(const Career& career) {
     return buildSuggestedBoardObjectiveInternal(career);
+}
+
+string buildSuggestedBoardObjectiveReason(const Career& career) {
+    return buildSuggestedBoardObjectiveReasonInternal(career);
 }
 
 vector<string> buildManagerActionLines(const Career& career, size_t limit) {

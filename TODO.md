@@ -79,6 +79,14 @@ Resumen: La GUI ahora acepta Ctrl+S para guardar, Ctrl+F para abrir el radar de 
 - [x] Fair play financiero visible
 Resumen: Finanzas ahora muestra maximo salarial recomendado, uso de masa salarial y alertas de fair play economico; se agrego cobertura automatizada para detectar presion salarial excesiva y el target de tests enlaza el modulo fair play.
 
+- [x] Objetivo sugerido de junta directiva con razonamiento dinamico
+Resumen: Se agrego sugerencia de objetivo de directiva para UI de carrera y GUI, junto con la razon de la recomendacion basada en finanzas, lesiones, filosofia de cantera, riesgo de descenso y empuje de promocion.
+
+- [ ] Agregar pruebas unitarias para la sugerencia y razon de objetivo de directiva
+Resumen: Añadir cobertura en `tests/project_tests.cpp` para validar el objetivo sugerido y la razon en escenarios de caja ajustada y lesiones.
+
+- [x] Validacion de objetivo sugerido y razon finalizada
+Resumen: Se agregó la prueba `suggested_board_objective` en `tests/project_tests.cpp` y el binario `FootballManagerTests.exe` la ejecutó con éxito; el entorno local arrojó dos fallos no relacionados por archivos temporales y mod assets faltantes.
 - Actualizar las plantillas de todos los equipos de la Primera División con los jugadores reales actuales de la temporada 2024/2025, obtenidos de transfermarkt.com.
 - [x] 2026-05-19: Añadida sugerencia dinámica de objetivo mensual en menú de operaciones, opción de aplicar objetivo sugerido y fila de objetivo propuesto en GUI de gestión.
 

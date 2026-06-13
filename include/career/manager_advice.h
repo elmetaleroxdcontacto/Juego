@@ -12,6 +12,7 @@ namespace manager_advice {
 std::vector<std::string> buildManagerActionLines(const Career& career, std::size_t limit = 5);
 std::vector<std::string> buildCareerStorylines(const Career& career, std::size_t limit = 5);
 std::string buildSuggestedBoardObjective(const Career& career);
+std::string buildSuggestedBoardObjectiveReason(const Career& career);
 
 std::string buildTransferCompetitionLabel(const Career& career,
                                           const Team& seller,

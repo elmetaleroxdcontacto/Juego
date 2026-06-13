@@ -361,6 +361,7 @@ void displayClubOperations(Career& career) {
 
     printReport(buildClubReport(career));
     cout << "\nSugerencia de objetivo: " << manager_advice::buildSuggestedBoardObjective(career) << endl;
+    cout << "Razon: " << manager_advice::buildSuggestedBoardObjectiveReason(career) << endl;
     cout << "Coherencia de filosofia: " << clubPhilosophyAlignmentScore(career, *career.myTeam) << "/100" << endl;
     cout << "\n1. Mejorar estadio" << endl;
     cout << "2. Mejorar cantera" << endl;

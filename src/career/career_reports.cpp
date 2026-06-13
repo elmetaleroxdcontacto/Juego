@@ -328,6 +328,8 @@ CareerReport buildBoardReport(const Career& career) {
     addFact(report, "Apoyo de lideres", to_string(dressing.leadershipSupport));
     addFact(report, "Expectativa del club", teamExpectationLabel(*career.myTeam));
     addFact(report, "Coherencia filosofica", to_string(clubPhilosophyAlignmentScore(career, *career.myTeam)) + "/100");
+    addFact(report, "Objetivo sugerido", manager_advice::buildSuggestedBoardObjective(career));
+    addFact(report, "Razon sugerida", manager_advice::buildSuggestedBoardObjectiveReason(career));
     addFact(report, "Prestigio", to_string(teamPrestigeScore(*career.myTeam)));
 
     addBlock(report,

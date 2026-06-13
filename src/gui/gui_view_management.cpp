@@ -563,6 +563,7 @@ GuiPageModel buildBoardModel(AppState& state) {
         objectiveRows.push_back({"Objetivo mensual", state.career.boardMonthlyObjective.empty() ? "Sin objetivo" : state.career.boardMonthlyObjective,
                                  std::to_string(state.career.boardMonthlyProgress) + "/" + std::to_string(state.career.boardMonthlyTarget)});
         objectiveRows.push_back({"Objetivo sugerido", manager_advice::buildSuggestedBoardObjective(state.career), "Propuesta coherente con club"});
+        objectiveRows.push_back({"Razon objetivo", manager_advice::buildSuggestedBoardObjectiveReason(state.career), "Por que se recomienda"});
         objectiveRows.push_back({"Estado objetivo", boardPressure.objectiveState,
                                  std::to_string(boardPressure.objectivePercent) + "% | " + boardPressure.nextMilestone});
         objectiveRows.push_back({"Confianza", std::to_string(state.career.boardConfidence) + "/100", boardStatusLabel(state.career.boardConfidence)});
